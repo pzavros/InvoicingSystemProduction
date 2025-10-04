@@ -1,0 +1,56 @@
+/* 
+  Theme.css - Centralized color theming system
+  This file contains all color variables for easy customization
+*/
+
+:root {
+  /* Primary palette - Blue theme */
+  --color-primary: #399ced; /* Blue */
+  --color-primary-light: #399ced; /* Light Blue */
+  --color-primary-dark: #399ced; /* Dark Blue */
+  
+  /* Secondary/Accent - Light Blue */
+  --color-secondary: #03a9f4; /* Light Blue */
+  --color-secondary-light: #4fc3f7; /* Lighter Blue */
+  --color-secondary-dark: #0288d1; /* Darker Light Blue */
+  
+  /* Neutral colors */
+  --color-background: #f5f9ff; /* Very Light Blue Background */
+  --color-background-light: #e3f2fd; /* Extra Light Blue Background */
+  --color-card-background: #ffffff;
+  
+  /* Text colors */
+  --color-text-primary: #2c3e50; /* Dark Blue-Gray */
+  --color-text-secondary: #607d8b; /* Blue-Gray */
+  
+  /* Border colors */
+  --color-border: #bbdefb; /* Very Light Blue Border */
+  --color-border-light: #e3f2fd;
+  
+  /* Shadow color */
+  --color-shadow: rgba(33, 150, 243, 0.1); /* Blue-tinted shadow */
+  
+  /* Error color - for canceled invoices */
+  --color-error: #D32F2F; /* Red */
+}
+
+/* Example alternate theme (commented out for now) */
+/*
+.dark-theme {
+  --color-primary: #4fa8c3;
+  --color-primary-light: #63c6e2;
+  --color-primary-dark: #3a8ba3;
+  
+  --color-background: #1f2937;
+  --color-background-light: #374151;
+  --color-card-background: #111827;
+  
+  --color-text-primary: #f9fafb;
+  --color-text-secondary: #9ca3af;
+  
+  --color-border: #4b5563;
+  --color-border-light: #ffffff1a;
+  
+  --color-shadow: rgba(0, 0, 0, 0.2);
+}
+*/

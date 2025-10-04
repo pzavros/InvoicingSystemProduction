@@ -1,0 +1,6 @@
+{
+  "repo_path": "C:\\Users\\User\\Documents\\InvoicingSystem\\InvoicingSystem",
+  "branch": "main",
+  "backup": false,
+  "backup_path": "C:\\Users\\User\\Documents\\InvoicingSystem\\updater\\backups"
+}

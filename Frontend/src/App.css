@@ -1,0 +1,110 @@
+body,
+html {
+  font-size: 0.9rem;
+  background: var(--color-background);
+  margin: 0;
+  padding: 0;
+}
+body,
+.form-control {
+  font-size: 0.9rem;
+}
+body,
+html,
+#root,
+.App {
+  min-height: 100vh;
+}
+
+/* Sidebar related styles */
+.MuiDrawer-root {
+  position: fixed;
+  z-index: 1200;
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.btn {
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.66rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.1rem 0.1rem var(--color-shadow) !important;
+}
+.App-link {
+  color: var(--color-primary);
+}
+
+.btn-light {
+  border-color: var(--color-border);
+}
+
+.btn-light:hover {
+  border-color: var(--color-border);
+  background-color: var(--color-background-light);
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.shadow {
+  box-shadow: 0 0.1rem 0.1rem var(--color-shadow) !important;
+}
+
+.modal-content,
+.card {
+  overflow: hidden;
+  border-radius: 0.756rem;
+  background-color: var(--color-card-background);
+}
+
+hr {
+  opacity: 0.1;
+}
+
+.table th {
+  border-top: 1px solid var(--color-border-light);
+  border-bottom: 1px solid var(--color-border-light);
+  border-bottom-color: var(--color-border-light) !important;
+}
+.table td {
+  text-align: left;
+}
+.table tr th:first-child,
+.table tr td:first-child {
+  padding-left: 0;
+}
+.table tr th:last-child,
+.table tr td:last-child {
+  padding-right: 0;
+}
+
+.form-control {
+  background: var(--color-background-light);
+  font-weight: 400;
+  padding: 0.5rem 0.75rem;
+  border: none;
+}
+.form-control:hover {
+  background: var(--color-background-light);
+}
+.form-control::placeholder,
+.form-control::-ms-input-placeholder,
+.form-control:-ms-input-placeholder {
+  color: var(--color-text-secondary);
+}
+.form-control:focus {
+  background: var(--color-background-light);
+}
+
+#invoiceCapture {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}

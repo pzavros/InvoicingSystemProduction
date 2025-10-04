@@ -1,0 +1,71 @@
+# ============================
+# Global ignores
+# ============================
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.bak
+*.swp
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.code-workspace
+
+# ============================
+# React / Frontend
+# ============================
+Frontend/node_modules/
+Frontend/dist/
+Frontend/build/
+Frontend/coverage/
+
+# Local env files
+Frontend/.env
+Frontend/.env.*.local
+
+# ============================
+# .NET / Backend
+# ============================
+Backend/bin/
+Backend/obj/
+Backend/**/Debug/
+Backend/**/Release/
+Backend/**/*.dll
+Backend/**/*.exe
+Backend/**/*.pdb
+Backend/**/*.cache
+
+# ASP.NET Core config overrides
+Backend/appsettings.Development.json
+Backend/appsettings.Local.json
+Backend/appsettings.*.json.user
+
+# EF / SQL local artifacts
+Backend/**/*.mdf
+Backend/**/*.ldf
+Backend/**/*.dbmdl
+
+# Publish profiles
+Backend/**/*.publishsettings
+Backend/**/*.pubxml
+Backend/**/*.pubxml.user
+
+# ============================
+# OS specific
+# ============================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Desktop.ini
+$RECYCLE.BIN/
+Backend/InvoiceDB.db
+Backend/Dockerfile
+Frontend/Dockerfile
+Frontend/Dockerfile.prod
+Frontend/src/components/ProductCatalogPage/LowStockAlert.jsx
+Backend/Services/SubscriptionBackgroundService.cs

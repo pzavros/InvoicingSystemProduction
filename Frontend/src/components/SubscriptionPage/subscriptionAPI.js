@@ -1,0 +1,66 @@
+import axios from 'axios';
+
+// Use empty string to rely on Vite proxy configuration in development
+// In production, use the full API URL
+const BASE_URL = import.meta.env.PROD 
+  ? (import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5000')
+  : ''; // Use Vite proxy in development
+
+// Create axios instance with authentication
+const api = axios.create({
+  baseURL: BASE_URL,
+});
+
+// Add request interceptor to include auth token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Add response interceptor to handle auth errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
+      localStorage.removeItem('hadSubscriptionAccess'); // Clear subscription access flag
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
+export const subscriptionAPI = {
+  // Get subscription status
+  getStatus: () => api.get('/api/subscription/status'),
+  
+  // Get user's subscription details
+  getSubscription: () => api.get('/api/subscription'),
+  
+  // Start 7-day trial
+  startTrial: () => api.post('/api/subscription/trial'),
+  
+  // Process payment
+  processPayment: (paymentData) => api.post('/api/subscription/payment', paymentData),
+  
+  // Get payment history
+  getPayments: () => api.get('/api/subscription/payments'),
+  
+  // Cancel subscription
+  cancelSubscription: () => api.delete('/api/subscription'),
+  
+  // Extend subscription
+  extendSubscription: (months = 1) => api.post(`/api/subscription/extend?months=${months}`),
+  
+  // Check access
+  checkAccess: () => api.get('/api/subscription/check-access'),
+};
+
+export default subscriptionAPI;
