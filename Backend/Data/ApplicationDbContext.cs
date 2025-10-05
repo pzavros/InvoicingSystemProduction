@@ -1,4 +1,5 @@
 using InvoicingBackend.Models;
+using Backend.Models.Webpage;
 using Microsoft.EntityFrameworkCore;
 
 namespace InvoicingBackend.Data
@@ -21,6 +22,10 @@ namespace InvoicingBackend.Data
         public DbSet<Payment> Payments { get; set; }
         public DbSet<InvoiceTemplate> InvoiceTemplates { get; set; }
         public DbSet<Client> Clients { get; set; }
+        
+        // Webpage Models
+        public DbSet<WaitlistEntry> WaitlistEntries { get; set; }
+        public DbSet<ContactMessage> ContactMessages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

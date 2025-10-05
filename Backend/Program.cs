@@ -2,6 +2,8 @@ using InvoicingBackend.Data;
 using InvoicingBackend.Interfaces;
 using InvoicingBackend.Services;
 using InvoicingBackend.Models;
+using Backend.Interfaces.Webpage;
+using Backend.Services.Webpage;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -70,6 +72,10 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<IInvoiceTemplateService, InvoiceTemplateService>();
 builder.Services.AddScoped<IClientService, ClientService>();
+
+// Webpage services
+builder.Services.AddScoped<IWaitlistService, WaitlistService>();
+builder.Services.AddScoped<IContactMessageService, ContactMessageService>();
 // Add Swagger.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
