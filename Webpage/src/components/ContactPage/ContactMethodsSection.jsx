@@ -16,22 +16,25 @@ const ContactMethodsSection = () => {
       icon: <Email sx={{ fontSize: 40 }} />,
       title: 'Email Support',
       description: 'Get in touch via email for detailed inquiries',
-      contact: 'support@invoicesystem.com',
-      action: 'Send Email'
+      contact: 'panazavros8@gmail.com',
+      action: 'Send Email',
+      onClick: () => window.open('mailto:panazavros8@gmail.com?subject=InvoiceSystem Pro Inquiry', '_blank')
     },
     {
       icon: <Phone sx={{ fontSize: 40 }} />,
       title: 'Phone Support',
       description: 'Speak directly with our support team',
-      contact: '+1 (555) 123-4567',
-      action: 'Call Now'
+      contact: '+357 97667089',
+      action: 'Call Now',
+      onClick: () => window.open('tel:+35797667089', '_blank')
     },
     {
       icon: <Support sx={{ fontSize: 40 }} />,
       title: 'Technical Support',
       description: 'Get help with technical issues and setup',
-      contact: 'Available 24/7 through multiple channels',
-      action: 'Get Support'
+      contact: 'Available via email for technical assistance',
+      action: 'Get Support',
+      onClick: () => window.open('mailto:panazavros8@gmail.com?subject=Technical Support - InvoiceSystem Pro', '_blank')
     }
   ];
 
@@ -79,22 +82,52 @@ const ContactMethodsSection = () => {
               {method.icon}
             </Box>
             
-            <Text variant="h5" weight="bold" sx={{ mb: 2 }}>
+            <Text variant="h5" weight="bold" align="center" sx={{ mb: 2 }}>
               {method.title}
             </Text>
-            <Text sx={{ color: 'text.secondary', mb: 3, lineHeight: 1.6 }}>
+            <Text align="center" sx={{ color: 'text.secondary', mb: 3, lineHeight: 1.6 }}>
               {method.description}
             </Text>
-            <Text sx={{ 
-              fontSize: '0.9rem', 
-              color: 'primary.main', 
-              fontWeight: 500,
-              mb: 3,
-              wordBreak: 'break-word'
-            }}>
-              {method.contact}
-            </Text>
-            <Button variant="outline" size="small" fullWidth>
+            <Box
+              sx={{
+                backgroundColor: 'rgba(102, 126, 234, 0.05)',
+                borderRadius: '12px',
+                p: 2,
+                mb: 3,
+                border: '1px solid rgba(102, 126, 234, 0.1)',
+                textAlign: 'center'
+              }}
+            >
+              <Text align="center" sx={{ 
+                fontSize: '0.95rem', 
+                color: 'text.primary', 
+                fontWeight: 600,
+                wordBreak: 'break-word',
+                userSelect: 'text',
+                '&::selection': {
+                  backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                  color: 'text.primary'
+                }
+              }}>
+                {method.contact}
+              </Text>
+            </Box>
+            <Button 
+              variant="primary" 
+              size="small" 
+              fullWidth
+              onClick={method.onClick}
+              sx={{
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+                fontWeight: 600,
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #5a6fd8 0%, #6b46c1 100%)',
+                  boxShadow: '0 4px 20px rgba(102, 126, 234, 0.3)',
+                  transform: 'translateY(-1px)'
+                }
+              }}
+            >
               {method.action}
             </Button>
           </Card>

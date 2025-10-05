@@ -55,7 +55,7 @@ const Navbar = () => {
   const navigationItems = [
     { id: 'home', path: '/', label: 'Home', icon: <DashboardRounded /> },
     { id: 'about', path: '/about', label: 'About Us', icon: <PeopleRounded /> },
-    { id: 'features', path: '/features', label: 'Features', icon: <AutoAwesome />, badge: 'New' },
+    { id: 'features', path: '/features', label: 'Features', icon: <AutoAwesome /> },
     { id: 'how-it-works', path: '/how-it-works', label: 'How It Works', icon: <AnalyticsRounded /> },
     { id: 'contact', path: '/contact', label: 'Contact', icon: <ReceiptLongRounded /> },
   ];
