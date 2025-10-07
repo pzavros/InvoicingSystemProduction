@@ -34,6 +34,8 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import PersonIcon from '@mui/icons-material/Person';
 import DescriptionIcon from '@mui/icons-material/Description';
 import GroupIcon from '@mui/icons-material/Group';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import { SidebarContext } from './SidebarContext';
 import { useAuth } from '../../utils/AuthContext';
 
@@ -139,6 +141,24 @@ export default function NavBar() {
       path: '/about', 
       description: 'System information',
       color: '#06b6d4'
+    },
+  ];
+
+  // Admin-only navigation items
+  const adminItems = [
+    { 
+      text: 'User Management', 
+      icon: <SupervisorAccountIcon />, 
+      path: '/admin/users', 
+      description: 'Manage system users',
+      color: '#dc2626'
+    },
+    { 
+      text: 'System Admin', 
+      icon: <AdminPanelSettingsIcon />, 
+      path: '/admin/system', 
+      description: 'Advanced system settings',
+      color: '#ea580c'
     },
   ];
   return (
@@ -371,6 +391,150 @@ export default function NavBar() {
           );
         })}
       </List>
+
+      {/* Admin Section */}
+      {currentUser?.isAdmin && (
+        <>
+          <Box sx={{ px: 2, py: 1 }}>
+            <Divider sx={{ borderColor: 'rgba(148, 163, 184, 0.2)' }} />
+            {sidebarOpen && (
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  color: 'rgba(255, 255, 255, 0.6)', 
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  letterSpacing: '0.5px',
+                  mt: 2,
+                  display: 'block'
+                }}
+              >
+                ADMIN PANEL
+              </Typography>
+            )}
+          </Box>
+          
+          <List sx={{ pt: 1, px: 1 }}>
+            {adminItems.map((item, index) => {
+              const isActive = location.pathname === item.path;
+              const isHovered = hoveredItem === item.text;
+              
+              return (
+                <Grow in timeout={800 + index * 100} key={item.text}>
+                  <Box sx={{ mb: 1 }}>
+                    <Tooltip 
+                      title={!sidebarOpen ? `${item.text} - ${item.description}` : ""} 
+                      placement="right"
+                      arrow
+                    >
+                      <ListItem
+                        component={Link}
+                        to={item.path}
+                        onMouseEnter={() => setHoveredItem(item.text)}
+                        onMouseLeave={() => setHoveredItem(null)}
+                        sx={{
+                          minHeight: 56,
+                          justifyContent: sidebarOpen ? 'initial' : 'center',
+                          px: 2,
+                          mx: 1,
+                          borderRadius: 3,
+                          cursor: 'pointer',
+                          textDecoration: 'none',
+                          position: 'relative',
+                          overflow: 'hidden',
+                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                          background: isActive 
+                            ? `linear-gradient(135deg, ${item.color}20 0%, ${item.color}10 100%)`
+                            : isHovered 
+                              ? 'rgba(255, 255, 255, 0.05)'
+                              : 'transparent',
+                          border: isActive 
+                            ? `1px solid ${item.color}40`
+                            : '1px solid transparent',
+                          transform: isHovered ? 'translateX(8px)' : 'translateX(0px)',
+                          boxShadow: isActive 
+                            ? `0 8px 32px ${item.color}20`
+                            : isHovered
+                              ? '0 8px 25px rgba(0, 0, 0, 0.1)'
+                              : 'none',
+                          '&::before': {
+                            content: '""',
+                            position: 'absolute',
+                            left: 0,
+                            top: 0,
+                            height: '100%',
+                            width: isActive ? '4px' : '0px',
+                            background: `linear-gradient(180deg, ${item.color} 0%, ${item.color}80 100%)`,
+                            borderRadius: '0 8px 8px 0',
+                            transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                          }
+                        }}
+                      >
+                        <ListItemIcon
+                          sx={{
+                            minWidth: 0,
+                            mr: sidebarOpen ? 2 : 'auto',
+                            justifyContent: 'center',
+                            color: isActive ? item.color : 'rgba(255, 255, 255, 0.8)',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            transform: isHovered ? 'scale(1.1)' : 'scale(1)',
+                            filter: isActive ? 'drop-shadow(0 0 8px currentColor)' : 'none'
+                          }}
+                        >
+                          {item.icon}
+                        </ListItemIcon>
+                        {sidebarOpen && (
+                          <Fade in={sidebarOpen} timeout={400}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 1 }}>
+                              <ListItemText
+                                primary={item.text}
+                                secondary={item.description}
+                                primaryTypographyProps={{
+                                  sx: { 
+                                    color: isActive ? item.color : 'white', 
+                                    fontWeight: isActive ? 600 : 500,
+                                    fontSize: '0.95rem',
+                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                                  }
+                                }}
+                                secondaryTypographyProps={{
+                                  sx: { 
+                                    color: 'rgba(255, 255, 255, 0.5)', 
+                                    fontSize: '0.75rem',
+                                    fontWeight: 400
+                                  }
+                                }}
+                              />
+                              {isActive && (
+                                <Chip
+                                  size="small"
+                                  label="•"
+                                  sx={{
+                                    bgcolor: item.color,
+                                    color: 'white',
+                                    minWidth: 'auto',
+                                    width: 24,
+                                    height: 24,
+                                    fontSize: '1.2rem',
+                                    fontWeight: 'bold',
+                                    '& .MuiChip-label': {
+                                      px: 0
+                                    }
+                                  }}
+                                />
+                              )}
+                            </Box>
+                          </Fade>
+                        )}
+                      </ListItem>
+                    </Tooltip>
+                  </Box>
+                </Grow>
+              );
+            })}
+          </List>
+        </>
+      )}
 
       {/* Enhanced Footer */}
       <Fade in timeout={1000}>

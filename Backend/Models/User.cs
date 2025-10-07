@@ -16,6 +16,7 @@ namespace InvoicingBackend.Models
         public DateTime? SubscriptionExpiryDate { get; set; }
         public string? SubscriptionPlan { get; set; } // Basic, Premium, etc.
         public bool IsTrialUser { get; set; } = false;
+        public bool IsAdmin { get; set; } = false;
         public DateTime? LastLoginDate { get; set; }
         
         // Audit trail for User

@@ -1,5 +1,6 @@
 // src/components/ProductCatalogPage/ProductCatalogPage.jsx
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -21,7 +22,7 @@ import {
   Warning as WarningIcon
 } from "@mui/icons-material";
 import ProductList from "./ProductList";
-import ProductForm from "./ProductForm";
+
 import CategoryManager from "./CategoryManager";
 import LowStockAlert from "./LowStockAlert";
 import { getAllProducts, getAllCategories, getLowStockProducts } from "./api";
@@ -41,13 +42,12 @@ function TabPanel({ children, value, index, ...other }) {
 }
 
 const ProductCatalogPage = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [lowStockProducts, setLowStockProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
-  const [showProductForm, setShowProductForm] = useState(false);
-  const [editingProduct, setEditingProduct] = useState(null);
   const [notification, setNotification] = useState({
     open: false,
     message: "",
@@ -83,30 +83,20 @@ const ProductCatalogPage = () => {
   };
 
   const handleAddProduct = () => {
-    setEditingProduct(null);
-    setShowProductForm(true);
+    navigate('/products/add');
   };
 
   const handleEditProduct = (product) => {
-    setEditingProduct(product);
-    setShowProductForm(true);
+    navigate(`/products/edit/${product.id}`);
   };
 
-  const handleCloseProductForm = () => {
-    setShowProductForm(false);
-    setEditingProduct(null);
-  };
-
-  const handleProductSaved = () => {
-    setShowProductForm(false);
-    setEditingProduct(null);
-    loadData(); // Refresh data
-    showNotification("Product saved successfully!", "success");
-  };
-
-  const handleProductDeleted = () => {
-    loadData(); // Refresh data
-    showNotification("Product deleted successfully!", "success");
+  const handleProductDeleted = async () => {
+    try {
+      await loadData(); // Refresh data
+      showNotification("Product deleted successfully!", "success");
+    } catch (error) {
+      showNotification("Error refreshing data: " + error.message, "error");
+    }
   };
 
   const showNotification = (message, severity = "success") => {
@@ -369,17 +359,7 @@ const ProductCatalogPage = () => {
         </TabPanel>
       </Card>
 
-      {/* Product Form Dialog */}
-      {showProductForm && (
-        <ProductForm
-          open={showProductForm}
-          product={editingProduct}
-          categories={categories}
-          onClose={handleCloseProductForm}
-          onSave={handleProductSaved}
-          showNotification={showNotification}
-        />
-      )}      {/* Enhanced Notification Snackbar */}
+      {/* Enhanced Notification Snackbar */}
       <Snackbar
         open={notification.open}
         autoHideDuration={6000}

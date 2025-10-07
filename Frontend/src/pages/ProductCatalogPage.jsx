@@ -9,16 +9,7 @@ export default function ProductCatalogPageWrapper() {
   return (
     <Page>
       <Section>
-        <Box
-          sx={{
-            maxWidth: "1400px",
-            margin: "0 auto",
-            width: "100%",
-            p: { xs: 2, sm: 3 },
-          }}
-        >
           <ProductCatalogPage />
-        </Box>
       </Section>
     </Page>
   );

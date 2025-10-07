@@ -8,6 +8,8 @@ import ContactPage from './pages/ContactPage.jsx';
 import AdminPage from './pages/AdminPage.jsx';
 import Navbar from './components/ReusableComponents/Navbar.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
+import { AdminAuthProvider } from './contexts/AdminAuthContext.jsx';
+import ProtectedAdminRoute from './components/ProtectedAdminRoute.jsx';
 
 const theme = createTheme({
   palette: {
@@ -92,17 +94,23 @@ function App() {
           },
         }}
       />
-      <Router>
-        <ScrollToTop />
-        <Routes>
-          <Route path="/admin" element={<AdminPage />} />
-          <Route path="/" element={<><Navbar /><HomePage /></>} />
-          <Route path="/about" element={<><Navbar /><AboutUsPage /></>} />
-          <Route path="/features" element={<><Navbar /><FeaturesPage /></>} />
-          <Route path="/how-it-works" element={<><Navbar /><HowItWorksPage /></>} />
-          <Route path="/contact" element={<><Navbar /><ContactPage /></>} />
-        </Routes>
-      </Router>
+      <AdminAuthProvider>
+        <Router>
+          <ScrollToTop />
+          <Routes>
+            <Route path="/system-management-portal-2025" element={
+              <ProtectedAdminRoute>
+                <AdminPage />
+              </ProtectedAdminRoute>
+            } />
+            <Route path="/" element={<><Navbar /><HomePage /></>} />
+            <Route path="/about" element={<><Navbar /><AboutUsPage /></>} />
+            <Route path="/features" element={<><Navbar /><FeaturesPage /></>} />
+            <Route path="/how-it-works" element={<><Navbar /><HowItWorksPage /></>} />
+            <Route path="/contact" element={<><Navbar /><ContactPage /></>} />
+          </Routes>
+        </Router>
+      </AdminAuthProvider>
     </ThemeProvider>
   )
 }

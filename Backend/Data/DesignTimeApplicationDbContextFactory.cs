@@ -26,15 +26,7 @@ namespace InvoicingBackend.Data
             }
 
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-
-            if (string.Equals(environment, "Development", StringComparison.OrdinalIgnoreCase))
-            {
-                optionsBuilder.UseSqlite(connectionString);
-            }
-            else
-            {
-                optionsBuilder.UseSqlServer(connectionString);
-            }
+            optionsBuilder.UseNpgsql(connectionString);
 
             return new ApplicationDbContext(optionsBuilder.Options);
         }

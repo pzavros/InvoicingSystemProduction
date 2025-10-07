@@ -27,17 +27,9 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.WriteIndented = true;
     });
 
-// Configure EF Core with your connection string.
-if (builder.Environment.IsDevelopment())
-{
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
-}
-else
-{
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-}
+// Configure EF Core with PostgreSQL
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Configure JWT settings
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -115,6 +107,9 @@ using (var scope = app.Services.CreateScope())
     
     // Seed demo users
     await UserSeeder.SeedUsersAsync(db);
+    
+    // Seed admin user
+    await AdminSeeder.SeedAdminUserAsync(db);
     
     // Seed invoice templates
     await InvoiceTemplateSeeder.SeedInvoiceTemplatesAsync(db);

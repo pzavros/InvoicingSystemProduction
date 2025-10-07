@@ -12,6 +12,7 @@ namespace InvoicingBackend.DTOs
         public DateTime? SubscriptionExpiryDate { get; set; }
         public string? SubscriptionPlan { get; set; }
         public bool IsTrialUser { get; set; }
+        public bool IsAdmin { get; set; }
         public DateTime? LastLoginDate { get; set; }
         public DateTime DateEntered { get; set; }
         public string? EnteredBy { get; set; }

@@ -1,8 +1,14 @@
-import React from 'react';
-import ClientsPage from '../components/ClientsPage/ClientsPage';
+// src/pages/ClientsPage.jsx
+import React from "react";
+import Page from "../components/ReusableComponents/Page";
+import Section from "../components/ReusableComponents/Section";
+import ClientsPage from "../components/ClientsPage/ClientsPage";
+import { Box } from "@mui/material";
 
-const ClientsPageWrapper = () => {
-  return <ClientsPage />;
-};
-
-export default ClientsPageWrapper;
+export default function ClientsPageWrapper() {
+  return (
+    <Page>
+          <ClientsPage />
+    </Page>
+  );
+}

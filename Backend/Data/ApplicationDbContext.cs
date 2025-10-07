@@ -31,10 +31,10 @@ namespace InvoicingBackend.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // configure Logo as binary
+            // configure Logo as binary (PostgreSQL uses bytea)
             modelBuilder.Entity<SystemSetup>()
                 .Property(x => x.Logo)
-                .HasColumnType("BLOB")
+                .HasColumnType("bytea")
                 .IsRequired(false);
 
             // seed currencies

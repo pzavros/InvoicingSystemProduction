@@ -16,8 +16,13 @@ import ProfilePage from './pages/ProfilePage';
 import SubscriptionPageWrapper from './pages/SubscriptionPage';
 import TemplatesPage from './pages/TemplatesPage';
 import ClientsPage from './pages/ClientsPage';
+import ClientFormPage from './pages/ClientFormPage';
+import ProductFormPage from './pages/ProductFormPage';
+import UserManagementPage from './pages/UserManagementPage';
+import SystemAdminPage from './pages/SystemAdminPage';
 import SubscriptionGuard from './components/SubscriptionPage/SubscriptionGuard';
 import SubscriptionBanner from './components/SubscriptionPage/SubscriptionBanner';
+import AdminRoute from './components/ReusableComponents/AdminRoute';
 import { SubscriptionProvider } from './utils/SubscriptionContext';
 import { AuthProvider, useAuth } from './utils/AuthContext';
 import './App.css';
@@ -36,9 +41,11 @@ function MainContent() {
       component="main"
       sx={{
         flexGrow: 1,
-        p: authenticated ? 3 : 0,
+        p: 0,
         ml: authenticated ? `${drawerWidth}px` : 0,
         transition: 'margin 0.3s ease',
+        backgroundColor: '#f8fafc',
+        minHeight: '100vh',
       }}
     >
       {authenticated && <SubscriptionBanner />}
@@ -59,14 +66,22 @@ function MainContent() {
         <Route path="/invoices/view/:id" element={<ProtectedRoute><SubscriptionGuard><InvoiceViewPage /></SubscriptionGuard></ProtectedRoute>} />
         <Route path="/dashboard" element={<ProtectedRoute><SubscriptionGuard><DashboardPage /></SubscriptionGuard></ProtectedRoute>} />
         <Route path="/products" element={<ProtectedRoute><SubscriptionGuard><ProductCatalogPage /></SubscriptionGuard></ProtectedRoute>} />
-        <Route path="/templates" element={<ProtectedRoute><SubscriptionGuard><TemplatesPage /></SubscriptionGuard></ProtectedRoute>} />
         <Route path="/clients" element={<ProtectedRoute><SubscriptionGuard><ClientsPage /></SubscriptionGuard></ProtectedRoute>} />
+        <Route path="/clients/add" element={<ProtectedRoute><SubscriptionGuard><ClientFormPage /></SubscriptionGuard></ProtectedRoute>} />
+        <Route path="/clients/edit/:id" element={<ProtectedRoute><SubscriptionGuard><ClientFormPage /></SubscriptionGuard></ProtectedRoute>} />
+        <Route path="/products/add" element={<ProtectedRoute><SubscriptionGuard><ProductFormPage /></SubscriptionGuard></ProtectedRoute>} />
+        <Route path="/products/edit/:id" element={<ProtectedRoute><SubscriptionGuard><ProductFormPage /></SubscriptionGuard></ProtectedRoute>} />
+        <Route path="/templates" element={<ProtectedRoute><SubscriptionGuard><TemplatesPage /></SubscriptionGuard></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><SubscriptionGuard><SystemSetupPage /></SubscriptionGuard></ProtectedRoute>} />
         <Route path="/report" element={<ProtectedRoute><SubscriptionGuard><ReportPage /></SubscriptionGuard></ProtectedRoute>} />
         
         {/* Routes that don't require subscription */}
         <Route path="/about" element={<ProtectedRoute><AboutUsPage /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+        
+        {/* Admin Routes - Protected and require admin privileges */}
+        <Route path="/admin/users" element={<ProtectedRoute><AdminRoute><UserManagementPage /></AdminRoute></ProtectedRoute>} />
+        <Route path="/admin/system" element={<ProtectedRoute><AdminRoute><SystemAdminPage /></AdminRoute></ProtectedRoute>} />
       </Routes>
     </Box>
   );

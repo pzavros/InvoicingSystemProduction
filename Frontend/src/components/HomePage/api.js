@@ -3,7 +3,7 @@ import axios from 'axios';
 // Use empty string to rely on Vite proxy configuration in development
 // In production, use the full API URL
 const API_BASE_URL = import.meta.env.PROD 
-  ? (import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5000')
+  ? (import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5088')
   : ''; // Use Vite proxy in development
 
 // Create axios instance with interceptors for authentication

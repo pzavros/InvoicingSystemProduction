@@ -904,13 +904,7 @@ const InvoiceModal = (props) => {
                     py: 1.5,
                     border: 'none',
                     fontFamily,
-                    boxShadow: `0 4px 15px ${templateColors.accent}55`,
-                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    '&:hover': {
-                      background: `linear-gradient(135deg, ${templateColors.accent} 0%, ${templateColors.primary} 100%)`,
-                      transform: 'translateY(-2px)',
-                      boxShadow: `0 8px 25px ${templateColors.accent}66`
-                    }
+                    boxShadow: `0 4px 15px ${templateColors.accent}55`
                   }}
                   onClick={() => GenerateInvoice(props.info.invoiceNumber)}
                 >

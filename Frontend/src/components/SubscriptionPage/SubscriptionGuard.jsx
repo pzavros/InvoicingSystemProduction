@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { 
   Container, 
-  Paper, 
   Typography, 
   Button, 
   CircularProgress, 
@@ -10,41 +9,21 @@ import {
   Card,
   CardContent
 } from '@mui/material';
-import { Warning, Lock, Star } from '@mui/icons-material';
+import { Lock, Star } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { subscriptionAPI } from './subscriptionAPI';
 import { useAuth } from '../../utils/AuthContext';
+import { useSubscription } from '../../utils/SubscriptionContext';
 
 const SubscriptionGuard = ({ children, requiredAccess = true }) => {
-  const [subscriptionStatus, setSubscriptionStatus] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const { authenticated } = useAuth();
+  const { subscriptionStatus, loading, error, refreshStatus } = useSubscription();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    checkSubscriptionStatus();
-  }, [authenticated]);
-
-  const checkSubscriptionStatus = async () => {
-    // If user is not authenticated, redirect to login
-    if (!authenticated) {
-      navigate('/login');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await subscriptionAPI.getStatus();
-      setSubscriptionStatus(response.data);
-    } catch (error) {
-      console.error('Error checking subscription status:', error);
-      setError('Failed to verify subscription status');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // If user is not authenticated, redirect to login
+  if (!authenticated) {
+    navigate('/login');
+    return null;
+  }
 
   if (loading) {
     return (
@@ -63,7 +42,7 @@ const SubscriptionGuard = ({ children, requiredAccess = true }) => {
         <Alert 
           severity="error" 
           action={
-            <Button color="inherit" size="small" onClick={checkSubscriptionStatus}>
+            <Button color="inherit" size="small" onClick={refreshStatus}>
               Retry
             </Button>
           }

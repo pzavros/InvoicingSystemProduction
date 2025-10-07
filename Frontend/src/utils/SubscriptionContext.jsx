@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, createContext } from 'react';
+import { useState, useEffect, useContext, createContext, useCallback, useRef } from 'react';
 import { subscriptionAPI } from '../components/SubscriptionPage/subscriptionAPI';
 import { useAuth } from './AuthContext';
 
@@ -18,8 +18,17 @@ export const SubscriptionProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [initialized, setInitialized] = useState(false);
+  const lastCallTime = useRef(0);
+  const abortController = useRef(null);
 
-  const checkSubscriptionStatus = async () => {
+  const checkSubscriptionStatus = useCallback(async (force = false) => {
+    // Debounce: prevent calls within 1 second of each other unless forced
+    const now = Date.now();
+    if (!force && now - lastCallTime.current < 1000) {
+      return;
+    }
+    lastCallTime.current = now;
+
     // Only check if user is authenticated
     if (!authenticated) {
       setLoading(false);
@@ -27,50 +36,91 @@ export const SubscriptionProvider = ({ children }) => {
       return;
     }
 
+    // Cancel any existing request
+    if (abortController.current) {
+      abortController.current.abort();
+    }
+    abortController.current = new AbortController();
+
     try {
       setLoading(true);
       setError(null);
       const response = await subscriptionAPI.getStatus();
-      setSubscriptionStatus(response.data);
+      
+      // Only update state if the request wasn't aborted
+      if (!abortController.current?.signal.aborted) {
+        setSubscriptionStatus(response.data);
+        setInitialized(true);
+      }
     } catch (error) {
-      console.error('Error checking subscription status:', error);
-      setError(error.response?.data?.message || 'Failed to check subscription status');
-      setSubscriptionStatus(null);
+      // Don't set error if request was aborted
+      if (!abortController.current?.signal.aborted) {
+        console.error('Error checking subscription status:', error);
+        setError(error.response?.data?.message || 'Failed to check subscription status');
+        setSubscriptionStatus(null);
+        setInitialized(true);
+      }
     } finally {
-      setLoading(false);
-      setInitialized(true);
+      if (!abortController.current?.signal.aborted) {
+        setLoading(false);
+      }
     }
-  };
+  }, [authenticated]);
 
   useEffect(() => {
-    // Initial check
-    checkSubscriptionStatus();
+    // Initial check when authentication status changes
+    if (authenticated && !initialized) {
+      checkSubscriptionStatus(true); // Force initial call
+    } else if (!authenticated) {
+      // Clear subscription status when user logs out
+      setSubscriptionStatus(null);
+      setInitialized(false);
+      setLoading(false);
+      setError(null);
+    }
+  }, [authenticated, initialized, checkSubscriptionStatus]);
 
-    // Set up interval to periodically check auth status and refresh subscription
+  useEffect(() => {
+    // Set up interval to periodically refresh subscription status
+    if (!authenticated || !initialized) return;
+    
     const interval = setInterval(() => {
       if (authenticated && !loading) {
-        checkSubscriptionStatus();
+        checkSubscriptionStatus(true); // Force periodic refresh
       }
-    }, 30000); // Check every 30 seconds
+    }, 600000); // Check every 10 minutes (further reduced frequency)
 
     return () => clearInterval(interval);
-  }, [authenticated, loading]);
+  }, [authenticated, initialized, loading, checkSubscriptionStatus]);
 
-  // Also check when the component mounts or when localStorage changes
+  // Handle storage changes (e.g., login/logout in another tab)
   useEffect(() => {
-    const handleStorageChange = () => {
-      if (authenticated) {
-        checkSubscriptionStatus();
-      } else {
-        setSubscriptionStatus(null);
-        setLoading(false);
-        setInitialized(true);
+    const handleStorageChange = (event) => {
+      // Only react to auth-related storage changes
+      if (event.key === 'authToken' || event.key === 'user') {
+        if (authenticated && initialized) {
+          checkSubscriptionStatus(true);
+        } else if (!authenticated) {
+          setSubscriptionStatus(null);
+          setLoading(false);
+          setInitialized(false);
+          setError(null);
+        }
       }
     };
 
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, [authenticated]);
+  }, [authenticated, initialized, checkSubscriptionStatus]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (abortController.current) {
+        abortController.current.abort();
+      }
+    };
+  }, []);
 
   const value = {
     subscriptionStatus,

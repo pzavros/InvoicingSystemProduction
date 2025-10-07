@@ -835,13 +835,7 @@ ${formData.billFrom}`);
             borderRadius: '12px',
             padding: '8px 16px',
             border: '1px solid rgba(255, 255, 255, 0.18)',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            '&:hover': {
-              background: 'rgba(255, 255, 255, 0.35)',
-              transform: 'translateY(-2px)',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
-            }
+            cursor: 'pointer'
           }}>
             <BiArrowBack size={18} color="#4a5568" />
             <Box sx={{ fontWeight: "600", ml: 2, color: "#2d3748" }}>
@@ -865,12 +859,7 @@ ${formData.billFrom}`);
           border: '1px solid rgba(255, 255, 255, 0.18)',
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
           overflow: 'visible',
-          position: 'relative',
-          transition: 'all 0.3s ease',
-          '&:hover': {
-            transform: 'translateY(-2px)',
-            boxShadow: '0 12px 40px rgba(0, 0, 0, 0.15)'
-          }
+          position: 'relative'
         }}>          <Box sx={{ 
             p: 3, 
             borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
@@ -1184,12 +1173,7 @@ ${formData.billFrom}`);
                 border: '1px solid rgba(255, 255, 255, 0.18)',
                 borderRadius: '20px',
                 boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                color: "#2d3748",
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0 12px 40px rgba(0, 0, 0, 0.15)'
-                }
+                color: "#2d3748"
               }}
             >            <Box
               sx={{
@@ -1772,14 +1756,7 @@ ${formData.billFrom}`);
               borderRadius: '12px',
               border: '2px solid rgba(102, 126, 234, 0.3)',
               color: '#667eea',
-              fontWeight: 600,
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                background: 'rgba(102, 126, 234, 0.1)',
-                borderColor: '#667eea',
-                transform: 'translateY(-2px)',
-                boxShadow: '0 8px 25px rgba(102, 126, 234, 0.25)'
-              }
+              fontWeight: 600
             }}
             disabled={loading}
           >
@@ -1797,13 +1774,6 @@ ${formData.billFrom}`);
               border: '2px solid rgba(34, 197, 94, 0.3)',
               color: '#22c55e',
               fontWeight: 600,
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                background: 'rgba(34, 197, 94, 0.1)',
-                borderColor: '#22c55e',
-                transform: 'translateY(-2px)',
-                boxShadow: '0 8px 25px rgba(34, 197, 94, 0.25)'
-              },
               '&:disabled': {
                 opacity: 0.5,
                 cursor: 'not-allowed'
@@ -1823,13 +1793,7 @@ ${formData.billFrom}`);
                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 borderRadius: '12px',
                 fontWeight: 600,
-                boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)',
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0 8px 25px rgba(102, 126, 234, 0.5)'
-                }
+                boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)'
               }}
               disabled={loading}
             >

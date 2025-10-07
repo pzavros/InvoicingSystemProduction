@@ -143,7 +143,7 @@ namespace InvoicingBackend.Services
             return user.SubscriptionExpiryDate > DateTime.UtcNow;
         }
 
-        public async Task<string> GenerateJwtTokenAsync(User user)
+        public Task<string> GenerateJwtTokenAsync(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
@@ -154,7 +154,8 @@ namespace InvoicingBackend.Services
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
                 new Claim("subscription_plan", user.SubscriptionPlan ?? "None"),
-                new Claim("is_trial", user.IsTrialUser.ToString())
+                new Claim("is_trial", user.IsTrialUser.ToString()),
+                new Claim("IsAdmin", user.IsAdmin.ToString())
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -167,7 +168,7 @@ namespace InvoicingBackend.Services
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            return Task.FromResult(tokenHandler.WriteToken(token));
         }
 
         public async Task<bool> VerifyPasswordAsync(string password, string passwordHash)
@@ -192,6 +193,7 @@ namespace InvoicingBackend.Services
                 SubscriptionExpiryDate = user.SubscriptionExpiryDate,
                 SubscriptionPlan = user.SubscriptionPlan,
                 IsTrialUser = user.IsTrialUser,
+                IsAdmin = user.IsAdmin,
                 LastLoginDate = user.LastLoginDate,
                 DateEntered = user.DateEntered,
                 EnteredBy = user.EnteredBy

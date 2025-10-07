@@ -36,10 +36,11 @@ import {
 import Page from '../ReusableComponents/Page';
 import Section from '../ReusableComponents/Section';
 import { subscriptionAPI } from './subscriptionAPI';
+import { useSubscription } from '../../utils/SubscriptionContext';
 import PaymentDialog from './PaymentDialog';
 
 const SubscriptionPage = () => {
-  const [subscriptionStatus, setSubscriptionStatus] = useState(null);
+  const { subscriptionStatus, loading: subscriptionLoading, refreshStatus } = useSubscription();
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -52,20 +53,14 @@ const SubscriptionPage = () => {
     fetchSubscriptionData();
   }, []);
 
-  const fetchSubscriptionData = async () => {
+    const fetchSubscriptionData = async () => {
     try {
       setLoading(true);
-      const [statusResponse, paymentsResponse] = await Promise.all([
-        subscriptionAPI.getStatus(),
-        subscriptionAPI.getPayments(),
-      ]);
-      
-      setSubscriptionStatus(statusResponse.data);
+      const paymentsResponse = await subscriptionAPI.getPayments();
       setPayments(paymentsResponse.data);
-      setError(null);
     } catch (error) {
-      console.error('Error fetching subscription data:', error);
-      setError('Failed to load subscription information');
+      console.error('Error fetching payment data:', error);
+      setError('Failed to load payment data');
     } finally {
       setLoading(false);
     }
@@ -76,6 +71,8 @@ const SubscriptionPage = () => {
       setActionLoading(true);
       await subscriptionAPI.startTrial();
       setSuccess('7-day trial started successfully!');
+      // Refresh subscription status from context
+      await refreshStatus();
       await fetchSubscriptionData();
     } catch (error) {
       console.error('Error starting trial:', error);
@@ -91,6 +88,8 @@ const SubscriptionPage = () => {
       await subscriptionAPI.cancelSubscription();
       setSuccess('Subscription cancelled successfully');
       setCancelDialogOpen(false);
+      // Refresh subscription status from context
+      await refreshStatus();
       await fetchSubscriptionData();
     } catch (error) {
       console.error('Error cancelling subscription:', error);
@@ -191,7 +190,7 @@ const SubscriptionPage = () => {
     });
   };
 
-  if (loading) {
+  if (loading || subscriptionLoading) {
     return (
       <Page>
         <Section>

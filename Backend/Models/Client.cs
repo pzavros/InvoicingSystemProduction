@@ -56,9 +56,11 @@ namespace InvoicingBackend.Models
         // Relationships
         public ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
 
-        // Calculated properties
-        public decimal TotalInvoiceAmount => Invoices?.Where(i => !i.IsDeleted).Sum(i => i.Total) ?? 0;
-        public int TotalInvoiceCount => Invoices?.Count(i => !i.IsDeleted) ?? 0;
-        public DateTime? LastInvoiceDate => Invoices?.Where(i => !i.IsDeleted).Max(i => i.DateOfIssue);
+                // Calculated properties for invoice statistics - Temporarily disabled due to EF Core issues
+        // public decimal TotalInvoiceAmount => Invoices?.Where(i => !i.IsDeleted).Sum(i => i.Total) ?? 0;
+        // public int TotalInvoiceCount => Invoices?.Count(i => !i.IsDeleted) ?? 0;
+        // public DateTime? LastInvoiceDate => Invoices?.Where(i => !i.IsDeleted).Any() == true 
+        //     ? Invoices.Where(i => !i.IsDeleted).Max(i => i.DateOfIssue) 
+        //     : null;
     }
 }

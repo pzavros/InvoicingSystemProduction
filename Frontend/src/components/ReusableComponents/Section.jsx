@@ -12,7 +12,7 @@ const Section = ({
       sx={{
         backgroundColor,
         width: '100%',
-        py: { xs: 2, sm: 4, md: 6 },
+        py: { xs: 2, sm: 2, md: 2 },
         ...props.sx,
       }}
       {...props}
@@ -21,7 +21,7 @@ const Section = ({
         sx={{
           maxWidth: '1200px',
           mx: 'auto',
-          px: { xs: 2, sm: 4, md: 6 },
+          px: { xs: 2, sm: 2, md: 2},
         }}
       >
         {children}

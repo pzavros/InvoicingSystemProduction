@@ -24,12 +24,13 @@ import {
   AccessTime as TrialIcon,
   Save as SaveIcon
 } from '@mui/icons-material';
-import { getUserProfile, updateUserProfile, getSubscriptionStatus } from './api';
+import { getUserProfile, updateUserProfile } from './api';
+import { useSubscription } from '../../utils/SubscriptionContext';
 import Page from '../ReusableComponents/Page';
 
 const UserProfile = () => {
   const [profile, setProfile] = useState(null);
-  const [subscriptionStatus, setSubscriptionStatus] = useState(null);
+  const { subscriptionStatus, loading: subscriptionLoading } = useSubscription();
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState('');
@@ -46,13 +47,9 @@ const UserProfile = () => {
 
   const fetchUserData = async () => {
     try {
-      const [profileData, subscriptionData] = await Promise.all([
-        getUserProfile(),
-        getSubscriptionStatus()
-      ]);
+      const profileData = await getUserProfile();
       
       setProfile(profileData);
-      setSubscriptionStatus(subscriptionData);
       setFormData({
         firstName: profileData.firstName,
         lastName: profileData.lastName,

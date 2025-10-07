@@ -15,6 +15,7 @@ import {
   CircularProgress,
   Typography,
   Divider,
+  Autocomplete,
 } from "@mui/material";
 import { BiArrowBack } from "react-icons/bi";
 import { useDispatch } from "react-redux";
@@ -35,6 +36,7 @@ import {
   getActiveInvoiceTemplate,
   getInvoiceTemplateById
 } from "./api";
+import { getAllClients } from "../ClientsPage/api";
 
 const InvoiceForm = () => {
   const dispatch = useDispatch();
@@ -97,6 +99,9 @@ const InvoiceForm = () => {
   const [loading, setLoading] = useState(false);
   const [currencies, setCurrencies] = useState([]);
   const [statuses, setStatuses] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [clientSelectionMode, setClientSelectionMode] = useState("manual"); // "manual" or "select"
+  const [selectedClientId, setSelectedClientId] = useState("");
   const [notification, setNotification] = useState({
     open: false,
     message: "",
@@ -139,6 +144,9 @@ const InvoiceForm = () => {
 
         const statusesData = await getAllStatuses();
         setStatuses(statusesData);
+
+        const clientsData = await getAllClients();
+        setClients(clientsData);
 
         let activeTemplateData = null;
         try {
@@ -497,6 +505,29 @@ const InvoiceForm = () => {
     }
   };
 
+  const handleClientSelectionModeChange = (mode) => {
+    setClientSelectionMode(mode);
+    if (mode === "manual") {
+      setSelectedClientId("");
+      // Keep existing manual data
+    }
+  };
+
+  const handleClientSelect = (event, selectedClient) => {
+    if (selectedClient) {
+      setSelectedClientId(selectedClient.id);
+      setFormData(prevData => ({
+        ...prevData,
+        billTo: selectedClient.name || "",
+        billToEmail: selectedClient.email || "",
+        billToAddress: `${selectedClient.address || ""} ${selectedClient.city || ""} ${selectedClient.state || ""} ${selectedClient.postalCode || ""}`.trim() || ""
+      }));
+    } else {
+      setSelectedClientId("");
+      // Keep existing form data when clearing selection
+    }
+  };
+
   const openModal = (event) => {
     event.preventDefault();
     handleCalculateTotal();
@@ -703,12 +734,7 @@ const InvoiceForm = () => {
             border: '1px solid rgba(255, 255, 255, 0.18)',
             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
             overflow: 'visible',
-            position: 'relative',
-            transition: 'all 0.3s ease',
-            '&:hover': {
-              transform: 'translateY(-2px)',
-              boxShadow: '0 12px 40px rgba(0, 0, 0, 0.15)'
-            }
+            position: 'relative'
           }}>            <Box sx={{ 
               p: 3, 
               borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
@@ -960,12 +986,7 @@ const InvoiceForm = () => {
                   border: '1px solid rgba(255, 255, 255, 0.18)',
                   borderRadius: '20px',
                   boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                  color: "#2d3748",
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 12px 40px rgba(0, 0, 0, 0.15)'
-                  }
+                  color: "#2d3748"
                 }}
               >              <Box
                 sx={{
@@ -1101,7 +1122,135 @@ const InvoiceForm = () => {
                         📧
                       </Box>
                       Bill To:
-                    </Typography><TextField
+                    </Typography>
+
+                    {/* Client Selection Mode Toggle */}
+                    <Box sx={{ mb: 3, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                      <Button
+                        variant={clientSelectionMode === "select" ? "contained" : "outlined"}
+                        size="small"
+                        onClick={() => handleClientSelectionModeChange("select")}
+                        sx={{
+                          borderRadius: '8px',
+                          textTransform: 'none',
+                          fontSize: '0.8rem',
+                          backgroundColor: clientSelectionMode === "select" ? '#667eea' : 'transparent',
+                          borderColor: '#667eea',
+                          color: clientSelectionMode === "select" ? 'white' : '#667eea',
+                          '&:hover': {
+                            backgroundColor: clientSelectionMode === "select" ? '#5a67d8' : 'rgba(102, 126, 234, 0.1)'
+                          }
+                        }}
+                      >
+                        👥 Select Client
+                      </Button>
+                      <Button
+                        variant={clientSelectionMode === "manual" ? "contained" : "outlined"}
+                        size="small"
+                        onClick={() => handleClientSelectionModeChange("manual")}
+                        sx={{
+                          borderRadius: '8px',
+                          textTransform: 'none',
+                          fontSize: '0.8rem',
+                          backgroundColor: clientSelectionMode === "manual" ? '#667eea' : 'transparent',
+                          borderColor: '#667eea',
+                          color: clientSelectionMode === "manual" ? 'white' : '#667eea',
+                          '&:hover': {
+                            backgroundColor: clientSelectionMode === "manual" ? '#5a67d8' : 'rgba(102, 126, 234, 0.1)'
+                          }
+                        }}
+                      >
+                        ✏️ Manual Entry
+                      </Button>
+                    </Box>
+
+                    {/* Client Selection Dropdown */}
+                    {clientSelectionMode === "select" && (
+                      <Autocomplete
+                        fullWidth
+                        options={clients}
+                        value={clients.find(client => client.id === selectedClientId) || null}
+                        onChange={handleClientSelect}
+                        getOptionLabel={(option) => option.name || ""}
+                        isOptionEqualToValue={(option, value) => option.id === value?.id}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label="🔍 Search & Select Client"
+                            placeholder="Type to search clients..."
+                            size="small"
+                            sx={{
+                              mb: 2,
+                              '& .MuiOutlinedInput-root': {
+                                background: 'rgba(255, 255, 255, 0.2)',
+                                backdropFilter: 'blur(10px)',
+                                borderRadius: '12px'
+                              },
+                              '.MuiOutlinedInput-notchedOutline': {
+                                borderColor: 'rgba(255, 255, 255, 0.3)',
+                                borderWidth: '2px'
+                              },
+                              '&:hover .MuiOutlinedInput-notchedOutline': {
+                                borderColor: 'rgba(102, 126, 234, 0.5)'
+                              },
+                              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                borderColor: '#667eea',
+                                borderWidth: '2px'
+                              },
+                              '& .MuiInputBase-input': {
+                                color: '#2d3748',
+                                fontWeight: 500
+                              },
+                              '& .MuiInputLabel-root': {
+                                fontSize: "0.9rem",
+                                color: '#4a5568',
+                                fontWeight: 600,
+                                '&.Mui-focused': { color: '#667eea' }
+                              }
+                            }}
+                          />
+                        )}
+                        renderOption={(props, option) => (
+                          <Box component="li" {...props} key={option.id}>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                              <Typography variant="body1" sx={{ fontWeight: 600, color: '#2d3748' }}>
+                                {option.name}
+                              </Typography>
+                              <Typography variant="caption" sx={{ color: '#6b7280' }}>
+                                📧 {option.email} {option.company && `• 🏢 ${option.company}`}
+                              </Typography>
+                              {option.phone && (
+                                <Typography variant="caption" sx={{ color: '#6b7280' }}>
+                                  📞 {option.phone}
+                                </Typography>
+                              )}
+                            </Box>
+                          </Box>
+                        )}
+                        filterOptions={(options, { inputValue }) => {
+                          const filtered = options.filter((option) =>
+                            option.name?.toLowerCase().includes(inputValue.toLowerCase()) ||
+                            option.email?.toLowerCase().includes(inputValue.toLowerCase()) ||
+                            option.company?.toLowerCase().includes(inputValue.toLowerCase()) ||
+                            option.phone?.includes(inputValue)
+                          );
+                          return filtered;
+                        }}
+                        noOptionsText="No clients found - try a different search term"
+                        clearOnEscape
+                        sx={{
+                          '& .MuiAutocomplete-popupIndicator': {
+                            color: '#667eea'
+                          },
+                          '& .MuiAutocomplete-clearIndicator': {
+                            color: '#667eea'
+                          }
+                        }}
+                      />
+                    )}
+
+                    {/* Manual Input Fields */}
+                    <TextField
                       placeholder="Who is this invoice to?"
                       name="billTo"
                       value={formData.billTo}
@@ -1109,10 +1258,13 @@ const InvoiceForm = () => {
                       fullWidth
                       required
                       size="small"
+                      disabled={clientSelectionMode === "select" && selectedClientId}
                       sx={{ 
                         mb: 2,
                         '& .MuiOutlinedInput-root': {
-                          background: 'rgba(255, 255, 255, 0.2)',
+                          background: (clientSelectionMode === "select" && selectedClientId) 
+                            ? 'rgba(200, 200, 200, 0.2)' 
+                            : 'rgba(255, 255, 255, 0.2)',
                           backdropFilter: 'blur(10px)',
                           borderRadius: '12px'
                         },
@@ -1141,10 +1293,13 @@ const InvoiceForm = () => {
                       type="email"
                       required
                       size="small"
+                      disabled={clientSelectionMode === "select" && selectedClientId}
                       sx={{ 
                         mb: 2,
                         '& .MuiOutlinedInput-root': {
-                          background: 'rgba(255, 255, 255, 0.2)',
+                          background: (clientSelectionMode === "select" && selectedClientId) 
+                            ? 'rgba(200, 200, 200, 0.2)' 
+                            : 'rgba(255, 255, 255, 0.2)',
                           backdropFilter: 'blur(10px)',
                           borderRadius: '12px'
                         },
@@ -1172,10 +1327,13 @@ const InvoiceForm = () => {
                       fullWidth
                       required
                       size="small"
+                      disabled={clientSelectionMode === "select" && selectedClientId}
                       sx={{ 
                         mb: 2,
                         '& .MuiOutlinedInput-root': {
-                          background: 'rgba(255, 255, 255, 0.2)',
+                          background: (clientSelectionMode === "select" && selectedClientId) 
+                            ? 'rgba(200, 200, 200, 0.2)' 
+                            : 'rgba(255, 255, 255, 0.2)',
                           backdropFilter: 'blur(10px)',
                           borderRadius: '12px'
                         },
@@ -1196,6 +1354,30 @@ const InvoiceForm = () => {
                         }
                       }}
                     />
+
+                    {/* Show selected client info when in select mode */}
+                    {clientSelectionMode === "select" && selectedClientId && (
+                      <Box sx={{ 
+                        mt: 2, 
+                        p: 2, 
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)', 
+                        borderRadius: '8px',
+                        border: '1px solid rgba(102, 126, 234, 0.2)'
+                      }}>
+                        <Typography variant="caption" sx={{ color: '#667eea', fontWeight: 600, mb: 1, display: 'block' }}>
+                          📋 Selected Client Details:
+                        </Typography>
+                        <Typography variant="body2" sx={{ mb: 0.5 }}>
+                          <strong>Name:</strong> {formData.billTo}
+                        </Typography>
+                        <Typography variant="body2" sx={{ mb: 0.5 }}>
+                          <strong>Email:</strong> {formData.billToEmail}
+                        </Typography>
+                        <Typography variant="body2">
+                          <strong>Address:</strong> {formData.billToAddress}
+                        </Typography>
+                      </Box>
+                    )}
                   </Box>
                 </Grid>                <Grid item xs={12} sm={6}>
                   <Box sx={{

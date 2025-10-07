@@ -27,6 +27,7 @@ import {
   FormControl,
   InputLabel
 } from '@mui/material';
+import { apiCall } from '../../utils/apiConfig.js';
 import {
   Email,
   TrendingUp,
@@ -62,23 +63,18 @@ const ContactMessagesDashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/webpage/contact/stats');
-      if (response.ok) {
-        const data = await response.json();
-        setStats({
-          totalMessages: data.totalMessages || 0,
-          newMessages: data.newMessages || 0,
-          inProgressMessages: data.inProgressMessages || 0,
-          resolvedMessages: data.resolvedMessages || 0,
-          todayMessages: data.todayMessages || 0,
-          weekMessages: data.weekMessages || 0,
-          monthMessages: data.monthMessages || 0,
-          statusBreakdown: data.statusBreakdown || {},
-          sourceBreakdown: data.sourceBreakdown || {}
-        });
-      } else {
-        setError('Failed to load statistics');
-      }
+      const data = await apiCall('/api/webpage/contact/stats');
+      setStats({
+        totalMessages: data.totalMessages || 0,
+        newMessages: data.newMessages || 0,
+        inProgressMessages: data.inProgressMessages || 0,
+        resolvedMessages: data.resolvedMessages || 0,
+        todayMessages: data.todayMessages || 0,
+        weekMessages: data.weekMessages || 0,
+        monthMessages: data.monthMessages || 0,
+        statusBreakdown: data.statusBreakdown || {},
+        sourceBreakdown: data.sourceBreakdown || {}
+      });
     } catch (err) {
       console.error('Error fetching stats:', err);
       setError('Unable to connect to server');
@@ -88,13 +84,8 @@ const ContactMessagesDashboard = () => {
   const fetchMessages = async () => {
     setMessagesLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/webpage/contact?page=1&pageSize=50');
-      if (response.ok) {
-        const data = await response.json();
-        setMessages(Array.isArray(data) ? data : []);
-      } else {
-        console.error('Failed to load messages');
-      }
+      const data = await apiCall('/api/webpage/contact?page=1&pageSize=50');
+      setMessages(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Error fetching messages:', err);
     } finally {
@@ -104,13 +95,11 @@ const ContactMessagesDashboard = () => {
 
   const markAsRead = async (id) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/webpage/contact/${id}/read`, {
+      await apiCall(`/api/webpage/contact/${id}/read`, {
         method: 'PATCH'
       });
-      if (response.ok) {
-        // Refresh data
-        await Promise.all([fetchStats(), fetchMessages()]);
-      }
+      // Refresh data
+      await Promise.all([fetchStats(), fetchMessages()]);
     } catch (err) {
       console.error('Error marking as read:', err);
     }
@@ -118,13 +107,11 @@ const ContactMessagesDashboard = () => {
 
   const markAsReplied = async (id) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/webpage/contact/${id}/replied`, {
+      await apiCall(`/api/webpage/contact/${id}/replied`, {
         method: 'PATCH'
       });
-      if (response.ok) {
-        // Refresh data
-        await Promise.all([fetchStats(), fetchMessages()]);
-      }
+      // Refresh data
+      await Promise.all([fetchStats(), fetchMessages()]);
     } catch (err) {
       console.error('Error marking as replied:', err);
     }
@@ -155,11 +142,8 @@ const ContactMessagesDashboard = () => {
     try {
       // Update notes if they changed
       if (adminNotes !== (selectedMessage.adminNotes || '')) {
-        await fetch(`http://localhost:5000/api/webpage/contact/${selectedMessage.id}/notes`, {
+        await apiCall(`/api/webpage/contact/${selectedMessage.id}/notes`, {
           method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
           body: JSON.stringify({
             notes: adminNotes
           })
@@ -168,11 +152,8 @@ const ContactMessagesDashboard = () => {
       
       // Update status if it changed
       if (selectedStatus !== selectedMessage.status) {
-        await fetch(`http://localhost:5000/api/webpage/contact/${selectedMessage.id}/status`, {
+        await apiCall(`/api/webpage/contact/${selectedMessage.id}/status`, {
           method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
           body: JSON.stringify({
             status: selectedStatus
           })
@@ -216,36 +197,77 @@ const ContactMessagesDashboard = () => {
     }
   };
 
-  const StatCard = ({ title, value, icon, color = 'primary' }) => (
-    <Card sx={{ height: '100%' }}>
-      <CardContent>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Box
-            sx={{
-              width: 48,
-              height: 48,
-              borderRadius: '50%',
-              background: `linear-gradient(135deg, ${color === 'primary' ? '#667eea 0%, #764ba2' : color === 'success' ? '#4caf50 0%, #2e7d32' : color === 'warning' ? '#ff9800 0%, #f57c00' : '#f44336 0%, #d32f2f'} 100%)`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white'
-            }}
-          >
-            {icon}
+  const StatCard = ({ title, value, icon, color = 'primary' }) => {
+    const colorMap = {
+      primary: { bg: '#667eea', bgSecondary: '#764ba2', shadow: 'rgba(102, 126, 234, 0.3)' },
+      success: { bg: '#48bb78', bgSecondary: '#38a169', shadow: 'rgba(72, 187, 120, 0.3)' },
+      warning: { bg: '#ed8936', bgSecondary: '#dd6b20', shadow: 'rgba(237, 137, 54, 0.3)' },
+      error: { bg: '#f56565', bgSecondary: '#e53e3e', shadow: 'rgba(245, 101, 101, 0.3)' }
+    };
+    
+    const colors = colorMap[color] || colorMap.primary;
+    
+    return (
+      <Card 
+        sx={{ 
+          height: '100%',
+          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.6) 100%)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          borderRadius: 3,
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          '&:hover': {
+            transform: 'translateY(-8px)',
+            boxShadow: `0 20px 40px ${colors.shadow}`,
+            border: `1px solid ${colors.bg}40`
+          }
+        }}
+      >
+        <CardContent sx={{ p: 3 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+            <Box
+              sx={{
+                width: 60,
+                height: 60,
+                borderRadius: 3,
+                background: `linear-gradient(135deg, ${colors.bg} 0%, ${colors.bgSecondary} 100%)`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                boxShadow: `0 8px 32px ${colors.shadow}`,
+                '& svg': { fontSize: '1.75rem' }
+              }}
+            >
+              {icon}
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <Typography 
+                variant="h3" 
+                fontWeight="bold" 
+                sx={{ 
+                  color: '#2d3748',
+                  mb: 0.5,
+                  lineHeight: 1
+                }}
+              >
+                {value?.toLocaleString() || 0}
+              </Typography>
+              <Typography 
+                variant="body1" 
+                sx={{ 
+                  color: '#718096',
+                  fontWeight: 500
+                }}
+              >
+                {title}
+              </Typography>
+            </Box>
           </Box>
-          <Box>
-            <Typography variant="h4" fontWeight="bold">
-              {value}
-            </Typography>
-            <Typography color="text.secondary">
-              {title}
-            </Typography>
-          </Box>
-        </Box>
-      </CardContent>
-    </Card>
-  );
+        </CardContent>
+      </Card>
+    );
+  };
 
   if (loading) {
     return (
@@ -256,18 +278,22 @@ const ContactMessagesDashboard = () => {
   }
 
   return (
-    <Box sx={{ p: 4, maxWidth: 1200, mx: 'auto' }}>
-      <Typography variant="h3" fontWeight="bold" sx={{ mb: 4 }}>
-        Contact Messages Dashboard
-      </Typography>
-
+    <Box sx={{ p: 4 }}>
       {error && (
-        <Alert severity="error" sx={{ mb: 4 }}>
+        <Alert 
+          severity="error" 
+          sx={{ 
+            mb: 4,
+            borderRadius: 2,
+            background: 'linear-gradient(135deg, rgba(244, 67, 54, 0.1) 0%, rgba(211, 47, 47, 0.05) 100%)',
+            border: '1px solid rgba(244, 67, 54, 0.2)'
+          }}
+        >
           {error}
         </Alert>
       )}
 
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <Grid container spacing={4} sx={{ mb: 6 }}>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Total Messages"
@@ -302,141 +328,280 @@ const ContactMessagesDashboard = () => {
         </Grid>
       </Grid>
 
-      {stats.statusBreakdown && typeof stats.statusBreakdown === 'object' && Object.keys(stats.statusBreakdown).length > 0 && (
-        <Card sx={{ mt: 4 }}>
-          <CardContent>
-            <Typography variant="h5" fontWeight="bold" sx={{ mb: 3 }}>
-              Status Breakdown
-            </Typography>
-            <Box>
-              {Object.entries(stats.statusBreakdown || {}).map(([status, count]) => (
-                <Typography key={status}>
-                  {status}: {count}
+      <Grid container spacing={4}>
+        {/* Status Breakdown Card */}
+        {stats.statusBreakdown && typeof stats.statusBreakdown === 'object' && Object.keys(stats.statusBreakdown).length > 0 && (
+          <Grid item xs={12} lg={4}>
+            <Card 
+              sx={{ 
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.6) 100%)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: 3,
+                height: 'fit-content'
+              }}
+            >
+              <CardContent sx={{ p: 4 }}>
+                <Typography 
+                  variant="h5" 
+                  fontWeight="bold" 
+                  sx={{ 
+                    mb: 3,
+                    color: '#2d3748',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1
+                  }}
+                >
+                  <QuestionAnswer sx={{ color: '#667eea' }} />
+                  Status Breakdown
                 </Typography>
-              ))}
-            </Box>
-          </CardContent>
-        </Card>
-      )}
-
-      <Card sx={{ mt: 4 }}>
-        <CardContent>
-          <Typography variant="h5" fontWeight="bold" sx={{ mb: 3 }}>
-            Recent Messages
-          </Typography>
-          {messagesLoading ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-              <CircularProgress />
-            </Box>
-          ) : messages.length > 0 ? (
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Email</TableCell>
-                  <TableCell>Subject</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Date</TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {messages.map((message) => (
-                  <TableRow 
-                    key={message.id}
-                    sx={{ 
-                      backgroundColor: message.isRead ? 'inherit' : 'rgba(102, 126, 234, 0.05)',
-                      fontWeight: message.isRead ? 'normal' : 'bold'
-                    }}
-                  >
-                    <TableCell>
-                      <Typography variant="body2" fontWeight={message.isRead ? 'normal' : 'bold'}>
-                        {message.firstName} {message.lastName}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>{message.email}</TableCell>
-                    <TableCell>
-                      <Typography 
-                        variant="body2" 
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {Object.entries(stats.statusBreakdown || {}).map(([status, count], index) => {
+                    const statusColors = {
+                      'New': '#f56565',
+                      'InProgress': '#ed8936',
+                      'Resolved': '#48bb78',
+                      'Closed': '#4299e1'
+                    };
+                    const color = statusColors[status] || '#667eea';
+                    return (
+                      <Box 
+                        key={status} 
                         sx={{ 
-                          maxWidth: 200, 
-                          overflow: 'hidden', 
-                          textOverflow: 'ellipsis',
-                          fontWeight: message.isRead ? 'normal' : 'bold'
+                          display: 'flex', 
+                          justifyContent: 'space-between', 
+                          alignItems: 'center',
+                          p: 2,
+                          borderRadius: 2,
+                          background: `linear-gradient(135deg, ${color}10 0%, ${color}05 100%)`,
+                          border: `1px solid ${color}20`
                         }}
                       >
-                        {message.subject}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Chip 
-                        label={message.status} 
-                        color={getStatusColor(message.status)}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2">
-                        {formatDate(message.createdAt)}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', gap: 1 }}>
-                        {!message.isRead && (
-                          <Tooltip title="Mark as Read">
-                            <IconButton 
-                              size="small" 
-                              onClick={() => markAsRead(message.id)}
-                              color="primary"
-                            >
-                              <MarkEmailRead fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        )}
-                        {!message.isReplied && (
-                          <Tooltip title="Mark as Replied">
-                            <IconButton 
-                              size="small" 
-                              onClick={() => markAsReplied(message.id)}
-                              color="success"
-                            >
-                              <Reply fontSize="small" />
-                            </IconButton>
-                          </Tooltip>
-                        )}
-                        <Tooltip title="View Details">
-                          <IconButton 
-                            size="small" 
-                            color="info"
-                            onClick={() => handleViewDetails(message)}
-                          >
-                            <Visibility fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
+                        <Typography fontWeight="500" sx={{ color: '#2d3748' }}>
+                          {status}
+                        </Typography>
+                        <Chip 
+                          label={count} 
+                          size="small"
+                          sx={{
+                            background: color,
+                            color: 'white',
+                            fontWeight: 'bold'
+                          }}
+                        />
                       </Box>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          ) : (
-            <Typography color="text.secondary">
-              No messages yet
-            </Typography>
-          )}
-        </CardContent>
-      </Card>
+                    );
+                  })}
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
 
-      {/* Message Details Dialog */}
+        {/* Messages Table */}
+        <Grid item xs={12} lg={stats.statusBreakdown && Object.keys(stats.statusBreakdown).length > 0 ? 8 : 12}>
+          <Card 
+            sx={{ 
+              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.6) 100%)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              borderRadius: 3
+            }}
+          >
+            <CardContent sx={{ p: 4 }}>
+              <Typography 
+                variant="h5" 
+                fontWeight="bold" 
+                sx={{ 
+                  mb: 3,
+                  color: '#2d3748',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1
+                }}
+              >
+                <Email sx={{ color: '#667eea' }} />
+                Recent Messages
+              </Typography>
+              
+              {messagesLoading ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+                  <CircularProgress size={48} sx={{ color: '#667eea' }} />
+                </Box>
+              ) : messages.length > 0 ? (
+                <Box sx={{ overflowX: 'auto' }}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell sx={{ fontWeight: 'bold', color: '#4a5568', borderBottom: '2px solid #e2e8f0' }}>Name</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: '#4a5568', borderBottom: '2px solid #e2e8f0' }}>Email</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: '#4a5568', borderBottom: '2px solid #e2e8f0' }}>Subject</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: '#4a5568', borderBottom: '2px solid #e2e8f0' }}>Status</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: '#4a5568', borderBottom: '2px solid #e2e8f0' }}>Date</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: '#4a5568', borderBottom: '2px solid #e2e8f0' }}>Actions</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {messages.map((message) => (
+                        <TableRow 
+                          key={message.id}
+                          sx={{ 
+                            backgroundColor: message.isRead ? 'inherit' : 'rgba(102, 126, 234, 0.04)',
+                            fontWeight: message.isRead ? 'normal' : 'bold',
+                            '&:hover': {
+                              backgroundColor: 'rgba(102, 126, 234, 0.08)',
+                              transform: 'scale(1.001)'
+                            },
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          <TableCell>
+                            <Typography 
+                              variant="body2" 
+                              fontWeight={message.isRead ? 'normal' : 'bold'}
+                              sx={{ color: '#2d3748' }}
+                            >
+                              {message.firstName} {message.lastName}
+                            </Typography>
+                          </TableCell>
+                          <TableCell sx={{ color: '#4a5568' }}>{message.email}</TableCell>
+                          <TableCell>
+                            <Typography 
+                              variant="body2" 
+                              sx={{ 
+                                maxWidth: 200, 
+                                overflow: 'hidden', 
+                                textOverflow: 'ellipsis',
+                                fontWeight: message.isRead ? 'normal' : 'bold',
+                                color: '#4a5568'
+                              }}
+                            >
+                              {message.subject}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Chip 
+                              label={message.status} 
+                              color={getStatusColor(message.status)}
+                              size="small"
+                              sx={{
+                                fontWeight: 'bold',
+                                '& .MuiChip-label': { fontSize: '0.75rem' }
+                              }}
+                            />
+                          </TableCell>
+                          <TableCell sx={{ color: '#718096', fontSize: '0.875rem' }}>
+                            {formatDate(message.createdAt)}
+                          </TableCell>
+                          <TableCell>
+                            <Box sx={{ display: 'flex', gap: 0.5 }}>
+                              {!message.isRead && (
+                                <Tooltip title="Mark as Read">
+                                  <IconButton 
+                                    size="small" 
+                                    onClick={() => markAsRead(message.id)}
+                                    sx={{ 
+                                      color: '#667eea',
+                                      '&:hover': { backgroundColor: 'rgba(102, 126, 234, 0.1)' }
+                                    }}
+                                  >
+                                    <MarkEmailRead fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                              )}
+                              {!message.isReplied && (
+                                <Tooltip title="Mark as Replied">
+                                  <IconButton 
+                                    size="small" 
+                                    onClick={() => markAsReplied(message.id)}
+                                    sx={{ 
+                                      color: '#48bb78',
+                                      '&:hover': { backgroundColor: 'rgba(72, 187, 120, 0.1)' }
+                                    }}
+                                  >
+                                    <Reply fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                              )}
+                              <Tooltip title="View Details">
+                                <IconButton 
+                                  size="small" 
+                                  onClick={() => handleViewDetails(message)}
+                                  sx={{ 
+                                    color: '#4299e1',
+                                    '&:hover': { backgroundColor: 'rgba(66, 153, 225, 0.1)' }
+                                  }}
+                                >
+                                  <Visibility fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            </Box>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </Box>
+              ) : (
+                <Box 
+                  sx={{ 
+                    textAlign: 'center', 
+                    py: 8,
+                    color: '#718096'
+                  }}
+                >
+                  <Email sx={{ fontSize: 64, color: '#cbd5e0', mb: 2 }} />
+                  <Typography variant="h6" sx={{ color: '#4a5568', mb: 1 }}>
+                    No messages yet
+                  </Typography>
+                  <Typography variant="body2">
+                    Contact messages will appear here once users start reaching out
+                  </Typography>
+                </Box>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* Enhanced Message Details Dialog */}
       <Dialog 
         open={detailsDialogOpen} 
         onClose={handleCloseDetails}
         maxWidth="md"
         fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)'
+          }
+        }}
       >
-        <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h6">Message Details</Typography>
-          <IconButton onClick={handleCloseDetails} size="small">
+        <DialogTitle 
+          sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            color: 'white',
+            borderRadius: '12px 12px 0 0'
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Email />
+            <Typography variant="h6" fontWeight="bold">Message Details</Typography>
+          </Box>
+          <IconButton 
+            onClick={handleCloseDetails} 
+            size="small"
+            sx={{ 
+              color: 'white',
+              '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' }
+            }}
+          >
             <Close />
           </IconButton>
         </DialogTitle>

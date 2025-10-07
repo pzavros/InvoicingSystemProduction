@@ -64,7 +64,32 @@ namespace InvoicingBackend.Services
             _context.Clients.Add(client);
             await _context.SaveChangesAsync();
 
-            return await GetClientByIdAsync(client.Id, userId) ?? throw new InvalidOperationException("Failed to retrieve created client");
+            // Return basic DTO directly to avoid complex queries on new client
+            return new ClientDto
+            {
+                Id = client.Id,
+                Name = client.Name,
+                Email = client.Email,
+                Company = client.Company,
+                Phone = client.Phone,
+                Address = client.Address,
+                City = client.City,
+                State = client.State,
+                PostalCode = client.PostalCode,
+                Country = client.Country,
+                Website = client.Website,
+                TaxNumber = client.TaxNumber,
+                Notes = client.Notes,
+                IsActive = client.IsActive,
+                DefaultPaymentTerms = client.DefaultPaymentTerms,
+                PreferredCurrencyId = client.PreferredCurrencyId,
+                PreferredCurrency = null,
+                TotalInvoiceAmount = 0,
+                TotalInvoiceCount = 0,
+                LastInvoiceDate = null,
+                DateEntered = client.DateEntered,
+                DateModified = client.DateModified
+            };
         }
 
         public async Task<ClientDto?> UpdateClientAsync(UpdateClientDto updateClientDto, int userId, string modifiedBy)
@@ -168,9 +193,10 @@ namespace InvoicingBackend.Services
                     Code = client.PreferredCurrency.Code ?? string.Empty,
                     Symbol = client.PreferredCurrency.Symbol ?? string.Empty
                 } : null,
-                TotalInvoiceAmount = client.TotalInvoiceAmount,
-                TotalInvoiceCount = client.TotalInvoiceCount,
-                LastInvoiceDate = client.LastInvoiceDate,
+                // Temporarily set to default values to avoid calculated property issues
+                TotalInvoiceAmount = 0,
+                TotalInvoiceCount = 0,
+                LastInvoiceDate = null,
                 DateEntered = client.DateEntered,
                 DateModified = client.DateModified
             };

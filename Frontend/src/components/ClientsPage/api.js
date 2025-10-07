@@ -1,32 +1,42 @@
-const API_BASE_URL = 'https://localhost:7101/api';
+import axios from 'axios';
 
-// Get auth token from localStorage
-const getAuthToken = () => {
-  return localStorage.getItem('authToken');
-};
+// Use environment variables for API configuration
+const API_BASE_URL = import.meta.env.PROD 
+  ? (import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5088')
+  : ''; // Use Vite proxy in development
 
-// Create headers with auth token
-const getAuthHeaders = () => {
-  const token = getAuthToken();
-  return {
-    'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` })
-  };
-};
+const clientApi = axios.create({
+  baseURL: API_BASE_URL,
+  headers: { "Content-Type": "application/json" },
+});
+
+// Add token to requests if available
+clientApi.interceptors.request.use((config) => {
+  const token = localStorage.getItem('authToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Handle token expiration
+clientApi.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Get all clients
 export const getAllClients = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/clients`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return await response.json();
+    const response = await clientApi.get('/api/clients');
+    return response.data;
   } catch (error) {
     console.error('Error fetching clients:', error);
     throw error;
@@ -36,16 +46,8 @@ export const getAllClients = async () => {
 // Search clients
 export const searchClients = async (searchTerm) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/clients?search=${encodeURIComponent(searchTerm)}`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return await response.json();
+    const response = await clientApi.get(`/api/clients?search=${encodeURIComponent(searchTerm)}`);
+    return response.data;
   } catch (error) {
     console.error('Error searching clients:', error);
     throw error;
@@ -55,16 +57,8 @@ export const searchClients = async (searchTerm) => {
 // Get client by ID
 export const getClientById = async (id) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/clients/${id}`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return await response.json();
+    const response = await clientApi.get(`/api/clients/${id}`);
+    return response.data;
   } catch (error) {
     console.error('Error fetching client:', error);
     throw error;
@@ -74,20 +68,12 @@ export const getClientById = async (id) => {
 // Get client by email
 export const getClientByEmail = async (email) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/clients/email/${encodeURIComponent(email)}`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    });
-
-    if (!response.ok) {
-      if (response.status === 404) {
-        return null; // Client not found
-      }
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return await response.json();
+    const response = await clientApi.get(`/api/clients/email/${encodeURIComponent(email)}`);
+    return response.data;
   } catch (error) {
+    if (error.response?.status === 404) {
+      return null; // Client not found
+    }
     console.error('Error fetching client by email:', error);
     throw error;
   }
@@ -96,57 +82,31 @@ export const getClientByEmail = async (email) => {
 // Create client
 export const createClient = async (clientData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/clients`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(clientData),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-    }
-
-    return await response.json();
+    const response = await clientApi.post('/api/clients', clientData);
+    return response.data;
   } catch (error) {
     console.error('Error creating client:', error);
-    throw error;
+    const errorMessage = error.response?.data?.message || error.message;
+    throw new Error(errorMessage);
   }
 };
 
 // Update client
 export const updateClient = async (id, clientData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/clients/${id}`, {
-      method: 'PUT',
-      headers: getAuthHeaders(),
-      body: JSON.stringify({ ...clientData, id }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-    }
-
-    return await response.json();
+    const response = await clientApi.put(`/api/clients/${id}`, { ...clientData, id });
+    return response.data;
   } catch (error) {
     console.error('Error updating client:', error);
-    throw error;
+    const errorMessage = error.response?.data?.message || error.message;
+    throw new Error(errorMessage);
   }
 };
 
 // Delete client
 export const deleteClient = async (id) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/clients/${id}`, {
-      method: 'DELETE',
-      headers: getAuthHeaders(),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
+    await clientApi.delete(`/api/clients/${id}`);
     return true;
   } catch (error) {
     console.error('Error deleting client:', error);
