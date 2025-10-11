@@ -18,7 +18,9 @@ import TemplatesPage from './pages/TemplatesPage';
 import ClientsPage from './pages/ClientsPage';
 import ClientFormPage from './pages/ClientFormPage';
 import ProductFormPage from './pages/ProductFormPage';
+import TemplateFormPage from './pages/TemplateFormPage';
 import UserManagementPage from './pages/UserManagementPage';
+import UserFormPage from './pages/UserFormPage';
 import SystemAdminPage from './pages/SystemAdminPage';
 import SubscriptionGuard from './components/SubscriptionPage/SubscriptionGuard';
 import SubscriptionBanner from './components/SubscriptionPage/SubscriptionBanner';
@@ -72,6 +74,8 @@ function MainContent() {
         <Route path="/products/add" element={<ProtectedRoute><SubscriptionGuard><ProductFormPage /></SubscriptionGuard></ProtectedRoute>} />
         <Route path="/products/edit/:id" element={<ProtectedRoute><SubscriptionGuard><ProductFormPage /></SubscriptionGuard></ProtectedRoute>} />
         <Route path="/templates" element={<ProtectedRoute><SubscriptionGuard><TemplatesPage /></SubscriptionGuard></ProtectedRoute>} />
+        <Route path="/templates/add" element={<ProtectedRoute><SubscriptionGuard><TemplateFormPage /></SubscriptionGuard></ProtectedRoute>} />
+        <Route path="/templates/edit/:id" element={<ProtectedRoute><SubscriptionGuard><TemplateFormPage /></SubscriptionGuard></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><SubscriptionGuard><SystemSetupPage /></SubscriptionGuard></ProtectedRoute>} />
         <Route path="/report" element={<ProtectedRoute><SubscriptionGuard><ReportPage /></SubscriptionGuard></ProtectedRoute>} />
         
@@ -81,6 +85,8 @@ function MainContent() {
         
         {/* Admin Routes - Protected and require admin privileges */}
         <Route path="/admin/users" element={<ProtectedRoute><AdminRoute><UserManagementPage /></AdminRoute></ProtectedRoute>} />
+        <Route path="/users/add" element={<ProtectedRoute><AdminRoute><UserFormPage /></AdminRoute></ProtectedRoute>} />
+        <Route path="/users/edit/:id" element={<ProtectedRoute><AdminRoute><UserFormPage /></AdminRoute></ProtectedRoute>} />
         <Route path="/admin/system" element={<ProtectedRoute><AdminRoute><SystemAdminPage /></AdminRoute></ProtectedRoute>} />
       </Routes>
     </Box>

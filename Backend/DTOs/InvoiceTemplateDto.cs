@@ -8,6 +8,7 @@ namespace InvoicingBackend.DTOs
         public string TemplateData { get; set; } = string.Empty;
         public bool IsActive { get; set; } = false;
         public bool IsSystemTemplate { get; set; } = false;
+        public int? DocumentTypeId { get; set; }
         public byte[]? PreviewImage { get; set; }
         public DateTime DateEntered { get; set; }
     }
@@ -17,6 +18,7 @@ namespace InvoicingBackend.DTOs
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string TemplateData { get; set; } = string.Empty;
+        public int? DocumentTypeId { get; set; }
         public byte[]? PreviewImage { get; set; }
     }
 
@@ -25,6 +27,7 @@ namespace InvoicingBackend.DTOs
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string TemplateData { get; set; } = string.Empty;
+        public int? DocumentTypeId { get; set; }
         public byte[]? PreviewImage { get; set; }
     }
 

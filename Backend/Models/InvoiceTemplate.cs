@@ -21,6 +21,10 @@ namespace InvoicingBackend.Models
         // Whether this is a system default template
         public bool IsSystemTemplate { get; set; } = false;
         
+        // Document type this template supports (optional - null means all types)
+        public int? DocumentTypeId { get; set; }
+        public DocumentType? DocumentType { get; set; }
+        
         // Preview image/thumbnail (optional)
         public byte[]? PreviewImage { get; set; }
         

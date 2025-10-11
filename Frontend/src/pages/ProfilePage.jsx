@@ -1,8 +1,12 @@
-import React from 'react';
-import UserProfile from '../components/AuthPages/UserProfile';
+// src/pages/ProfilePage.jsx
+import React from "react";
+import Page from "../components/ReusableComponents/Page";
+import UserProfilePage from "../components/UserProfilePage/UserProfilePage";
 
-const ProfilePage = () => {
-  return <UserProfile />;
-};
-
-export default ProfilePage;
+export default function ProfilePageWrapper() {
+  return (
+    <Page>
+      <UserProfilePage />
+    </Page>
+  );
+}

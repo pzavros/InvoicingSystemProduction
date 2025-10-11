@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace InvoicingBackend.Models
@@ -7,15 +8,22 @@ namespace InvoicingBackend.Models
     public class Invoice : BaseEntity
     {
         // Remove duplicate Id property since it's now in BaseEntity
-        public string InvoiceNumber     { get; set; }
+        [Required]
+        public string InvoiceNumber     { get; set; } = string.Empty;
         public DateTime DateOfIssue     { get; set; }
         public DateTime DueDate         { get; set; }
-        public string BillTo            { get; set; }
-        public string BillToEmail       { get; set; }
-        public string BillToAddress     { get; set; }
-        public string BillFrom          { get; set; }
-        public string BillFromEmail     { get; set; }
-        public string BillFromAddress   { get; set; }
+        [Required]
+        public string BillTo            { get; set; } = string.Empty;
+        [Required]
+        public string BillToEmail       { get; set; } = string.Empty;
+        [Required]
+        public string BillToAddress     { get; set; } = string.Empty;
+        [Required]
+        public string BillFrom          { get; set; } = string.Empty;
+        [Required]
+        public string BillFromEmail     { get; set; } = string.Empty;
+        [Required]
+        public string BillFromAddress   { get; set; } = string.Empty;
         public string? Notes            { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
@@ -37,20 +45,24 @@ namespace InvoicingBackend.Models
         public decimal Total            { get; set; }
 
         public int      CurrencyId      { get; set; }
-        public Currency Currency        { get; set; }
+        public Currency? Currency        { get; set; }
 
-        public string   CompanyName     { get; set; }
-        public string   CompanyNo       { get; set; }
-        public string   VatNo           { get; set; }
-        public string   TicNo           { get; set; }
-        public string   Website         { get; set; }
-        public string   CompanyEmail    { get; set; }
-        public string   BankName        { get; set; }
-        public string   AccountName     { get; set; }
-        public string   AccountNo       { get; set; }
-        public string   Swift           { get; set; }
-        public string   Iban            { get; set; }
+        public string   CompanyName     { get; set; } = string.Empty;
+        public string   CompanyNo       { get; set; } = string.Empty;
+        public string   VatNo           { get; set; } = string.Empty;
+        public string   TicNo           { get; set; } = string.Empty;
+        public string   Website         { get; set; } = string.Empty;
+        public string   CompanyEmail    { get; set; } = string.Empty;
+        public string   BankName        { get; set; } = string.Empty;
+        public string   AccountName     { get; set; } = string.Empty;
+        public string   AccountNo       { get; set; } = string.Empty;
+        public string   Swift           { get; set; } = string.Empty;
+        public string   Iban            { get; set; } = string.Empty;
         public int? StatusId { get; set; } = 1;
+
+        // Document type (Invoice, Proforma, Quotation, Tax Invoice)
+        public int DocumentTypeId { get; set; } = 1; // Default to standard invoice
+        public DocumentType? DocumentType { get; set; }
 
         // Optional link to the template used when the invoice was created
         public int? TemplateId { get; set; }

@@ -1709,6 +1709,7 @@ ${formData.billFrom}`);
                 statusId: formData.statusId, // Pass statusId
                 statusName: formData.statusName, // Pass statusName
                 isDeleted: formData.isDeleted, // Pass isDeleted
+                documentTypeId: formData.documentTypeId, // Pass documentTypeId
               }}
               items={formData.items}
               currency={formData.currency}

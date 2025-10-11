@@ -22,7 +22,7 @@ namespace InvoicingBackend.Services
         public async Task<DashboardStatsDto> GetDashboardStatsAsync()
         {
             var currentDate = DateTime.UtcNow;
-            var currentMonthStart = new DateTime(currentDate.Year, currentDate.Month, 1);
+            var currentMonthStart = new DateTime(currentDate.Year, currentDate.Month, 1, 0, 0, 0, DateTimeKind.Utc);
             var last3MonthsStart = currentMonthStart.AddMonths(-3);
             var last6MonthsStart = currentMonthStart.AddMonths(-6);
             var lastYearStart = currentMonthStart.AddYears(-1);
@@ -66,7 +66,7 @@ namespace InvoicingBackend.Services
         public async Task<DashboardStatsDto> GetDashboardStatsAsync(int userId)
         {
             var currentDate = DateTime.UtcNow;
-            var currentMonthStart = new DateTime(currentDate.Year, currentDate.Month, 1);
+            var currentMonthStart = new DateTime(currentDate.Year, currentDate.Month, 1, 0, 0, 0, DateTimeKind.Utc);
             var last3MonthsStart = currentMonthStart.AddMonths(-3);
             var last6MonthsStart = currentMonthStart.AddMonths(-6);
             var lastYearStart = currentMonthStart.AddYears(-1);
@@ -108,7 +108,7 @@ namespace InvoicingBackend.Services
 
         public async Task<MonthlyDashboardStatsDto> GetDashboardStatsForMonthYearAsync(int month, int year, int userId)
         {
-            var monthStart = new DateTime(year, month, 1);
+            var monthStart = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Utc);
             var monthEnd = monthStart.AddMonths(1);
 
             var invoices = _context.Invoices.Where(i => !i.IsDeleted && i.UserId == userId);
@@ -134,7 +134,7 @@ namespace InvoicingBackend.Services
 
             for (int month = 1; month <= 12; month++)
             {
-                var monthStart = new DateTime(year, month, 1);
+                var monthStart = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Utc);
                 var totalAmount = invoicesInYear
                     .Where(i => i.DateOfIssue.Month == month)
                     .Sum(i => i.Total);
@@ -160,7 +160,7 @@ namespace InvoicingBackend.Services
 
             for (int month = 1; month <= 12; month++)
             {
-                var monthStart = new DateTime(year, month, 1);
+                var monthStart = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Utc);
                 var invoiceCount = invoicesInYear
                     .Count(i => i.DateOfIssue.Month == month);
 

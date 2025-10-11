@@ -37,6 +37,7 @@ import {
   getInvoiceTemplateById
 } from "./api";
 import { getAllClients } from "../ClientsPage/api";
+import { getAllDocumentTypes } from "../DocumentTypePage/api";
 
 const InvoiceForm = () => {
   const dispatch = useDispatch();
@@ -94,12 +95,14 @@ const InvoiceForm = () => {
     statusId: 1,
     statusName: "Draft",
     templateId: null,
+    documentTypeId: 1, // Default to standard invoice
   });
 
   const [loading, setLoading] = useState(false);
   const [currencies, setCurrencies] = useState([]);
   const [statuses, setStatuses] = useState([]);
   const [clients, setClients] = useState([]);
+  const [documentTypes, setDocumentTypes] = useState([]);
   const [clientSelectionMode, setClientSelectionMode] = useState("manual"); // "manual" or "select"
   const [selectedClientId, setSelectedClientId] = useState("");
   const [notification, setNotification] = useState({
@@ -148,43 +151,36 @@ const InvoiceForm = () => {
         const clientsData = await getAllClients();
         setClients(clientsData);
 
-        let activeTemplateData = null;
-        try {
-          activeTemplateData = await getActiveInvoiceTemplate();
-          if (activeTemplateData) {
-            setTemplateFromDto(activeTemplateData);
-          }
-        } catch (templateError) {
-          console.error("Error fetching active invoice template:", templateError);
-        }
+        const documentTypesData = await getAllDocumentTypes();
+        setDocumentTypes(documentTypesData);
+
+        // Load template after setting up initial form data
+        await loadTemplateForDocumentType(1); // Default to Invoice (type 1)
 
         const setupData = await getSystemSetup(); // Assuming this returns { ..., logo, logoMimeType }
         
         if (isEdit && params.id) {
           try {
-            const invoiceData = await getInvoiceById(params.id); // Assuming this returns { ..., logo, logoMimeType }
+            const invoiceData = await getInvoiceById(params.id);
             mapInvoiceDataToForm(invoiceData, currenciesData, statusesData);
-            const templateIdToUse = invoiceData.templateId || activeTemplateData?.id || null;
-            setFormData(prev => ({ ...prev, templateId: templateIdToUse }));
-
-            if (templateIdToUse) {
-              if (invoiceData.templateId && invoiceData.templateId === activeTemplateData?.id) {
-                setTemplateFromDto(activeTemplateData);
-              } else if (invoiceData.templateId) {
-                try {
-                  const templateDto = await getInvoiceTemplateById(invoiceData.templateId);
-                  if (templateDto) {
-                    setTemplateFromDto(templateDto);
-                  }
-                } catch (templateFetchError) {
-                  console.error("Error fetching invoice template by id:", templateFetchError);
-                  if (activeTemplateData) {
-                    setTemplateFromDto(activeTemplateData);
-                    setFormData(prev => ({ ...prev, templateId: activeTemplateData.id }));
-                  } else {
-                    setSelectedTemplate(null);
-                  }
+            
+            // Load template based on invoice's document type
+            if (invoiceData.documentTypeId) {
+              await loadTemplateForDocumentType(invoiceData.documentTypeId);
+            }
+            
+            // If invoice has a specific template, use that instead
+            if (invoiceData.templateId) {
+              try {
+                const templateDto = await getInvoiceTemplateById(invoiceData.templateId);
+                if (templateDto) {
+                  setTemplateFromDto(templateDto);
+                  setFormData(prev => ({ ...prev, templateId: invoiceData.templateId }));
                 }
+              } catch (templateFetchError) {
+                console.error("Error fetching invoice template by id:", templateFetchError);
+                // Fall back to active template for this document type
+                await loadTemplateForDocumentType(invoiceData.documentTypeId || 1);
               }
             } else {
               setSelectedTemplate(null);
@@ -216,9 +212,14 @@ const InvoiceForm = () => {
                 currency: invoiceToCopy.currency || defaultSymbol,
                 statusId: invoiceToCopy.statusId || defaultStatus.statusId,
                 statusName: invoiceToCopy.statusName || defaultStatus.name,
-                templateId: invoiceToCopy.templateId || activeTemplateData?.id || null,
+                templateId: invoiceToCopy.templateId || null,
                 // companyLogo and companyLogoMimeType are expected to be in invoiceToCopy
               };
+              
+              // Load template for the copied invoice's document type
+              if (invoiceToCopy.documentTypeId) {
+                await loadTemplateForDocumentType(invoiceToCopy.documentTypeId);
+              }
             } else {
               console.warn(`Invoice with ID ${params.id} not found for copying.`);
               baseDataForNewOrCopy = {
@@ -231,14 +232,21 @@ const InvoiceForm = () => {
               };
             }
           } else { // New invoice
+            const defaultDocumentTypeId = documentTypes?.[0]?.id || null;
             baseDataForNewOrCopy = {
               ...formData, // Initial formData state, includes empty companyLogoMimeType
               currencyId: defaultCurrencyId,
               currency: defaultSymbol,
               statusId: defaultStatus.statusId,
               statusName: defaultStatus.name,
-              templateId: activeTemplateData?.id || null,
+              documentTypeId: defaultDocumentTypeId,
+              templateId: null, // Will be set by loadTemplateForDocumentType
             };
+            
+            // Load template for the default document type
+            if (defaultDocumentTypeId) {
+              await loadTemplateForDocumentType(defaultDocumentTypeId);
+            }
           }
 
           setFormData({ 
@@ -381,6 +389,7 @@ const InvoiceForm = () => {
       statusId: currentStatus.statusId,
       statusName: currentStatus.name,
       templateId: invoiceData.templateId || null,
+      documentTypeId: invoiceData.documentTypeId || 1,
     });
   };
 
@@ -457,8 +466,27 @@ const InvoiceForm = () => {
     handleCalculateTotal();
   };
 
-  const editField = (name, value) => {
+  const loadTemplateForDocumentType = async (documentTypeId) => {
+    try {
+      const activeTemplateData = await getActiveInvoiceTemplate(documentTypeId);
+      if (activeTemplateData) {
+        console.log('Loading template for document type:', documentTypeId, activeTemplateData.name);
+        setTemplateFromDto(activeTemplateData);
+        setFormData(prev => ({ ...prev, templateId: activeTemplateData.id }));
+      }
+    } catch (error) {
+      console.error('Error loading template for document type:', error);
+    }
+  };
+
+  const editField = async (name, value) => {
     setFormData({ ...formData, [name]: value });
+    
+    // If document type changes, update the active template
+    if (name === 'documentTypeId') {
+      await loadTemplateForDocumentType(value);
+    }
+    
     handleCalculateTotal();
   };
 
@@ -586,6 +614,7 @@ const InvoiceForm = () => {
       iban: formData.iban,
       StatusId: formData.statusId || 1,
       TemplateId: formData.templateId,
+      DocumentTypeId: formData.documentTypeId || 1,
       items: formData.items.map(item => ({
         ProductId: item.productId || null,
         Title: item.itemName || "",
@@ -1002,7 +1031,54 @@ const InvoiceForm = () => {
                   border: '1px solid rgba(255, 255, 255, 0.2)'
                 }}
               >
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  {/* Document Type Selection */}
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                    <Typography sx={{ 
+                      fontWeight: 700, 
+                      minWidth: "120px",
+                      color: '#2d3748',
+                      fontSize: '0.95rem'
+                    }}>
+                      📋 Document Type:
+                    </Typography>
+                    <FormControl size="small" sx={{ minWidth: 200 }}>
+                      <Select
+                        value={formData.documentTypeId}
+                        onChange={(e) => editField('documentTypeId', e.target.value)}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            background: 'rgba(255, 255, 255, 0.2)',
+                            backdropFilter: 'blur(10px)',
+                            borderRadius: '12px'
+                          },
+                          '.MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgba(255, 255, 255, 0.3)',
+                            borderWidth: '2px'
+                          },
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgba(102, 126, 234, 0.5)'
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#667eea',
+                            borderWidth: '2px'
+                          },
+                          '& .MuiInputBase-input': {
+                            color: '#2d3748',
+                            fontWeight: 500
+                          }
+                        }}
+                      >
+                        {documentTypes.map((type) => (
+                          <MenuItem key={type.id} value={type.id}>
+                            {type.displayName}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Box>
+
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                     <Typography sx={{ 
                       fontWeight: 700, 
                       minWidth: "120px",
@@ -1665,6 +1741,7 @@ const InvoiceForm = () => {
                 taxAmount: formData.taxAmount,
                 discountRate: formData.discountRate,
                 discountAmount: formData.discountAmount,
+                documentTypeId: formData.documentTypeId,
               }}
               items={formData.items}
               currency={formData.currency}

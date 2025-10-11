@@ -14,7 +14,11 @@ import {
   Grid,
   Paper,
   Fade,
-  CircularProgress
+  CircularProgress,
+  InputAdornment,
+  IconButton,
+  Switch,
+  FormControlLabel
 } from '@mui/material';
 import {
   Person as PersonIcon,
@@ -22,11 +26,18 @@ import {
   CalendarToday as CalendarIcon,
   Verified as VerifiedIcon,
   AccessTime as TrialIcon,
-  Save as SaveIcon
+  Save as SaveIcon,
+  Edit as EditIcon,
+  Security as SecurityIcon,
+  Settings as SettingsIcon,
+  Notifications as NotificationsIcon,
+  Lock as LockIcon,
+  Visibility,
+  VisibilityOff
 } from '@mui/icons-material';
 import { getUserProfile, updateUserProfile } from './api';
 import { useSubscription } from '../../utils/SubscriptionContext';
-import Page from '../ReusableComponents/Page';
+import Section from '../ReusableComponents/Section';
 
 const UserProfile = () => {
   const [profile, setProfile] = useState(null);
@@ -40,6 +51,26 @@ const UserProfile = () => {
     lastName: '',
     email: ''
   });
+  
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false
+  });
+
+  const [preferences, setPreferences] = useState({
+    emailNotifications: true,
+    marketingEmails: false,
+    securityAlerts: true
+  });
+
+  const [activeTab, setActiveTab] = useState('profile');
 
   useEffect(() => {
     fetchUserData();
@@ -69,6 +100,27 @@ const UserProfile = () => {
     });
     if (error) setError('');
     if (success) setSuccess('');
+  };
+
+  const handlePasswordChange = (e) => {
+    setPasswordData({
+      ...passwordData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handlePreferenceChange = (e) => {
+    setPreferences({
+      ...preferences,
+      [e.target.name]: e.target.checked
+    });
+  };
+
+  const togglePasswordVisibility = (field) => {
+    setShowPasswords({
+      ...showPasswords,
+      [field]: !showPasswords[field]
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -111,211 +163,674 @@ const UserProfile = () => {
 
   if (loading) {
     return (
-      <Page>
-        <Container maxWidth="md" sx={{ py: 4, display: 'flex', justifyContent: 'center' }}>
+      <Section>
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
           <CircularProgress size={60} />
-        </Container>
-      </Page>
+        </Box>
+      </Section>
     );
   }
 
   return (
-    <Page>
-      <Container maxWidth="md" sx={{ py: 4 }}>
-        <Fade in={true} timeout={800}>
-          <Box>
-            <Typography
-              variant="h4"
-              sx={{
-                fontWeight: 'bold',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                mb: 4,
-                textAlign: 'center'
+    <Section>
+      <Fade in={true} timeout={800}>
+        <Grid container spacing={3}>
+          {/* Header Row */}
+          <Grid item xs={12}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+              <Box 
+                sx={{ 
+                  width: 48,
+                  height: 48,
+                  borderRadius: 2,
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 8px 16px rgba(102, 126, 234, 0.3)'
+                }}
+              >
+                <PersonIcon sx={{ color: 'white', fontSize: 24 }} />
+              </Box>
+              <Box>
+                <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1f2937' }}>
+                  User Profile
+                </Typography>
+                <Typography variant="body1" sx={{ color: '#6b7280' }}>
+                  Manage your account settings and preferences
+                </Typography>
+              </Box>
+            </Box>
+          </Grid>
+
+          {/* Profile Summary Card */}
+          <Grid item xs={12} md={4}>
+            <Card 
+              elevation={0}
+              sx={{ 
+                borderRadius: 2,
+                border: '1px solid rgba(148, 163, 184, 0.2)',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+                height: '100%'
               }}
             >
-              User Profile
-            </Typography>
-
-            <Grid container spacing={3}>
-              {/* Profile Information Card */}
-              <Grid item xs={12} md={4}>
-                <Card elevation={4} sx={{ borderRadius: 3, height: 'fit-content' }}>
-                  <CardContent sx={{ textAlign: 'center', p: 3 }}>
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{ textAlign: 'center', mb: 3 }}>
+                  <Box sx={{ position: 'relative', display: 'inline-block' }}>
                     <Avatar
                       sx={{
-                        width: 100,
-                        height: 100,
+                        width: 80,
+                        height: 80,
                         margin: '0 auto',
                         mb: 2,
                         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        fontSize: '2rem'
+                        fontSize: '2rem',
+                        fontWeight: 'bold'
                       }}
                     >
                       {profile?.firstName?.[0]}{profile?.lastName?.[0]}
                     </Avatar>
-                    
-                    <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
-                      {profile?.firstName} {profile?.lastName}
+                    <IconButton
+                      size="small"
+                      sx={{
+                        position: 'absolute',
+                        bottom: 8,
+                        right: -4,
+                        backgroundColor: '#667eea',
+                        color: 'white',
+                        width: 28,
+                        height: 28,
+                        '&:hover': { backgroundColor: '#5a67d8' }
+                      }}
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+                  
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1 }}>
+                    {profile?.firstName} {profile?.lastName}
+                  </Typography>
+                  
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    {profile?.email}
+                  </Typography>
+
+                  <Chip
+                    icon={profile?.isTrialUser ? <TrialIcon /> : <VerifiedIcon />}
+                    label={getSubscriptionLabel()}
+                    color={getSubscriptionColor()}
+                    size="small"
+                    sx={{ fontWeight: 'bold' }}
+                  />
+                </Box>
+
+                <Divider sx={{ my: 2 }} />
+
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <Typography variant="caption" color="text.secondary">
+                      Member Since
                     </Typography>
-                    
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      {profile?.email}
+                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                      {formatDate(profile?.dateEntered)}
                     </Typography>
-
-                    <Chip
-                      icon={profile?.isTrialUser ? <TrialIcon /> : <VerifiedIcon />}
-                      label={getSubscriptionLabel()}
-                      color={getSubscriptionColor()}
-                      variant="outlined"
-                      sx={{ mb: 2 }}
-                    />
-
-                    <Divider sx={{ my: 2 }} />
-
-                    <Box sx={{ textAlign: 'left' }}>
+                  </Grid>
+                  {profile?.subscriptionExpiryDate && (
+                    <Grid item xs={6}>
                       <Typography variant="caption" color="text.secondary">
-                        Member Since
+                        Subscription
                       </Typography>
-                      <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <CalendarIcon fontSize="small" />
-                        {formatDate(profile?.dateEntered)}
+                      <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                        {formatDate(profile?.subscriptionExpiryDate)}
                       </Typography>
+                    </Grid>
+                  )}
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
 
-                      {profile?.subscriptionExpiryDate && (
-                        <Box sx={{ mt: 2 }}>
-                          <Typography variant="caption" color="text.secondary">
-                            Subscription {subscriptionStatus?.isActive ? 'Expires' : 'Expired'}
-                          </Typography>
-                          <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <CalendarIcon fontSize="small" />
-                            {formatDate(profile?.subscriptionExpiryDate)}
-                          </Typography>
-                        </Box>
-                      )}
+          {/* Tab Navigation */}
+          <Grid item xs={12} md={8}>
+            <Grid container spacing={2} sx={{ mb: 3 }}>
+              {[
+                { key: 'profile', label: 'Profile', icon: PersonIcon },
+                { key: 'security', label: 'Security', icon: SecurityIcon },
+                { key: 'preferences', label: 'Preferences', icon: SettingsIcon }
+              ].map((tab) => {
+                const IconComponent = tab.icon;
+                return (
+                  <Grid item xs={4} key={tab.key}>
+                    <Button
+                      fullWidth
+                      variant={activeTab === tab.key ? 'contained' : 'outlined'}
+                      startIcon={<IconComponent />}
+                      onClick={() => setActiveTab(tab.key)}
+                      sx={{
+                        py: 1.5,
+                        borderRadius: 2,
+                        fontWeight: 'bold',
+                        ...(activeTab === tab.key ? {
+                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                          boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+                          border: 'none'
+                        } : {
+                          color: '#6b7280',
+                          borderColor: 'rgba(148, 163, 184, 0.3)',
+                          '&:hover': {
+                            backgroundColor: 'rgba(102, 126, 234, 0.04)',
+                            borderColor: '#667eea'
+                          }
+                        })
+                      }}
+                    >
+                      {tab.label}
+                    </Button>
+                  </Grid>
+                );
+              })}
+            </Grid>
+          </Grid>
+
+          {/* Tab Content */}
+          <Grid item xs={12} md={8}>
+            {activeTab === 'profile' && (
+              <Card 
+                elevation={0}
+                sx={{ 
+                  borderRadius: 2,
+                  border: '1px solid rgba(148, 163, 184, 0.2)',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
+                }}
+              >
+                <CardContent sx={{ p: 3 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                    <Box 
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: 2,
+                        background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <EditIcon sx={{ color: 'white', fontSize: 18 }} />
                     </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              {/* Edit Profile Form */}
-              <Grid item xs={12} md={8}>
-                <Card elevation={4} sx={{ borderRadius: 3 }}>
-                  <CardContent sx={{ p: 4 }}>
-                    <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold' }}>
-                      Edit Profile
+                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                      Profile Information
                     </Typography>
+                  </Box>
 
-                    {error && (
-                      <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
-                        {error}
-                      </Alert>
-                    )}
+                  {error && (
+                    <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
+                      {error}
+                    </Alert>
+                  )}
 
-                    {success && (
-                      <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }}>
-                        {success}
-                      </Alert>
-                    )}
+                  {success && (
+                    <Alert severity="success" sx={{ mb: 2, borderRadius: 2 }}>
+                      {success}
+                    </Alert>
+                  )}
 
-                    <Box component="form" onSubmit={handleSubmit}>
-                      <Grid container spacing={3}>
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            fullWidth
-                            name="firstName"
-                            label="First Name"
-                            value={formData.firstName}
-                            onChange={handleChange}
-                            required
-                            InputProps={{
-                              startAdornment: <PersonIcon sx={{ mr: 1, color: 'action.active' }} />
-                            }}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            fullWidth
-                            name="lastName"
-                            label="Last Name"
-                            value={formData.lastName}
-                            onChange={handleChange}
-                            required
-                            InputProps={{
-                              startAdornment: <PersonIcon sx={{ mr: 1, color: 'action.active' }} />
-                            }}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12}>
-                          <TextField
-                            fullWidth
-                            name="email"
-                            type="email"
-                            label="Email Address"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                            InputProps={{
-                              startAdornment: <EmailIcon sx={{ mr: 1, color: 'action.active' }} />
-                            }}
-                          />
-                        </Grid>
-
-                        <Grid item xs={12}>
-                          <Button
-                            type="submit"
-                            variant="contained"
-                            size="large"
-                            disabled={updating}
-                            startIcon={<SaveIcon />}
-                            sx={{
+                  <Box component="form" onSubmit={handleSubmit}>
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          name="firstName"
+                          label="First Name"
+                          value={formData.firstName}
+                          onChange={handleChange}
+                          required
+                          size="small"
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <PersonIcon sx={{ color: 'action.active' }} />
+                              </InputAdornment>
+                            )
+                          }}
+                          sx={{ 
+                            '& .MuiOutlinedInput-root': {
                               borderRadius: 2,
-                              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                              '&:hover': {
-                                background: 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)',
+                              '&:hover .MuiOutlinedInput-notchedOutline': {
+                                borderColor: '#10b981'
+                              },
+                              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                borderColor: '#10b981'
                               }
+                            },
+                            '& .MuiInputLabel-root.Mui-focused': {
+                              color: '#10b981'
+                            }
+                          }}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          name="lastName"
+                          label="Last Name"
+                          value={formData.lastName}
+                          onChange={handleChange}
+                          required
+                          size="small"
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <PersonIcon sx={{ color: 'action.active' }} />
+                              </InputAdornment>
+                            )
+                          }}
+                          sx={{ 
+                            '& .MuiOutlinedInput-root': {
+                              borderRadius: 2,
+                              '&:hover .MuiOutlinedInput-notchedOutline': {
+                                borderColor: '#10b981'
+                              },
+                              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                borderColor: '#10b981'
+                              }
+                            },
+                            '& .MuiInputLabel-root.Mui-focused': {
+                              color: '#10b981'
+                            }
+                          }}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12}>
+                        <TextField
+                          fullWidth
+                          name="email"
+                          type="email"
+                          label="Email Address"
+                          value={formData.email}
+                          onChange={handleChange}
+                          required
+                          size="small"
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <EmailIcon sx={{ color: 'action.active' }} />
+                              </InputAdornment>
+                            )
+                          }}
+                          sx={{ 
+                            '& .MuiOutlinedInput-root': {
+                              borderRadius: 2,
+                              '&:hover .MuiOutlinedInput-notchedOutline': {
+                                borderColor: '#10b981'
+                              },
+                              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                borderColor: '#10b981'
+                              }
+                            },
+                            '& .MuiInputLabel-root.Mui-focused': {
+                              color: '#10b981'
+                            }
+                          }}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12}>
+                        <Button
+                          type="submit"
+                          variant="contained"
+                          disabled={updating}
+                          startIcon={<SaveIcon />}
+                          sx={{
+                            backgroundColor: '#10b981',
+                            backgroundImage: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                            borderRadius: 2,
+                            px: 3,
+                            py: 1,
+                            fontWeight: 600,
+                            '&:hover': {
+                              backgroundColor: '#059669',
+                              backgroundImage: 'linear-gradient(135deg, #059669 0%, #047857 100%)'
+                            },
+                            '&:disabled': {
+                              backgroundColor: '#9ca3af',
+                              color: 'white'
+                            }
+                          }}
+                        >
+                          {updating ? 'Updating...' : 'Update Profile'}
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  </Box>
+                </CardContent>
+              </Card>
+            )}
+
+            {activeTab === 'security' && (
+              <Card 
+                elevation={0}
+                sx={{ 
+                  borderRadius: 2,
+                  border: '1px solid rgba(148, 163, 184, 0.2)',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
+                }}
+              >
+                <CardContent sx={{ p: 3 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                    <Box 
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: 2,
+                        background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <SecurityIcon sx={{ color: 'white', fontSize: 18 }} />
+                    </Box>
+                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                      Security Settings
+                    </Typography>
+                  </Box>
+
+                  <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        name="currentPassword"
+                        type={showPasswords.current ? 'text' : 'password'}
+                        label="Current Password"
+                        value={passwordData.currentPassword}
+                        onChange={handlePasswordChange}
+                        size="small"
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton
+                                onClick={() => togglePasswordVisibility('current')}
+                                edge="end"
+                                size="small"
+                              >
+                                {showPasswords.current ? <VisibilityOff /> : <Visibility />}
+                              </IconButton>
+                            </InputAdornment>
+                          )
+                        }}
+                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                      />
+                    </Grid>
+                    
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        name="newPassword"
+                        type={showPasswords.new ? 'text' : 'password'}
+                        label="New Password"
+                        value={passwordData.newPassword}
+                        onChange={handlePasswordChange}
+                        size="small"
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton
+                                onClick={() => togglePasswordVisibility('new')}
+                                edge="end"
+                                size="small"
+                              >
+                                {showPasswords.new ? <VisibilityOff /> : <Visibility />}
+                              </IconButton>
+                            </InputAdornment>
+                          )
+                        }}
+                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                      />
+                    </Grid>
+                    
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        name="confirmPassword"
+                        type={showPasswords.confirm ? 'text' : 'password'}
+                        label="Confirm New Password"
+                        value={passwordData.confirmPassword}
+                        onChange={handlePasswordChange}
+                        size="small"
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton
+                                onClick={() => togglePasswordVisibility('confirm')}
+                                edge="end"
+                                size="small"
+                              >
+                                {showPasswords.confirm ? <VisibilityOff /> : <Visibility />}
+                              </IconButton>
+                            </InputAdornment>
+                          )
+                        }}
+                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                      />
+                    </Grid>
+                    
+                    <Grid item xs={12}>
+                      <Button
+                        variant="contained"
+                        startIcon={<LockIcon />}
+                        sx={{
+                          backgroundColor: '#ef4444',
+                          backgroundImage: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                          boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)',
+                          borderRadius: 2,
+                          px: 3,
+                          py: 1,
+                          fontWeight: 600,
+                          '&:hover': {
+                            backgroundColor: '#dc2626'
+                          }
+                        }}
+                      >
+                        Update Password
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+            )}
+
+            {activeTab === 'preferences' && (
+              <Card 
+                elevation={0}
+                sx={{ 
+                  borderRadius: 2,
+                  border: '1px solid rgba(148, 163, 184, 0.2)',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
+                }}
+              >
+                <CardContent sx={{ p: 3 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                    <Box 
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: 2,
+                        background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <SettingsIcon sx={{ color: 'white', fontSize: 18 }} />
+                    </Box>
+                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                      Notification Preferences
+                    </Typography>
+                  </Box>
+
+                  <Grid container spacing={2}>
+                    {[
+                      { 
+                        key: 'emailNotifications', 
+                        label: 'Email Notifications', 
+                        description: 'Receive important updates via email',
+                        icon: EmailIcon
+                      },
+                      { 
+                        key: 'securityAlerts', 
+                        label: 'Security Alerts', 
+                        description: 'Get notified about security events',
+                        icon: SecurityIcon
+                      },
+                      { 
+                        key: 'marketingEmails', 
+                        label: 'Marketing Emails', 
+                        description: 'Receive promotional content and updates',
+                        icon: NotificationsIcon
+                      }
+                    ].map((pref) => {
+                      const IconComponent = pref.icon;
+                      return (
+                        <Grid item xs={12} key={pref.key}>
+                          <Box 
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              p: 2,
+                              borderRadius: 2,
+                              backgroundColor: '#f8fafc',
+                              border: '1px solid rgba(148, 163, 184, 0.2)'
                             }}
                           >
-                            {updating ? 'Updating...' : 'Update Profile'}
-                          </Button>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                              <Box 
+                                sx={{
+                                  width: 28,
+                                  height: 28,
+                                  borderRadius: 1.5,
+                                  background: preferences[pref.key] 
+                                    ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
+                                    : 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center'
+                                }}
+                              >
+                                <IconComponent sx={{ color: 'white', fontSize: 16 }} />
+                              </Box>
+                              <Box>
+                                <Typography sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>
+                                  {pref.label}
+                                </Typography>
+                                <Typography variant="caption" sx={{ color: '#6b7280' }}>
+                                  {pref.description}
+                                </Typography>
+                              </Box>
+                            </Box>
+                            <Switch
+                              name={pref.key}
+                              checked={preferences[pref.key]}
+                              onChange={handlePreferenceChange}
+                              size="small"
+                              sx={{
+                                '& .MuiSwitch-switchBase.Mui-checked': {
+                                  color: '#3b82f6'
+                                },
+                                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                  backgroundColor: '#3b82f6'
+                                }
+                              }}
+                            />
+                          </Box>
                         </Grid>
-                      </Grid>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
+                      );
+                    })}
+                    
+                    <Grid item xs={12}>
+                      <Button
+                        variant="contained"
+                        startIcon={<SaveIcon />}
+                        sx={{
+                          backgroundColor: '#3b82f6',
+                          backgroundImage: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                          boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
+                          borderRadius: 2,
+                          px: 3,
+                          py: 1,
+                          fontWeight: 600,
+                          '&:hover': {
+                            backgroundColor: '#2563eb'
+                          }
+                        }}
+                      >
+                        Save Preferences
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </Card>
+            )}
+          </Grid>
 
-            {/* Subscription Status */}
-            {!subscriptionStatus?.isActive && (
-              <Fade in={true} timeout={1200}>
-                <Paper
-                  elevation={4}
+          {/* Subscription Status Warning - Full Width */}
+          {!subscriptionStatus?.isActive && (
+            <Grid item xs={12}>
+              <Paper
+                elevation={0}
+                sx={{
+                  p: 3,
+                  borderRadius: 2,
+                  background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+                  border: '1px solid #f59e0b'
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                  <Box 
+                    sx={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 2,
+                      background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <TrialIcon sx={{ color: 'white', fontSize: 18 }} />
+                  </Box>
+                  <Box>
+                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#92400e' }}>
+                      Subscription Expired
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#a16207' }}>
+                      Your subscription has expired. Please renew to continue using all features.
+                    </Typography>
+                  </Box>
+                </Box>
+                <Button
+                  variant="contained"
                   sx={{
-                    mt: 3,
-                    p: 3,
-                    borderRadius: 3,
-                    background: 'linear-gradient(135deg, #fee2e2 0%, #fef3c7 100%)',
-                    border: '1px solid #f59e0b'
+                    backgroundColor: '#f59e0b',
+                    backgroundImage: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                    fontWeight: 'bold',
+                    '&:hover': {
+                      backgroundColor: '#d97706'
+                    }
                   }}
                 >
-                  <Typography variant="h6" color="warning.main" sx={{ fontWeight: 'bold', mb: 1 }}>
-                    Subscription Expired
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Your subscription has expired. Please renew to continue using the system.
-                  </Typography>
-                </Paper>
-              </Fade>
-            )}
-          </Box>
-        </Fade>
-      </Container>
-    </Page>
+                  Renew Subscription
+                </Button>
+              </Paper>
+            </Grid>
+          )}
+        </Grid>
+      </Fade>
+    </Section>
   );
 };
 

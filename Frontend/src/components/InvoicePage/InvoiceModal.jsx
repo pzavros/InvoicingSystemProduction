@@ -113,7 +113,19 @@ const InvoiceModal = (props) => {
   };
 
   const isInvoiceCanceled = props.info.isDeleted || props.info.statusId === 4;
-  const invoiceTitle = isInvoiceCanceled ? "CANCELED INVOICE" : "CASH INVOICE";
+  
+  // Function to get document type title based on documentTypeId
+  const getDocumentTypeTitle = (documentTypeId) => {
+    switch (documentTypeId) {
+      case 1: return "INVOICE";
+      case 2: return "TAX INVOICE";
+      case 3: return "PROFORMA INVOICE";
+      case 4: return "QUOTATION";
+      default: return "INVOICE";
+    }
+  };
+  
+  const invoiceTitle = isInvoiceCanceled ? "CANCELED INVOICE" : getDocumentTypeTitle(props.info.documentTypeId);
 
   const templateTheme = React.useMemo(() => {
     const config = props.templateConfig || {};

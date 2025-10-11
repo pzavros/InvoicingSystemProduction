@@ -78,6 +78,45 @@ namespace InvoicingBackend.Controllers
             }
         }
 
+        // GET: api/invoicetemplates/active/document-type/{documentTypeId?}
+        [HttpGet("active/document-type")]
+        public async Task<IActionResult> GetActiveTemplateByDocumentType([FromQuery] int? documentTypeId = null)
+        {
+            try
+            {
+                var userId = GetUserId();
+                if (userId == null) return Unauthorized();
+
+                var template = await _templateService.GetActiveTemplateByDocumentTypeAsync(userId.Value, documentTypeId);
+                if (template == null)
+                    return NotFound(new { message = "No active template found for this document type." });
+
+                return Ok(template);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while fetching the active template.", error = ex.Message });
+            }
+        }
+
+        // GET: api/invoicetemplates/by-document-type
+        [HttpGet("by-document-type")]
+        public async Task<IActionResult> GetTemplatesByDocumentType([FromQuery] int? documentTypeId = null)
+        {
+            try
+            {
+                var userId = GetUserId();
+                if (userId == null) return Unauthorized();
+
+                var templates = await _templateService.GetTemplatesByDocumentTypeAsync(userId.Value, documentTypeId);
+                return Ok(templates);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while fetching templates.", error = ex.Message });
+            }
+        }
+
         // POST: api/invoicetemplates
         [HttpPost]
         public async Task<IActionResult> CreateTemplate([FromBody] CreateInvoiceTemplateDto createDto)

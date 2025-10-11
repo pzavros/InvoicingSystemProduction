@@ -223,6 +223,7 @@ namespace InvoicingBackend.Services
                 EnteredBy = $"User{userId}",
                 DateEntered = DateTime.UtcNow,
                 StatusId = dto.StatusId,
+                DocumentTypeId = dto.DocumentTypeId, // Add document type
                 UserId = userId // Set the user ownership
             };
 
@@ -298,7 +299,9 @@ namespace InvoicingBackend.Services
             invoice.BankName = dto.BankName;
             invoice.AccountName = dto.AccountName;
             invoice.AccountNo = dto.AccountNo;
-            invoice.Swift = dto.Swift;            invoice.Iban = dto.Iban;
+            invoice.Swift = dto.Swift;
+            invoice.Iban = dto.Iban;
+            invoice.DocumentTypeId = dto.DocumentTypeId; // Add document type update
             
             // Store original items for stock restoration
             var originalItems = invoice.Items.ToList();

@@ -181,6 +181,29 @@ namespace InvoicingBackend.Services
             return BCrypt.Net.BCrypt.HashPassword(password);
         }
 
+        public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
+        {
+            var users = await _context.Users
+                .OrderBy(u => u.LastName)
+                .ThenBy(u => u.FirstName)
+                .ToListAsync();
+
+            return users.Select(MapToUserDto);
+        }
+
+        public async Task<bool> UpdateAdminStatusAsync(int userId, bool isAdmin)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return false;
+
+            user.IsAdmin = isAdmin;
+            user.DateModified = DateTime.UtcNow;
+            user.ModifiedBy = "Admin";
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
         private UserDto MapToUserDto(User user)
         {
             return new UserDto

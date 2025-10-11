@@ -16,5 +16,9 @@ namespace InvoicingBackend.Interfaces
         Task<string> GenerateJwtTokenAsync(User user);
         Task<bool> VerifyPasswordAsync(string password, string passwordHash);
         string HashPassword(string password);
+        
+        // Admin methods
+        Task<IEnumerable<UserDto>> GetAllUsersAsync();
+        Task<bool> UpdateAdminStatusAsync(int userId, bool isAdmin);
     }
 }

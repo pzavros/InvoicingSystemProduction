@@ -22,6 +22,7 @@ namespace InvoicingBackend.Services
                 {
                     Name = "Modern Professional",
                     Description = "A clean, modern template perfect for professional services, consultancy, and corporate businesses. Features elegant typography and structured layout.",
+                    DocumentTypeId = 1, // Standard Invoice
                     IsSystemTemplate = true,
                     IsActive = false,
                     DateEntered = DateTime.UtcNow,
@@ -73,6 +74,7 @@ namespace InvoicingBackend.Services
                 {
                     Name = "Creative Colorful",
                     Description = "A vibrant, eye-catching template ideal for creative agencies, designers, and modern startups. Features bold colors and dynamic layouts.",
+                    DocumentTypeId = 4, // Quotation - more suitable for creative work
                     IsSystemTemplate = true,
                     IsActive = false,
                     DateEntered = DateTime.UtcNow,
@@ -131,6 +133,7 @@ namespace InvoicingBackend.Services
                 {
                     Name = "Minimalist Clean",
                     Description = "An ultra-clean, minimalist template focusing on clarity and simplicity. Perfect for tech companies, freelancers, and modern businesses.",
+                    DocumentTypeId = 3, // Proforma - good for tech companies showing estimates
                     IsSystemTemplate = true,
                     IsActive = false,
                     DateEntered = DateTime.UtcNow,

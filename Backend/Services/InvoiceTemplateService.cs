@@ -17,13 +17,26 @@ namespace InvoicingBackend.Services
 
         public async Task<IEnumerable<InvoiceTemplateDto>> GetUserTemplatesAsync(int userId)
         {
-            var templates = await _context.InvoiceTemplates
+            var allTemplates = await _context.InvoiceTemplates
                 .Where(t => t.UserId == userId || t.IsSystemTemplate)
                 .OrderByDescending(t => t.IsActive)
                 .ThenByDescending(t => t.DateEntered)
                 .ToListAsync();
 
-            return templates.Select(MapToDto);
+            // Group by name and prioritize user templates over system templates with the same name
+            var filteredTemplates = allTemplates
+                .GroupBy(t => t.Name)
+                .Select(group => 
+                {
+                    // If there's a user template in the group, return it; otherwise return the system template
+                    var userTemplate = group.FirstOrDefault(t => t.UserId == userId);
+                    return userTemplate ?? group.First();
+                })
+                .OrderByDescending(t => t.IsActive)
+                .ThenByDescending(t => t.DateEntered)
+                .ToList();
+
+            return filteredTemplates.Select(MapToDto);
         }
 
         public async Task<InvoiceTemplateDto?> GetTemplateByIdAsync(int templateId, int userId)
@@ -36,10 +49,20 @@ namespace InvoicingBackend.Services
 
         public async Task<InvoiceTemplateDto?> GetActiveTemplateAsync(int userId)
         {
+            // First, try to get user's active template
             var activeTemplate = await _context.InvoiceTemplates
                 .FirstOrDefaultAsync(t => t.UserId == userId && t.IsActive);
 
-            return activeTemplate != null ? MapToDto(activeTemplate) : null;
+            if (activeTemplate != null)
+            {
+                return MapToDto(activeTemplate);
+            }
+
+            // If no user template is active, return the first system template as fallback
+            var fallbackTemplate = await _context.InvoiceTemplates
+                .FirstOrDefaultAsync(t => t.IsSystemTemplate);
+
+            return fallbackTemplate != null ? MapToDto(fallbackTemplate) : null;
         }
 
         public async Task<InvoiceTemplateDto> CreateTemplateAsync(CreateInvoiceTemplateDto createDto, int userId)
@@ -49,6 +72,7 @@ namespace InvoicingBackend.Services
                 Name = createDto.Name,
                 Description = createDto.Description,
                 TemplateData = createDto.TemplateData,
+                DocumentTypeId = createDto.DocumentTypeId,
                 PreviewImage = createDto.PreviewImage,
                 UserId = userId,
                 IsActive = false,
@@ -74,6 +98,7 @@ namespace InvoicingBackend.Services
             template.Name = updateDto.Name;
             template.Description = updateDto.Description;
             template.TemplateData = updateDto.TemplateData;
+            template.DocumentTypeId = updateDto.DocumentTypeId;
             template.PreviewImage = updateDto.PreviewImage;
             template.DateModified = DateTime.UtcNow;
             template.ModifiedBy = userId.ToString();
@@ -97,9 +122,16 @@ namespace InvoicingBackend.Services
 
         public async Task<bool> SetActiveTemplateAsync(int templateId, int userId)
         {
-            // First, deactivate all user templates
+            // Get the selected template first to know its document type
+            var selectedTemplate = await _context.InvoiceTemplates
+                .FirstOrDefaultAsync(t => t.Id == templateId && (t.UserId == userId || t.IsSystemTemplate));
+
+            if (selectedTemplate == null)
+                return false;
+
+            // Deactivate all user templates of the same document type
             var userTemplates = await _context.InvoiceTemplates
-                .Where(t => t.UserId == userId)
+                .Where(t => t.UserId == userId && t.IsActive && t.DocumentTypeId == selectedTemplate.DocumentTypeId)
                 .ToListAsync();
 
             foreach (var template in userTemplates)
@@ -107,33 +139,27 @@ namespace InvoicingBackend.Services
                 template.IsActive = false;
             }
 
-            // Then activate the selected template
-            var selectedTemplate = await _context.InvoiceTemplates
-                .FirstOrDefaultAsync(t => t.Id == templateId && (t.UserId == userId || t.IsSystemTemplate));
-
-            if (selectedTemplate == null)
-                return false;
-
-            // If it's a system template, create a copy for the user
+            // If it's a system template, create a user copy instead of modifying the original
             if (selectedTemplate.IsSystemTemplate)
             {
-                var userTemplate = new InvoiceTemplate
+                var userCopy = new InvoiceTemplate
                 {
-                    Name = selectedTemplate.Name + " (Copy)",
+                    Name = selectedTemplate.Name,
                     Description = selectedTemplate.Description,
                     TemplateData = selectedTemplate.TemplateData,
-                    PreviewImage = selectedTemplate.PreviewImage,
-                    UserId = userId,
+                    DocumentTypeId = selectedTemplate.DocumentTypeId,
                     IsActive = true,
                     IsSystemTemplate = false,
+                    UserId = userId,
                     DateEntered = DateTime.UtcNow,
-                    EnteredBy = userId.ToString()
+                    EnteredBy = $"User-{userId}"
                 };
 
-                _context.InvoiceTemplates.Add(userTemplate);
+                _context.InvoiceTemplates.Add(userCopy);
             }
             else
             {
+                // If it's already a user template, just activate it
                 selectedTemplate.IsActive = true;
             }
 
@@ -151,6 +177,57 @@ namespace InvoicingBackend.Services
             return systemTemplates.Select(MapToDto);
         }
 
+        public async Task<InvoiceTemplateDto?> GetActiveTemplateByDocumentTypeAsync(int userId, int? documentTypeId = null)
+        {
+            Console.WriteLine($"GetActiveTemplateByDocumentTypeAsync called with userId: {userId}, documentTypeId: {documentTypeId}");
+            
+            // First, try to get user's active template for the specific document type
+            var activeTemplate = await _context.InvoiceTemplates
+                .Where(t => t.UserId == userId && t.IsActive && t.DocumentTypeId == documentTypeId)
+                .FirstOrDefaultAsync();
+
+            Console.WriteLine($"Found user active template: {activeTemplate?.Name ?? "None"}");
+
+            if (activeTemplate != null)
+            {
+                return MapToDto(activeTemplate);
+            }
+
+            // If no user template is active, fallback to system template for this document type (regardless of IsActive)
+            var systemTemplate = await _context.InvoiceTemplates
+                .Where(t => t.IsSystemTemplate && t.DocumentTypeId == documentTypeId)
+                .OrderBy(t => t.Name) // Get the first one if multiple exist
+                .FirstOrDefaultAsync();
+
+            Console.WriteLine($"Found system template: {systemTemplate?.Name ?? "None"}");
+
+            // If we found a system template, return it even if it's not marked as active
+            if (systemTemplate != null)
+            {
+                return MapToDto(systemTemplate);
+            }
+
+            // Last fallback: if no template exists for this document type, get any system template as default
+            var fallbackSystemTemplate = await _context.InvoiceTemplates
+                .Where(t => t.IsSystemTemplate)
+                .OrderBy(t => t.Name)
+                .FirstOrDefaultAsync();
+
+            Console.WriteLine($"Found fallback system template: {fallbackSystemTemplate?.Name ?? "None"}");
+
+            return fallbackSystemTemplate != null ? MapToDto(fallbackSystemTemplate) : null;
+        }
+
+        public async Task<IEnumerable<InvoiceTemplateDto>> GetTemplatesByDocumentTypeAsync(int userId, int? documentTypeId = null)
+        {
+            var templates = await _context.InvoiceTemplates
+                .Where(t => (t.UserId == userId || t.IsSystemTemplate) && t.DocumentTypeId == documentTypeId)
+                .OrderBy(t => t.Name)
+                .ToListAsync();
+
+            return templates.Select(MapToDto);
+        }
+
         private static InvoiceTemplateDto MapToDto(InvoiceTemplate template)
         {
             return new InvoiceTemplateDto
@@ -161,6 +238,7 @@ namespace InvoicingBackend.Services
                 TemplateData = template.TemplateData,
                 IsActive = template.IsActive,
                 IsSystemTemplate = template.IsSystemTemplate,
+                DocumentTypeId = template.DocumentTypeId,
                 PreviewImage = template.PreviewImage,
                 DateEntered = template.DateEntered
             };

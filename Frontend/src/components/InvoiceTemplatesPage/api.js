@@ -127,4 +127,43 @@ export const getSystemTemplates = async () => {
   }
 };
 
+// Get all document types
+export const getDocumentTypes = async () => {
+  try {
+    const response = await api.get('/api/documenttypes');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching document types:', error);
+    throw error;
+  }
+};
+
+// Get templates by document type
+export const getTemplatesByDocumentType = async (documentTypeId = null) => {
+  try {
+    const url = documentTypeId 
+      ? `/api/invoicetemplates/by-document-type?documentTypeId=${documentTypeId}`
+      : '/api/invoicetemplates/by-document-type';
+    const response = await api.get(url);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching templates by document type:', error);
+    throw error;
+  }
+};
+
+// Get active template by document type
+export const getActiveTemplateByDocumentType = async (documentTypeId = null) => {
+  try {
+    const url = documentTypeId 
+      ? `/api/invoicetemplates/active/document-type?documentTypeId=${documentTypeId}`
+      : '/api/invoicetemplates/active/document-type';
+    const response = await api.get(url);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching active template by document type:', error);
+    throw error;
+  }
+};
+
 export default api;

@@ -152,9 +152,12 @@ export const updateBulkInvoiceStatus = async (invoiceIds, statusId) => {
   }
 };
 
-export const getActiveInvoiceTemplate = async () => {
+export const getActiveInvoiceTemplate = async (documentTypeId = null) => {
   try {
-    const response = await invoiceApi.get('/api/invoicetemplates/active');
+    const url = documentTypeId 
+      ? `/api/invoicetemplates/active/document-type?documentTypeId=${documentTypeId}`
+      : '/api/invoicetemplates/active';
+    const response = await invoiceApi.get(url);
     return response.data;
   } catch (error) {
     if (error.response?.status === 404) {

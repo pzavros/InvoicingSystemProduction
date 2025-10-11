@@ -25,6 +25,12 @@ Frontend/coverage/
 Frontend/.env
 Frontend/.env.*.local
 
+# Root level environment files (for email configuration)
+.env
+.env.development
+.env.production
+.env.*.local
+
 # ============================
 # .NET / Backend
 # ============================

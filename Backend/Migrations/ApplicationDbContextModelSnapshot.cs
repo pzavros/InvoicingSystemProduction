@@ -351,6 +351,87 @@ namespace Backend.Migrations
                         });
                 });
 
+            modelBuilder.Entity("InvoicingBackend.Models.DocumentType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTime?>("DateDeleted")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("DateEntered")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("EnteredBy")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsProforma")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsQuotation")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("NumberPrefix")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<bool>("RequiresTaxInfo")
+                        .HasColumnType("boolean");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bytea");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("DocumentTypes");
+                });
+
             modelBuilder.Entity("InvoicingBackend.Models.Invoice", b =>
                 {
                     b.Property<int>("Id")
@@ -434,6 +515,9 @@ namespace Backend.Migrations
                     b.Property<decimal>("DiscountRate")
                         .HasColumnType("decimal(5,2)");
 
+                    b.Property<int>("DocumentTypeId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -504,6 +588,8 @@ namespace Backend.Migrations
                     b.HasIndex("ClientId");
 
                     b.HasIndex("CurrencyId");
+
+                    b.HasIndex("DocumentTypeId");
 
                     b.HasIndex("TemplateId");
 
@@ -609,6 +695,9 @@ namespace Backend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int?>("DocumentTypeId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("EnteredBy")
                         .HasColumnType("text");
 
@@ -645,6 +734,8 @@ namespace Backend.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DocumentTypeId");
 
                     b.HasIndex("UserId");
 
@@ -1217,6 +1308,15 @@ namespace Backend.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("InvoicingBackend.Models.DocumentType", b =>
+                {
+                    b.HasOne("InvoicingBackend.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("InvoicingBackend.Models.Invoice", b =>
                 {
                     b.HasOne("InvoicingBackend.Models.Client", "Client")
@@ -1228,6 +1328,12 @@ namespace Backend.Migrations
                         .WithMany()
                         .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("InvoicingBackend.Models.DocumentType", "DocumentType")
+                        .WithMany("Invoices")
+                        .HasForeignKey("DocumentTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("InvoicingBackend.Models.InvoiceTemplate", "Template")
@@ -1242,6 +1348,8 @@ namespace Backend.Migrations
                     b.Navigation("Client");
 
                     b.Navigation("Currency");
+
+                    b.Navigation("DocumentType");
 
                     b.Navigation("Template");
 
@@ -1274,10 +1382,17 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("InvoicingBackend.Models.InvoiceTemplate", b =>
                 {
+                    b.HasOne("InvoicingBackend.Models.DocumentType", "DocumentType")
+                        .WithMany("Templates")
+                        .HasForeignKey("DocumentTypeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("InvoicingBackend.Models.User", "User")
                         .WithMany("InvoiceTemplates")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("DocumentType");
 
                     b.Navigation("User");
                 });
@@ -1363,6 +1478,13 @@ namespace Backend.Migrations
             modelBuilder.Entity("InvoicingBackend.Models.Client", b =>
                 {
                     b.Navigation("Invoices");
+                });
+
+            modelBuilder.Entity("InvoicingBackend.Models.DocumentType", b =>
+                {
+                    b.Navigation("Invoices");
+
+                    b.Navigation("Templates");
                 });
 
             modelBuilder.Entity("InvoicingBackend.Models.Invoice", b =>

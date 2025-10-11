@@ -21,6 +21,7 @@ namespace InvoicingBackend.Data
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<InvoiceTemplate> InvoiceTemplates { get; set; }
+        public DbSet<DocumentType> DocumentTypes { get; set; }
         public DbSet<Client> Clients { get; set; }
         
         // Webpage Models
@@ -143,6 +144,20 @@ namespace InvoicingBackend.Data
                 .HasOne(c => c.PreferredCurrency)
                 .WithMany()
                 .HasForeignKey(c => c.PreferredCurrencyId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // Invoice → DocumentType relationship (Many-to-One)
+            modelBuilder.Entity<Invoice>()
+                .HasOne(i => i.DocumentType)
+                .WithMany(dt => dt.Invoices)
+                .HasForeignKey(i => i.DocumentTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // InvoiceTemplate → DocumentType relationship (Many-to-One, Optional)
+            modelBuilder.Entity<InvoiceTemplate>()
+                .HasOne(t => t.DocumentType)
+                .WithMany(dt => dt.Templates)
+                .HasForeignKey(t => t.DocumentTypeId)
                 .OnDelete(DeleteBehavior.SetNull);
 
         }

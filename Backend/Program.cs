@@ -2,6 +2,7 @@ using InvoicingBackend.Data;
 using InvoicingBackend.Interfaces;
 using InvoicingBackend.Services;
 using InvoicingBackend.Models;
+using InvoicingBackend.Utils;
 using Backend.Interfaces.Webpage;
 using Backend.Services.Webpage;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Load environment variables from .env files
+EnvironmentLoader.LoadEnvironmentFiles(builder.Environment);
 
 // Conditionally force Kestrel to listen on all interfaces at port 5000 for Docker compatibility only
 // For development, let it use default ports
@@ -33,6 +37,19 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Configure JWT settings
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+
+// Configure Email settings
+builder.Services.Configure<EmailSettings>(options =>
+{
+    options.SmtpHost = Environment.GetEnvironmentVariable("EMAIL_SMTP_HOST") ?? "smtp.office365.com";
+    options.SmtpPort = int.Parse(Environment.GetEnvironmentVariable("EMAIL_SMTP_PORT") ?? "587");
+    options.Username = Environment.GetEnvironmentVariable("EMAIL_SMTP_USERNAME") ?? "";
+    options.Password = Environment.GetEnvironmentVariable("EMAIL_SMTP_PASSWORD") ?? "";
+    options.FromName = Environment.GetEnvironmentVariable("EMAIL_FROM_NAME") ?? "Invoicing System";
+    options.FromAddress = Environment.GetEnvironmentVariable("EMAIL_FROM_ADDRESS") ?? "";
+    options.UseSsl = bool.Parse(Environment.GetEnvironmentVariable("EMAIL_USE_SSL") ?? "true");
+    options.EnableSsl = bool.Parse(Environment.GetEnvironmentVariable("EMAIL_ENABLE_SSL") ?? "true");
+});
 
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
@@ -63,7 +80,9 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
 builder.Services.AddScoped<IInvoiceTemplateService, InvoiceTemplateService>();
+builder.Services.AddScoped<IDocumentTypeService, DocumentTypeService>();
 builder.Services.AddScoped<IClientService, ClientService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // Webpage services
 builder.Services.AddScoped<IWaitlistService, WaitlistService>();
@@ -110,6 +129,8 @@ using (var scope = app.Services.CreateScope())
     
     // Seed admin user
     await AdminSeeder.SeedAdminUserAsync(db);
+    
+    // Document types are seeded via migration
     
     // Seed invoice templates
     await InvoiceTemplateSeeder.SeedInvoiceTemplatesAsync(db);

@@ -26,9 +26,8 @@ namespace InvoicingBackend.Controllers
         {
             try
             {
-                // This would require adding a GetAllUsers method to IUserService
-                // For now, return a placeholder
-                return Ok(new { message = "Admin users endpoint - implementation needed" });
+                var users = await _userService.GetAllUsersAsync();
+                return Ok(users);
             }
             catch (Exception ex)
             {
@@ -44,9 +43,11 @@ namespace InvoicingBackend.Controllers
         {
             try
             {
-                // This would require adding an UpdateAdminStatus method to IUserService
-                // For now, return a placeholder
-                return Ok(new { message = $"Admin status update for user {id} - implementation needed" });
+                var result = await _userService.UpdateAdminStatusAsync(id, dto.IsAdmin);
+                if (!result)
+                    return NotFound(new { message = "User not found." });
+
+                return Ok(new { message = "Admin status updated successfully." });
             }
             catch (Exception ex)
             {

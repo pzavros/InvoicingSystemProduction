@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -11,7 +11,8 @@ import {
   Divider,
   IconButton,
   Stack,
-  Chip
+  Chip,
+  CircularProgress
 } from '@mui/material';
 import {
   Close as CloseIcon,
@@ -20,17 +21,50 @@ import {
   Phone as PhoneIcon
 } from '@mui/icons-material';
 import { COLOR_THEMES } from '../../utils/colorThemes';
+import { getTemplateById } from './api';
 
 const TemplatePreviewModal = ({ open, onClose, template, onSetActive }) => {
+  const [currentTemplate, setCurrentTemplate] = useState(template);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  // Fetch fresh template data when modal opens
+  useEffect(() => {
+    const fetchFreshTemplate = async () => {
+      if (open && template?.id) {
+        setLoading(true);
+        setError(null);
+        try {
+          const freshTemplate = await getTemplateById(template.id);
+          console.log('Preview Modal - Fresh template loaded:', freshTemplate);
+          setCurrentTemplate(freshTemplate);
+        } catch (error) {
+          console.error('Error fetching fresh template data:', error);
+          setError('Failed to load latest template data. Showing cached version.');
+          // Fallback to the passed template if fetch fails
+          setCurrentTemplate(template);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchFreshTemplate();
+  }, [open, template?.id]);
+
   if (!template) return null;
+
+  // Use currentTemplate for the preview content
+  const templateToUse = currentTemplate || template;
 
   // Parse template data safely and support legacy & advanced formats
   let templateConfig = {};
   try {
-    if (template.templateData) {
-      templateConfig = typeof template.templateData === 'string'
-        ? JSON.parse(template.templateData)
-        : template.templateData;
+    if (templateToUse.templateData) {
+      templateConfig = typeof templateToUse.templateData === 'string'
+        ? JSON.parse(templateToUse.templateData)
+        : templateToUse.templateData;
+      console.log('Preview Modal - Parsed template config:', templateConfig);
     }
   } catch (error) {
     console.error('Error parsing template data:', error);
@@ -38,19 +72,28 @@ const TemplatePreviewModal = ({ open, onClose, template, onSetActive }) => {
   }
 
   const rawLayout = (templateConfig.layout || templateConfig.layoutId || '').toString().toLowerCase();
-  const rawTheme = (templateConfig.theme || templateConfig.colorTheme?.id || '').toString().toLowerCase();
-  const palette = templateConfig.colorTheme
-    || (rawTheme && COLOR_THEMES?.[rawTheme])
-    || null;
+  
+  // Fix theme parsing - support both old and new formats
+  let rawTheme = '';
+  if (templateConfig.colorTheme) {
+    // New format: colorTheme is the ID string
+    rawTheme = templateConfig.colorTheme.toString().toLowerCase();
+  } else if (templateConfig.theme) {
+    // Legacy format: theme could be name or ID
+    rawTheme = templateConfig.theme.toString().toLowerCase();
+  }
+  
+  const palette = COLOR_THEMES?.[rawTheme] || null;
+  console.log('Preview Modal - Theme parsing:', { rawTheme, palette, availableThemes: Object.keys(COLOR_THEMES) });
 
   const colors = {
-    primary: palette?.colors?.primary || templateConfig.primaryColor || '#2563eb',
-    secondary: palette?.colors?.secondary || templateConfig.secondaryColor || '#1e40af',
-    accent: palette?.colors?.accent || templateConfig.accentColor || '#3b82f6',
-    background: palette?.colors?.background || templateConfig.backgroundColor || '#f8fafc',
-    surface: palette?.colors?.surface || templateConfig.surfaceColor || '#ffffff',
-    text: palette?.colors?.text || templateConfig.textColor || '#1f2937',
-    textSecondary: palette?.colors?.textSecondary || templateConfig.labelColor || '#6b7280'
+    primary: templateConfig.colors?.primary || palette?.colors?.primary || palette?.primary || '#2563eb',
+    secondary: templateConfig.colors?.secondary || palette?.colors?.secondary || palette?.secondary || '#1e40af',
+    accent: templateConfig.colors?.accent || palette?.colors?.accent || palette?.primary || '#3b82f6',
+    background: templateConfig.colors?.background || palette?.colors?.background || '#f8fafc',
+    surface: templateConfig.colors?.surface || palette?.colors?.surface || '#ffffff',
+    text: templateConfig.colors?.text || palette?.colors?.text || '#1f2937',
+    textSecondary: templateConfig.colors?.textSecondary || palette?.colors?.textSecondary || '#6b7280'
   };
 
   const previewVariant = (() => {
@@ -96,10 +139,10 @@ const TemplatePreviewModal = ({ open, onClose, template, onSetActive }) => {
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Box>
             <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1f2937' }}>
-              {template.name} Preview
+              {templateToUse.name} Preview
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {template.description}
+              {templateToUse.description}
             </Typography>
           </Box>
           <IconButton onClick={onClose} sx={{ color: '#6b7280' }}>
@@ -109,6 +152,25 @@ const TemplatePreviewModal = ({ open, onClose, template, onSetActive }) => {
       </DialogTitle>
 
       <DialogContent sx={{ px: 3, pb: 2 }}>
+        {loading ? (
+          <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="400px">
+            <CircularProgress />
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+              Loading latest template data...
+            </Typography>
+          </Box>
+        ) : (
+          <>
+        {error && (
+          <Box mb={2}>
+            <Chip 
+              label={error} 
+              color="warning" 
+              variant="outlined" 
+              sx={{ fontSize: '0.75rem' }} 
+            />
+          </Box>
+        )}
         {/* Template Info */}
         <Box mb={3}>
           <Stack direction="row" spacing={1} mb={2}>
@@ -124,10 +186,10 @@ const TemplatePreviewModal = ({ open, onClose, template, onSetActive }) => {
               variant="outlined"
               sx={{ textTransform: 'capitalize' }}
             />
-            {template.isSystemTemplate && (
+            {templateToUse.isSystemTemplate && (
               <Chip label="System Template" color="info" variant="filled" />
             )}
-            {template.isActive && (
+            {templateToUse.isActive && (
               <Chip label="Currently Active" color="success" variant="filled" />
             )}
           </Stack>
@@ -159,10 +221,19 @@ const TemplatePreviewModal = ({ open, onClose, template, onSetActive }) => {
           >
             <Box>
               <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 1 }}>
-                INVOICE
+                {(() => {
+                  console.log('Preview Modal - Template config type:', templateConfig.type);
+                  console.log('Preview Modal - Full template config:', templateConfig);
+                  if (templateConfig.type === 'tax') return 'TAX INVOICE';
+                  if (templateConfig.type === 'proforma') return 'PROFORMA INVOICE';
+                  if (templateConfig.type === 'quote') return 'QUOTATION';
+                  return 'INVOICE';
+                })()}
               </Typography>
               <Typography variant="h6" sx={{ opacity: 0.9 }}>
-                Invoice #INV-2024-001
+                {(templateConfig.type === 'quote' || templateToUse.name?.toLowerCase().includes('quotation')) 
+                  ? 'Quote #QUO-2024-001' 
+                  : 'Invoice #INV-2024-001'}
               </Typography>
             </Box>
             <Box textAlign="right">
@@ -414,17 +485,19 @@ const TemplatePreviewModal = ({ open, onClose, template, onSetActive }) => {
             </>
           )}
         </Paper>
+        </>
+        )}
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 3 }}>
         <Button onClick={onClose} color="inherit">
           Close Preview
         </Button>
-        {!template?.isActive && (
+        {!templateToUse?.isActive && (
           <Button 
             variant="contained" 
             onClick={() => {
-              onSetActive && onSetActive(template.id);
+              onSetActive && onSetActive(templateToUse.id);
               onClose();
             }}
             sx={{
@@ -435,7 +508,7 @@ const TemplatePreviewModal = ({ open, onClose, template, onSetActive }) => {
             Use This Template
           </Button>
         )}
-        {template?.isActive && (
+        {templateToUse?.isActive && (
           <Button 
             variant="contained" 
             disabled
