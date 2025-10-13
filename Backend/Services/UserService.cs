@@ -2,6 +2,7 @@ using InvoicingBackend.Data;
 using InvoicingBackend.DTOs;
 using InvoicingBackend.Interfaces;
 using InvoicingBackend.Models;
+using InvoicingBackend.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -16,11 +17,13 @@ namespace InvoicingBackend.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly JwtSettings _jwtSettings;
+        private readonly IEmailService _emailService;
 
-        public UserService(ApplicationDbContext context, IOptions<JwtSettings> jwtSettings)
+        public UserService(ApplicationDbContext context, IOptions<JwtSettings> jwtSettings, IEmailService emailService)
         {
             _context = context;
             _jwtSettings = jwtSettings.Value;
+            _emailService = emailService;
         }
 
         public async Task<UserDto?> GetUserByIdAsync(int id)
@@ -204,6 +207,120 @@ namespace InvoicingBackend.Services
             return true;
         }
 
+        public async Task<bool> UpdatePasswordAsync(int userId, UpdatePasswordDto passwordDto)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return false;
+
+            // Verify current password
+            if (!await VerifyPasswordAsync(passwordDto.CurrentPassword, user.PasswordHash))
+            {
+                return false;
+            }
+
+            // Update with new password
+            user.PasswordHash = HashPassword(passwordDto.NewPassword);
+            user.DateModified = DateTime.UtcNow;
+            user.ModifiedBy = user.Email;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateUserPreferencesAsync(int userId, UserPreferencesDto preferencesDto)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return false;
+
+            // Update user preferences
+            user.Currency = preferencesDto.Currency ?? user.Currency;
+            user.DateFormat = preferencesDto.DateFormat ?? user.DateFormat;
+            user.Language = preferencesDto.Language ?? user.Language;
+            user.EmailNotifications = preferencesDto.EmailNotifications;
+            user.DarkMode = preferencesDto.DarkMode;
+            
+            user.DateModified = DateTime.UtcNow;
+            user.ModifiedBy = user.Email;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> RequestPasswordChangeOtpAsync(int userId, RequestPasswordChangeOtpDto requestDto)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return false;
+
+            // Generate OTP directly without password verification
+            user.PasswordChangeOtp = OtpHelper.GenerateOtp();
+            user.PasswordChangeOtpExpiry = OtpHelper.GetOtpExpiryTime();
+            
+            user.DateModified = DateTime.UtcNow;
+            user.ModifiedBy = user.Email;
+
+            await _context.SaveChangesAsync();
+
+            // Send OTP email
+            try
+            {
+                var emailResult = await _emailService.SendPasswordChangeOtpEmailAsync(user.Email, user.FirstName, user.PasswordChangeOtp);
+                
+                if (!emailResult.Success)
+                {
+                    // Log the error but don't expose email service errors
+                    Console.WriteLine($"Failed to send OTP email: {emailResult.Message}");
+                    // Clear the OTP since email failed
+                    user.PasswordChangeOtp = null;
+                    user.PasswordChangeOtpExpiry = null;
+                    await _context.SaveChangesAsync();
+                    return false;
+                }
+                
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Log the error but don't expose email service errors
+                Console.WriteLine($"Failed to send OTP email: {ex.Message}");
+                // Clear the OTP since email failed
+                user.PasswordChangeOtp = null;
+                user.PasswordChangeOtpExpiry = null;
+                await _context.SaveChangesAsync();
+                return false;
+            }
+        }
+
+        public async Task<bool> VerifyPasswordChangeOtpAsync(int userId, string otp)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null || string.IsNullOrEmpty(user.PasswordChangeOtp)) return false;
+
+            return OtpHelper.ValidateOtp(otp, user.PasswordChangeOtp, user.PasswordChangeOtpExpiry ?? DateTime.MinValue);
+        }
+
+        public async Task<bool> ChangePasswordWithOtpAsync(int userId, ChangePasswordWithOtpDto changeDto)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null || string.IsNullOrEmpty(user.PasswordChangeOtp)) return false;
+
+            // Validate OTP
+            if (!OtpHelper.ValidateOtp(changeDto.Otp, user.PasswordChangeOtp, user.PasswordChangeOtpExpiry ?? DateTime.MinValue))
+                return false;
+
+            // Update password
+            user.PasswordHash = HashPassword(changeDto.NewPassword);
+            
+            // Clear OTP data
+            user.PasswordChangeOtp = null;
+            user.PasswordChangeOtpExpiry = null;
+            
+            user.DateModified = DateTime.UtcNow;
+            user.ModifiedBy = user.Email;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
         private UserDto MapToUserDto(User user)
         {
             return new UserDto
@@ -219,7 +336,12 @@ namespace InvoicingBackend.Services
                 IsAdmin = user.IsAdmin,
                 LastLoginDate = user.LastLoginDate,
                 DateEntered = user.DateEntered,
-                EnteredBy = user.EnteredBy
+                EnteredBy = user.EnteredBy,
+                Currency = user.Currency,
+                DateFormat = user.DateFormat,
+                Language = user.Language,
+                EmailNotifications = user.EmailNotifications,
+                DarkMode = user.DarkMode
             };
         }
     }

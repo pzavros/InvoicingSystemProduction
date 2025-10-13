@@ -13,7 +13,6 @@ import {
   TableCell,
   TableBody,
   Paper,
-  Avatar,
   Divider,
   Link,
 } from "@mui/material";
@@ -100,9 +99,39 @@ const InvoiceModal = (props) => {
     email: "info@i-spiral.com",
   };
 
-  const logoSrc = props.info.logo
-    ? `data:image/png;base64,${props.info.logo}`
-    : "https://via.placeholder.com/120x120?text=Company+Logo";
+  const placeholderLogoSrc = "https://via.placeholder.com/120x120?text=Company+Logo";
+  const primaryLogoValue = typeof props.logo === 'string' && props.logo.trim().length > 0
+    ? props.logo.trim()
+    : typeof props.info?.logo === 'string' && props.info.logo.trim().length > 0
+      ? props.info.logo.trim()
+      : "";
+  const parseNumericAmount = (value) => {
+    if (value === undefined || value === null) {
+      return 0;
+    }
+    const numeric = typeof value === "string" ? parseFloat(value) : Number(value);
+    return Number.isFinite(numeric) ? numeric : 0;
+  };
+
+  const rawMimeType = typeof props.logoMimeType === 'string' && props.logoMimeType.trim().length > 0
+    ? props.logoMimeType.trim()
+    : typeof props.info?.logoMimeType === 'string' && props.info.logoMimeType.trim().length > 0
+      ? props.info.logoMimeType.trim()
+      : "";
+
+  const cleanedMimeType = rawMimeType
+    ? rawMimeType.replace(/^data:/i, "").replace(/;base64$/i, "")
+    : "image/png";
+
+  const logoMimeType = cleanedMimeType.includes("/")
+    ? cleanedMimeType
+    : "image/png";
+
+  const logoSrc = primaryLogoValue
+    ? primaryLogoValue.startsWith("data:")
+      ? primaryLogoValue
+      : `data:${logoMimeType};base64,${primaryLogoValue}`
+    : placeholderLogoSrc;
 
   const bankInfo = props.bankInfo || {
     bankName: "Hellenic Bank",
@@ -202,6 +231,27 @@ const InvoiceModal = (props) => {
     borderRadius,
     sections,
   } = templateTheme;
+
+  const logoPositionRaw = typeof props.templateConfig?.logoPosition === "string"
+    ? props.templateConfig.logoPosition.toLowerCase()
+    : "right";
+
+  const logoAlignment = logoPositionRaw === "left"
+    ? "flex-start"
+    : logoPositionRaw === "center"
+      ? "center"
+      : "flex-end";
+
+  const logoTextAlign = logoAlignment === "flex-start"
+    ? "left"
+    : logoAlignment === "center"
+      ? "center"
+      : "right";
+
+  const shouldRenderLogo = sections.showCompanyLogo && !!logoSrc;
+  const hasCustomLogo = primaryLogoValue.length > 0;
+  const discountAmountValue = parseNumericAmount(props.discountAmount);
+  const showDiscountRow = discountAmountValue > 0;
 
   const templateName = props.templateMeta?.name || null;
 
@@ -332,50 +382,170 @@ const InvoiceModal = (props) => {
                 )}
               </Box>
 
-              {/* Right side - Company details */}
-              <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-end", width: "50%" }}>
-                {/* Company Name */}
-                <Typography
-                  variant="h5"
-                  sx={{ 
-                    fontWeight: "600", 
-                    color: templateColors.text,
-                    mb: 2,
-                    fontSize: '1.25rem',
-                    fontFamily
-                  }}
-                >
-                  {companyInfo.name}
-                </Typography>
+              {/* Right side - Company logo and details */}
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: logoAlignment,
+                  width: "50%",
+                  textAlign: logoTextAlign
+                }}
+              >
+                {shouldRenderLogo && (
+                  <Box
+                    sx={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: logoAlignment,
+                      mb: sections.showCompanyDetails ? 2 : 0
+                    }}
+                  >
+                    <Box
+                      component="img"
+                      src={logoSrc}
+                      alt={`${companyInfo.name || "Company"} logo`}
+                      sx={{
+                        maxHeight: 96,
+                        maxWidth: 220,
+                        objectFit: "contain",
+                        borderRadius: 2,
+                        backgroundColor: "transparent",
+                        p: 0,
+                        boxShadow: "none",
+                        border: "none",
+                        transition: "all 0.3s ease",
+                        "@media print": {
+                          backgroundColor: "transparent",
+                          boxShadow: "none",
+                          border: "none"
+                        }
+                      }}
+                    />
+                  </Box>
+                )}
 
-                {/* Company Details */}
-                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-                  {companyInfo.companyNo && (
-                    <Typography variant="body2" sx={{ mb: 0.5, color: templateColors.textSecondary, fontWeight: 400, fontSize: '0.85rem', fontFamily }}>
-                      Company No: {companyInfo.companyNo}
+                {sections.showCompanyDetails && (
+                  <>
+                    <Typography
+                      variant="h5"
+                      sx={{
+                        fontWeight: "600",
+                        color: headerTextColor,
+                        mb: 2,
+                        fontSize: "1.25rem",
+                        fontFamily,
+                        textAlign: logoTextAlign
+                      }}
+                    >
+                      {companyInfo.name}
                     </Typography>
-                  )}
-                  {companyInfo.vatNo && (
-                    <Typography variant="body2" sx={{ mb: 0.5, color: templateColors.textSecondary, fontWeight: 400, fontSize: '0.85rem', fontFamily }}>
-                      VAT No: {companyInfo.vatNo}
-                    </Typography>
-                  )}
-                  {companyInfo.ticNo && (
-                    <Typography variant="body2" sx={{ mb: 0.5, color: templateColors.textSecondary, fontWeight: 400, fontSize: '0.85rem', fontFamily }}>
-                      TIC No: {companyInfo.ticNo}
-                    </Typography>
-                  )}
-                  {companyInfo.website && (
-                    <Typography variant="body2" sx={{ mb: 0.5, color: templateColors.textSecondary, fontWeight: 400, fontSize: '0.85rem', fontFamily }}>
-                      Website: <Link href={companyInfo.website} target="_blank" rel="noopener" sx={{ color: templateColors.accent, fontWeight: 500, textDecoration: 'none' }}>{companyInfo.website}</Link>
-                    </Typography>
-                  )}
-                  {companyInfo.email && (
-                    <Typography variant="body2" sx={{ color: templateColors.textSecondary, fontWeight: 400, fontSize: '0.85rem', fontFamily }}>
-                      Email: <Link href={`mailto:${companyInfo.email}`} sx={{ color: templateColors.accent, fontWeight: 500, textDecoration: 'none' }}>{companyInfo.email}</Link>
-                    </Typography>
-                  )}
-                </Box>
+
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: logoAlignment,
+                        gap: 0.5
+                      }}
+                    >
+                      {companyInfo.companyNo && (
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: headerTextColor,
+                            fontWeight: 400,
+                            fontSize: "0.85rem",
+                            fontFamily,
+                            textAlign: logoTextAlign
+                          }}
+                        >
+                          Company No: {companyInfo.companyNo}
+                        </Typography>
+                      )}
+                      {companyInfo.vatNo && (
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: headerTextColor,
+                            fontWeight: 400,
+                            fontSize: "0.85rem",
+                            fontFamily,
+                            textAlign: logoTextAlign
+                          }}
+                        >
+                          VAT No: {companyInfo.vatNo}
+                        </Typography>
+                      )}
+                      {companyInfo.ticNo && (
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: headerTextColor,
+                            fontWeight: 400,
+                            fontSize: "0.85rem",
+                            fontFamily,
+                            textAlign: logoTextAlign
+                          }}
+                        >
+                          TIC No: {companyInfo.ticNo}
+                        </Typography>
+                      )}
+                      {companyInfo.website && (
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: headerTextColor,
+                            fontWeight: 400,
+                            fontSize: "0.85rem",
+                            fontFamily,
+                            textAlign: logoTextAlign
+                          }}
+                        >
+                          Website:{" "}
+                          <Link
+                            href={companyInfo.website}
+                            target="_blank"
+                            rel="noopener"
+                            sx={{
+                              color: headerTextColor,
+                              fontWeight: 500,
+                              textDecoration: "underline",
+                              textUnderlineOffset: "3px"
+                            }}
+                          >
+                            {companyInfo.website}
+                          </Link>
+                        </Typography>
+                      )}
+                      {companyInfo.email && (
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: headerTextColor,
+                            fontWeight: 400,
+                            fontSize: "0.85rem",
+                            fontFamily,
+                            textAlign: logoTextAlign
+                          }}
+                        >
+                          Email:{" "}
+                          <Link
+                            href={`mailto:${companyInfo.email}`}
+                            sx={{
+                              color: headerTextColor,
+                              fontWeight: 500,
+                              textDecoration: "underline",
+                              textUnderlineOffset: "3px"
+                            }}
+                          >
+                            {companyInfo.email}
+                          </Link>
+                        </Typography>
+                      )}
+                    </Box>
+                  </>
+                )}
               </Box>
             </Box>{/* Body Section */}
             <Box sx={{ p: 4, color: templateColors.text, background: surfaceColor }}>              {/* First Row: Billed From and Billed To */}
@@ -666,7 +836,7 @@ const InvoiceModal = (props) => {
                         </TableCell>
                       </TableRow>
                     )}
-                    {props.discountAmount !== 0.0 && (
+                    {showDiscountRow && (
                       <TableRow>
                         <TableCell sx={{ borderBottom: 'none' }} />
                         <TableCell
@@ -693,7 +863,7 @@ const InvoiceModal = (props) => {
                           <span style={{ fontSize: "0.8rem", marginRight: '4px', color: templateColors.textSecondary }}>
                             ({props.info.discountRate || 0}%)
                           </span>
-                          {props.currency} {props.discountAmount}
+                          {props.currency} {discountAmountValue.toFixed(2)}
                         </TableCell>
                       </TableRow>
                     )}

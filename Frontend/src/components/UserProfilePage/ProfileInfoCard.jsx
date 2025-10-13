@@ -43,7 +43,7 @@ const ProfileInfoCard = ({
   };
 
   return (
-    <Grid container spacing={3} component="form" onSubmit={handleSubmit}>
+    <Grid container spacing={3}>
       {/* Title Row - Full Width */}
       <Grid size={{ xs: 12 }}>
         <Typography variant="h6" sx={{ fontWeight: 600, color: "#1f2937", mb: 2 }}>
@@ -51,8 +51,8 @@ const ProfileInfoCard = ({
         </Typography>
       </Grid>
 
-      {/* First Row - 3 Fields */}
-      <Grid size={{ xs: 12, md: 4 }}>
+      {/* First Row - 2 Fields */}
+      <Grid size={{ xs: 12, md: 6 }}>
         <TextField
           fullWidth
           name="firstName"
@@ -65,7 +65,7 @@ const ProfileInfoCard = ({
         />
       </Grid>
 
-      <Grid size={{ xs: 12, md: 4 }}>
+      <Grid size={{ xs: 12, md: 6 }}>
         <TextField
           fullWidth
           name="lastName"
@@ -78,23 +78,9 @@ const ProfileInfoCard = ({
         />
       </Grid>
 
-      <Grid size={{ xs: 12, md: 4 }}>
-        <TextField
-          fullWidth
-          name="email"
-          type="email"
-          label="Email Address"
-          value={formData.email}
-          onChange={handleChange}
-          required
-          disabled={updating}
-          size="small"
-        />
-      </Grid>
-
       {/* Button Row - Full Width */}
       {showButton && (
-        <Grid size={{ xs: 12 }}>
+        <Grid size={{ xs: 12 }} component="form" onSubmit={handleSubmit}>
           <Button
             type="submit"
             variant="contained"

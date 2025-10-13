@@ -39,17 +39,36 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 // Configure Email settings
+// Make sure env vars are visible (you already load .env via EnvironmentLoader)
+builder.Configuration.AddEnvironmentVariables();
+
+// Configure Email settings (Graph first, SMTP fallback)
 builder.Services.Configure<EmailSettings>(options =>
 {
-    options.SmtpHost = Environment.GetEnvironmentVariable("EMAIL_SMTP_HOST") ?? "smtp.office365.com";
-    options.SmtpPort = int.Parse(Environment.GetEnvironmentVariable("EMAIL_SMTP_PORT") ?? "587");
-    options.Username = Environment.GetEnvironmentVariable("EMAIL_SMTP_USERNAME") ?? "";
-    options.Password = Environment.GetEnvironmentVariable("EMAIL_SMTP_PASSWORD") ?? "";
-    options.FromName = Environment.GetEnvironmentVariable("EMAIL_FROM_NAME") ?? "Invoicing System";
-    options.FromAddress = Environment.GetEnvironmentVariable("EMAIL_FROM_ADDRESS") ?? "";
-    options.UseSsl = bool.Parse(Environment.GetEnvironmentVariable("EMAIL_USE_SSL") ?? "true");
-    options.EnableSsl = bool.Parse(Environment.GetEnvironmentVariable("EMAIL_ENABLE_SSL") ?? "true");
+    // ---- Graph switch (default true if you want Graph by default) ----
+    var useGraphEnv = builder.Configuration["EMAIL_USE_GRAPH"];
+    options.UseGraphApi = string.IsNullOrWhiteSpace(useGraphEnv)
+        ? true
+        : bool.TryParse(useGraphEnv, out var g) && g;
+
+    // ---- Graph creds (from Entra App) ----
+    options.TenantId    = builder.Configuration["EMAIL_TENANT_ID"];
+    options.ClientId    = builder.Configuration["EMAIL_CLIENT_ID"];
+    options.ClientSecret= builder.Configuration["EMAIL_CLIENT_SECRET"]; // SECRET VALUE (not the GUID ID)
+
+    // ---- Identity (common) ----
+    options.FromAddress = builder.Configuration["EMAIL_FROM_ADDRESS"] ?? "";
+    options.FromName    = builder.Configuration["EMAIL_FROM_NAME"] ?? "Invoicing System";
+
+    // ---- SMTP (optional fallback) ----
+    options.SmtpHost    = builder.Configuration["EMAIL_SMTP_HOST"] ?? "smtp.office365.com";
+    options.SmtpPort    = int.TryParse(builder.Configuration["EMAIL_SMTP_PORT"], out var port) ? port : 587;
+    options.Username    = builder.Configuration["EMAIL_SMTP_USERNAME"] ?? "";
+    options.Password    = builder.Configuration["EMAIL_SMTP_PASSWORD"] ?? "";
+    options.UseSsl      = bool.TryParse(builder.Configuration["EMAIL_USE_SSL"], out var useSsl) ? useSsl : true;
+    options.EnableSsl   = bool.TryParse(builder.Configuration["EMAIL_ENABLE_SSL"], out var enableSsl) ? enableSsl : true;
 });
+
 
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();

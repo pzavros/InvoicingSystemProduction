@@ -62,16 +62,17 @@ namespace InvoicingBackend.Services
                         Symbol = invoice.Currency.Symbol
                     },
                     CompanyName = invoice.CompanyName,
-                    CompanyNo = invoice.CompanyNo,
-                    StatusId = invoice.StatusId,
-                    StatusName = invoice.StatusId.HasValue && statuses.TryGetValue(invoice.StatusId.Value, out var name)
+                CompanyNo = invoice.CompanyNo,
+                StatusId = invoice.StatusId,
+                StatusName = invoice.StatusId.HasValue && statuses.TryGetValue(invoice.StatusId.Value, out var name)
                         ? name                        : "Unknown",
-                    TemplateId = invoice.TemplateId,
-                    IsDeleted = invoice.IsDeleted, // Map IsDeleted
-                    Items = invoice.Items.Select(item => new InvoiceItemDto
-                    {
-                        Id = item.Id,
-                        ProductId = item.ProductId,
+                TemplateId = invoice.TemplateId,
+                DocumentTypeId = invoice.DocumentTypeId,
+                IsDeleted = invoice.IsDeleted, // Map IsDeleted
+                Items = invoice.Items.Select(item => new InvoiceItemDto
+                {
+                    Id = item.Id,
+                    ProductId = item.ProductId,
                         Title = item.Title,
                         Description = item.Description,
                         Quantity = item.Quantity,
@@ -146,6 +147,7 @@ namespace InvoicingBackend.Services
                 Iban = invoice.Iban,
                 Logo  = sys?.Logo != null ? Convert.ToBase64String(sys.Logo) : null,
                 StatusId = invoice.StatusId,                StatusName = statusName,
+                DocumentTypeId = invoice.DocumentTypeId,
                 TemplateId = invoice.TemplateId,
                 IsDeleted = invoice.IsDeleted, // Map IsDeleted
                 Items = invoice.Items.Select(item => new InvoiceItemDto

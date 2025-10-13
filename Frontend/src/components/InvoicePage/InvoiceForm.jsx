@@ -1733,6 +1733,7 @@ const InvoiceForm = () => {
                 billToAddress: formData.billToAddress,
                 billFrom: formData.billFrom,
                 billFromEmail: formData.billFromEmail,
+                billFromAddress: formData.address,
                 address: formData.address,
                 notes: formData.notes,
                 total: formData.total,

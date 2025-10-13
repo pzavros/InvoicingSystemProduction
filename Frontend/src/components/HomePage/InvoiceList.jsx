@@ -41,6 +41,7 @@ import { visuallyHidden } from '@mui/utils'; // Corrected import for TableSortLa
 import { useNavigate } from 'react-router-dom';
 import { Search as SearchIcon, Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, Visibility as ViewIcon, Receipt as ReceiptIcon } from '@mui/icons-material';
 import { getAllInvoices, deleteInvoice, getAllStatuses, updateBulkInvoiceStatus } from '../InvoicePage/api';
+import { getAllDocumentTypes } from '../DocumentTypePage/api';
 import { useDispatch } from 'react-redux';
 import { formatDate } from '../ReusableComponents/dateUtils';
 
@@ -125,6 +126,39 @@ const StatusBadge = ({ status }) => {
   );
 };
 
+const DOCUMENT_TYPE_BASE_STYLES = {
+  default: {
+    label: 'Invoice',
+    color: '#2563eb',
+    backgroundColor: 'rgba(37, 99, 235, 0.12)',
+    border: '1px solid rgba(37, 99, 235, 0.25)'
+  },
+  1: {
+    label: 'Invoice',
+    color: '#2563eb',
+    backgroundColor: 'rgba(37, 99, 235, 0.12)',
+    border: '1px solid rgba(37, 99, 235, 0.25)'
+  },
+  2: {
+    label: 'Tax Invoice',
+    color: '#047857',
+    backgroundColor: 'rgba(4, 120, 87, 0.12)',
+    border: '1px solid rgba(4, 120, 87, 0.25)'
+  },
+  3: {
+    label: 'Proforma Invoice',
+    color: '#7c3aed',
+    backgroundColor: 'rgba(124, 58, 237, 0.12)',
+    border: '1px solid rgba(124, 58, 237, 0.25)'
+  },
+  4: {
+    label: 'Quotation',
+    color: '#d97706',
+    backgroundColor: 'rgba(217, 119, 6, 0.12)',
+    border: '1px solid rgba(217, 119, 6, 0.25)'
+  }
+};
+
 // Sorting helper functions
 function descendingComparator(a, b, orderBy) {
   let valA = a[orderBy];
@@ -175,6 +209,7 @@ const headCells = [
   { id: 'invoiceNumber', numeric: false, label: 'Invoice #' },
   { id: 'dateOfIssue', numeric: false, label: 'Date' },
   { id: 'billTo', numeric: false, label: 'Client' },
+  { id: 'documentTypeId', numeric: false, label: 'Type' },
   { id: 'total', numeric: true, label: 'Amount' },
 ];
 
@@ -184,6 +219,7 @@ export default function InvoiceList() {
   
   const [invoices, setInvoices] = useState([]);
   const [filteredInvoices, setFilteredInvoices] = useState([]);
+  const [documentTypes, setDocumentTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
@@ -191,12 +227,37 @@ export default function InvoiceList() {
   const [activeStatusFilters, setActiveStatusFilters] = useState({ draft: true, unpaid: true, paid: true });
   const [showAllStatuses, setShowAllStatuses] = useState(false);
   const [dateFilter, setDateFilter] = useState('all');
-  
+
   const [order, setOrder] = useState('desc'); // Default order: descending
   const [orderBy, setOrderBy] = useState('invoiceNumber'); // Default sort by Invoice #
-  
+
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const documentTypeMap = React.useMemo(() => {
+    const map = { ...DOCUMENT_TYPE_BASE_STYLES };
+    (documentTypes || []).forEach((type) => {
+      if (!type) return;
+      const typeId = type.id ?? type.documentTypeId;
+      if (!typeId) return;
+      const label = type.displayName || type.name || type.description || type.code || `Type ${typeId}`;
+      map[typeId] = {
+        ...(map[typeId] || DOCUMENT_TYPE_BASE_STYLES.default),
+        label
+      };
+    });
+    return map;
+  }, [documentTypes]);
+
+  const getDocumentTypeMeta = React.useCallback(
+    (typeId) => {
+      if (typeId === null || typeId === undefined) {
+        return documentTypeMap.default;
+      }
+      return documentTypeMap[typeId] || documentTypeMap.default;
+    },
+    [documentTypeMap]
+  );
   
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [invoiceToDelete, setInvoiceToDelete] = useState(null);
@@ -216,6 +277,7 @@ export default function InvoiceList() {
   useEffect(() => {
     fetchInvoices();
     fetchStatuses();
+    fetchDocumentTypes();
   }, []);
   
   useEffect(() => {
@@ -226,8 +288,15 @@ export default function InvoiceList() {
     setLoading(true);
     try {
       const data = await getAllInvoices();
-      setInvoices(data);
-      setFilteredInvoices(data);
+      const normalized = (data || []).map((invoice) => {
+        const resolvedTypeId = invoice?.documentTypeId ?? invoice?.DocumentTypeId ?? 1;
+        return {
+          ...invoice,
+          documentTypeId: resolvedTypeId
+        };
+      });
+      setInvoices(normalized);
+      setFilteredInvoices(normalized);
     } catch (err) {
       console.error('Error fetching invoices:', err);
       setError('Failed to load invoices. Please try again later.');
@@ -251,6 +320,16 @@ export default function InvoiceList() {
         { statusId: 2, name: 'Unpaid' },
         { statusId: 3, name: 'Paid' }
       ]);
+    }
+  };
+
+  const fetchDocumentTypes = async () => {
+    try {
+      const data = await getAllDocumentTypes();
+      setDocumentTypes(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Error fetching document types:', err);
+      setDocumentTypes([]);
     }
   };
   
@@ -1130,6 +1209,8 @@ export default function InvoiceList() {
                       const isItemSelected = isSelected(invoice.id);
                       const labelId = `enhanced-table-checkbox-${invoice.id}`;
                       const isDeleted = invoice.statusName?.toLowerCase() === 'deleted';
+                      const docTypeMeta = getDocumentTypeMeta(invoice.documentTypeId);
+                      const totalValue = Number(invoice.total ?? 0);
 
                       return (
                         <TableRow 
@@ -1206,6 +1287,30 @@ export default function InvoiceList() {
                           >
                             {invoice.billTo}
                           </TableCell>
+                          <TableCell
+                            sx={{
+                              color: docTypeMeta.color,
+                              fontSize: '0.75rem'
+                            }}
+                          >
+                            <Chip
+                              label={docTypeMeta.label}
+                              size="small"
+                              sx={{
+                                backgroundColor: docTypeMeta.backgroundColor,
+                                color: docTypeMeta.color,
+                                borderRadius: '12px',
+                                fontWeight: 600,
+                                letterSpacing: '0.05em',
+                                textTransform: 'uppercase',
+                                border: docTypeMeta.border,
+                                '& .MuiChip-label': {
+                                  px: 1.25,
+                                  py: 0.25
+                                }
+                              }}
+                            />
+                          </TableCell>
                           <TableCell 
                             align="right" 
                             sx={{ 
@@ -1215,7 +1320,7 @@ export default function InvoiceList() {
                               fontSize: '0.875rem'
                             }}
                           >
-                            {(invoice.currency?.symbol || '$')}{invoice.total?.toFixed(2)}
+                            {(invoice.currency?.symbol || '$')}{totalValue.toFixed(2)}
                           </TableCell>
                           <TableCell>
                             <StatusBadge status={invoice.statusName || 'Unknown'} />

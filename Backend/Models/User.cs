@@ -19,6 +19,17 @@ namespace InvoicingBackend.Models
         public bool IsAdmin { get; set; } = false;
         public DateTime? LastLoginDate { get; set; }
         
+        // User Preferences
+        public string? Currency { get; set; } = "USD";
+        public string? DateFormat { get; set; } = "MM/DD/YYYY";
+        public string? Language { get; set; } = "English";
+        public bool EmailNotifications { get; set; } = true;
+        public bool DarkMode { get; set; } = false;
+        
+        // OTP for password change
+        public string? PasswordChangeOtp { get; set; }
+        public DateTime? PasswordChangeOtpExpiry { get; set; }
+        
         // Audit trail for User
         public DateTime DateEntered { get; set; } = DateTime.UtcNow;
         public string? EnteredBy { get; set; }

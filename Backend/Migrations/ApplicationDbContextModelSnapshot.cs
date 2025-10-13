@@ -1222,8 +1222,17 @@ namespace Backend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Currency")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("DarkMode")
+                        .HasColumnType("boolean");
+
                     b.Property<DateTime>("DateEntered")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DateFormat")
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("DateModified")
                         .HasColumnType("timestamp with time zone");
@@ -1231,6 +1240,9 @@ namespace Backend.Migrations
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("EmailNotifications")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("EnteredBy")
                         .HasColumnType("text");
@@ -1248,6 +1260,9 @@ namespace Backend.Migrations
                     b.Property<bool>("IsTrialUser")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("Language")
+                        .HasColumnType("text");
+
                     b.Property<DateTime?>("LastLoginDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -1257,6 +1272,12 @@ namespace Backend.Migrations
 
                     b.Property<string>("ModifiedBy")
                         .HasColumnType("text");
+
+                    b.Property<string>("PasswordChangeOtp")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("PasswordChangeOtpExpiry")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()

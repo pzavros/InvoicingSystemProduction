@@ -69,10 +69,13 @@ export const getUserProfile = async () => {
 // Update user profile
 export const updateUserProfile = async (userData) => {
   try {
+    console.log('Sending user data to backend:', userData);
     const response = await authApi.put("/api/auth/profile", userData);
     return response.data;
   } catch (error) {
     console.error("Error updating user profile:", error);
+    console.error("Error response:", error.response?.data);
+    console.error("Error status:", error.response?.status);
     throw error;
   }
 };

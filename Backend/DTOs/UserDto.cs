@@ -16,5 +16,12 @@ namespace InvoicingBackend.DTOs
         public DateTime? LastLoginDate { get; set; }
         public DateTime DateEntered { get; set; }
         public string? EnteredBy { get; set; }
+        
+                // User preferences
+        public string? Currency { get; set; }
+        public string? DateFormat { get; set; }
+        public string? Language { get; set; }
+        public bool EmailNotifications { get; set; }
+        public bool DarkMode { get; set; }
     }
 }

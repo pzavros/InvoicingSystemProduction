@@ -13,11 +13,13 @@ import ProfileInfoCard from './ProfileInfoCard';
 import PreferencesCard from './PreferencesCard';
 import SubscriptionAlert from './SubscriptionAlert';
 import NotificationSnackbar from './NotificationSnackbar';
+import ChangePasswordDialog from './ChangePasswordDialog';
 import useProfileData from './useProfileData';
 import useNotification from './useNotification';
 
 const UserProfilePage = () => {
   const [saving, setSaving] = useState(false);
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
   const { authenticated, user, loading: authLoading } = useAuth();
   const { notification, showNotification, hideNotification } = useNotification();
   
@@ -139,7 +141,7 @@ const UserProfilePage = () => {
         </Box>
 
         {/* Action Buttons */}
-        <Box sx={{ mb: 4, display: 'flex', gap: 2, justifyContent: 'flex-start' }}>
+        <Box sx={{ mb: 4, display: 'flex', gap: 2, justifyContent: 'flex-start', flexWrap: 'wrap' }}>
           <Button
             type="submit"
             variant="contained"
@@ -191,12 +193,36 @@ const UserProfilePage = () => {
               },
               transition: "all 0.2s ease"
             }}
-            onClick={() => {
-              // TODO: Implement change password functionality
-              showNotification('Change Password functionality coming soon!', 'info');
-            }}
+            onClick={() => setPasswordDialogOpen(true)}
           >
             Change Password
+          </Button>
+
+          <Button
+            variant="outlined"
+            color="warning"
+            size="large"
+            sx={{
+              px: 5,
+              py: 1.5,
+              fontSize: "0.95rem",
+              fontWeight: 600,
+              borderRadius: 2,
+              textTransform: "none",
+              "&:hover": {
+                transform: "translateY(-1px)"
+              },
+              "&:active": {
+                transform: "translateY(0)"
+              },
+              transition: "all 0.2s ease"
+            }}
+            onClick={() => {
+              // TODO: Implement change email functionality
+              showNotification('Change Email functionality coming soon!', 'info');
+            }}
+          >
+            Change Email
           </Button>
         </Box>
       </Box>
@@ -204,6 +230,13 @@ const UserProfilePage = () => {
       <NotificationSnackbar
         notification={notification}
         onClose={hideNotification}
+      />
+
+      <ChangePasswordDialog
+        open={passwordDialogOpen}
+        onClose={() => setPasswordDialogOpen(false)}
+        onChangePassword={changePassword}
+        showNotification={showNotification}
       />
     </Section>
   );

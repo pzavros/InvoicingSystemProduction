@@ -46,6 +46,7 @@ import {
   getActiveInvoiceTemplate,
   getInvoiceTemplateById
 } from "../InvoicePage/api";
+import { getAllDocumentTypes } from "../DocumentTypePage/api";
 
 const InvoiceViewForm = ({ invoice, isEditMode, invoiceId }) => {
   const dispatch = useDispatch();
@@ -55,6 +56,7 @@ const InvoiceViewForm = ({ invoice, isEditMode, invoiceId }) => {
   const [editMode, setEditMode] = useState(isEditMode);
   const [currencies, setCurrencies] = useState([]);
   const [statuses, setStatuses] = useState([]);
+  const [documentTypes, setDocumentTypes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [statusUpdateLoading, setStatusUpdateLoading] = useState(false);
   const [notification, setNotification] = useState({
@@ -134,6 +136,7 @@ const InvoiceViewForm = ({ invoice, isEditMode, invoiceId }) => {
     iban: invoice?.iban || '',
     statusName: invoice?.statusName || 'Draft',
     statusId: invoice?.statusId || 1,
+    documentTypeId: invoice?.documentTypeId || 1,
     templateId: invoice?.templateId || null,
     isDeleted: invoice?.isDeleted || false, // Ensure isDeleted is initialized
     items: invoice?.items?.map((item, index) => ({
@@ -155,16 +158,43 @@ const InvoiceViewForm = ({ invoice, isEditMode, invoiceId }) => {
     ],
   });
 
+  const documentTypeLabel = React.useMemo(() => {
+    const typeId = formData?.documentTypeId;
+    if (!typeId) {
+      return "";
+    }
+
+    const apiType = documentTypes.find((type) => type.id === typeId);
+    if (apiType?.displayName) {
+      return apiType.displayName;
+    }
+
+    switch (typeId) {
+      case 1:
+        return "Invoice";
+      case 2:
+        return "Tax Invoice";
+      case 3:
+        return "Proforma Invoice";
+      case 4:
+        return "Quotation";
+      default:
+        return "Invoice";
+    }
+  }, [documentTypes, formData?.documentTypeId]);
+
   useEffect(() => {
     const fetchInitialData = async () => {
       setLoading(true);
       try {
-        const [currenciesData, statusesData] = await Promise.all([
+        const [currenciesData, statusesData, documentTypesData] = await Promise.all([
           getAllCurrencies(),
-          getAllStatuses()
+          getAllStatuses(),
+          getAllDocumentTypes()
         ]);
         setCurrencies(currenciesData);
         setStatuses(statusesData);
+        setDocumentTypes(documentTypesData);
       } catch (error) {
         console.error("Error fetching initial data:", error);
         setNotification({
@@ -226,8 +256,10 @@ const InvoiceViewForm = ({ invoice, isEditMode, invoiceId }) => {
         accountName: invoice?.accountName || '',
         accountNo: invoice?.accountNo || '',
         swift: invoice?.swift || '',
-        iban: invoice?.iban || '',        statusName: currentStatus.name,
+        iban: invoice?.iban || '',
+        statusName: currentStatus.name,
         statusId: currentStatus.statusId,
+        documentTypeId: invoice?.documentTypeId || 1,
         templateId: invoice?.templateId || null, // Add templateId for template loading
         isDeleted: invoice?.isDeleted || false, // Ensure isDeleted is updated
         items: invoice?.items?.map((item, index) => ({
@@ -250,9 +282,15 @@ const InvoiceViewForm = ({ invoice, isEditMode, invoiceId }) => {
       if (!formData.templateId) {
         // If no template ID, try to get the active template
         try {
-          const activeTemplate = await getActiveInvoiceTemplate();
+          const activeTemplate = await getActiveInvoiceTemplate(formData.documentTypeId || invoice?.documentTypeId || null);
           if (activeTemplate) {
             setTemplateFromDto(activeTemplate);
+            if (activeTemplate.id && !formData.templateId) {
+              setFormData(prev => ({
+                ...prev,
+                templateId: activeTemplate.id
+              }));
+            }
           }
         } catch (error) {
           console.error('Error loading active template for view:', error);
@@ -275,7 +313,7 @@ const InvoiceViewForm = ({ invoice, isEditMode, invoiceId }) => {
     };
 
     loadTemplateForView();
-  }, [formData.templateId, selectedTemplate]);
+  }, [formData.templateId, formData.documentTypeId, selectedTemplate]);
 
   const handleRowDel = (itemToDelete) => {
     if (!editMode) return;
@@ -543,6 +581,7 @@ const InvoiceViewForm = ({ invoice, isEditMode, invoiceId }) => {
       swift: formData.swift || "",
       iban: formData.iban || "N/A",
       statusId: formData.statusId || 1,
+      DocumentTypeId: formData.documentTypeId || 1,
       templateId: formData.templateId || null,
       items: formData.items.map(item => ({
         Id: isNaN(parseInt(item.itemId)) ? 0 : parseInt(item.itemId),
@@ -878,9 +917,30 @@ ${formData.billFrom}`);
               flexGrow: 1,
               display: 'flex',
               alignItems: 'center',
-              gap: 1
+              gap: 1.5,
+              flexWrap: 'wrap'
             }}>
-              📄 Invoice #{formData.invoiceNumber}
+              <Typography component="span" sx={{ fontWeight: 700, color: "#2d3748" }}>
+                📄 Invoice #{formData.invoiceNumber}
+              </Typography>
+              {documentTypeLabel && (
+                <Box
+                  sx={{
+                    px: 1.5,
+                    py: 0.5,
+                    borderRadius: '999px',
+                    background: 'rgba(102, 126, 234, 0.12)',
+                    border: '1px solid rgba(102, 126, 234, 0.35)',
+                    color: '#434190',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em'
+                  }}
+                >
+                  {documentTypeLabel}
+                </Box>
+              )}
             </Box>
               {statuses.length > 0 && (
               <FormControl sx={{ 
@@ -1706,6 +1766,7 @@ ${formData.billFrom}`);
                 discountRate: formData.discountRate,
                 discountAmount: formData.discountAmount,
                 logo: formData.companyLogo,
+                logoMimeType: invoice?.logoMimeType || "",
                 statusId: formData.statusId, // Pass statusId
                 statusName: formData.statusName, // Pass statusName
                 isDeleted: formData.isDeleted, // Pass isDeleted
@@ -1717,6 +1778,7 @@ ${formData.billFrom}`);
               taxAmount={formData.taxAmount}
               discountAmount={formData.discountAmount}
               total={formData.total}
+              logoMimeType={invoice?.logoMimeType || ""}
               companyInfo={getCompanyInfo()}
               bankInfo={getBankInfo()}
               templateConfig={selectedTemplate?.parsedConfig}

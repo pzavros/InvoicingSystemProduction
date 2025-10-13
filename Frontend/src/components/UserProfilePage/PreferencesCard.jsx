@@ -54,17 +54,7 @@ const PreferencesCard = ({
     { value: 'AUD', label: 'Australian Dollar ($)' }
   ];
 
-  const timezones = [
-    { value: 'UTC', label: 'UTC' },
-    { value: 'America/New_York', label: 'Eastern Time' },
-    { value: 'America/Chicago', label: 'Central Time' },
-    { value: 'America/Denver', label: 'Mountain Time' },
-    { value: 'America/Los_Angeles', label: 'Pacific Time' },
-    { value: 'Europe/London', label: 'London Time' },
-    { value: 'Europe/Berlin', label: 'Central European Time' },
-    { value: 'Asia/Tokyo', label: 'Japan Time' },
-    { value: 'Australia/Sydney', label: 'Sydney Time' }
-  ];
+
 
   const dateFormats = [
     { value: 'MM/DD/YYYY', label: 'MM/DD/YYYY' },
@@ -74,7 +64,7 @@ const PreferencesCard = ({
   ];
 
   return (
-    <Grid container spacing={3} component="form" onSubmit={handleSubmit}>
+    <Grid container spacing={3}>
       {/* Title Row - Full Width */}
       <Grid size={{ xs: 12 }}>
         <Typography variant="h6" sx={{ fontWeight: 600, color: "#1f2937", mb: 2 }}>
@@ -82,8 +72,8 @@ const PreferencesCard = ({
         </Typography>
       </Grid>
 
-      {/* First Row - 3 Fields */}
-      <Grid size={{ xs: 12, md: 4 }}>
+      {/* First Row - Currency and Date Format */}
+      <Grid size={{ xs: 12, md: 6 }}>
         <TextField
           fullWidth
           select
@@ -102,26 +92,7 @@ const PreferencesCard = ({
         </TextField>
       </Grid>
 
-      <Grid size={{ xs: 12, md: 4 }}>
-        <TextField
-          fullWidth
-          select
-          name="timezone"
-          label="Timezone"
-          value={preferences?.timezone || 'UTC'}
-          onChange={handlePreferenceChange}
-          disabled={updating}
-          size="small"
-        >
-          {timezones.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
-        </TextField>
-      </Grid>
-
-      <Grid size={{ xs: 12, md: 4 }}>
+      <Grid size={{ xs: 12, md: 6 }}>
         <TextField
           fullWidth
           select
@@ -141,7 +112,7 @@ const PreferencesCard = ({
       </Grid>
 
       {/* Second Row - Language Field */}
-      <Grid size={{ xs: 12, md: 4 }}>
+      <Grid size={{ xs: 12, md: 6 }}>
         <TextField
           fullWidth
           name="language"
@@ -154,7 +125,7 @@ const PreferencesCard = ({
       </Grid>
 
       {/* Third Row - Switches Side by Side */}
-      <Grid size={{ xs: 12, md: 4 }}>
+      <Grid size={{ xs: 12, md: 6 }}>
         <FormControlLabel
           control={
             <Switch
@@ -168,7 +139,7 @@ const PreferencesCard = ({
         />
       </Grid>
 
-      <Grid size={{ xs: 12, md: 4 }}>
+      <Grid size={{ xs: 12, md: 6 }}>
         <FormControlLabel
           control={
             <Switch
@@ -184,7 +155,7 @@ const PreferencesCard = ({
 
       {/* Button Row - Full Width */}
       {showButton && (
-        <Grid size={{ xs: 12 }}>
+        <Grid size={{ xs: 12 }} component="form" onSubmit={handleSubmit}>
           <Button
             type="submit"
             variant="contained"

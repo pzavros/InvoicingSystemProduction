@@ -1,6 +1,14 @@
 // src/components/UserProfilePage/useProfileData.js
 import { useState, useEffect, useCallback } from 'react';
-import { getUserProfile, updateUserProfile, updatePassword, updatePreferences } from './api';
+import { 
+  getUserProfile, 
+  updateUserProfile, 
+  updatePassword, 
+  updatePreferences,
+  requestPasswordChangeOtp,
+  verifyPasswordChangeOtp,
+  changePasswordWithOtp
+} from './api';
 
 const useProfileData = () => {
   const [profile, setProfile] = useState(null);
@@ -9,8 +17,7 @@ const useProfileData = () => {
   
   const [formData, setFormData] = useState({
     firstName: '',
-    lastName: '',
-    email: ''
+    lastName: ''
   });
   
   const [passwordData, setPasswordData] = useState({
@@ -20,9 +27,11 @@ const useProfileData = () => {
   });
 
   const [preferences, setPreferences] = useState({
+    currency: 'USD',
+    dateFormat: 'MM/DD/YYYY',
+    language: 'English',
     emailNotifications: true,
-    marketingEmails: false,
-    securityAlerts: true
+    darkMode: false
   });
 
   const fetchProfile = useCallback(async () => {
@@ -44,18 +53,17 @@ const useProfileData = () => {
       setProfile(profileData);
       setFormData({
         firstName: profileData.firstName,
-        lastName: profileData.lastName,
-        email: profileData.email
+        lastName: profileData.lastName
       });
       
-      // Set preferences if they exist in profile data
-      if (profileData.preferences) {
-        setPreferences({
-          emailNotifications: profileData.preferences.emailNotifications ?? true,
-          marketingEmails: profileData.preferences.marketingEmails ?? false,
-          securityAlerts: profileData.preferences.securityAlerts ?? true
-        });
-      }
+      // Set preferences from profile data
+      setPreferences({
+        currency: profileData.currency || 'USD',
+        dateFormat: profileData.dateFormat || 'MM/DD/YYYY',
+        language: profileData.language || 'English',
+        emailNotifications: profileData.emailNotifications ?? true,
+        darkMode: profileData.darkMode ?? false
+      });
     } catch (err) {
       console.error('Error fetching profile:', err);
       
@@ -76,20 +84,76 @@ const useProfileData = () => {
 
   const updateProfile = useCallback(async (data) => {
     try {
-      await updateUserProfile(data);
+      // Merge the form data with existing profile data to create a complete UserDto
+      const completeUserData = {
+        id: profile.id,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: profile.email,
+        isActive: profile.isActive ?? true,
+        subscriptionPlan: profile.subscriptionPlan,
+        subscriptionExpiryDate: profile.subscriptionExpiryDate,
+        isTrialUser: profile.isTrialUser ?? false,
+        isAdmin: profile.isAdmin ?? false,
+        lastLoginDate: profile.lastLoginDate,
+        dateEntered: profile.dateEntered,
+        enteredBy: profile.enteredBy,
+        // Include preferences
+        currency: profile.currency,
+        dateFormat: profile.dateFormat,
+        language: profile.language,
+        emailNotifications: profile.emailNotifications ?? true,
+        darkMode: profile.darkMode ?? false
+      };
+      
+      await updateUserProfile(completeUserData);
       await fetchProfile(); // Refresh data
       return { success: true };
     } catch (err) {
-      return { success: false, error: err.message || 'Failed to update profile' };
+      console.error('Update profile error:', err);
+      return { success: false, error: err.response?.data?.message || err.message || 'Failed to update profile' };
     }
-  }, [fetchProfile]);
+  }, [profile, fetchProfile]);
 
-  const changePassword = useCallback(async (data) => {
-    try {
-      await updatePassword(data);
-      return { success: true };
-    } catch (err) {
-      return { success: false, error: err.message || 'Failed to update password' };
+  const changePassword = useCallback({
+    // Legacy password change (for backward compatibility)
+    legacy: async (data) => {
+      try {
+        await updatePassword(data);
+        return { success: true };
+      } catch (err) {
+        return { success: false, error: err.response?.data?.message || err.message || 'Failed to update password' };
+      }
+    },
+    
+    // Step 1: Request OTP
+    requestOtp: async (data) => {
+      try {
+        await requestPasswordChangeOtp(data);
+        return { success: true };
+      } catch (err) {
+        return { success: false, error: err.response?.data?.message || err.message || 'Failed to send OTP' };
+      }
+    },
+    
+    // Step 2: Verify OTP
+    verifyOtp: async (data) => {
+      try {
+        await verifyPasswordChangeOtp(data);
+        return { success: true };
+      } catch (err) {
+        return { success: false, error: err.response?.data?.message || err.message || 'Invalid or expired OTP' };
+      }
+    },
+    
+    // Step 3: Change password with OTP
+    changePassword: async (data) => {
+      try {
+        await changePasswordWithOtp(data);
+        return { success: true };
+      } catch (err) {
+        return { success: false, error: err.response?.data?.message || err.message || 'Failed to change password' };
+      }
     }
   }, []);
 

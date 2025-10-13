@@ -17,6 +17,15 @@ namespace InvoicingBackend.Interfaces
         Task<bool> VerifyPasswordAsync(string password, string passwordHash);
         string HashPassword(string password);
         
+        // Password and Preferences methods
+        Task<bool> UpdatePasswordAsync(int userId, UpdatePasswordDto passwordDto);
+        Task<bool> UpdateUserPreferencesAsync(int userId, UserPreferencesDto preferencesDto);
+        
+        // OTP methods for password change
+        Task<bool> RequestPasswordChangeOtpAsync(int userId, RequestPasswordChangeOtpDto requestDto);
+        Task<bool> VerifyPasswordChangeOtpAsync(int userId, string otp);
+        Task<bool> ChangePasswordWithOtpAsync(int userId, ChangePasswordWithOtpDto changeDto);
+        
         // Admin methods
         Task<IEnumerable<UserDto>> GetAllUsersAsync();
         Task<bool> UpdateAdminStatusAsync(int userId, bool isAdmin);

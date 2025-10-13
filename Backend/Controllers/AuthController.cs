@@ -122,6 +122,126 @@ namespace InvoicingBackend.Controllers
             }
         }
 
+        // PUT: api/auth/password
+        [HttpPut("password")]
+        [Authorize]
+        public async Task<IActionResult> UpdatePassword([FromBody] UpdatePasswordDto passwordDto)
+        {
+            if (passwordDto == null)
+                return BadRequest(new { message = "Invalid password data." });
+
+            try
+            {
+                var userId = GetCurrentUserId();
+                var result = await _userService.UpdatePasswordAsync(userId, passwordDto);
+                
+                if (!result)
+                    return BadRequest(new { message = "Current password is incorrect." });
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating password.", error = ex.Message });
+            }
+        }
+
+        // PUT: api/auth/preferences
+        [HttpPut("preferences")]
+        [Authorize]
+        public async Task<IActionResult> UpdatePreferences([FromBody] UserPreferencesDto preferencesDto)
+        {
+            if (preferencesDto == null)
+                return BadRequest(new { message = "Invalid preferences data." });
+
+            try
+            {
+                var userId = GetCurrentUserId();
+                var result = await _userService.UpdateUserPreferencesAsync(userId, preferencesDto);
+                
+                if (!result)
+                    return NotFound(new { message = "User not found." });
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while updating preferences.", error = ex.Message });
+            }
+        }
+
+        // POST: api/auth/request-password-change-otp
+        [HttpPost("request-password-change-otp")]
+        [Authorize]
+        public async Task<IActionResult> RequestPasswordChangeOtp([FromBody] RequestPasswordChangeOtpDto requestDto)
+        {
+            if (requestDto == null)
+                return BadRequest(new { message = "Invalid request data." });
+
+            try
+            {
+                var userId = GetCurrentUserId();
+                var result = await _userService.RequestPasswordChangeOtpAsync(userId, requestDto);
+                
+                if (!result)
+                    return BadRequest(new { message = "Current password is incorrect or failed to send OTP email." });
+
+                return Ok(new { message = "OTP has been sent to your email address." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while requesting OTP.", error = ex.Message });
+            }
+        }
+
+        // POST: api/auth/verify-password-change-otp
+        [HttpPost("verify-password-change-otp")]
+        [Authorize]
+        public async Task<IActionResult> VerifyPasswordChangeOtp([FromBody] VerifyPasswordChangeOtpDto verifyDto)
+        {
+            if (verifyDto == null)
+                return BadRequest(new { message = "Invalid verification data." });
+
+            try
+            {
+                var userId = GetCurrentUserId();
+                var result = await _userService.VerifyPasswordChangeOtpAsync(userId, verifyDto.Otp);
+                
+                if (!result)
+                    return BadRequest(new { message = "Invalid or expired OTP." });
+
+                return Ok(new { message = "OTP verified successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while verifying OTP.", error = ex.Message });
+            }
+        }
+
+        // POST: api/auth/change-password-with-otp
+        [HttpPost("change-password-with-otp")]
+        [Authorize]
+        public async Task<IActionResult> ChangePasswordWithOtp([FromBody] ChangePasswordWithOtpDto changeDto)
+        {
+            if (changeDto == null)
+                return BadRequest(new { message = "Invalid password change data." });
+
+            try
+            {
+                var userId = GetCurrentUserId();
+                var result = await _userService.ChangePasswordWithOtpAsync(userId, changeDto);
+                
+                if (!result)
+                    return BadRequest(new { message = "Invalid or expired OTP." });
+
+                return Ok(new { message = "Password changed successfully." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while changing password.", error = ex.Message });
+            }
+        }
+
         private int GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

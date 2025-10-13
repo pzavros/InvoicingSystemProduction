@@ -29,3 +29,34 @@ export const updatePreferences = async (preferences) => {
     throw error;
   }
 };
+
+// OTP-based password change functions
+export const requestPasswordChangeOtp = async (data) => {
+  try {
+    const response = await authApi.post('/api/auth/request-password-change-otp', data);
+    return response.data;
+  } catch (error) {
+    console.error('Error requesting password change OTP:', error);
+    throw error;
+  }
+};
+
+export const verifyPasswordChangeOtp = async (data) => {
+  try {
+    const response = await authApi.post('/api/auth/verify-password-change-otp', data);
+    return response.data;
+  } catch (error) {
+    console.error('Error verifying password change OTP:', error);
+    throw error;
+  }
+};
+
+export const changePasswordWithOtp = async (data) => {
+  try {
+    const response = await authApi.post('/api/auth/change-password-with-otp', data);
+    return response.data;
+  } catch (error) {
+    console.error('Error changing password with OTP:', error);
+    throw error;
+  }
+};
