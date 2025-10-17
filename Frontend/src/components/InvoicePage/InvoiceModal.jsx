@@ -63,10 +63,11 @@ const printStyles = `
   }
 `;
 
-// Inject styles into document head
-if (typeof document !== 'undefined') {
+// Inject styles into document head only once
+if (typeof document !== 'undefined' && !document.head.querySelector('#invoice-modal-print-styles')) {
   const styleSheet = document.createElement('style');
   styleSheet.type = 'text/css';
+  styleSheet.id = 'invoice-modal-print-styles';
   styleSheet.innerText = printStyles;
   document.head.appendChild(styleSheet);
 }
@@ -90,9 +91,12 @@ const GenerateInvoice = (invoiceNumber) => {
 };
 
 const InvoiceModal = (props) => {
+  // Default props to avoid runtime errors
+  const items = Array.isArray(props.items) ? props.items : [];
+  const info = props.info || {};
   const companyInfo = props.companyInfo || {
-    name: props.info.billFrom || "Uknown",
-    companyNo: props.info.companyNo || "Uknown",
+    name: info.billFrom || "Unknown",
+    companyNo: info.companyNo || "Unknown",
     vatNo: "6789456",
     ticNo: "1234563",
     website: "https://www.i-spiral.com",
@@ -198,13 +202,34 @@ const InvoiceModal = (props) => {
     const fontFamily = config.fontFamily || config.typography?.fontFamily || '"Inter", "Arial", "Helvetica", sans-serif';
     const borderRadius = config.layout?.borderRadius || '12px';
 
+    const sectionsConfig = config.sections || {};
+
     const sections = {
-      showCompanyLogo: config.sections?.showCompanyLogo ?? true,
-      showCompanyDetails: config.sections?.showCompanyDetails ?? true,
-      showBankDetails: config.sections?.showBankDetails ?? true,
-      showNotes: config.sections?.showNotes ?? true,
-      showTerms: config.sections?.showTerms ?? true,
-      highlightTotals: config.sections?.highlightTotals ?? true,
+      showCompanyLogo: sectionsConfig.showCompanyLogo
+        ?? sectionsConfig.showLogo
+        ?? config.logoSettings?.showLogo
+        ?? true,
+      showCompanyDetails: sectionsConfig.showCompanyDetails
+        ?? sectionsConfig.showCompanyInfo
+        ?? true,
+      showCompanyInfo: sectionsConfig.showCompanyInfo
+        ?? sectionsConfig.showCompanyDetails
+        ?? true,
+      showBankDetails: sectionsConfig.showBankDetails
+        ?? sectionsConfig.showBankInfo
+        ?? true,
+      showBankInfo: sectionsConfig.showBankInfo
+        ?? sectionsConfig.showBankDetails
+        ?? true,
+      showNotes: sectionsConfig.showNotes ?? true,
+      showTerms: sectionsConfig.showTerms ?? true,
+      showDates: sectionsConfig.showDates ?? true,
+      highlightTotals: sectionsConfig.highlightTotals ?? true,
+      showAmountDueBox: sectionsConfig.showAmountDueBox ?? true,
+      showTotals: sectionsConfig.showTotals ?? true,
+      showTax: sectionsConfig.showTax ?? true,
+      showDiscount: sectionsConfig.showDiscount ?? true,
+      showItemsTable: sectionsConfig.showItemsTable ?? true,
     };
 
     return {
@@ -250,6 +275,68 @@ const InvoiceModal = (props) => {
 
   const shouldRenderLogo = sections.showCompanyLogo && !!logoSrc;
   const hasCustomLogo = primaryLogoValue.length > 0;
+  const locale = props.locale;
+  const currencyCode = props.currencyCode ? props.currencyCode.toUpperCase() : null;
+  const currencySymbol = props.currencySymbol || props.currency || "";
+  const dateFormatRaw = props.dateFormat || "MM/DD/YYYY";
+  const normalizedDateFormat = dateFormatRaw.toUpperCase().replace(/\s+/g, "");
+
+  const formatCurrency = (value) => {
+    const amount = parseNumericAmount(value);
+
+    if (currencyCode) {
+      try {
+        return new Intl.NumberFormat(locale || undefined, {
+          style: "currency",
+          currency: currencyCode,
+        }).format(amount);
+      } catch (err) {
+        console.warn("Failed to format currency with preferences:", err);
+      }
+    }
+
+    const symbol = currencySymbol || "";
+    const needsSpace = symbol && !/\s$/.test(symbol);
+    return `${symbol}${needsSpace ? " " : ""}${amount.toFixed(2)}`.trim();
+  };
+
+  const formatDateWithPreference = (value) => {
+    if (!value) {
+      return "";
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+
+    const pad = (num) => String(num).padStart(2, "0");
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+
+    switch (normalizedDateFormat) {
+      case "DD/MM/YYYY":
+        return `${day}/${month}/${year}`;
+      case "YYYY-MM-DD":
+        return `${year}-${month}-${day}`;
+      case "YYYY/MM/DD":
+        return `${year}/${month}/${day}`;
+      case "DD-MM-YYYY":
+        return `${day}-${month}-${year}`;
+      case "MM-DD-YYYY":
+        return `${month}-${day}-${year}`;
+      case "MM/DD/YYYY":
+        return `${month}/${day}/${year}`;
+      default:
+        try {
+          return date.toLocaleDateString(locale || undefined);
+        } catch {
+          return `${month}/${day}/${year}`;
+        }
+    }
+  };
+
   const discountAmountValue = parseNumericAmount(props.discountAmount);
   const showDiscountRow = discountAmountValue > 0;
 
@@ -331,6 +418,7 @@ const InvoiceModal = (props) => {
               }}
             >
               {/* Left side - INVOICE title and details */}
+              {sections.showInvoiceHeader !== false && (
               <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", width: "50%" }}>
                 <Typography
                   variant="h3"
@@ -356,31 +444,21 @@ const InvoiceModal = (props) => {
                 >
                   Invoice No.: {props.info.invoiceNumber || ""}
                 </Typography>
-                <Typography
-                  variant="body1"
-                  sx={{ 
-                    fontWeight: 500, 
-                    color: headerTextColor,
-                    fontSize: '0.95rem',
-                    fontFamily
-                  }}
-                >
-                  Date Of Issue: {props.info.dateOfIssue || ""}
-                </Typography>
-                {templateName && (
+                {sections.showDates !== false && (
                   <Typography
-                    variant="body2"
+                    variant="body1"
                     sx={{ 
-                      fontWeight: 500,
+                      fontWeight: 500, 
                       color: headerTextColor,
-                      fontFamily,
-                      opacity: 0.85
+                      fontSize: '0.95rem',
+                      fontFamily
                     }}
                   >
-                    Using template: {templateName}
+                    Date Of Issue: {formatDateWithPreference(props.info.dateOfIssue)}
                   </Typography>
                 )}
               </Box>
+              )}
 
               {/* Right side - Company logo and details */}
               <Box
@@ -547,246 +625,250 @@ const InvoiceModal = (props) => {
                   </>
                 )}
               </Box>
-            </Box>{/* Body Section */}
-            <Box sx={{ p: 4, color: templateColors.text, background: surfaceColor }}>              {/* First Row: Billed From and Billed To */}
-              <Grid container spacing={2} sx={{ mb: 3 }}>                <Grid item xs={12} md={6}>
-                  <Box sx={{ 
-                    px: 8, 
-                    py: 4,
-                    borderRadius: borderRadius,
-                    border: `1px solid ${templateColors.subtleBorder}`,
-                    minHeight: '120px',
-                    minWidth: '100%',
-                    width: '100%',
-                    '@media print': {
-                      border: '1px solid #000000'
-                    }
-                  }}>
-                    <Typography sx={{ 
-                      fontWeight: "bold", 
-                      mb: 2,
-                      color: templateColors.text,
-                      fontSize: '0.95rem',
-                      fontFamily
-                    }}>
-                      Billed From:
-                    </Typography>
-                    <Typography sx={{ color: templateColors.text, fontWeight: 500, mb: 1, fontSize: '0.9rem', fontFamily }}>{props.info.billFrom || ""}</Typography>
-                    <Typography sx={{ color: templateColors.textSecondary, fontWeight: 400, mb: 1, fontSize: '0.85rem', fontFamily }}>{props.info.billFromAddress || ""}</Typography>
-                    <Typography sx={{ color: templateColors.textSecondary, fontWeight: 400, fontSize: '0.85rem', fontFamily }}>{props.info.billFromEmail || ""}</Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <Box sx={{ 
-                    px: 8, 
-                    py: 4,
-                    borderRadius: borderRadius,
-                    border: `1px solid ${templateColors.subtleBorder}`,
-                    minHeight: '120px',
-                    minWidth: '100%',
-                    width: '100%',
-                    '@media print': {
-                      border: '1px solid #000000'
-                    }
-                  }}>
-                    <Typography sx={{ 
-                      fontWeight: "bold", 
-                      mb: 2,
-                      color: templateColors.text,
-                      fontSize: '0.95rem',
-                      fontFamily
-                    }}>
-                      Billed To:
-                    </Typography>
-                    <Typography sx={{ color: templateColors.text, fontWeight: 500, mb: 1, fontSize: '0.9rem', fontFamily }}>{props.info.billTo || ""}</Typography>
-                    <Typography sx={{ color: templateColors.textSecondary, fontWeight: 400, mb: 1, fontSize: '0.85rem', fontFamily }}>{props.info.billToAddress || ""}</Typography>
-                    <Typography sx={{ color: templateColors.textSecondary, fontWeight: 400, fontSize: '0.85rem', fontFamily }}>{props.info.billToEmail || ""}</Typography>
-                  </Box>
-                </Grid>
-              </Grid>              {/* Second Row: Amount Due */}
-              <Grid container spacing={3} sx={{ mb: 4 }}>
-                <Grid item xs={12} md={6}>
-                  <Box sx={{ 
-                    p: 3, 
-                    borderRadius: borderRadius,
-                    border: `1px solid ${templateColors.subtleBorder}`,
-                    backgroundColor: surfaceColor,
-                    '@media print': {
-                      border: '1px solid #000000'
-                    }
-                  }}>
-                    <Typography sx={{ 
-                      fontWeight: "bold", 
-                      mb: 2,
-                      color: templateColors.text,
-                      fontSize: '0.95rem',
-                      fontFamily
-                    }}>
-                      Amount Due:
-                    </Typography>
-                    <Typography
-                      sx={{ 
-                        fontWeight: "600", 
-                        color: templateColors.text,
-                        fontSize: '1.25rem',
-                        fontFamily
+            </Box>
+
+            {templateName && (
+              <Box sx={{ px: 4, pt: 2, pb: 1 }}>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontWeight: 500,
+                    color: templateColors.textSecondary,
+                    fontFamily,
+                    opacity: 0.85
+                  }}
+                >
+                  Using template: {templateName}
+                </Typography>
+              </Box>
+            )}
+
+            {/* Body Section */}
+            <Box sx={{ p: 4, color: templateColors.text, background: surfaceColor }}>
+              {/* First Row: Billed From and Billed To */}
+              {sections.showCompanyInfo !== false && (
+                <Grid container spacing={2} sx={{ mb: 3 }}>
+                  <Grid item xs={12} md={6}>
+                    <Box
+                      sx={{
+                        px: 8,
+                        py: 4,
+                        borderRadius: borderRadius,
+                        border: `1px solid ${templateColors.subtleBorder}`,
+                        minHeight: '120px',
+                        width: '100%',
+                        '@media print': {
+                          border: '1px solid #000000'
+                        }
                       }}
                     >
-                      {props.currency} {props.total}
-                    </Typography>
-                  </Box>
+                      <Typography
+                        sx={{
+                          fontWeight: 'bold',
+                          mb: 2,
+                          color: templateColors.text,
+                          fontSize: '0.95rem',
+                          fontFamily
+                        }}
+                      >
+                        Billed From:
+                      </Typography>
+                      <Typography sx={{ color: templateColors.text, fontWeight: 500, mb: 1, fontSize: '0.9rem', fontFamily }}>{props.info.billFrom || ''}</Typography>
+                      <Typography sx={{ color: templateColors.textSecondary, fontWeight: 400, mb: 1, fontSize: '0.85rem', fontFamily }}>{props.info.billFromAddress || ''}</Typography>
+                      <Typography sx={{ color: templateColors.textSecondary, fontWeight: 400, fontSize: '0.85rem', fontFamily }}>{props.info.billFromEmail || ''}</Typography>
+                    </Box>
+                  </Grid>
+                  {sections.showClientDetails !== false && (
+                    <Grid item xs={12} md={6}>
+                      <Box
+                        sx={{
+                          px: 8,
+                          py: 4,
+                          borderRadius: borderRadius,
+                          border: `1px solid ${templateColors.subtleBorder}`,
+                          minHeight: '120px',
+                          width: '100%',
+                          '@media print': {
+                            border: '1px solid #000000'
+                          }
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            fontWeight: 'bold',
+                            mb: 2,
+                            color: templateColors.text,
+                            fontSize: '0.95rem',
+                            fontFamily
+                          }}
+                        >
+                          Billed To:
+                        </Typography>
+                        <Typography sx={{ color: templateColors.text, fontWeight: 500, mb: 1, fontSize: '0.9rem', fontFamily }}>{props.info.billTo || ''}</Typography>
+                        <Typography sx={{ color: templateColors.textSecondary, fontWeight: 400, mb: 1, fontSize: '0.85rem', fontFamily }}>{props.info.billToAddress || ''}</Typography>
+                        <Typography sx={{ color: templateColors.textSecondary, fontWeight: 400, fontSize: '0.85rem', fontFamily }}>{props.info.billToEmail || ''}</Typography>
+                      </Box>
+                    </Grid>
+                  )}
                 </Grid>
-              </Grid>{/* Items Table */}
-              <TableContainer
-                component={Paper}
-                sx={{
-                  background: surfaceColor,
-                  boxShadow: 'none',
-                  border: `1px solid ${templateColors.subtleBorder}`,
-                  borderRadius: borderRadius,
-                  overflow: 'hidden',
-                  '@media print': {
-                    border: '1px solid #000000',
-                    boxShadow: 'none'
-                  }
-                }}
-              >
-                <Table>
-                  <TableHead sx={{ background: tableHeaderBackground }}>
-                    <TableRow sx={sections.highlightTotals ? { background: totalBackgroundColor } : undefined}>
-                      <TableCell sx={{ 
-                        width: "70px", 
-                        color: tableHeaderTextColor, 
-                        fontWeight: "600",
-                        fontSize: '0.9rem',
-                        py: 2,
-                        fontFamily,
-                        border: `1px solid ${templateColors.subtleBorder}`,
-                        '@media print': {
-                          border: '1px solid #000000',
-                          backgroundColor: surfaceColor
-                        }
-                      }}>
-                        QTY
-                      </TableCell>
-                      <TableCell sx={{ 
-                        color: tableHeaderTextColor, 
-                        fontWeight: "600",
-                        fontSize: '0.9rem',
-                        py: 2,
-                        fontFamily,
-                        border: `1px solid ${templateColors.subtleBorder}`,
-                        '@media print': {
-                          border: '1px solid #000000',
-                          backgroundColor: surfaceColor
-                        }
-                      }}>
-                        DESCRIPTION
-                      </TableCell>
-                      <TableCell align="right" sx={{ 
-                        width: "100px", 
-                        color: tableHeaderTextColor, 
-                        fontWeight: "600",
-                        fontSize: '0.9rem',
-                        py: 2,
-                        fontFamily,
-                        border: `1px solid ${templateColors.subtleBorder}`,
-                        '@media print': {
-                          border: '1px solid #000000',
-                          backgroundColor: surfaceColor
-                        }
-                      }}>
-                        UNIT PRICE
-                      </TableCell>
-                      <TableCell align="right" sx={{ 
-                        width: "120px", 
-                        color: tableHeaderTextColor, 
-                        fontWeight: "600",
-                        fontSize: '0.9rem',
-                        py: 2,
-                        fontFamily,
-                        border: `1px solid ${templateColors.subtleBorder}`,
-                        '@media print': {
-                          border: '1px solid #000000',
-                          backgroundColor: surfaceColor
-                        }
-                      }}>
-                        TOTAL
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {props.items.map((item, i) => (
-                      <TableRow key={i} sx={{
-                        '&:nth-of-type(even)': {
-                          background: `${templateColors.accent}10`,
-                          '@media print': {
-                            background: surfaceColor
-                          }
-                        }
-                      }}>
+              )}
+
+              {/* Items Table */}
+              {sections.showItemsTable !== false && (
+                <TableContainer
+                  component={Paper}
+                  sx={{
+                    background: surfaceColor,
+                    boxShadow: 'none',
+                    border: `1px solid ${templateColors.subtleBorder}`,
+                    borderRadius: borderRadius,
+                    overflow: 'hidden',
+                    '@media print': {
+                      border: '1px solid #000000',
+                      boxShadow: 'none'
+                    }
+                  }}
+                >
+                  <Table>
+                    <TableHead sx={{ background: tableHeaderBackground }}>
+                      <TableRow sx={sections.highlightTotals ? { background: totalBackgroundColor } : undefined}>
                         <TableCell sx={{ 
-                          width: "70px",
-                          fontWeight: 500,
-                          color: templateColors.text,
-                          py: 2,
+                          width: "70px", 
+                          color: tableHeaderTextColor, 
+                          fontWeight: "600",
                           fontSize: '0.9rem',
+                          py: 2,
                           fontFamily,
                           border: `1px solid ${templateColors.subtleBorder}`,
                           '@media print': {
-                            border: '1px solid #000000'
+                            border: '1px solid #000000',
+                            backgroundColor: surfaceColor
                           }
                         }}>
-                          {item.itemQuantity}
+                          QTY
                         </TableCell>
-                        <TableCell sx={{
-                          color: templateColors.text,
-                          fontWeight: 400,
-                          py: 2,
+                        <TableCell sx={{ 
+                          color: tableHeaderTextColor, 
+                          fontWeight: "600",
                           fontSize: '0.9rem',
+                          py: 2,
                           fontFamily,
                           border: `1px solid ${templateColors.subtleBorder}`,
                           '@media print': {
-                            border: '1px solid #000000'
+                            border: '1px solid #000000',
+                            backgroundColor: surfaceColor
                           }
                         }}>
-                          {item.itemName}
-                          {item.itemDescription && item.itemDescription.trim().length > 0 ? ` - ${item.itemDescription}` : null}
-                        </TableCell>
-                        <TableCell align="right" sx={{ 
-                          width: "100px",
-                          fontWeight: 500,
-                          color: templateColors.text,
-                          py: 2,
-                          fontSize: '0.9rem',
-                          fontFamily,
-                          border: `1px solid ${templateColors.subtleBorder}`,
-                          '@media print': {
-                            border: '1px solid #000000'
-                          }
-                        }}>
-                          {props.currency} {item.itemPrice}
+                          DESCRIPTION
                         </TableCell>
                         <TableCell align="right" sx={{ 
-                          width: "120px",
-                          fontWeight: 600,
-                          color: templateColors.text,
-                          py: 2,
+                          width: "100px", 
+                          color: tableHeaderTextColor, 
+                          fontWeight: "600",
                           fontSize: '0.9rem',
+                          py: 2,
                           fontFamily,
                           border: `1px solid ${templateColors.subtleBorder}`,
                           '@media print': {
-                            border: '1px solid #000000'
+                            border: '1px solid #000000',
+                            backgroundColor: surfaceColor
                           }
                         }}>
-                          {props.currency} {item.itemPrice * item.itemQuantity}
+                          UNIT PRICE
+                        </TableCell>
+                        <TableCell align="right" sx={{ 
+                          width: "120px", 
+                          color: tableHeaderTextColor, 
+                          fontWeight: "600",
+                          fontSize: '0.9rem',
+                          py: 2,
+                          fontFamily,
+                          border: `1px solid ${templateColors.subtleBorder}`,
+                          '@media print': {
+                            border: '1px solid #000000',
+                            backgroundColor: surfaceColor
+                          }
+                        }}>
+                          TOTAL
                         </TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>              {/* Summary Table */}
-              <TableContainer
+                    </TableHead>
+                    <TableBody>
+                      {items.map((item, i) => (
+                        <TableRow key={i} sx={{
+                          '&:nth-of-type(even)': {
+                            background: `${templateColors.accent}10`,
+                            '@media print': {
+                              background: surfaceColor
+                            }
+                          }
+                        }}>
+                          <TableCell sx={{ 
+                            width: "70px",
+                            fontWeight: 500,
+                            color: templateColors.text,
+                            py: 2,
+                            fontSize: '0.9rem',
+                            fontFamily,
+                            border: `1px solid ${templateColors.subtleBorder}`,
+                            '@media print': {
+                              border: '1px solid #000000'
+                            }
+                          }}>
+                            {item.itemQuantity}
+                          </TableCell>
+                          <TableCell sx={{
+                            color: templateColors.text,
+                            fontWeight: 400,
+                            py: 2,
+                            fontSize: '0.9rem',
+                            fontFamily,
+                            border: `1px solid ${templateColors.subtleBorder}`,
+                            '@media print': {
+                              border: '1px solid #000000'
+                            }
+                          }}>
+                            {item.itemName}
+                            {item.itemDescription && item.itemDescription.trim().length > 0 ? ` - ${item.itemDescription}` : null}
+                          </TableCell>
+                          <TableCell align="right" sx={{ 
+                            width: "100px",
+                            fontWeight: 500,
+                            color: templateColors.text,
+                            py: 2,
+                            fontSize: '0.9rem',
+                            fontFamily,
+                            border: `1px solid ${templateColors.subtleBorder}`,
+                            '@media print': {
+                              border: '1px solid #000000'
+                            }
+                          }}>
+                            {formatCurrency(item.itemPrice)}
+                          </TableCell>
+                          <TableCell align="right" sx={{ 
+                            width: "120px",
+                            fontWeight: 600,
+                            color: templateColors.text,
+                            py: 2,
+                            fontSize: '0.9rem',
+                            fontFamily,
+                            border: `1px solid ${templateColors.subtleBorder}`,
+                            '@media print': {
+                              border: '1px solid #000000'
+                            }
+                          }}>
+                            {formatCurrency(item.itemPrice * item.itemQuantity)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+
+              {/* Summary Table */}
+              {sections.showTotals !== false && (
+                <TableContainer
                 component={Paper}
                 sx={{
                   mt: 3,
@@ -807,7 +889,7 @@ const InvoiceModal = (props) => {
                       <TableCell sx={{ borderBottom: 'none' }}>&nbsp;</TableCell>
                       <TableCell sx={{ borderBottom: 'none' }}>&nbsp;</TableCell>
                     </TableRow>
-                    {parseFloat(props.info.taxRate) > 0 && (
+                    {sections.showTax !== false && parseFloat(props.info.taxRate) > 0 && (
                       <TableRow>
                         <TableCell />
                         <TableCell
@@ -832,11 +914,11 @@ const InvoiceModal = (props) => {
                           <span style={{ fontSize: "0.8rem", marginRight: '4px', color: templateColors.textSecondary }}>
                             ({props.info.taxRate || 0}%)
                           </span>
-                          {props.currency} {props.taxAmount}
+                          {formatCurrency(props.taxAmount)}
                         </TableCell>
                       </TableRow>
                     )}
-                    {showDiscountRow && (
+                    {sections.showDiscount !== false && showDiscountRow && (
                       <TableRow>
                         <TableCell sx={{ borderBottom: 'none' }} />
                         <TableCell
@@ -863,7 +945,7 @@ const InvoiceModal = (props) => {
                           <span style={{ fontSize: "0.8rem", marginRight: '4px', color: templateColors.textSecondary }}>
                             ({props.info.discountRate || 0}%)
                           </span>
-                          {props.currency} {discountAmountValue.toFixed(2)}
+                          {formatCurrency(discountAmountValue)}
                         </TableCell>
                       </TableRow>
                     )}
@@ -893,12 +975,72 @@ const InvoiceModal = (props) => {
                           fontFamily
                         }}
                       >
-                        {props.currency} {props.total}
+                        {formatCurrency(props.total)}
                       </TableCell>
                     </TableRow>
                   </TableBody>
                 </Table>
-              </TableContainer>              {/* Notes Section */}
+                </TableContainer>
+              )}
+
+              {sections.showAmountDueBox && (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    mt: 3,
+                    mb: sections.showNotes || sections.showBankDetails ? 4 : 0
+                  }}
+                >
+                  <Box
+                    sx={{
+                      p: 3,
+                      minWidth: { xs: '100%', sm: 280 },
+                      borderRadius: borderRadius,
+                      border: `1px solid ${templateColors.subtleBorder}`,
+                      backgroundColor: surfaceColor,
+                      textAlign: 'right',
+                      '@media print': {
+                        border: '1px solid #000000'
+                      }
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontWeight: 'bold',
+                        mb: 1.5,
+                        color: templateColors.text,
+                        fontSize: '0.95rem',
+                        fontFamily
+                      }}
+                    >
+                      Amount Due
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontWeight: 600,
+                        color: templateColors.text,
+                        fontSize: '1.4rem',
+                        fontFamily
+                      }}
+                    >
+                      {formatCurrency(props.total)}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        color: templateColors.textSecondary,
+                        fontSize: '0.8rem',
+                        mt: 0.5,
+                        fontFamily
+                      }}
+                    >
+                      Due upon receipt
+                    </Typography>
+                  </Box>
+                </Box>
+              )}
+
+              {/* Notes Section */}
               {sections.showNotes && props.info.notes && props.info.notes.trim().length > 0 && (
                 <Box
                   sx={{
@@ -1061,7 +1203,8 @@ const InvoiceModal = (props) => {
               </Box>
               )}
             </Box>
-          </Box>          {/* Action Buttons */}
+          </Box>
+          {/* Action Buttons */}
           <Box sx={{ 
             pb: 4, 
             px: 4,

@@ -12,6 +12,9 @@ import {
   Fade,
   Grow
 } from '@mui/material';
+import {
+  Insights as InsightsIcon
+} from '@mui/icons-material';
 
 import AnnualEarningsChart from '../components/DashboardPage/AnnualEarningsChart';
 import AnnualInvoiceCountChart from '../components/DashboardPage/AnnualInvoiceCountChart';
@@ -32,24 +35,104 @@ export default function DashboardPage() {
   const currentYear = today.getFullYear();
 
   const years = Array.from({ length: 5 }, (_, i) => today.getFullYear() - i);
+  const selectedMonthLabel = monthNames[month - 1];
+  const minYear = years[years.length - 1];
+  const maxYear = years[0];
+  const chartsRendered = 4;
+
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       <Fade in={true} timeout={800}>
         <Box>
-          <Typography 
-            variant="h4" 
-            gutterBottom 
-            sx={{ 
-              fontWeight: 'bold',
-              background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              mb: 3
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'space-between',
+              alignItems: { xs: 'flex-start', md: 'center' },
+              gap: 3,
+              mb: 4,
+              p: 3,
+              borderRadius: 3,
+              background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
+              border: '1px solid rgba(79, 70, 229, 0.18)',
+              boxShadow: '0 4px 12px rgba(79, 70, 229, 0.15)',
+              position: 'relative',
+              overflow: 'hidden',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '4px',
+                background: 'linear-gradient(90deg, #4f46e5 0%, #7c3aed 50%, #3b82f6 100%)',
+                borderRadius: '3px 3px 0 0'
+              }
             }}
           >
-            Dashboard Overview
-          </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, minWidth: 280 }}>
+              <Box
+                sx={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: '16px',
+                  background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 10px 18px rgba(79, 70, 229, 0.35)'
+                }}
+              >
+                <InsightsIcon sx={{ color: 'white', fontSize: 26 }} />
+              </Box>
+              <Box>
+                <Typography
+                  variant="h5"
+                  component="h1"
+                  sx={{
+                    fontWeight: 'bold',
+                    background: 'linear-gradient(135deg, #4338ca 0%, #7c3aed 100%)',
+                    backgroundClip: 'text',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    mb: 0.5
+                  }}
+                >
+                  Dashboard Overview
+                </Typography>
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    color: 'text.secondary',
+                    fontWeight: 'medium'
+                  }}
+                >
+                  Track revenue, invoice volume, and yearly performance at a glance.
+                </Typography>
+              </Box>
+            </Box>
+
+            <Stack
+              spacing={0.5}
+              sx={{
+                minWidth: { xs: '100%', md: 320 }
+              }}
+            >
+              <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#4f46e5' }}>
+                Current Filters
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Reporting Period: {selectedMonthLabel} {year}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Year Range Loaded: {minYear} – {maxYear}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Metrics Displayed: {chartsRendered} dashboards
+              </Typography>
+            </Stack>
+          </Box>
 
           <Grow in={true} timeout={600}>
             <Paper

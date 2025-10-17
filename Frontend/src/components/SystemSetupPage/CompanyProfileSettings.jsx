@@ -326,89 +326,128 @@ const CompanyProfileSettings = () => {
           '100%': { boxShadow: '0 0 0 0 rgba(103, 126, 234, 0)' }
         }
       }}
-    >      {/* Hero Header */}
+    >
+      {/* Hero Header */}
       <Box
         sx={{
-          background: 'rgba(248, 249, 250, 0.8)',
-          borderBottom: '1px solid rgba(0,0,0,0.08)',
-          pb: 4,
-          animation: 'fadeInUp 0.6s ease-out'
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'space-between',
+          alignItems: { xs: 'flex-start', md: 'center' },
+          gap: 3,
+          mb: 4,
+          p: 3,
+          borderRadius: 3,
+          background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
+          border: '1px solid rgba(34, 197, 94, 0.18)',
+          boxShadow: '0 4px 12px rgba(34, 197, 94, 0.12)',
+          position: 'relative',
+          overflow: 'hidden',
+          animation: 'fadeInUp 0.6s ease-out',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '4px',
+            background: 'linear-gradient(90deg, #059669 0%, #10b981 50%, #22c55e 100%)',
+            borderRadius: '3px 3px 0 0'
+          }
         }}
       >
-        <Stack direction="row" alignItems="center" spacing={3} sx={{ maxWidth: 1400, mx: 'auto' }}>          <Avatar
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, minWidth: 280 }}>
+          <Box
             sx={{
-              width: 64,
-              height: 64,
-              background: 'linear-gradient(45deg, #FF6B6B, #4ECDC4)',
-              fontSize: '24px',
-              fontWeight: 'bold',
+              width: 56,
+              height: 56,
+              borderRadius: '16px',
+              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 10px 18px rgba(16, 185, 129, 0.35)',
               animation: 'scaleIn 0.5s ease-out 0.2s both'
             }}
           >
-            <BusinessIcon fontSize="large" />
-          </Avatar>
-          
-          <Box >
+            <BusinessIcon sx={{ color: 'white', fontSize: 26 }} />
+          </Box>
+          <Box sx={{ animation: 'slideInLeft 0.6s ease-out 0.1s both' }}>
             <Typography
-              variant="h3"
+              variant="h5"
+              component="h1"
               sx={{
-                color: '#2c3e50',
-                fontWeight: 700,
-                fontSize: { xs: '1.8rem', md: '2.5rem' },
-                mb: 1,
-                animation: 'slideInLeft 0.6s ease-out 0.1s both'
+                fontWeight: 'bold',
+                background: 'linear-gradient(135deg, #047857 0%, #10b981 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                mb: 0.5
               }}
             >
               Company Settings
             </Typography>
-            
             <Typography
-              variant="h6"
+              variant="subtitle2"
               sx={{
-                color: '#6c757d',
-                fontWeight: 400,
-                mb: 2,
-                animation: 'slideInLeft 0.6s ease-out 0.2s both'
+                color: 'text.secondary',
+                fontWeight: 'medium'
               }}
             >
-              Configure your business profile and banking details
+              Configure your business profile and banking details to keep your invoices accurate.
             </Typography>
-              {/* Progress Indicator */}
-            <Box sx={{ animation: 'slideInLeft 0.6s ease-out 0.3s both' }}>
-              <Stack direction="row" alignItems="center" spacing={2}>
-                <Typography variant="body2" sx={{ color: '#495057', fontWeight: 500 }}>
-                  Setup Progress: {Math.round(formProgress)}%
-                </Typography>                <Box sx={{ flex: 1, maxWidth: 200 }}>
-                  <LinearProgress
-                    variant="determinate"
-                    value={formProgress}
-                    sx={{
-                      height: 8,
-                      borderRadius: 4,
-                      backgroundColor: 'rgba(0,0,0,0.1)',
-                      '& .MuiLinearProgress-bar': {
-                        borderRadius: 4,
-                        background: 'linear-gradient(90deg, #4ECDC4, #44A08D)',
-                      }
-                    }}
-                  />
-                </Box>
-                {formProgress === 100 && (
-                  <Chip
-                    icon={<CheckIcon />}
-                    label="Complete"
-                    size="small"                    sx={{
-                      backgroundColor: 'rgba(76, 175, 80, 0.9)',
-                      color: 'white',
-                      fontWeight: 600,
-                      animation: 'pulse 2s infinite'
-                    }}
-                  />
-                )}
-              </Stack>            </Box>
           </Box>
-        </Stack>
-      </Box>{/* Main Content */}
+        </Box>
+
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: { xs: 'flex-start', md: 'flex-end' },
+            gap: 1.5,
+            minWidth: { xs: '100%', md: 320 },
+            animation: 'slideInRight 0.6s ease-out 0.2s both'
+          }}
+        >
+          <Stack direction="row" alignItems="center" spacing={1.5}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#047857' }}>
+              Setup Progress
+            </Typography>
+            {formProgress === 100 && (
+              <Chip
+                icon={<CheckIcon />}
+                label="Complete"
+                size="small"
+                sx={{
+                  backgroundColor: 'rgba(34, 197, 94, 0.15)',
+                  color: '#047857',
+                  fontWeight: 600,
+                  animation: 'pulse 2s infinite'
+                }}
+              />
+            )}
+          </Stack>
+          <Box sx={{ width: { xs: '100%', md: 240 } }}>
+            <LinearProgress
+              variant="determinate"
+              value={formProgress}
+              sx={{
+                height: 8,
+                borderRadius: 4,
+                backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                '& .MuiLinearProgress-bar': {
+                  borderRadius: 4,
+                  background: 'linear-gradient(90deg, #059669 0%, #10b981 50%, #22c55e 100%)'
+                }
+              }}
+            />
+          </Box>
+          <Typography variant="body2" color="text.secondary">
+            {Math.round(formProgress)}% complete{hasUnsavedChanges ? ' • Unsaved changes' : ''}
+          </Typography>
+        </Box>
+      </Box>
+      {/* Main Content */}
       <Box sx={{ maxWidth: 1400, mx: 'auto', p: 3 }}>
         {/* Tab Navigation */}        <Paper
           elevation={0}

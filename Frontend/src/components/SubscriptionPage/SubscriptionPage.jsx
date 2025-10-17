@@ -202,25 +202,128 @@ const SubscriptionPage = () => {
     );
   }
 
+  const monthlyPriceLabel = subscriptionStatus?.monthlyPrice != null
+    ? `€${subscriptionStatus.monthlyPrice.toFixed(2)} per month`
+    : 'Price unavailable';
+
+  const nextBillingLabel = subscriptionStatus?.isTrialActive && subscriptionStatus?.trialEndDate
+    ? `Trial ends ${formatDate(subscriptionStatus.trialEndDate)}`
+    : subscriptionStatus?.nextPaymentDate
+      ? `Next payment ${formatDate(subscriptionStatus.nextPaymentDate)}`
+      : 'Next payment not scheduled';
+
+  const expiryCountdown = Number.isFinite(subscriptionStatus?.daysUntilExpiry)
+    ? `${subscriptionStatus.daysUntilExpiry} day${subscriptionStatus.daysUntilExpiry === 1 ? '' : 's'} remaining`
+    : 'Expiry information unavailable';
+
   return (
     <Page>
       <Section>
         <Fade in={true} timeout={800}>
           <Box>
-            <Typography 
-              variant="h4" 
-              gutterBottom 
-              sx={{ 
-                fontWeight: 'bold',
-                background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                mb: 3
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'space-between',
+                alignItems: { xs: 'flex-start', md: 'center' },
+                gap: 3,
+                mb: 4,
+                p: 3,
+                borderRadius: 3,
+                background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
+                border: '1px solid rgba(79, 70, 229, 0.18)',
+                boxShadow: '0 4px 12px rgba(79, 70, 229, 0.15)',
+                position: 'relative',
+                overflow: 'hidden',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '4px',
+                  background: 'linear-gradient(90deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%)',
+                  borderRadius: '3px 3px 0 0'
+                }
               }}
             >
-              Subscription Management
-            </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, minWidth: 260 }}>
+                <Box
+                  sx={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: '16px',
+                    background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 10px 20px rgba(79, 70, 229, 0.35)'
+                  }}
+                >
+                  <CreditCard sx={{ color: 'white', fontSize: 26 }} />
+                </Box>
+                <Box>
+                  <Typography
+                    variant="h5"
+                    component="h1"
+                    sx={{
+                      fontWeight: 'bold',
+                      background: 'linear-gradient(135deg, #4338ca 0%, #7c3aed 100%)',
+                      backgroundClip: 'text',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      mb: 0.5
+                    }}
+                  >
+                    Subscription Management
+                  </Typography>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{
+                      color: 'text.secondary',
+                      fontWeight: 'medium'
+                    }}
+                  >
+                    Monitor plan status, manage billing, and keep your subscription current.
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: { xs: 'column', md: 'row' },
+                  alignItems: { xs: 'flex-start', md: 'center' },
+                  gap: { xs: 1.5, md: 3 },
+                  minWidth: { xs: '100%', md: 'auto' }
+                }}
+              >
+                {subscriptionStatus && (
+                  <Stack direction="row" spacing={1.5} alignItems="center">
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#4f46e5' }}>
+                      Status
+                    </Typography>
+                    {getStatusChip(
+                      subscriptionStatus.status,
+                      subscriptionStatus.isTrialActive,
+                      subscriptionStatus.isActive
+                    )}
+                  </Stack>
+                )}
+                <Stack spacing={0.5}>
+                  <Typography variant="body2" color="text.secondary">
+                    {monthlyPriceLabel}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {nextBillingLabel}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {expiryCountdown}
+                  </Typography>
+                </Stack>
+              </Box>
+            </Box>
 
               {error && (
                 <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>

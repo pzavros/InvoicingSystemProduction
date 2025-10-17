@@ -56,7 +56,8 @@ namespace InvoicingBackend.Services
                             showBankDetails = true,
                             showNotes = true,
                             showTerms = true,
-                            highlightTotals = true
+                            highlightTotals = true,
+                            showAmountDueBox = true
                         },
                         styling = new
                         {
@@ -108,7 +109,8 @@ namespace InvoicingBackend.Services
                             showBankDetails = true,
                             showNotes = true,
                             showTerms = true,
-                            highlightTotals = true
+                            highlightTotals = true,
+                            showAmountDueBox = true
                         },
                         styling = new
                         {
@@ -166,7 +168,8 @@ namespace InvoicingBackend.Services
                             showBankDetails = true,
                             showNotes = true,
                             showTerms = false,
-                            highlightTotals = false
+                            highlightTotals = false,
+                            showAmountDueBox = true
                         },
                         styling = new
                         {

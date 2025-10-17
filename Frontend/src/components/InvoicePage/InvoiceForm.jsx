@@ -38,6 +38,54 @@ import {
 } from "./api";
 import { getAllClients } from "../ClientsPage/api";
 import { getAllDocumentTypes } from "../DocumentTypePage/api";
+import { getUserProfile } from "../AuthPages/api";
+
+const LANGUAGE_LOCALE_MAP = {
+  english: "en-US",
+  french: "fr-FR",
+  spanish: "es-ES",
+  german: "de-DE",
+  italian: "it-IT",
+  portuguese: "pt-PT",
+};
+
+const resolveLocaleFromPreference = (languagePreference) => {
+  if (!languagePreference) {
+    return typeof navigator !== "undefined" && navigator.language
+      ? navigator.language
+      : "en-US";
+  }
+
+  const normalized = languagePreference.trim().toLowerCase();
+  return (
+    LANGUAGE_LOCALE_MAP[normalized] ||
+    (typeof navigator !== "undefined" && navigator.language) ||
+    "en-US"
+  );
+};
+
+const readStoredUserPreferences = () => {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    const storedUserRaw = localStorage.getItem("user");
+    if (!storedUserRaw) {
+      return null;
+    }
+
+    const storedUser = JSON.parse(storedUserRaw);
+    return {
+      currency: storedUser?.currency ? storedUser.currency.toUpperCase() : null,
+      dateFormat: storedUser?.dateFormat ? storedUser.dateFormat.toUpperCase() : null,
+      language: storedUser?.language || null,
+    };
+  } catch (error) {
+    console.warn("Failed to read stored user preferences:", error);
+    return null;
+  }
+};
 
 const InvoiceForm = () => {
   const dispatch = useDispatch();
@@ -70,6 +118,7 @@ const InvoiceForm = () => {
     discountRate: 0,
     discountAmount: "0.00",
     currency: "$",
+    currencyCode: "USD",
     currencyId: 1,
     companyLogo: "",
     companyLogoMimeType: "", // Added for MIME type
@@ -111,6 +160,11 @@ const InvoiceForm = () => {
     severity: "success",
   });
   const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [userPreferences, setUserPreferences] = useState(() => readStoredUserPreferences());
+
+  const resolvedLocale = resolveLocaleFromPreference(userPreferences?.language);
+  const resolvedDateFormat = (userPreferences?.dateFormat || "MM/DD/YYYY").toUpperCase().trim();
+  const resolvedCurrencyCode = (formData.currencyCode || userPreferences?.currency || "USD")?.toUpperCase();
 
   const parseTemplateData = (templateDto) => {
     if (!templateDto) return null;
@@ -159,6 +213,67 @@ const InvoiceForm = () => {
 
         const setupData = await getSystemSetup(); // Assuming this returns { ..., logo, logoMimeType }
         
+        let profileData = null;
+        try {
+          profileData = await getUserProfile();
+          const normalizedPreferences = {
+            currency: profileData.currency ? profileData.currency.toUpperCase() : null,
+            dateFormat: profileData.dateFormat ? profileData.dateFormat.toUpperCase() : "MM/DD/YYYY",
+            language: profileData.language || null,
+          };
+
+          setUserPreferences(normalizedPreferences);
+
+          if (typeof window !== "undefined") {
+            try {
+              const storedUserRaw = localStorage.getItem("user");
+              if (storedUserRaw) {
+                const storedUser = JSON.parse(storedUserRaw);
+                const updatedUser = {
+                  ...storedUser,
+                  currency: normalizedPreferences.currency || storedUser?.currency,
+                  dateFormat: normalizedPreferences.dateFormat || storedUser?.dateFormat,
+                  language: normalizedPreferences.language || storedUser?.language,
+                };
+                localStorage.setItem("user", JSON.stringify(updatedUser));
+              }
+            } catch (storageError) {
+              console.warn("Failed to sync user preferences to localStorage:", storageError);
+            }
+          }
+        } catch (prefError) {
+          console.error("Error fetching user preferences for invoice defaults:", prefError);
+        }
+
+        const findCurrencyById = (id) => currenciesData.find(c => c.id === id);
+
+        const preferredCurrency = profileData?.currency
+          ? currenciesData.find(
+              c => (c.code || "").toUpperCase() === profileData.currency.toUpperCase()
+            )
+          : null;
+
+        const systemCurrency = setupData?.defaultCurrencyId
+          ? findCurrencyById(setupData.defaultCurrencyId)
+          : null;
+
+        const fallbackCurrency =
+          preferredCurrency ||
+          systemCurrency ||
+          currenciesData.find(c => (c.code || "").toUpperCase() === "USD") ||
+          currenciesData[0] ||
+          null;
+
+        const currencyDefaults = {
+          id: fallbackCurrency?.id ?? systemCurrency?.id ?? 1,
+          symbol:
+            fallbackCurrency?.symbol ||
+            fallbackCurrency?.code ||
+            profileData?.currency ||
+            "$",
+          code: (fallbackCurrency?.code || profileData?.currency || "USD")?.toUpperCase(),
+        };
+        
         if (isEdit && params.id) {
           try {
             const invoiceData = await getInvoiceById(params.id);
@@ -169,22 +284,7 @@ const InvoiceForm = () => {
               await loadTemplateForDocumentType(invoiceData.documentTypeId);
             }
             
-            // If invoice has a specific template, use that instead
-            if (invoiceData.templateId) {
-              try {
-                const templateDto = await getInvoiceTemplateById(invoiceData.templateId);
-                if (templateDto) {
-                  setTemplateFromDto(templateDto);
-                  setFormData(prev => ({ ...prev, templateId: invoiceData.templateId }));
-                }
-              } catch (templateFetchError) {
-                console.error("Error fetching invoice template by id:", templateFetchError);
-                // Fall back to active template for this document type
-                await loadTemplateForDocumentType(invoiceData.documentTypeId || 1);
-              }
-            } else {
-              setSelectedTemplate(null);
-            }
+
           } catch (error) {
             console.error("Error fetching invoice:", error);
             setNotification({
@@ -194,9 +294,6 @@ const InvoiceForm = () => {
             });
           }
         } else {
-          const defaultCurrencyId = setupData.defaultCurrencyId || 1;
-          const defaultCurrency = currenciesData.find(c => c.id === defaultCurrencyId);
-          const defaultSymbol = defaultCurrency ? defaultCurrency.symbol : "$";
           const defaultStatus = statusesData.find(s => s.statusId === 1) || { statusId: 1, name: 'Draft' };
 
           let baseDataForNewOrCopy;
@@ -204,15 +301,17 @@ const InvoiceForm = () => {
           if (isCopy && params.id) {
             const invoiceToCopy = getOneInvoice(params.id); // Assuming this Redux state includes companyLogoMimeType
             if (invoiceToCopy) {
+              const copyCurrency = findCurrencyById(invoiceToCopy.currencyId);
               baseDataForNewOrCopy = {
                 ...invoiceToCopy,
                 id: generateRandomId(),
                 invoiceNumber: listSize + 1,
-                currencyId: invoiceToCopy.currencyId || defaultCurrencyId,
-                currency: invoiceToCopy.currency || defaultSymbol,
+                currencyId: invoiceToCopy.currencyId || currencyDefaults.id,
+                currency: invoiceToCopy.currency || copyCurrency?.symbol || currencyDefaults.symbol,
+                currencyCode: (invoiceToCopy.currencyCode || copyCurrency?.code || currencyDefaults.code)?.toUpperCase(),
                 statusId: invoiceToCopy.statusId || defaultStatus.statusId,
                 statusName: invoiceToCopy.statusName || defaultStatus.name,
-                templateId: invoiceToCopy.templateId || null,
+                templateId: null,
                 // companyLogo and companyLogoMimeType are expected to be in invoiceToCopy
               };
               
@@ -224,8 +323,9 @@ const InvoiceForm = () => {
               console.warn(`Invoice with ID ${params.id} not found for copying.`);
               baseDataForNewOrCopy = {
                 ...formData, // Initial formData state, includes empty companyLogoMimeType
-                currencyId: defaultCurrencyId,
-                currency: defaultSymbol,
+                currencyId: currencyDefaults.id,
+                currency: currencyDefaults.symbol,
+                currencyCode: currencyDefaults.code,
                 statusId: defaultStatus.statusId,
                 statusName: defaultStatus.name,
                 templateId: activeTemplateData?.id || null,
@@ -235,8 +335,9 @@ const InvoiceForm = () => {
             const defaultDocumentTypeId = documentTypes?.[0]?.id || null;
             baseDataForNewOrCopy = {
               ...formData, // Initial formData state, includes empty companyLogoMimeType
-              currencyId: defaultCurrencyId,
-              currency: defaultSymbol,
+              currencyId: currencyDefaults.id,
+              currency: currencyDefaults.symbol,
+              currencyCode: currencyDefaults.code,
               statusId: defaultStatus.statusId,
               statusName: defaultStatus.name,
               documentTypeId: defaultDocumentTypeId,
@@ -271,6 +372,7 @@ const InvoiceForm = () => {
             address: setupData.address || baseDataForNewOrCopy.address || "",
             currencyId: baseDataForNewOrCopy.currencyId,
             currency: baseDataForNewOrCopy.currency,
+            currencyCode: baseDataForNewOrCopy.currencyCode || currencyDefaults.code,
             statusId: baseDataForNewOrCopy.statusId,
             statusName: baseDataForNewOrCopy.statusName,
             templateId: baseDataForNewOrCopy.templateId,
@@ -358,6 +460,7 @@ const InvoiceForm = () => {
       total: invoiceData.total?.toFixed(2) || "0.00",
       currencyId: invoiceData.currencyId,
       currency: symbol,
+      currencyCode: (invoiceData.currency?.code || invoiceData.currencyCode || "USD")?.toUpperCase(),
       companyName: invoiceData.companyName,
       companyNo: invoiceData.companyNo,
       vatNo: invoiceData.vatNo,
@@ -388,7 +491,7 @@ const InvoiceForm = () => {
       ],
       statusId: currentStatus.statusId,
       statusName: currentStatus.name,
-      templateId: invoiceData.templateId || null,
+      templateId: null,
       documentTypeId: invoiceData.documentTypeId || 1,
     });
   };
@@ -468,11 +571,14 @@ const InvoiceForm = () => {
 
   const loadTemplateForDocumentType = async (documentTypeId) => {
     try {
+      setSelectedTemplate(null);
       const activeTemplateData = await getActiveInvoiceTemplate(documentTypeId);
       if (activeTemplateData) {
-        console.log('Loading template for document type:', documentTypeId, activeTemplateData.name);
         setTemplateFromDto(activeTemplateData);
         setFormData(prev => ({ ...prev, templateId: activeTemplateData.id }));
+      } else {
+        setSelectedTemplate(null);
+        setFormData(prev => ({ ...prev, templateId: null }));
       }
     } catch (error) {
       console.error('Error loading template for document type:', error);
@@ -496,7 +602,8 @@ const InvoiceForm = () => {
       setFormData(prevData => ({ 
         ...prevData, 
         currencyId: selectedCurrencyId,
-        currency: selectedCurrency.symbol,
+        currency: selectedCurrency.symbol || selectedCurrency.code || prevData.currency,
+        currencyCode: selectedCurrency.code || prevData.currencyCode,
       }));
     }
   };
@@ -556,8 +663,11 @@ const InvoiceForm = () => {
     }
   };
 
-  const openModal = (event) => {
+  const openModal = async (event) => {
     event.preventDefault();
+    if (formData.documentTypeId) {
+      await loadTemplateForDocumentType(formData.documentTypeId);
+    }
     handleCalculateTotal();
     setIsOpen(true);
   };
@@ -669,11 +779,14 @@ const InvoiceForm = () => {
   const handleCopyInvoice = () => {
     const receivedInvoice = getOneInvoice(copyId);
     if (receivedInvoice) {
+      const invoiceCurrency = currencies.find(c => c.id === receivedInvoice.currencyId);
       setFormData({
         ...receivedInvoice,
         id: formData.id,
         invoiceNumber: formData.invoiceNumber,
         templateId: receivedInvoice.templateId || formData.templateId,
+        currency: receivedInvoice.currency || invoiceCurrency?.symbol || formData.currency,
+        currencyCode: (receivedInvoice.currencyCode || invoiceCurrency?.code || formData.currencyCode)?.toUpperCase(),
       });
     } else {
       setNotification({
@@ -1746,6 +1859,8 @@ const InvoiceForm = () => {
               }}
               items={formData.items}
               currency={formData.currency}
+              currencyCode={resolvedCurrencyCode}
+              currencySymbol={formData.currency}
               subTotal={formData.subTotal}
               taxAmount={formData.taxAmount}
               discountAmount={formData.discountAmount}
@@ -1756,6 +1871,8 @@ const InvoiceForm = () => {
               bankInfo={getBankInfo()}
               templateConfig={selectedTemplate?.parsedConfig}
               templateMeta={selectedTemplate}
+              dateFormat={resolvedDateFormat}
+              locale={resolvedLocale}
             />
           </Box>
         </Grid>

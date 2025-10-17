@@ -60,6 +60,7 @@ const PreferencesCard = ({
     { value: 'MM/DD/YYYY', label: 'MM/DD/YYYY' },
     { value: 'DD/MM/YYYY', label: 'DD/MM/YYYY' },
     { value: 'YYYY-MM-DD', label: 'YYYY-MM-DD' },
+    { value: 'YYYY/MM/DD', label: 'YYYY/MM/DD' },
     { value: 'DD-MM-YYYY', label: 'DD-MM-YYYY' }
   ];
 

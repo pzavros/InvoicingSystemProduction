@@ -452,92 +452,157 @@ const InvoiceTemplatesPage = () => {
   return (
     <Box sx={{ p: 3 }}>
       {/* Header */}
-      <Paper
-        elevation={3}
+      <Box
         sx={{
-          p: 3,
+          display: 'flex',
+          flexWrap: 'wrap',
+          justifyContent: 'space-between',
+          alignItems: { xs: 'flex-start', md: 'center' },
+          gap: 3,
           mb: 4,
+          p: 3,
           borderRadius: 3,
           background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-          border: '1px solid rgba(148, 163, 184, 0.1)'
+          border: '1px solid rgba(59, 130, 246, 0.15)',
+          boxShadow: '0 4px 12px rgba(59, 130, 246, 0.1)',
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '4px',
+            background: 'linear-gradient(90deg, #1d4ed8 0%, #3b82f6 50%, #8b5cf6 100%)',
+            borderRadius: '3px 3px 0 0'
+          }
         }}
       >
-        <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, minWidth: 280 }}>
+          <Box
+            sx={{
+              width: 48,
+              height: 48,
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 8px 16px rgba(59, 130, 246, 0.35)'
+            }}
+          >
+            <DocumentIcon sx={{ color: 'white', fontSize: 24 }} />
+          </Box>
           <Box>
             <Typography
-              variant="h4"
+              variant="h5"
+              component="h1"
               sx={{
                 fontWeight: 'bold',
-                color: '#1f2937',
-                mb: 1
+                background: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                mb: 0.5
               }}
             >
-              Invoice Templates
+              Invoice Template Management
             </Typography>
-            <Typography variant="body1" color="text.secondary">
+            <Typography
+              variant="subtitle2"
+              sx={{
+                color: 'text.secondary',
+                fontWeight: 'medium'
+              }}
+            >
               Create and manage your invoice templates. Set one active template per document type.
             </Typography>
           </Box>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <FormControl size="small" sx={{ minWidth: 200 }}>
-              <InputLabel>Document Type</InputLabel>
-              <Select
-                value={selectedDocumentType}
-                label="Document Type"
-                onChange={(e) => setSelectedDocumentType(e.target.value)}
-                sx={{
-                  borderRadius: 2,
-                  backgroundColor: 'white'
-                }}
-              >
-                <MenuItem value="all">All Document Types</MenuItem>
-                {documentTypes.map((docType) => (
-                  <MenuItem key={docType.id} value={docType.id}>
-                    {docType.displayName}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => navigate('/templates/add')}
-              sx={{
-                background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-                color: 'white',
-                fontWeight: 600,
-                borderRadius: 2,
-                px: 3,
-                py: 1.5,
-                textTransform: 'none'
-              }}
-            >
-              Create Template
-            </Button>
-            
-            <Button
-              variant="outlined"
-              startIcon={<AddIcon />}
-              onClick={() => handleOpenDialog()}
-              sx={{
-                borderColor: '#d1d5db',
-                color: '#6b7280',
-                fontWeight: 600,
-                borderRadius: 2,
-                px: 3,
-                py: 1.5,
-                textTransform: 'none',
-                '&:hover': {
-                  borderColor: '#9ca3af',
-                  backgroundColor: 'rgba(107, 114, 128, 0.1)'
-                }
-              }}
-            >
-              Advanced Mode
-            </Button>
-          </Stack>
         </Box>
-      </Paper>
+
+        <Stack
+          direction={{ xs: 'column', md: 'row' }}
+          spacing={2}
+          alignItems={{ xs: 'stretch', md: 'center' }}
+          sx={{ width: { xs: '100%', md: 'auto' } }}
+        >
+          <FormControl
+            size="small"
+            sx={{
+              minWidth: { xs: '100%', md: 200 },
+              backgroundColor: 'white',
+              borderRadius: 2,
+              boxShadow: { xs: '0 4px 8px rgba(148, 163, 184, 0.15)', md: 'none' }
+            }}
+          >
+            <InputLabel>Document Type</InputLabel>
+            <Select
+              value={selectedDocumentType}
+              label="Document Type"
+              onChange={(e) => setSelectedDocumentType(e.target.value)}
+              sx={{
+                borderRadius: 2,
+                backgroundColor: 'white'
+              }}
+            >
+              <MenuItem value="all">All Document Types</MenuItem>
+              {documentTypes.map((docType) => (
+                <MenuItem key={docType.id} value={docType.id}>
+                  {docType.displayName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={() => navigate('/templates/add')}
+            sx={{
+              backgroundColor: '#1d4ed8',
+              backgroundImage: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%)',
+              boxShadow: '0 8px 16px rgba(59, 130, 246, 0.35)',
+              borderRadius: 2,
+              px: 3,
+              py: 1.5,
+              fontWeight: 600,
+              textTransform: 'none',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              '&:hover': {
+                backgroundImage: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 50%, #2563eb 100%)',
+                transform: 'translateY(-2px)',
+                boxShadow: '0 12px 24px rgba(37, 99, 235, 0.45)'
+              }
+            }}
+          >
+            Create Template
+          </Button>
+
+          <Button
+            variant="outlined"
+            startIcon={<AddIcon />}
+            onClick={() => handleOpenDialog()}
+            sx={{
+              borderColor: 'rgba(148, 163, 184, 0.6)',
+              color: '#334155',
+              fontWeight: 600,
+              borderRadius: 2,
+              px: 3,
+              py: 1.5,
+              textTransform: 'none',
+              backgroundColor: 'rgba(255, 255, 255, 0.6)',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                borderColor: 'rgba(59, 130, 246, 0.6)',
+                backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                boxShadow: '0 8px 16px rgba(59, 130, 246, 0.15)'
+              }
+            }}
+          >
+            Advanced Mode
+          </Button>
+        </Stack>
+      </Box>
 
       {/* Templates DataGrid */}
       <Paper

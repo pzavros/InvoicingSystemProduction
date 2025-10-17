@@ -17,15 +17,6 @@ import {
   Select,
   InputLabel,
   FormControl,
-  Chip,
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Paper,
-  Divider
 } from "@mui/material";
 import {
   ArrowBack as ArrowBackIcon,
@@ -40,6 +31,7 @@ import {
   getDocumentTypes
 } from "../InvoiceTemplatesPage/api";
 import { COLOR_THEMES } from "../../utils/colorThemes";
+import InvoiceTemplatePreview from "../InvoiceTemplatesPage/InvoiceTemplatePreview";
 
 /** ---------- Form Components ---------- **/
 const FormGrid = ({ size, children }) => (
@@ -74,13 +66,17 @@ const TemplateForm = () => {
     isActive: false,
     sections: {
       showLogo: true,
+      showCompanyLogo: true,
+      showInvoiceHeader: true,
       showCompanyInfo: true,
       showCompanyDetails: true,
+      showClientDetails: true,
       showBankDetails: true,
       showBankInfo: true,
       showDates: true,
       showItemsTable: true,
       showTotals: true,
+      showAmountDueBox: true,
       showTax: true,
       showDiscount: true,
       showNotes: true,
@@ -115,70 +111,6 @@ const TemplateForm = () => {
     severity: "success"
   });
 
-  // Sample data for preview
-  const sampleInvoiceData = {
-    isOpen: true,
-    id: "preview-001",
-    currency: "$",
-    currentDate: new Date().toISOString().split('T')[0],
-    invoiceNumber: "001",
-    dateOfIssue: new Date().toISOString().split('T')[0],
-    billTo: "John Smith",
-    billToEmail: "john.smith@example.com",
-    billToAddress: "123 Main Street, New York, NY 10001",
-    billFrom: "Your Company Name",
-    billFromEmail: "hello@yourcompany.com",
-    address: "456 Business Ave, Suite 100, New York, NY 10002",
-    notes: "Thank you for your business! Payment is due within 30 days.",
-    total: "1,150.00",
-    subTotal: "1,000.00",
-    taxRate: 10,
-    taxAmount: "100.00",
-    discountRate: 5,
-    discountAmount: "50.00",
-    logo: "https://via.placeholder.com/120x120?text=Logo"
-  };
-
-  const sampleItems = [
-    {
-      itemId: 1,
-      itemName: "Web Design Services",
-      itemDescription: "Complete website redesign and development",
-      itemPrice: "500.00",
-      itemQuantity: 1,
-    },
-    {
-      itemId: 2,
-      itemName: "SEO Optimization",
-      itemDescription: "3-month SEO campaign and optimization",
-      itemPrice: "300.00",
-      itemQuantity: 1,
-    },
-    {
-      itemId: 3,
-      itemName: "Content Creation",
-      itemDescription: "Blog posts and marketing content",
-      itemPrice: "250.00",
-      itemQuantity: 1,
-    },
-  ];
-
-  const sampleCompanyInfo = {
-    name: formData.name ? `${formData.name} Preview` : "Your Company Name",
-    companyNo: "12345678",
-    vatNo: "VAT123456789",
-    ticNo: "TIC987654321",
-    website: "https://www.yourcompany.com",
-    email: "hello@yourcompany.com",
-  };
-
-  const sampleBankInfo = {
-    bankName: "Sample Bank",
-    accountName: "Your Company Name",
-    accountNo: "123456789",
-    swift: "SAMPUS33",
-    iban: "US12 3456 7890 1234 5678 90",
-  };
 
   useEffect(() => {
     const initializeData = async () => {
@@ -255,6 +187,12 @@ const TemplateForm = () => {
         }
       }
 
+      const showInvoiceHeader = parsedConfig.sections?.showInvoiceHeader ?? true;
+      const showCompanyDetails = parsedConfig.sections?.showCompanyDetails ?? parsedConfig.sections?.showCompanyInfo ?? true;
+      const showClientDetails = parsedConfig.sections?.showClientDetails ?? true;
+      const showBankDetails = parsedConfig.sections?.showBankDetails ?? parsedConfig.sections?.showBankInfo ?? true;
+      const showLogo = parsedConfig.sections?.showLogo ?? parsedConfig.sections?.showCompanyLogo ?? parsedConfig.logoSettings?.showLogo ?? true;
+
       setFormData({
         name: template.name || "",
         description: template.description || "",
@@ -265,14 +203,18 @@ const TemplateForm = () => {
         documentTypeId: template.documentTypeId || null,
         isActive: template.isActive || false,
         sections: {
-          showLogo: parsedConfig.sections?.showLogo ?? true,
-          showCompanyInfo: parsedConfig.sections?.showCompanyInfo ?? true,
-          showCompanyDetails: parsedConfig.sections?.showCompanyDetails ?? true,
-          showBankDetails: parsedConfig.sections?.showBankDetails ?? true,
-          showBankInfo: parsedConfig.sections?.showBankInfo ?? true,
+          showLogo: showLogo,
+          showCompanyLogo: parsedConfig.sections?.showCompanyLogo ?? showLogo,
+          showInvoiceHeader,
+          showCompanyInfo: showCompanyDetails,
+          showCompanyDetails: showCompanyDetails,
+          showClientDetails,
+          showBankDetails: showBankDetails,
+          showBankInfo: showBankDetails,
           showDates: parsedConfig.sections?.showDates ?? true,
           showItemsTable: parsedConfig.sections?.showItemsTable ?? true,
           showTotals: parsedConfig.sections?.showTotals ?? true,
+          showAmountDueBox: parsedConfig.sections?.showAmountDueBox ?? true,
           showTax: parsedConfig.sections?.showTax ?? true,
           showDiscount: parsedConfig.sections?.showDiscount ?? true,
           showNotes: parsedConfig.sections?.showNotes ?? true,
@@ -282,7 +224,7 @@ const TemplateForm = () => {
           bankInfoBackground: parsedConfig.sections?.bankInfoBackground ?? true
         },
         logoSettings: {
-          showLogo: parsedConfig.logoSettings?.showLogo ?? true,
+          showLogo: showLogo,
           size: parsedConfig.logoSettings?.size || "medium",
           style: parsedConfig.logoSettings?.style || "square"
         },
@@ -323,23 +265,54 @@ const TemplateForm = () => {
 
   // Handle nested object updates
   const handleSectionChange = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      sections: {
+    setFormData(prev => {
+      const updatedSections = {
         ...prev.sections,
         [field]: value
+      };
+
+      if (field === 'showCompanyInfo' || field === 'showCompanyDetails') {
+        updatedSections.showCompanyInfo = value;
+        updatedSections.showCompanyDetails = value;
       }
-    }));
+
+      if (field === 'showBankInfo' || field === 'showBankDetails') {
+        updatedSections.showBankInfo = value;
+        updatedSections.showBankDetails = value;
+      }
+
+      if (field === 'showLogo' || field === 'showCompanyLogo') {
+        updatedSections.showLogo = value;
+        updatedSections.showCompanyLogo = value;
+      }
+
+      return {
+        ...prev,
+        sections: updatedSections
+      };
+    });
   };
 
   const handleLogoChange = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      logoSettings: {
-        ...prev.logoSettings,
-        [field]: value
+    setFormData(prev => {
+      const updated = {
+        ...prev,
+        logoSettings: {
+          ...prev.logoSettings,
+          [field]: value
+        }
+      };
+
+      if (field === 'showLogo') {
+        updated.sections = {
+          ...prev.sections,
+          showLogo: value,
+          showCompanyLogo: value
+        };
       }
-    }));
+
+      return updated;
+    });
   };
 
   const handleFooterChange = (field, value) => {
@@ -377,11 +350,6 @@ const TemplateForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Helper function to get theme color
-  const getThemeColor = () => {
-    return formData.customColors?.primary || COLOR_THEMES[formData.colorTheme]?.colors?.primary || '#667eea';
-  };
-
   const generateTemplateData = () => {
     const selectedTheme = COLOR_THEMES[formData.colorTheme];
     
@@ -403,14 +371,18 @@ const TemplateForm = () => {
         fontFamily: formData.fontStyle
       },
       sections: {
-        showLogo: formData.sections?.showLogo ?? true,
-        showCompanyInfo: formData.sections?.showCompanyInfo ?? true,
-        showCompanyDetails: formData.sections?.showCompanyDetails ?? true,
-        showBankDetails: formData.sections?.showBankDetails ?? true,
-        showBankInfo: formData.sections?.showBankInfo ?? true,
+        showLogo: formData.sections?.showLogo ?? formData.sections?.showCompanyLogo ?? formData.logoSettings?.showLogo ?? true,
+        showCompanyLogo: formData.sections?.showCompanyLogo ?? formData.sections?.showLogo ?? formData.logoSettings?.showLogo ?? true,
+        showInvoiceHeader: formData.sections?.showInvoiceHeader ?? true,
+        showCompanyInfo: formData.sections?.showCompanyDetails ?? formData.sections?.showCompanyInfo ?? true,
+        showCompanyDetails: formData.sections?.showCompanyDetails ?? formData.sections?.showCompanyInfo ?? true,
+        showClientDetails: formData.sections?.showClientDetails ?? true,
+        showBankDetails: formData.sections?.showBankDetails ?? formData.sections?.showBankInfo ?? true,
+        showBankInfo: formData.sections?.showBankInfo ?? formData.sections?.showBankDetails ?? true,
         showDates: formData.sections?.showDates ?? true,
         showItemsTable: formData.sections?.showItemsTable ?? true,
         showTotals: formData.sections?.showTotals ?? true,
+        showAmountDueBox: formData.sections?.showAmountDueBox ?? true,
         showTax: formData.sections?.showTax ?? true,
         showDiscount: formData.sections?.showDiscount ?? true,
         showNotes: formData.sections?.showNotes ?? true,
@@ -439,6 +411,8 @@ const TemplateForm = () => {
       }
     };
   };
+
+  const previewConfig = generateTemplateData();
 
   const handleSave = async () => {
     if (!validateForm()) return;
@@ -801,8 +775,29 @@ const TemplateForm = () => {
               <FormControlLabel
                 control={
                   <Switch
-                    checked={formData.sections?.showCompanyInfo ?? true}
-                    onChange={(e) => handleSectionChange('showCompanyInfo', e.target.checked)}
+                    checked={formData.sections?.showInvoiceHeader ?? true}
+                    onChange={(e) => handleSectionChange('showInvoiceHeader', e.target.checked)}
+                    sx={{
+                      '& .MuiSwitch-switchBase.Mui-checked': {
+                        color: '#667eea',
+                      },
+                      '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                        backgroundColor: '#667eea',
+                      },
+                    }}
+                  />
+                }
+                label="Show Invoice Header"
+                sx={{ color: "#374151", fontWeight: 500 }}
+              />
+            </FormGrid>
+
+            <FormGrid size={{ xs: 12, sm: 6 }}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={formData.sections?.showCompanyDetails ?? true}
+                    onChange={(e) => handleSectionChange('showCompanyDetails', e.target.checked)}
                     sx={{
                       '& .MuiSwitch-switchBase.Mui-checked': {
                         color: '#667eea',
@@ -822,8 +817,29 @@ const TemplateForm = () => {
               <FormControlLabel
                 control={
                   <Switch
-                    checked={formData.sections?.showBankInfo ?? true}
-                    onChange={(e) => handleSectionChange('showBankInfo', e.target.checked)}
+                    checked={formData.sections?.showClientDetails ?? true}
+                    onChange={(e) => handleSectionChange('showClientDetails', e.target.checked)}
+                    sx={{
+                      '& .MuiSwitch-switchBase.Mui-checked': {
+                        color: '#667eea',
+                      },
+                      '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                        backgroundColor: '#667eea',
+                      },
+                    }}
+                  />
+                }
+                label="Show Client Details"
+                sx={{ color: "#374151", fontWeight: 500 }}
+              />
+            </FormGrid>
+
+            <FormGrid size={{ xs: 12, sm: 6 }}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={formData.sections?.showBankDetails ?? true}
+                    onChange={(e) => handleSectionChange('showBankDetails', e.target.checked)}
                     sx={{
                       '& .MuiSwitch-switchBase.Mui-checked': {
                         color: '#667eea',
@@ -927,6 +943,27 @@ const TemplateForm = () => {
               <FormControlLabel
                 control={
                   <Switch
+                    checked={formData.sections?.showAmountDueBox ?? true}
+                    onChange={(e) => handleSectionChange('showAmountDueBox', e.target.checked)}
+                    sx={{
+                      '& .MuiSwitch-switchBase.Mui-checked': {
+                        color: '#667eea',
+                      },
+                      '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                        backgroundColor: '#667eea',
+                      },
+                    }}
+                  />
+                }
+                label="Show Amount Due Summary"
+                sx={{ color: "#374151", fontWeight: 500 }}
+              />
+            </FormGrid>
+
+            <FormGrid size={{ xs: 12, sm: 6 }}>
+              <FormControlLabel
+                control={
+                  <Switch
                     checked={formData.sections?.tableBorder ?? true}
                     onChange={(e) => handleSectionChange('tableBorder', e.target.checked)}
                     sx={{
@@ -999,271 +1036,18 @@ const TemplateForm = () => {
                 p: 4
               }}
             >
-              {/* Inline Invoice Preview */}
-              <Box sx={{ 
-                maxWidth: '800px', 
-                mx: 'auto', 
-                backgroundColor: 'white',
-                fontFamily: formData.fontStyle === 'classic' ? 'serif' : 
-                           formData.fontStyle === 'elegant' ? 'Georgia, serif' : 
-                           formData.fontStyle === 'minimal' ? 'Arial, sans-serif' : 
-                           'Roboto, sans-serif'
-              }}>
-                {/* Invoice Header */}
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-                  <Box>
-                    <Typography 
-                      variant="h4" 
-                      sx={{ 
-                        fontWeight: 'bold', 
-                        color: getThemeColor(),
-                        fontSize: formData.fontStyle === 'minimal' ? '2rem' : '2.5rem'
-                      }}
-                    >
-                      {formData.type === 'tax' ? 'TAX INVOICE' : 
-                       formData.type === 'proforma' ? 'PROFORMA INVOICE' : 
-                       formData.type === 'quote' ? 'QUOTATION' : 'INVOICE'}
-                    </Typography>
-                    <Typography variant="h6" sx={{ color: '#666', mt: 1 }}>
-                      #{sampleInvoiceData.invoiceNumber}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ textAlign: 'right' }}>
-                    {formData.logoSettings?.showLogo !== false && (
-                      <Box sx={{ 
-                        width: formData.logoSettings?.size === 'large' ? 120 : 
-                               formData.logoSettings?.size === 'small' ? 60 : 80, 
-                        height: formData.logoSettings?.size === 'large' ? 120 : 
-                                formData.logoSettings?.size === 'small' ? 60 : 80, 
-                        backgroundColor: '#f0f0f0', 
-                        borderRadius: formData.logoSettings?.style === 'circle' ? '50%' : formData.borderRadius, 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center' 
-                      }}>
-                        <Typography variant="caption" sx={{ color: '#999' }}>Logo</Typography>
-                      </Box>
-                    )}
-                  </Box>
-                </Box>
-
-                {/* Company & Client Info */}
-                {formData.sections?.showCompanyInfo !== false && (
-                  <Grid container spacing={4} sx={{ mb: 4 }}>
-                    <Grid item xs={6}>
-                      <Typography 
-                        variant="subtitle2" 
-                        sx={{ 
-                          fontWeight: 'bold', 
-                          mb: 1, 
-                          color: getThemeColor()
-                        }}
-                      >
-                        From:
-                      </Typography>
-                      <Typography variant="body2">{sampleCompanyInfo.name}</Typography>
-                      <Typography variant="body2" sx={{ color: '#666' }}>{sampleCompanyInfo.email}</Typography>
-                      <Typography variant="body2" sx={{ color: '#666' }}>{sampleCompanyInfo.website}</Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography 
-                        variant="subtitle2" 
-                        sx={{ 
-                          fontWeight: 'bold', 
-                          mb: 1, 
-                          color: getThemeColor()
-                        }}
-                      >
-                        To:
-                      </Typography>
-                      <Typography variant="body2">{sampleInvoiceData.billTo}</Typography>
-                      <Typography variant="body2" sx={{ color: '#666' }}>{sampleInvoiceData.billToEmail}</Typography>
-                      <Typography variant="body2" sx={{ color: '#666' }}>{sampleInvoiceData.billToAddress}</Typography>
-                    </Grid>
-                  </Grid>
-                )}
-
-                {/* Invoice Details */}
-                {formData.sections?.showDates !== false && (
-                  <Grid container spacing={4} sx={{ mb: 4 }}>
-                    <Grid item xs={6}>
-                      <Typography variant="body2" sx={{ color: '#666' }}>
-                        <strong>Date Issued:</strong> {sampleInvoiceData.dateOfIssue}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography variant="body2" sx={{ color: '#666' }}>
-                        <strong>Due Date:</strong> {sampleInvoiceData.dueDate}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                )}
-
-                {/* Items Table */}
-                {formData.sections?.showItemsTable !== false && (
-                  <TableContainer 
-                    component={Paper} 
-                    elevation={0} 
-                    sx={{ 
-                      mb: 4, 
-                      border: formData.sections?.tableBorder !== false ? '1px solid #e0e0e0' : 'none',
-                      borderRadius: formData.sections?.tableStyle === 'rounded' ? formData.borderRadius : 0
-                    }}
-                  >
-                    <Table>
-                      <TableHead 
-                        sx={{ 
-                          backgroundColor: getThemeColor(),
-                          '& .MuiTableCell-root': {
-                            fontSize: formData.fontStyle === 'minimal' ? '0.875rem' : '1rem'
-                          }
-                        }}
-                      >
-                        <TableRow>
-                          <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Description</TableCell>
-                          <TableCell align="center" sx={{ color: 'white', fontWeight: 'bold' }}>Qty</TableCell>
-                          <TableCell align="center" sx={{ color: 'white', fontWeight: 'bold' }}>Rate</TableCell>
-                          <TableCell align="center" sx={{ color: 'white', fontWeight: 'bold' }}>Amount</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {sampleItems.map((item, index) => (
-                          <TableRow 
-                            key={index}
-                            sx={{
-                              '&:nth-of-type(odd)': {
-                                backgroundColor: formData.sections?.alternateRowColors !== false ? 'rgba(0, 0, 0, 0.04)' : 'transparent',
-                              },
-                            }}
-                          >
-                            <TableCell>{item.name}</TableCell>
-                            <TableCell align="center">{item.quantity}</TableCell>
-                            <TableCell align="center">${item.price}</TableCell>
-                            <TableCell align="center">${(item.quantity * item.price).toFixed(2)}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                )}
-
-                {/* Totals */}
-                {formData.sections?.showTotals !== false && (
-                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 4 }}>
-                    <Box sx={{ minWidth: 200 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                        <Typography variant="body2">Subtotal:</Typography>
-                        <Typography variant="body2">$1,000.00</Typography>
-                      </Box>
-                      {formData.sections?.showTax !== false && (
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                          <Typography variant="body2">Tax:</Typography>
-                          <Typography variant="body2">$100.00</Typography>
-                        </Box>
-                      )}
-                      {formData.sections?.showDiscount !== false && (
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                          <Typography variant="body2">Discount:</Typography>
-                          <Typography variant="body2">-$50.00</Typography>
-                        </Box>
-                      )}
-                      <Divider sx={{ my: 1 }} />
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Total:</Typography>
-                        <Typography 
-                          variant="h6" 
-                          sx={{ 
-                            fontWeight: 'bold', 
-                            color: getThemeColor()
-                          }}
-                        >
-                          $1,150.00
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Box>
-                )}
-
-                {/* Notes */}
-                {formData.sections?.showNotes !== false && sampleInvoiceData.notes && (
-                  <Box sx={{ mb: 4 }}>
-                    <Typography 
-                      variant="subtitle2" 
-                      sx={{ 
-                        fontWeight: 'bold', 
-                        mb: 1,
-                        color: getThemeColor()
-                      }}
-                    >
-                      Notes:
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: '#666' }}>{sampleInvoiceData.notes}</Typography>
-                  </Box>
-                )}
-
-                {/* Bank Info */}
-                {formData.sections?.showBankInfo !== false && (
-                  <Box sx={{ 
-                    backgroundColor: formData.sections?.bankInfoBackground !== false ? '#f9f9f9' : 'transparent', 
-                    p: formData.sections?.bankInfoBackground !== false ? 3 : 2, 
-                    borderRadius: formData.borderRadius,
-                    border: formData.sections?.bankInfoBackground === false ? '1px solid #e0e0e0' : 'none'
-                  }}>
-                    <Typography 
-                      variant="subtitle2" 
-                      sx={{ 
-                        fontWeight: 'bold', 
-                        mb: 2, 
-                        color: getThemeColor()
-                      }}
-                    >
-                      Banking Details:
-                    </Typography>
-                    <Grid container spacing={2}>
-                      <Grid item xs={6}>
-                        <Typography variant="caption" sx={{ color: '#666' }}>Bank Name:</Typography>
-                        <Typography variant="body2">{sampleBankInfo.bankName}</Typography>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Typography variant="caption" sx={{ color: '#666' }}>Account Name:</Typography>
-                        <Typography variant="body2">{sampleBankInfo.accountName}</Typography>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Typography variant="caption" sx={{ color: '#666' }}>IBAN:</Typography>
-                        <Typography variant="body2">{sampleBankInfo.iban}</Typography>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Typography variant="caption" sx={{ color: '#666' }}>SWIFT:</Typography>
-                        <Typography variant="body2">{sampleBankInfo.swift}</Typography>
-                      </Grid>
-                    </Grid>
-                  </Box>
-                )}
-
-                {/* Footer */}
-                {formData.footerSettings?.showFooter !== false && formData.footerSettings?.text && (
-                  <Box sx={{ 
-                    mt: 4, 
-                    pt: 2, 
-                    borderTop: '1px solid #e0e0e0',
-                    textAlign: formData.footerSettings?.alignment || 'center'
-                  }}>
-                    <Typography 
-                      variant="body2" 
-                      sx={{ 
-                        color: '#666',
-                        fontStyle: formData.footerSettings?.style === 'italic' ? 'italic' : 'normal'
-                      }}
-                    >
-                      {formData.footerSettings?.text || ""}
-                    </Typography>
-                  </Box>
-                )}
-              </Box>
+              <InvoiceTemplatePreview
+                templateConfig={previewConfig}
+                templateMeta={{ name: formData.name || '' }}
+                containerSx={{
+                  maxWidth: '100%',
+                  boxShadow: 'none',
+                  border: 'none',
+                  p: 0,
+                }}
+              />
             </Box>
           </Box>
-
-
 
           {/* Actions */}
           <Box sx={{ 

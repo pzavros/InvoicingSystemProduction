@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Grid,
@@ -93,6 +93,28 @@ const InvoiceViewForm = ({ invoice, isEditMode, invoiceId }) => {
     setSelectedTemplate(normalizedTemplate);
   };
 
+  const fetchActiveTemplate = useCallback(async (documentTypeId) => {
+    const resolvedDocTypeId = documentTypeId ?? invoice?.documentTypeId ?? null;
+    try {
+      if (!resolvedDocTypeId) {
+        setSelectedTemplate(null);
+        setFormData(prev => ({ ...prev, templateId: null }));
+        return;
+      }
+
+      setSelectedTemplate(null);
+      const activeTemplate = await getActiveInvoiceTemplate(resolvedDocTypeId);
+      if (activeTemplate) {
+        setTemplateFromDto(activeTemplate);
+        setFormData(prev => ({ ...prev, templateId: activeTemplate.id || null }));
+      } else {
+        setFormData(prev => ({ ...prev, templateId: null }));
+      }
+    } catch (error) {
+      console.error('Error loading active template for view:', error);
+    }
+  }, [invoice?.documentTypeId]);
+
   const [formData, setFormData] = useState({
     id: invoice?.id || '',
     invoiceNumber: invoice?.invoiceNumber || '',
@@ -137,7 +159,7 @@ const InvoiceViewForm = ({ invoice, isEditMode, invoiceId }) => {
     statusName: invoice?.statusName || 'Draft',
     statusId: invoice?.statusId || 1,
     documentTypeId: invoice?.documentTypeId || 1,
-    templateId: invoice?.templateId || null,
+    templateId: null,
     isDeleted: invoice?.isDeleted || false, // Ensure isDeleted is initialized
     items: invoice?.items?.map((item, index) => ({
       itemId: item.id || `temp-${index}-${Date.now()}`,
@@ -260,7 +282,7 @@ const InvoiceViewForm = ({ invoice, isEditMode, invoiceId }) => {
         statusName: currentStatus.name,
         statusId: currentStatus.statusId,
         documentTypeId: invoice?.documentTypeId || 1,
-        templateId: invoice?.templateId || null, // Add templateId for template loading
+        templateId: null,
         isDeleted: invoice?.isDeleted || false, // Ensure isDeleted is updated
         items: invoice?.items?.map((item, index) => ({
           itemId: item.id || `temp-${index}-${Date.now()}`,
@@ -276,44 +298,10 @@ const InvoiceViewForm = ({ invoice, isEditMode, invoiceId }) => {
     }
   }, [invoice, currencies, statuses]);
 
-  // Template loading effect
   useEffect(() => {
-    const loadTemplateForView = async () => {
-      if (!formData.templateId) {
-        // If no template ID, try to get the active template
-        try {
-          const activeTemplate = await getActiveInvoiceTemplate(formData.documentTypeId || invoice?.documentTypeId || null);
-          if (activeTemplate) {
-            setTemplateFromDto(activeTemplate);
-            if (activeTemplate.id && !formData.templateId) {
-              setFormData(prev => ({
-                ...prev,
-                templateId: activeTemplate.id
-              }));
-            }
-          }
-        } catch (error) {
-          console.error('Error loading active template for view:', error);
-        }
-        return;
-      }
-
-      if (selectedTemplate?.id === formData.templateId) {
-        return; // Already loaded
-      }
-
-      try {
-        const templateDto = await getInvoiceTemplateById(formData.templateId);
-        if (templateDto) {
-          setTemplateFromDto(templateDto);
-        }
-      } catch (error) {
-        console.error('Error loading template for view:', error);
-      }
-    };
-
-    loadTemplateForView();
-  }, [formData.templateId, formData.documentTypeId, selectedTemplate]);
+    const docTypeId = formData.documentTypeId || invoice?.documentTypeId || null;
+    fetchActiveTemplate(docTypeId);
+  }, [fetchActiveTemplate, formData.documentTypeId, invoice?.documentTypeId]);
 
   const handleRowDel = (itemToDelete) => {
     if (!editMode) return;
@@ -484,8 +472,9 @@ const InvoiceViewForm = ({ invoice, isEditMode, invoiceId }) => {
     }
   };
 
-  const openModal = (event) => {
+  const openModal = async (event) => {
     event.preventDefault();
+    await fetchActiveTemplate(formData.documentTypeId || invoice?.documentTypeId || null);
     setIsOpen(true);
   };
 
@@ -653,6 +642,7 @@ const InvoiceViewForm = ({ invoice, isEditMode, invoiceId }) => {
     
     try {
       // First open the preview modal to ensure the invoice is rendered
+      await fetchActiveTemplate(formData.documentTypeId || invoice?.documentTypeId || null);
       setIsOpen(true);
       
       // Wait a bit for the modal to render

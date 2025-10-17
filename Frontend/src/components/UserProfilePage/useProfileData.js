@@ -161,6 +161,25 @@ const useProfileData = () => {
     try {
       await updatePreferences(prefs);
       setPreferences(prefs);
+
+      if (typeof window !== 'undefined') {
+        try {
+          const storedUserRaw = localStorage.getItem('user');
+          if (storedUserRaw) {
+            const storedUser = JSON.parse(storedUserRaw);
+            const updatedUser = {
+              ...storedUser,
+              currency: prefs.currency ? prefs.currency.toUpperCase() : storedUser?.currency,
+              dateFormat: prefs.dateFormat ? prefs.dateFormat.toUpperCase() : storedUser?.dateFormat,
+              language: prefs.language || storedUser?.language
+            };
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+          }
+        } catch (storageError) {
+          console.warn('Failed to sync preferences to localStorage:', storageError);
+        }
+      }
+
       return { success: true };
     } catch (err) {
       return { success: false, error: err.message || 'Failed to save preferences' };
