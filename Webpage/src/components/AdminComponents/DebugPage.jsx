@@ -9,7 +9,7 @@ const DebugPage = () => {
       console.log('Testing API...');
       setResult('Testing...');
       
-      const response = await fetch('http://localhost:5000/api/webpage/waitlist/stats');
+      const response = await fetch('/api/webpage/waitlist/stats');
       console.log('Response:', response);
       
       if (response.ok) {
