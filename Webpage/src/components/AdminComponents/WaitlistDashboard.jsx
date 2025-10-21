@@ -48,7 +48,7 @@ const WaitlistDashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/webpage/waitlist/stats');
+      const response = await fetch('/api/webpage/waitlist/stats');
       if (response.ok) {
         const data = await response.json();
         setStats(data);
@@ -63,7 +63,7 @@ const WaitlistDashboard = () => {
 
   const fetchEntries = async (pageNum = 1) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/webpage/waitlist?page=${pageNum}&pageSize=50`);
+      const response = await fetch(`/api/webpage/waitlist?page=${pageNum}&pageSize=50`);
       if (response.ok) {
         const data = await response.json();
         setEntries(data.entries || []);
@@ -79,7 +79,7 @@ const WaitlistDashboard = () => {
 
   const exportCsv = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/webpage/waitlist/export');
+      const response = await fetch('/api/webpage/waitlist/export');
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);

@@ -9,7 +9,7 @@ const TestWaitlistDashboard = () => {
     const fetchData = async () => {
       try {
         console.log('Fetching stats...');
-        const response = await fetch('http://localhost:5000/api/webpage/waitlist/stats');
+        const response = await fetch('/api/webpage/waitlist/stats');
         
         if (response.ok) {
           const data = await response.json();
