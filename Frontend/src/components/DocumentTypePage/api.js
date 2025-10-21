@@ -1,4 +1,7 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+// API Base URL Configuration
+// Development: empty string uses Vite proxy (/api -> http://localhost:5088)
+// Production: /api routed through Caddy reverse proxy to backend container
+const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || '';
 
 // Create axios-like wrapper for fetch
 const api = {

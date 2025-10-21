@@ -1,10 +1,9 @@
 import axios from 'axios';
 
-// Use empty string to rely on Vite proxy configuration in development
-// In production, use the full API URL
-const API_BASE_URL = import.meta.env.PROD 
-  ? (import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5088')
-  : ''; // Use Vite proxy in development
+// API Base URL Configuration
+// Development: empty string uses Vite proxy (/api -> http://localhost:5088)
+// Production: /api routed through Caddy reverse proxy to backend container
+const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || '';
 
 const invoiceViewApi = axios.create({
   baseURL: API_BASE_URL,

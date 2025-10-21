@@ -1,10 +1,10 @@
 // src/components/UserManagementPage/api.js
 import axios from 'axios';
 
-// Use environment variables for API configuration
-const API_BASE_URL = import.meta.env.PROD 
-  ? (import.meta.env.VITE_APP_API_BASE_URL || 'http://localhost:5088')
-  : ''; // Use Vite proxy in development
+// API Base URL Configuration
+// Development: empty string uses Vite proxy (/api -> http://localhost:5088)
+// Production: /api routed through Caddy reverse proxy to backend container
+const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL || '';
 
 // Create axios instance
 const adminApi = axios.create({

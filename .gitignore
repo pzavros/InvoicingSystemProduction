@@ -79,3 +79,7 @@ docker-compose.yml
 docker/Caddyfile
 Webpage/Dockerfile
 Webpage/nginx.conf
+API_QUICK_REFERENCE.md
+API_ENDPOINTS_CONFIGURATION.md
+API_MIGRATION_SUMMARY.md
+GIT_ENV_FILES_NOTE.md
