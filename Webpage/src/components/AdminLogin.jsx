@@ -113,12 +113,6 @@ const AdminLogin = () => {
               )}
             </Button>
           </Box>
-
-          <Box mt={3} textAlign="center">
-            <Typography variant="body2" color="text.secondary">
-              Default credentials: admin@invoicesystem.com / Admin123!
-            </Typography>
-          </Box>
         </Paper>
       </Container>
     </Box>
