@@ -11,6 +11,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
+// NEW imports
+using Microsoft.AspNetCore.HttpOverrides;
+using System.Net;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Load environment variables from .env files
@@ -69,6 +73,14 @@ builder.Services.Configure<EmailSettings>(options =>
     options.EnableSsl   = bool.TryParse(builder.Configuration["EMAIL_ENABLE_SSL"], out var enableSsl) ? enableSsl : true;
 });
 
+// ---------------------- NEW: Forwarded Headers configuration ----------------------
+// This lets the app respect X-Forwarded-For / X-Forwarded-Proto coming from Caddy
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    // Optionally restrict to known proxies:
+    // options.KnownProxies.Add(IPAddress.Parse("YOUR_PROXY_IP"));
+});
 
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
@@ -110,7 +122,9 @@ builder.Services.AddScoped<IContactMessageService, ContactMessageService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Add permissive CORS for local debugging.
+// ---------------------- CORS ----------------------
+// Register both a permissive default policy for dev and a production policy for the live domain.
+// In Development we'll keep the existing default policy; in Production we'll use "AllowFrontend".
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -119,6 +133,13 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
+    });
+
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("https://e-nvoicing.com", "https://www.e-nvoicing.com")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 
@@ -132,7 +153,22 @@ if (app.Environment.IsDevelopment())
 
 // Serve static files
 app.UseStaticFiles();
-app.UseCors();
+
+// ---------------------- Use forwarded headers + select CORS policy ----------------------
+// Use forwarded headers early so authentication and URL-generation see the correct proto/host.
+app.UseForwardedHeaders();
+
+// If we're in Production, enable the named policy for the frontend domain.
+// Otherwise (Development) use the default policy that allows localhost dev ports.
+if (app.Environment.IsProduction())
+{
+    app.UseCors("AllowFrontend");
+}
+else
+{
+    app.UseCors();
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

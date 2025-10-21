@@ -75,3 +75,7 @@ Frontend/Dockerfile
 Frontend/Dockerfile.prod
 Frontend/src/components/ProductCatalogPage/LowStockAlert.jsx
 Backend/Services/SubscriptionBackgroundService.cs
+docker-compose.yml
+docker/Caddyfile
+Webpage/Dockerfile
+Webpage/nginx.conf
