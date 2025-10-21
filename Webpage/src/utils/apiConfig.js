@@ -3,7 +3,7 @@
 // Production: /api routed through Caddy reverse proxy to backend container
 const API_CONFIG = {
   BASE_URL: import.meta.env.VITE_API_BASE_URL || '',
-  ADMIN_ENDPOINT: import.meta.env.VITE_ADMIN_API_ENDPOINT || '/api/admin',
+  ADMIN_ENDPOINT: import.meta.env.VITE_ADMIN_API_ENDPOINT || '/api',
   REGULAR_ENDPOINT: import.meta.env.VITE_REGULAR_API_ENDPOINT || '/api',
 };
 
@@ -47,8 +47,8 @@ export const apiCall = async (endpoint, options = {}) => {
 
 // Specific API endpoints
 export const API_ENDPOINTS = {
-  // Admin Auth
-  ADMIN_LOGIN: '/api/admin/auth/login',
+  // Admin Auth - Uses the same auth endpoint as regular users
+  ADMIN_LOGIN: '/api/auth/login',
   
   // Waitlist
   WAITLIST: '/api/waitlist',
