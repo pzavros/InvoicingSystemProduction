@@ -223,12 +223,12 @@ const ContactMessagesDashboard = () => {
           }
         }}
       >
-        <CardContent sx={{ p: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+        <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 2, sm: 3 } }}>
             <Box
               sx={{
-                width: 60,
-                height: 60,
+                width: { xs: 48, sm: 60 },
+                height: { xs: 48, sm: 60 },
                 borderRadius: 3,
                 background: `linear-gradient(135deg, ${colors.bg} 0%, ${colors.bgSecondary} 100%)`,
                 display: 'flex',
@@ -236,7 +236,7 @@ const ContactMessagesDashboard = () => {
                 justifyContent: 'center',
                 color: 'white',
                 boxShadow: `0 8px 32px ${colors.shadow}`,
-                '& svg': { fontSize: '1.75rem' }
+                '& svg': { fontSize: { xs: '1.5rem', sm: '1.75rem' } }
               }}
             >
               {icon}
@@ -248,7 +248,8 @@ const ContactMessagesDashboard = () => {
                 sx={{ 
                   color: '#2d3748',
                   mb: 0.5,
-                  lineHeight: 1
+                  lineHeight: 1,
+                  fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3rem' }
                 }}
               >
                 {value?.toLocaleString() || 0}
@@ -257,7 +258,8 @@ const ContactMessagesDashboard = () => {
                 variant="body1" 
                 sx={{ 
                   color: '#718096',
-                  fontWeight: 500
+                  fontWeight: 500,
+                  fontSize: { xs: '0.875rem', sm: '1rem' }
                 }}
               >
                 {title}
@@ -278,7 +280,7 @@ const ContactMessagesDashboard = () => {
   }
 
   return (
-    <Box sx={{ p: 4 }}>
+    <Box sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
       {error && (
         <Alert 
           severity="error" 
@@ -328,7 +330,7 @@ const ContactMessagesDashboard = () => {
         </Grid>
       </Grid>
 
-      <Grid container spacing={4}>
+      <Grid container spacing={{ xs: 3, sm: 4 }}>
         {/* Status Breakdown Card */}
         {stats.statusBreakdown && typeof stats.statusBreakdown === 'object' && Object.keys(stats.statusBreakdown).length > 0 && (
           <Grid item xs={12} lg={4}>
@@ -341,22 +343,23 @@ const ContactMessagesDashboard = () => {
                 height: 'fit-content'
               }}
             >
-              <CardContent sx={{ p: 4 }}>
+              <CardContent sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
                 <Typography 
                   variant="h5" 
                   fontWeight="bold" 
                   sx={{ 
-                    mb: 3,
+                    mb: { xs: 2, sm: 3 },
                     color: '#2d3748',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 1
+                    gap: 1,
+                    fontSize: { xs: '1.25rem', sm: '1.5rem' }
                   }}
                 >
-                  <QuestionAnswer sx={{ color: '#667eea' }} />
+                  <QuestionAnswer sx={{ color: '#667eea', fontSize: { xs: '1.25rem', sm: '1.5rem' } }} />
                   Status Breakdown
                 </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 1.5, sm: 2 } }}>
                   {Object.entries(stats.statusBreakdown || {}).map(([status, count], index) => {
                     const statusColors = {
                       'New': '#f56565',
@@ -372,13 +375,13 @@ const ContactMessagesDashboard = () => {
                           display: 'flex', 
                           justifyContent: 'space-between', 
                           alignItems: 'center',
-                          p: 2,
+                          p: { xs: 1.5, sm: 2 },
                           borderRadius: 2,
                           background: `linear-gradient(135deg, ${color}10 0%, ${color}05 100%)`,
                           border: `1px solid ${color}20`
                         }}
                       >
-                        <Typography fontWeight="500" sx={{ color: '#2d3748' }}>
+                        <Typography fontWeight="500" sx={{ color: '#2d3748', fontSize: { xs: '0.875rem', sm: '1rem' } }}>
                           {status}
                         </Typography>
                         <Chip 
@@ -409,19 +412,20 @@ const ContactMessagesDashboard = () => {
               borderRadius: 3
             }}
           >
-            <CardContent sx={{ p: 4 }}>
+            <CardContent sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
               <Typography 
                 variant="h5" 
                 fontWeight="bold" 
                 sx={{ 
-                  mb: 3,
+                  mb: { xs: 2, sm: 3 },
                   color: '#2d3748',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 1
+                  gap: 1,
+                  fontSize: { xs: '1.25rem', sm: '1.5rem' }
                 }}
               >
-                <Email sx={{ color: '#667eea' }} />
+                <Email sx={{ color: '#667eea', fontSize: { xs: '1.25rem', sm: '1.5rem' } }} />
                 Recent Messages
               </Typography>
               
@@ -430,15 +434,15 @@ const ContactMessagesDashboard = () => {
                   <CircularProgress size={48} sx={{ color: '#667eea' }} />
                 </Box>
               ) : messages.length > 0 ? (
-                <Box sx={{ overflowX: 'auto' }}>
-                  <Table>
+                <Box sx={{ overflowX: 'auto', mx: { xs: -2, sm: 0 } }}>
+                  <Table sx={{ minWidth: { xs: 600, sm: 'auto' } }}>
                     <TableHead>
                       <TableRow>
                         <TableCell sx={{ fontWeight: 'bold', color: '#4a5568', borderBottom: '2px solid #e2e8f0' }}>Name</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold', color: '#4a5568', borderBottom: '2px solid #e2e8f0' }}>Email</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold', color: '#4a5568', borderBottom: '2px solid #e2e8f0' }}>Subject</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: '#4a5568', borderBottom: '2px solid #e2e8f0', display: { xs: 'none', sm: 'table-cell' } }}>Email</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: '#4a5568', borderBottom: '2px solid #e2e8f0', display: { xs: 'none', md: 'table-cell' } }}>Subject</TableCell>
                         <TableCell sx={{ fontWeight: 'bold', color: '#4a5568', borderBottom: '2px solid #e2e8f0' }}>Status</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold', color: '#4a5568', borderBottom: '2px solid #e2e8f0' }}>Date</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', color: '#4a5568', borderBottom: '2px solid #e2e8f0', display: { xs: 'none', sm: 'table-cell' } }}>Date</TableCell>
                         <TableCell sx={{ fontWeight: 'bold', color: '#4a5568', borderBottom: '2px solid #e2e8f0' }}>Actions</TableCell>
                       </TableRow>
                     </TableHead>
@@ -460,13 +464,13 @@ const ContactMessagesDashboard = () => {
                             <Typography 
                               variant="body2" 
                               fontWeight={message.isRead ? 'normal' : 'bold'}
-                              sx={{ color: '#2d3748' }}
+                              sx={{ color: '#2d3748', fontSize: { xs: '0.875rem', sm: '1rem' } }}
                             >
                               {message.firstName} {message.lastName}
                             </Typography>
                           </TableCell>
-                          <TableCell sx={{ color: '#4a5568' }}>{message.email}</TableCell>
-                          <TableCell>
+                          <TableCell sx={{ color: '#4a5568', display: { xs: 'none', sm: 'table-cell' } }}>{message.email}</TableCell>
+                          <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                             <Typography 
                               variant="body2" 
                               sx={{ 
@@ -491,7 +495,7 @@ const ContactMessagesDashboard = () => {
                               }}
                             />
                           </TableCell>
-                          <TableCell sx={{ color: '#718096', fontSize: '0.875rem' }}>
+                          <TableCell sx={{ color: '#718096', fontSize: '0.875rem', display: { xs: 'none', sm: 'table-cell' } }}>
                             {formatDate(message.createdAt)}
                           </TableCell>
                           <TableCell>

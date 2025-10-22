@@ -16,7 +16,9 @@ import {
   Divider,
   Paper,
   useTheme,
-  alpha
+  alpha,
+  IconButton,
+  useMediaQuery
 } from '@mui/material';
 import { 
   LogoutRounded, 
@@ -27,7 +29,9 @@ import {
   SettingsRounded,
   PeopleRounded,
   SecurityRounded,
-  AdminPanelSettingsRounded
+  AdminPanelSettingsRounded,
+  MenuRounded,
+  CloseRounded
 } from '@mui/icons-material';
 import SimpleWaitlistDashboard from '../components/AdminComponents/SimpleWaitlistDashboard.jsx';
 import ContactMessagesDashboard from '../components/AdminComponents/ContactMessagesDashboard.jsx';
@@ -36,8 +40,10 @@ import { useAdminAuth } from '../contexts/AdminAuthContext.jsx';
 
 const AdminPage = () => {
   const [selectedTab, setSelectedTab] = useState(0);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const { logout, user } = useAdminAuth();
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const drawerWidth = 280;
 
@@ -77,6 +83,17 @@ const AdminPage = () => {
     logout();
   };
 
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
+  const handleNavigation = (id) => {
+    setSelectedTab(id);
+    if (isMobile) {
+      setMobileOpen(false);
+    }
+  };
+
   const renderContent = () => {
     switch (selectedTab) {
       case 0:
@@ -87,7 +104,7 @@ const AdminPage = () => {
         return <DebugPage />;
       case 3:
         return (
-          <Box sx={{ p: 4 }}>
+          <Box sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
             <Typography variant="h4" gutterBottom>System Settings</Typography>
             <Typography color="text.secondary">Advanced configuration panel coming soon...</Typography>
           </Box>
@@ -97,33 +114,17 @@ const AdminPage = () => {
     }
   };
 
-  return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      {/* Enhanced Sidebar */}
-      <Drawer
-        variant="permanent"
+  const drawerContent = (
+    <>
+      {/* Header Section */}
+      <Box
         sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            width: drawerWidth,
-            boxSizing: 'border-box',
-            background: 'linear-gradient(145deg, #0f0c29 0%, #302b63 50%, #24243e 100%)',
-            color: 'white',
-            borderRight: 'none',
-            boxShadow: '4px 0 20px rgba(0, 0, 0, 0.1)'
-          },
+          p: 3,
+          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+          backdropFilter: 'blur(10px)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
         }}
       >
-        {/* Header Section */}
-        <Box
-          sx={{
-            p: 3,
-            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
-            backdropFilter: 'blur(10px)',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
-          }}
-        >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
             <Avatar
               sx={{
@@ -203,7 +204,7 @@ const AdminPage = () => {
               <ListItem key={item.id} disablePadding sx={{ mb: 1 }}>
                 <ListItemButton
                   selected={isSelected}
-                  onClick={() => !item.disabled && setSelectedTab(item.id)}
+                  onClick={() => !item.disabled && handleNavigation(item.id)}
                   disabled={item.disabled}
                   sx={{
                     borderRadius: 2,
@@ -277,6 +278,52 @@ const AdminPage = () => {
             Logout
           </Button>
         </Box>
+    </>
+  );
+
+  return (
+    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+      {/* Mobile Drawer */}
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={handleDrawerToggle}
+        ModalProps={{
+          keepMounted: true, // Better open performance on mobile.
+        }}
+        sx={{
+          display: { xs: 'block', md: 'none' },
+          '& .MuiDrawer-paper': {
+            width: drawerWidth,
+            boxSizing: 'border-box',
+            background: 'linear-gradient(145deg, #0f0c29 0%, #302b63 50%, #24243e 100%)',
+            color: 'white',
+            borderRight: 'none',
+            boxShadow: '4px 0 20px rgba(0, 0, 0, 0.1)'
+          },
+        }}
+      >
+        {drawerContent}
+      </Drawer>
+
+      {/* Desktop Drawer */}
+      <Drawer
+        variant="permanent"
+        sx={{
+          display: { xs: 'none', md: 'block' },
+          width: drawerWidth,
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
+            width: drawerWidth,
+            boxSizing: 'border-box',
+            background: 'linear-gradient(145deg, #0f0c29 0%, #302b63 50%, #24243e 100%)',
+            color: 'white',
+            borderRight: 'none',
+            boxShadow: '4px 0 20px rgba(0, 0, 0, 0.1)'
+          },
+        }}
+      >
+        {drawerContent}
       </Drawer>
 
       {/* Main Content */}
@@ -284,6 +331,7 @@ const AdminPage = () => {
         component="main"
         sx={{
           flexGrow: 1,
+          width: { xs: '100%', md: `calc(100% - ${drawerWidth}px)` },
           background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
           minHeight: '100vh'
         }}
@@ -299,21 +347,39 @@ const AdminPage = () => {
             color: 'black'
           }}
         >
-          <Toolbar sx={{ px: 4 }}>
-            <Box>
-              <Typography variant="h5" fontWeight="bold" sx={{ color: '#2d3748' }}>
+          <Toolbar sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
+            {/* Mobile Menu Button */}
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2, display: { md: 'none' } }}
+            >
+              <MenuRounded />
+            </IconButton>
+
+            <Box sx={{ flexGrow: 1 }}>
+              <Typography variant="h5" fontWeight="bold" sx={{ 
+                color: '#2d3748',
+                fontSize: { xs: '1.25rem', sm: '1.5rem' }
+              }}>
                 {navigationItems.find(item => item.id === selectedTab)?.label || 'Dashboard'}
               </Typography>
-              <Typography variant="body2" sx={{ color: '#718096' }}>
+              <Typography variant="body2" sx={{ 
+                color: '#718096',
+                display: { xs: 'none', sm: 'block' }
+              }}>
                 {navigationItems.find(item => item.id === selectedTab)?.description || 'Welcome to the admin portal'}
               </Typography>
             </Box>
-            <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Chip
                 icon={<SecurityRounded />}
                 label="Secure Session"
                 size="small"
                 sx={{
+                  display: { xs: 'none', sm: 'flex' },
                   background: 'linear-gradient(135deg, #48bb78 0%, #38a169 100%)',
                   color: 'white',
                   fontWeight: 'bold'
