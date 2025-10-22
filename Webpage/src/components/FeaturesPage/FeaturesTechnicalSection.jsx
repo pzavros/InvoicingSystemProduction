@@ -14,7 +14,7 @@ const FeaturesTechnicalSection = () => {
     {
       icon: <Security />,
       title: 'Secure & Reliable',
-      description: 'Your business data is protected with bank-level security and automatic backups'
+      description: 'Your business data is protected with JWT authentication and secure authorization'
     },
     {
       icon: <Speed />,
@@ -23,13 +23,13 @@ const FeaturesTechnicalSection = () => {
     },
     {
       icon: <CloudSync />,
-      title: 'Always Available',
-      description: 'Access your invoices anywhere, anytime from any device with automatic sync'
+      title: 'Cloud-Based Access',
+      description: 'Access your invoices anywhere, anytime from any device through the web interface'
     },
     {
       icon: <Settings />,
-      title: 'Flexible Billing',
-      description: 'Try free, then choose a plan that grows with your business needs'
+      title: 'Trial & Subscription',
+      description: 'Start with a trial period, then subscribe to continue using the platform'
     }
   ];
 

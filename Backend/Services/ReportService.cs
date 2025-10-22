@@ -12,36 +12,38 @@ namespace InvoicingBackend.Services
     public class ReportService : IReportService
     {
         private readonly ApplicationDbContext _db;
-        public ReportService(ApplicationDbContext db) => _db = db;        public async Task<Stream> GenerateLogisticsReportAsync(ReportFilterDto filter)
+        public ReportService(ApplicationDbContext db) => _db = db;        public async Task<Stream> GenerateLogisticsReportAsync(ReportFilterDto filter, int userId)
         {
             // Debug: Log the filter parameters
-            Console.WriteLine($"DEBUG: Filter From: {filter.From}, To: {filter.To}");
+            Console.WriteLine($"DEBUG: Filter From: {filter.From}, To: {filter.To}, UserId: {userId}");
             Console.WriteLine($"DEBUG: Filter StatusIds: [{string.Join(", ", filter.StatusIds)}]");
             
-            // Debug: First, let's see how many total invoices we have
-            var totalInvoices = await _db.Invoices.CountAsync();
-            Console.WriteLine($"DEBUG: Total invoices in database: {totalInvoices}");
+            // Debug: First, let's see how many total invoices we have for this user
+            var totalInvoices = await _db.Invoices.CountAsync(i => i.UserId == userId);
+            Console.WriteLine($"DEBUG: Total invoices for user {userId}: {totalInvoices}");
             
             // Debug: Count invoices in date range (without status filter)
             var invoicesInDateRange = await _db.Invoices
-                .Where(i => i.DateOfIssue.Date >= filter.From.Date && i.DateOfIssue.Date <= filter.To.Date)
+                .Where(i => i.UserId == userId && i.DateOfIssue.Date >= filter.From.Date && i.DateOfIssue.Date <= filter.To.Date)
                 .CountAsync();
-            Console.WriteLine($"DEBUG: Invoices in date range {filter.From:yyyy-MM-dd} to {filter.To:yyyy-MM-dd}: {invoicesInDateRange}");
+            Console.WriteLine($"DEBUG: User {userId} invoices in date range {filter.From:yyyy-MM-dd} to {filter.To:yyyy-MM-dd}: {invoicesInDateRange}");
             
-            // Debug: Count invoices by StatusId distribution
+            // Debug: Count invoices by StatusId distribution for this user
             var statusDistribution = await _db.Invoices
+                .Where(i => i.UserId == userId)
                 .GroupBy(i => i.StatusId)
                 .Select(g => new { StatusId = g.Key, Count = g.Count() })
                 .ToListAsync();
-            Console.WriteLine("DEBUG: Status distribution:");
+            Console.WriteLine($"DEBUG: Status distribution for user {userId}:");
             foreach (var status in statusDistribution)
             {
                 Console.WriteLine($"  StatusId {status.StatusId ?? -1}: {status.Count} invoices");
             }
 
-            // 1) fetch matching invoices with their items and join with status
+            // 1) fetch matching invoices with their items and join with status - FILTERED BY USER
             var invoicesWithStatus = await _db.Invoices
                 .Where(i =>
+                    i.UserId == userId &&
                     i.DateOfIssue.Date >= filter.From.Date &&
                     i.DateOfIssue.Date <= filter.To.Date &&
                     (i.StatusId == null || filter.StatusIds.Contains(i.StatusId.Value))

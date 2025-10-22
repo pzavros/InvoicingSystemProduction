@@ -7,6 +7,6 @@ namespace InvoicingBackend.Interfaces
 {
     public interface IReportService
     {
-        Task<Stream> GenerateLogisticsReportAsync(ReportFilterDto filter);
+        Task<Stream> GenerateLogisticsReportAsync(ReportFilterDto filter, int userId);
     }
 }

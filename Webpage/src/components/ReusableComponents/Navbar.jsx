@@ -11,8 +11,7 @@ import {
   useMediaQuery,
   Chip,
   Fab,
-  Zoom,
-  Collapse
+  Zoom
 } from '@mui/material';
 import {
   MenuRounded,
@@ -60,10 +59,11 @@ const Navbar = () => {
     { id: 'contact', path: '/contact', label: 'Contact', icon: <ReceiptLongRounded /> },
   ];
 
-  const secondaryItems = [
-    { id: 'pricing', path: '/pricing', label: 'Pricing', icon: <LaunchRounded /> },
-    { id: 'support', path: '/support', label: 'Support', icon: <SettingsRounded /> },
-  ];
+  // Secondary navigation items - Commented out for now
+  // const secondaryItems = [
+  //   { id: 'pricing', path: '/pricing', label: 'Pricing', icon: <LaunchRounded /> },
+  //   { id: 'support', path: '/support', label: 'Support', icon: <SettingsRounded /> },
+  // ];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -246,12 +246,17 @@ const Navbar = () => {
         elevation={0}
         sx={{
           background: scrolled 
-            ? 'rgba(255, 255, 255, 0.8)' 
-            : 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(20px)',
+            ? 'rgba(255, 255, 255, 0.5)' 
+            : 'rgba(255, 255, 255, 0.65)',
+          backdropFilter: 'blur(40px) saturate(200%) brightness(1.05)',
+          WebkitBackdropFilter: 'blur(40px) saturate(200%) brightness(1.05)',
           borderBottom: scrolled 
-            ? '1px solid rgba(102, 126, 234, 0.1)' 
-            : '1px solid rgba(255, 255, 255, 0.1)',
+            ? '1px solid rgba(102, 126, 234, 0.2)' 
+            : '1px solid rgba(255, 255, 255, 0.3)',
+          borderTop: '1px solid rgba(255, 255, 255, 0.8)',
+          boxShadow: scrolled 
+            ? '0 8px 32px rgba(102, 126, 234, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8)' 
+            : '0 4px 16px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
           transition: 'all 0.3s ease',
           zIndex: 1000,
         }}
@@ -264,7 +269,7 @@ const Navbar = () => {
             minHeight: { xs: 70, md: 80 }
           }}
         >
-          {/* Logo with Weird Design */}
+          {/* Logo with SVG Image */}
           <Box 
             onClick={() => navigate('/')}
             sx={{ 
@@ -280,32 +285,52 @@ const Navbar = () => {
           >
             <Box
               sx={{
-                width: 48,
-                height: 48,
-                borderRadius: '16px',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                width: { xs: 45, md: 50 },
+                height: { xs: 45, md: 50 },
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%)',
+                backdropFilter: 'blur(10px)',
+                border: '1.5px solid rgba(102, 126, 234, 0.15)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 position: 'relative',
                 overflow: 'hidden',
+                boxShadow: '0 4px 16px rgba(102, 126, 234, 0.1)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  boxShadow: '0 6px 24px rgba(102, 126, 234, 0.2)',
+                  border: '1.5px solid rgba(102, 126, 234, 0.3)',
+                  background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.12) 0%, rgba(118, 75, 162, 0.12) 100%)',
+                },
                 '&::before': {
                   content: '""',
                   position: 'absolute',
                   top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  background: 'linear-gradient(45deg, rgba(255,255,255,0.2) 0%, transparent 50%)',
-                  animation: 'shine 3s infinite',
+                  left: '-100%',
+                  width: '100%',
+                  height: '100%',
+                  background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent)',
+                  animation: 'logoShine 4s infinite',
                 },
-                '@keyframes shine': {
-                  '0%': { transform: 'translateX(-100%)' },
-                  '100%': { transform: 'translateX(100%)' }
+                '@keyframes logoShine': {
+                  '0%': { left: '-100%' },
+                  '100%': { left: '100%' }
                 }
               }}
             >
-              <RocketLaunchRounded sx={{ color: 'white', fontSize: 24 }} />
+              <Box
+                component="img"
+                src="/media/logo.svg"
+                alt="E-Nvoicing Logo"
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  borderRadius: '10px',
+                  filter: 'drop-shadow(0 2px 4px rgba(102, 126, 234, 0.15))'
+                }}
+              />
             </Box>
             <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
               <Text variant="h6" weight="bold" sx={{ 
@@ -313,12 +338,11 @@ const Navbar = () => {
                 backgroundClip: 'text',
                 textFillColor: 'transparent',
                 WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
+                WebkitTextFillColor: 'transparent',
+                fontSize: { xs: '1.1rem', md: '1.25rem' },
+                letterSpacing: '-0.02em'
               }}>
-                InvoiceSystem
-              </Text>
-              <Text sx={{ fontSize: '0.7rem', color: 'text.secondary', mt: -0.5 }}>
-                Pro Edition
+                E-Nvoicing
               </Text>
             </Box>
           </Box>
@@ -330,12 +354,13 @@ const Navbar = () => {
                 display: 'flex', 
                 alignItems: 'center', 
                 gap: 0.5,
-                background: 'rgba(255, 255, 255, 0.5)',
-                backdropFilter: 'blur(20px)',
+                background: 'rgba(255, 255, 255, 0.25)',
+                backdropFilter: 'blur(35px) saturate(200%) brightness(1.1)',
+                WebkitBackdropFilter: 'blur(35px) saturate(200%) brightness(1.1)',
                 borderRadius: '50px',
                 p: 0.5,
-                border: '1px solid rgba(102, 126, 234, 0.1)',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.4)',
+                boxShadow: '0 8px 32px rgba(102, 126, 234, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.8), inset 0 -1px 2px rgba(102, 126, 234, 0.1)',
               }}
             >
               {navigationItems.slice(0, 5).map((item, index) => (
@@ -372,7 +397,7 @@ const Navbar = () => {
                 size="small"
                 startIcon={<LaunchRounded />}
                 onClick={() => {
-                  window.open('http://localhost:5173', '_blank');
+                  navigate('/coming-soon');
                 }}
                 sx={{
                   background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -414,7 +439,7 @@ const Navbar = () => {
       </AppBar>
 
       {/* Mobile Navigation Drawer */}
-      <Collapse in={mobileOpen && isMobile}>
+      {mobileOpen && isMobile && (
         <Box
           sx={{
             position: 'fixed',
@@ -422,12 +447,26 @@ const Navbar = () => {
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(20px)',
+            background: 'rgba(255, 255, 255, 0.7)',
+            backdropFilter: 'blur(40px) saturate(200%) brightness(1.05)',
+            WebkitBackdropFilter: 'blur(40px) saturate(200%) brightness(1.05)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.6)',
+            boxShadow: 'inset 0 1px 2px rgba(255, 255, 255, 0.8), 0 -8px 32px rgba(102, 126, 234, 0.1)',
             zIndex: 999,
             overflow: 'auto',
             pt: 2,
-            pb: 4
+            pb: 4,
+            animation: 'slideDown 0.3s ease-out',
+            '@keyframes slideDown': {
+              '0%': {
+                opacity: 0,
+                transform: 'translateY(-20px)'
+              },
+              '100%': {
+                opacity: 1,
+                transform: 'translateY(0)'
+              }
+            }
           }}
         >
           {/* Main Navigation */}
@@ -443,8 +482,8 @@ const Navbar = () => {
             ))}
           </Box>
 
-          {/* Secondary Items */}
-          <Box sx={{ mb: 4 }}>
+          {/* Secondary Items - Commented out for now */}
+          {/* <Box sx={{ mb: 4 }}>
             <Text variant="h6" sx={{ px: 3, mb: 2, color: 'text.secondary', fontSize: '0.9rem' }}>
               MORE
             </Text>
@@ -454,7 +493,7 @@ const Navbar = () => {
                 item={item}
               />
             ))}
-          </Box>
+          </Box> */}
 
           {/* Action Buttons */}
           <Box sx={{ px: 3, pt: 2, borderTop: '1px solid rgba(0,0,0,0.1)' }}>
@@ -463,7 +502,7 @@ const Navbar = () => {
               fullWidth
               startIcon={<RocketLaunchRounded />}
               onClick={() => {
-                window.open('http://localhost:5173', '_blank');
+                navigate('/coming-soon');
                 setMobileOpen(false);
               }}
               sx={{
@@ -475,12 +514,12 @@ const Navbar = () => {
             </Button>
           </Box>
         </Box>
-      </Collapse>
+      )}
 
       {/* Floating Action Button for Quick Actions */}
       <Zoom in={scrolled && !isMobile}>
         <Fab
-          onClick={() => window.open('http://localhost:5173', '_blank')}
+          onClick={() => navigate('/coming-soon')}
           sx={{
             position: 'fixed',
             bottom: 32,

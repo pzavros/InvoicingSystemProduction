@@ -1,7 +1,8 @@
 import { 
   Email, 
   Phone,
-  Support
+  Support,
+  Chat
 } from '@mui/icons-material';
 import { Box } from '@mui/material';
 import Section from '../ReusableComponents/Section.jsx';
@@ -16,25 +17,44 @@ const ContactMethodsSection = () => {
       icon: <Email sx={{ fontSize: 40 }} />,
       title: 'Email Support',
       description: 'Get in touch via email for detailed inquiries',
-      contact: 'panazavros8@gmail.com',
+      contact: 'support@e-nvoicing.com',
       action: 'Send Email',
-      onClick: () => window.open('mailto:panazavros8@gmail.com?subject=InvoiceSystem Pro Inquiry', '_blank')
+      onClick: () => window.open('mailto:support@e-nvoicing.com?subject=E-Nvoicing Inquiry', '_blank')
     },
     {
-      icon: <Phone sx={{ fontSize: 40 }} />,
-      title: 'Phone Support',
-      description: 'Speak directly with our support team',
+      icon: <Chat sx={{ fontSize: 40 }} />,
+      title: 'WhatsApp Chat',
+      description: 'Quick responses via WhatsApp messaging',
       contact: '+357 97667089',
-      action: 'Call Now',
-      onClick: () => window.open('tel:+35797667089', '_blank')
+      action: 'Chat on WhatsApp',
+      onClick: () => {
+        // Try to detect if mobile, use api.whatsapp.com for better compatibility
+        const message = encodeURIComponent('Hello! I would like to know more about E-Nvoicing');
+        const whatsappUrl = `https://api.whatsapp.com/send?phone=35797667089&text=${message}`;
+        window.open(whatsappUrl, '_blank');
+      }
     },
+    // Phone Support - Commented out for now
+    // {
+    //   icon: <Phone sx={{ fontSize: 40 }} />,
+    //   title: 'Phone Support',
+    //   description: 'Speak directly with our support team',
+    //   contact: '+357 97667089',
+    //   action: 'Call Now',
+    //   onClick: () => window.open('tel:+35797667089', '_blank')
+    // },
     {
       icon: <Support sx={{ fontSize: 40 }} />,
       title: 'Technical Support',
       description: 'Get help with technical issues and setup',
       contact: 'Available via email for technical assistance',
       action: 'Get Support',
-      onClick: () => window.open('mailto:panazavros8@gmail.com?subject=Technical Support - InvoiceSystem Pro', '_blank')
+      onClick: () => {
+        const formSection = document.getElementById('contact-form');
+        if (formSection) {
+          formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
     }
   ];
 

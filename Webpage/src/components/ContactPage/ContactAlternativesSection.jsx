@@ -21,6 +21,19 @@ const ContactAlternativesSection = () => {
           <Text variant="h5" weight="bold" sx={{ mb: 2 }}>
             Email Contact
           </Text>
+          <Text 
+            sx={{ 
+              color: '#667eea', 
+              fontSize: '1.2rem', 
+              fontWeight: 600,
+              mb: 2,
+              '&:hover': { textDecoration: 'underline' }
+            }}
+            component="a"
+            href="mailto:support@e-nvoicing.com"
+          >
+            support@e-nvoicing.com
+          </Text>
           <Text sx={{ color: 'text.secondary', fontSize: '1rem', lineHeight: 1.6 }}>
             Send us a message using the contact form above and we'll get back to you as soon as possible. 
             All inquiries are handled via email for your convenience.

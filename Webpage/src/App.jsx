@@ -5,6 +5,7 @@ import AboutUsPage from './pages/AboutUsPage.jsx';
 import FeaturesPage from './pages/FeaturesPage.jsx';
 import HowItWorksPage from './pages/HowItWorksPage.jsx';
 import ContactPage from './pages/ContactPage.jsx';
+import ComingSoonPage from './pages/ComingSoonPage.jsx';
 import AdminPage from './pages/AdminPage.jsx';
 import Navbar from './components/ReusableComponents/Navbar.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
@@ -108,6 +109,7 @@ function App() {
             <Route path="/features" element={<><Navbar /><FeaturesPage /></>} />
             <Route path="/how-it-works" element={<><Navbar /><HowItWorksPage /></>} />
             <Route path="/contact" element={<><Navbar /><ContactPage /></>} />
+            <Route path="/coming-soon" element={<><Navbar /><ComingSoonPage /></>} />
           </Routes>
         </Router>
       </AdminAuthProvider>

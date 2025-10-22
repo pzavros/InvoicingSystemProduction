@@ -44,9 +44,15 @@ const AboutStorySection = () => {
           display: { xs: 'none', md: 'flex' },
           alignItems: 'center'
         }}>
-          <Card variant="gradient" sx={{ width: '100%', maxWidth: 400, height: 450, p: 4 }}>
-            <Group sx={{ fontSize: 60, color: 'white', mb: 3 }} />
-            <Text variant="h4" weight="bold" sx={{ mb: 3, color: 'white' }}>
+          <Card variant="gradient" sx={{ 
+            width: '100%', 
+            maxWidth: 400, 
+            height: { xs: 'auto', md: 450 },
+            minHeight: { xs: 300, md: 450 },
+            p: { xs: 3, md: 4 }
+          }}>
+            <Group sx={{ fontSize: { xs: 45, md: 60 }, color: 'white', mb: { xs: 2, md: 3 } }} />
+            <Text variant="h4" weight="bold" sx={{ mb: { xs: 2, md: 3 }, color: 'white' }}>
               Full-Stack Excellence
             </Text>
             <Text sx={{ color: 'rgba(255,255,255,0.9)', lineHeight: 1.6 }}>

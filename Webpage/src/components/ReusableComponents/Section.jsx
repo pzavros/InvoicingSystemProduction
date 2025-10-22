@@ -7,7 +7,8 @@ const Section = ({
   subtitle, 
   variant = 'default',
   spacing = 'normal',
-  sx = {} 
+  sx = {},
+  ...otherProps
 }) => {
   const spacingMap = {
     compact: { xs: 3, md: 4 },
@@ -30,11 +31,11 @@ const Section = ({
     
     hero: {
       background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      borderRadius: 4,
+      borderRadius: { xs: 2, md: 4 },
       color: 'white',
       position: 'relative',
       overflow: 'hidden',
-      px: { xs: 3, md: 6 },
+      px: { xs: 3, sm: 4, md: 6 },
       '&::before': {
         content: '""',
         position: 'absolute',
@@ -48,11 +49,11 @@ const Section = ({
     
     cta: {
       background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      borderRadius: 4,
+      borderRadius: { xs: 2, md: 4 },
       color: 'white',
       position: 'relative',
       overflow: 'hidden',
-      px: { xs: 3, md: 6 },
+      px: { xs: 3, sm: 4, md: 6 },
       '&::before': {
         content: '""',
         position: 'absolute',
@@ -70,24 +71,28 @@ const Section = ({
   return (
     <Box
       component="section"
+      {...otherProps}
       sx={{
         width: '100%',
         py: spacingMap[spacing],
         px: 0, // Remove inconsistent padding - let Page handle all horizontal spacing
         mb: { xs: 4, md: 6 },
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         ...variantStyles,
         ...sx
       }}
     >
-      <Box sx={{ position: 'relative', zIndex: 1 }}>
+      <Box sx={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: '1400px', mx: 'auto' }}>
         {title && (
-          <Box sx={{ textAlign: 'center', mb: subtitle ? 2 : 4 }}>
+          <Box sx={{ textAlign: 'center', mb: subtitle ? { xs: 1.5, md: 2 } : { xs: 3, md: 4 } }}>
             <Text 
               variant="h2" 
               weight="bold" 
               align="center" 
               sx={{ 
-                mb: 3,
+                mb: { xs: 2, md: 3 },
                 color: variant === 'gradient' || variant === 'hero' || variant === 'cta' ? 'white' : 'inherit',
                 ...(variant === 'default' && {
                   background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -108,12 +113,14 @@ const Section = ({
             variant="h6" 
             align="center" 
             sx={{ 
-              mb: 6,
+              mb: { xs: 4, md: 6 },
               color: variant === 'gradient' || variant === 'hero' || variant === 'cta' 
                 ? 'rgba(255,255,255,0.9)' 
                 : 'text.secondary',
               maxWidth: 600,
-              mx: 'auto'
+              mx: 'auto',
+              px: { xs: 1, md: 0 }, // Add small padding on mobile
+              lineHeight: { xs: 1.5, md: 1.6 }
             }}
           >
             {subtitle}

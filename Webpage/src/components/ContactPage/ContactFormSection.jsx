@@ -118,7 +118,7 @@ const ContactFormSection = () => {
   };
 
   return (
-    <Section variant="light" spacing="large" sx={{ mt: 8 }}>
+    <Section variant="light" spacing="large" sx={{ mt: 8 }} id="contact-form">
       <Row gap={8} sx={{ alignItems: 'flex-start' }}>
         <Column sx={{ flex: 1 }}>
           <Text variant="h2" weight="bold" sx={{ mb: 2 }}>

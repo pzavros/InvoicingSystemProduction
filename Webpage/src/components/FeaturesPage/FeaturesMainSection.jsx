@@ -24,8 +24,8 @@ const FeaturesMainSection = () => {
         'Create, read, update, delete invoices',
         'Status management (Draft, Sent, Paid, Overdue)',
         'Bulk status updates for multiple invoices',
-        'Multi-currency support with real-time conversion',
-        'Invoice numbering and sequence management'
+        'Multi-currency support',
+        'Invoice numbering and data management'
       ]
     },
     {
@@ -57,23 +57,23 @@ const FeaturesMainSection = () => {
       title: 'Customizable Templates',
       description: 'Professional invoice templates with brand customization options',
       details: [
-        'Multiple pre-designed invoice templates',
+        'Multiple invoice template options',
         'Custom branding and logo integration',
         'Template management system',
         'PDF generation with custom styling',
-        'Template sharing and backup'
+        'Document type specific templates'
       ]
     },
     {
       icon: <Inventory sx={{ fontSize: 48, color: '#667eea' }} />,
       title: 'Product & Service Catalog',
-      description: 'Integrated inventory management with pricing and categorization',
+      description: 'Integrated product management with pricing and categorization',
       details: [
         'Product and service database',
-        'Pricing management and updates',
+        'Pricing management and history tracking',
         'Category organization',
         'Quick invoice item selection',
-        'Inventory tracking and reports'
+        'Product search and filtering'
       ]
     },
     {
@@ -85,7 +85,7 @@ const FeaturesMainSection = () => {
         'Logistics and shipping reports',
         'Financial summaries and statements',
         'Custom date range filtering',
-        'Automated report scheduling'
+        'Export data for analysis'
       ]
     }
   ];

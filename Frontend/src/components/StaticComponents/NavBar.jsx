@@ -185,7 +185,7 @@ export default function NavBar() {
         <Box sx={{
           display: 'flex',
           alignItems: 'center',
-          padding: 3,
+          padding: '32px 24px', // Increased padding to make header taller
           justifyContent: sidebarOpen ? 'space-between' : 'center',
           background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
           borderBottom: '1px solid rgba(148, 163, 184, 0.1)',

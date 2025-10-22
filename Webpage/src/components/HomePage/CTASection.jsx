@@ -46,7 +46,7 @@ const CTASection = () => {
           color: 'rgba(255,255,255,0.8)',
           fontSize: '1.1rem'
         }}>
-          Early users receive 50% off their first year and priority support
+          Be among the first to experience the future of invoicing management
         </Text>
 
         <Row gap={3} sx={{ justifyContent: 'center', flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>

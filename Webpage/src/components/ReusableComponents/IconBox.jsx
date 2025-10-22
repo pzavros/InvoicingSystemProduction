@@ -42,11 +42,16 @@ const IconBox = ({
   const colorStyles = colors[color] || colors.primary;
   const variantStyles = variants[variant] || variants.circular;
 
+  // Make size responsive if it's a number
+  const responsiveSize = typeof size === 'number' 
+    ? { xs: size * 0.7, sm: size * 0.85, md: size }
+    : size;
+
   return (
     <Box
       sx={{
-        width: size,
-        height: size,
+        width: responsiveSize,
+        height: responsiveSize,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

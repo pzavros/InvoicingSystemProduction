@@ -36,12 +36,12 @@ const FeaturesSection = () => {
     {
       icon: <CloudSync sx={{ fontSize: 48, color: '#667eea' }} />,
       title: 'Product Catalog',
-      description: 'Manage your products and services with integrated pricing, inventory tracking, and quick invoice integration.'
+      description: 'Manage your products and services with integrated pricing, category organization, and quick invoice integration.'
     },
     {
       icon: <Security sx={{ fontSize: 48, color: '#764ba2' }} />,
       title: 'Reports & Export',
-      description: 'Generate comprehensive Excel reports and logistics data for detailed business analysis and record keeping.'
+      description: 'Generate comprehensive Excel reports with logistics data for detailed business analysis and record keeping.'
     }
   ];
 

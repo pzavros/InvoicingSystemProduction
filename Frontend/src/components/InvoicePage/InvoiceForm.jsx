@@ -332,7 +332,7 @@ const InvoiceForm = () => {
               };
             }
           } else { // New invoice
-            const defaultDocumentTypeId = documentTypes?.[0]?.id || null;
+            const defaultDocumentTypeId = documentTypes?.[0]?.id || 1;
             baseDataForNewOrCopy = {
               ...formData, // Initial formData state, includes empty companyLogoMimeType
               currencyId: currencyDefaults.id,
@@ -1157,7 +1157,7 @@ const InvoiceForm = () => {
                     </Typography>
                     <FormControl size="small" sx={{ minWidth: 200 }}>
                       <Select
-                        value={formData.documentTypeId}
+                        value={formData.documentTypeId || 1}
                         onChange={(e) => editField('documentTypeId', e.target.value)}
                         sx={{
                           '& .MuiOutlinedInput-root': {

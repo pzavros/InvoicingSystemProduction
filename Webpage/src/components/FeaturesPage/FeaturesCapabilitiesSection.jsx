@@ -82,22 +82,28 @@ const FeaturesCapabilitiesSection = () => {
           alignItems: 'center',
           justifyContent: 'center'
         }}>
-          <Card variant="gradient" sx={{ width: '100%', maxWidth: 400, height: 500, p: 4 }}>
+          <Card variant="gradient" sx={{ 
+            width: '100%', 
+            maxWidth: 400, 
+            height: { xs: 'auto', md: 500 },
+            minHeight: { xs: 300, md: 500 },
+            p: { xs: 3, md: 4 }
+          }}>
             <Box sx={{ textAlign: 'center' }}>
               <Box
                 sx={{
-                  width: 100,
-                  height: 100,
+                  width: { xs: 70, sm: 85, md: 100 },
+                  height: { xs: 70, sm: 85, md: 100 },
                   borderRadius: '50%',
                   background: 'rgba(255,255,255,0.2)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   mx: 'auto',
-                  mb: 4
+                  mb: { xs: 3, md: 4 }
                 }}
               >
-                <Settings sx={{ fontSize: 50, color: 'white' }} />
+                <Settings sx={{ fontSize: { xs: 35, md: 50 }, color: 'white' }} />
               </Box>
               
               <Text variant="h4" weight="bold" sx={{ mb: 2, color: 'white' }}>

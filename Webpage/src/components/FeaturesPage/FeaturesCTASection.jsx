@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { Box, IconButton, Fade, Tooltip, CircularProgress } from '@mui/material';
-import { PlayArrow, Close, OpenInNew, VideoLibrary } from '@mui/icons-material';
+import { PlayArrow, Close, OpenInNew, VideoLibrary, Rocket } from '@mui/icons-material';
 import Section from '../ReusableComponents/Section.jsx';
 import Column from '../ReusableComponents/Column.jsx';
 import Row from '../ReusableComponents/Row.jsx';
 import Text from '../ReusableComponents/Text.jsx';
 import Button from '../ReusableComponents/Button.jsx';
+import WaitlistModal from '../ReusableComponents/WaitlistModal.jsx';
 
 const FeaturesCTASection = () => {
   const [showVideo, setShowVideo] = useState(false);
   const [videoLoading, setVideoLoading] = useState(true);
+  const [waitlistOpen, setWaitlistOpen] = useState(false);
   const videoId = 'dA3Dq24BzgY'; // YouTube video ID
   const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
 
@@ -47,19 +49,15 @@ const FeaturesCTASection = () => {
         
         <Row gap={3} sx={{ justifyContent: 'center', flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
           <Button 
-            variant="primary" 
+            variant="glass" 
             size="large"
-            sx={{ 
-              background: 'rgba(255,255,255,0.9)',
-              color: '#667eea',
-              '&:hover': {
-                background: 'white',
-              }
-            }}
+            onClick={() => setWaitlistOpen(true)}
+            startIcon={<Rocket />}
           >
-            Get Started Now
+            Join Waitlist
           </Button>
-          <Button 
+          {/* View Demo Button - Commented out for now */}
+          {/* <Button 
             variant="outline" 
             size="large"
             onClick={handleViewDemo}
@@ -74,7 +72,7 @@ const FeaturesCTASection = () => {
             }}
           >
             View Demo
-          </Button>
+          </Button> */}
         </Row>
 
         {/* Video Player */}
@@ -209,6 +207,11 @@ const FeaturesCTASection = () => {
           </Box>
         </Fade>
       </Column>
+
+      <WaitlistModal 
+        open={waitlistOpen} 
+        onClose={() => setWaitlistOpen(false)} 
+      />
     </Section>
   );
 };

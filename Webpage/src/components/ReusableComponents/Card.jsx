@@ -85,14 +85,14 @@ const Card = ({
           }}
         >
           {icon && (
-            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
+            <Box sx={{ mb: { xs: 2, md: 3 }, display: 'flex', justifyContent: 'center' }}>
               {variant === 'feature' ? (
                 <Box
                   sx={{
                     background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
                     borderRadius: '50%',
-                    width: 80,
-                    height: 80,
+                    width: { xs: 60, sm: 70, md: 80 },
+                    height: { xs: 60, sm: 70, md: 80 },
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
@@ -103,8 +103,8 @@ const Card = ({
               ) : variant === 'step' ? (
                 <Box
                   sx={{
-                    width: 120,
-                    height: 120,
+                    width: { xs: 80, sm: 100, md: 120 },
+                    height: { xs: 80, sm: 100, md: 120 },
                     borderRadius: '50%',
                     background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
                     display: 'flex',

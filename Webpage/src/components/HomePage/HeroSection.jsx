@@ -26,6 +26,13 @@ const HeroSection = () => {
 
   const handleLearnMore = () => {
     navigate('/how-it-works');
+    // Scroll to screenshots section after navigation
+    setTimeout(() => {
+      const showcaseSection = document.querySelector('[data-section="system-showcase"]');
+      if (showcaseSection) {
+        showcaseSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
   };
 
   return (
@@ -51,7 +58,7 @@ const HeroSection = () => {
           Complete Invoicing System for Your Business
         </Text>
         
-        <Text variant="h5" gutterBottom color="rgba(255, 255, 255, 0.9)" sx={{ maxWidth: 600, mx: 'auto', mb: 4 }}>
+        <Text variant="h5" gutterBottom color="rgba(255, 255, 255, 0.9)" align="center" sx={{ maxWidth: 600, mx: 'auto', mb: 4, textAlign: 'center' }}>
           Full-featured invoicing platform with client management, dashboard analytics, and customizable templates
         </Text>
         

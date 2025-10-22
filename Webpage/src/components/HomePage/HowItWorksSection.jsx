@@ -10,12 +10,12 @@ const HowItWorksSection = () => {
     {
       icon: <PersonAdd sx={{ fontSize: 56, color: '#667eea' }} />,
       title: 'Register & Setup',
-      description: 'Create your account, configure system settings, and add your business information to get started.'
+      description: 'Create your account, configure system settings, and add your business information to get started. Complete in under 1 minute.'
     },
     {
       icon: <Palette sx={{ fontSize: 56, color: '#764ba2' }} />,
       title: 'Add Clients & Products',
-      description: 'Build your client database and product catalog using the integrated management system with search capabilities.'
+      description: 'Build your client catalogue and product catalog using the integrated management system with search capabilities.'
     },
     {
       icon: <Payment sx={{ fontSize: 56, color: '#667eea' }} />,

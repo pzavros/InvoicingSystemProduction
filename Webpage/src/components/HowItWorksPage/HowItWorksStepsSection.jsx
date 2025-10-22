@@ -1,4 +1,4 @@
-import { PersonAdd, Palette, Payment, CheckCircle } from '@mui/icons-material';
+import { PersonAdd, Palette, Payment, Settings, CheckCircle } from '@mui/icons-material';
 import { Box } from '@mui/material';
 import Section from '../ReusableComponents/Section.jsx';
 import Column from '../ReusableComponents/Column.jsx';
@@ -12,20 +12,19 @@ const HowItWorksStepsSection = () => {
     {
       icon: <PersonAdd sx={{ fontSize: 56, color: '#667eea' }} />,
       title: 'Account Setup & Configuration',
-      description: 'Register your account and configure your business settings, including company information, branding, and system preferences.',
+      description: 'Create your account and configure system settings in just 1 minute. Add your business information to get started.',
       details: [
         'Create your secure user account in seconds',
         'Set up company profile and business information',
         'Configure system settings and preferences',
-        'Choose your subscription plan (trial available)',
-        'Customize invoice templates and branding'
+        'Choose your subscription plan (trial available)'
       ],
-      time: '5 minutes'
+      time: '1 min'
     },
     {
       icon: <Palette sx={{ fontSize: 56, color: '#764ba2' }} />,
       title: 'Build Your Business Database',
-      description: 'Add your clients and products to create a comprehensive business database for streamlined invoice creation.',
+      description: 'Build your client catalogue and product catalog using the integrated management system with search capabilities.',
       details: [
         'Add client information with contact details',
         'Create your product and service catalog',
@@ -33,17 +32,30 @@ const HowItWorksStepsSection = () => {
         'Import existing data if migrating from another system',
         'Configure client-specific settings and preferences'
       ],
-      time: '15 minutes'
+      time: '5 mins'
     },
     {
-      icon: <Payment sx={{ fontSize: 56, color: '#667eea' }} />,
+      icon: <Settings sx={{ fontSize: 56, color: '#667eea' }} />,
+      title: 'Customize Templates',
+      description: 'Create custom invoice templates with your branding, or use our professional default templates to get started quickly.',
+      details: [
+        'Choose from pre-built invoice templates',
+        'Customize templates with your logo and branding',
+        'Set default templates for different document types',
+        'Configure invoice numbering and formatting',
+        'Save templates for quick reuse'
+      ],
+      time: '2 mins'
+    },
+    {
+      icon: <Payment sx={{ fontSize: 56, color: '#764ba2' }} />,
       title: 'Create & Manage Invoices',
       description: 'Generate professional invoices using templates, track their status, and analyze your business performance through the dashboard.',
       details: [
         'Create invoices using customizable templates',
         'Manage invoice status (Draft, Sent, Paid, Overdue)',
         'Perform bulk operations on multiple invoices',
-        'Track payments and send automated reminders',
+        'Track payments and monitor outstanding balances',
         'Generate reports and analytics for business insights'
       ],
       time: 'Ongoing'
@@ -53,7 +65,7 @@ const HowItWorksStepsSection = () => {
   return (
     <Section spacing="large" sx={{ mt: 4 }}>
       <Text variant="h2" weight="bold" align="center" sx={{ mb: 2 }}>
-        Three Simple Steps to Success
+        Four Simple Steps to Success
       </Text>
       <Text variant="h6" align="center" sx={{ 
         color: 'text.secondary', 
@@ -61,7 +73,7 @@ const HowItWorksStepsSection = () => {
         maxWidth: 600, 
         mx: 'auto' 
       }}>
-        Our streamlined process gets you from signup to your first invoice in under 30 minutes
+        Our streamlined process gets you from signup to your first invoice in under 10 minutes
       </Text>
       
       <Grid columns={{ xs: 1 }} gap={8} sx={{ maxWidth: 800, mx: 'auto' }}>
