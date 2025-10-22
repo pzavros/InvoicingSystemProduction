@@ -411,7 +411,7 @@ const SystemShowcaseSection = () => {
               }}>
                 <Box sx={{
                   position: 'relative',
-                  borderRadius: 4,
+                  borderRadius: 2,
                   overflow: 'hidden',
                   background: 'linear-gradient(145deg, #f8fafc 0%, #ffffff 100%)',
                   border: '1px solid rgba(102, 126, 234, 0.1)',
