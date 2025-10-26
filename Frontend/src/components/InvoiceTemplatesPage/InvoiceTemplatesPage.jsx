@@ -243,17 +243,18 @@ const InvoiceTemplatesPage = () => {
   const getTemplateTypeIcon = (template) => {
     const isSystem = template.isSystemTemplate;
     const initials = isSystem ? 'PRO' : 'CT';
-    const color = isSystem ? '#3b82f6' : '#8b5cf6';
+    const color = isSystem ? '#6366f1' : '#8b5cf6';
     
     return (
       <Avatar
         sx={{
           backgroundColor: color,
           color: 'white',
-          width: 44,
-          height: 44,
+          width: 48,
+          height: 48,
           fontSize: '0.75rem',
-          fontWeight: 700
+          fontWeight: 700,
+          boxShadow: '0 4px 12px rgba(99, 102, 241, 0.25)'
         }}
       >
         {initials}
@@ -290,13 +291,13 @@ const InvoiceTemplatesPage = () => {
       width: 300,
       sortable: false,
       renderCell: (params) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, height: '100%', py: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, height: '100%', py: 1 }}>
           {getTemplateTypeIcon(params.row.template)}
           <Box>
-            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#111827', fontSize: '1rem' }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1f2937', fontSize: '1rem', mb: 0.5 }}>
               {params.value}
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
+            <Typography variant="body2" sx={{ fontSize: '0.85rem', color: '#6b7280', lineHeight: 1.4 }}>
               {params.row.description}
             </Typography>
           </Box>
@@ -313,11 +314,15 @@ const InvoiceTemplatesPage = () => {
           <Chip
             label={params.value}
             size="small"
-            color={params.row.isSystemTemplate ? 'primary' : 'secondary'}
-            variant="outlined"
             sx={{
               fontWeight: 600,
-              fontSize: '0.75rem'
+              fontSize: '0.75rem',
+              backgroundColor: params.row.isSystemTemplate ? '#f0f4ff' : '#f3e8ff',
+              color: params.row.isSystemTemplate ? '#6366f1' : '#8b5cf6',
+              border: params.row.isSystemTemplate ? '1.5px solid #c7d2fe' : '1.5px solid #ddd6fe',
+              '& .MuiChip-label': {
+                px: 1.5
+              }
             }}
           />
         </Box>
@@ -333,12 +338,19 @@ const InvoiceTemplatesPage = () => {
           <Chip
             label={params.value}
             size="small"
-            color="info"
-            variant="filled"
             icon={<DocumentIcon fontSize="inherit" />}
             sx={{
               fontWeight: 600,
-              fontSize: '0.75rem'
+              fontSize: '0.75rem',
+              backgroundColor: '#fef3c7',
+              color: '#d97706',
+              border: '1.5px solid #fde68a',
+              '& .MuiChip-icon': {
+                color: '#d97706'
+              },
+              '& .MuiChip-label': {
+                px: 1.5
+              }
             }}
           />
         </Box>
@@ -354,12 +366,19 @@ const InvoiceTemplatesPage = () => {
           <Chip
             label={params.value ? 'Active' : 'Inactive'}
             size="small"
-            color={params.value ? 'success' : 'default'}
-            variant={params.value ? 'filled' : 'outlined'}
             icon={params.value ? <ActiveIcon fontSize="inherit" /> : undefined}
             sx={{
               fontWeight: 600,
-              fontSize: '0.75rem'
+              fontSize: '0.75rem',
+              backgroundColor: params.value ? '#d1fae5' : '#f3f4f6',
+              color: params.value ? '#059669' : '#6b7280',
+              border: params.value ? '1.5px solid #a7f3d0' : '1.5px solid #e5e7eb',
+              '& .MuiChip-icon': {
+                color: '#059669'
+              },
+              '& .MuiChip-label': {
+                px: 1.5
+              }
             }}
           />
         </Box>
@@ -380,11 +399,17 @@ const InvoiceTemplatesPage = () => {
               sx={{
                 textTransform: 'none',
                 borderRadius: '8px',
-                px: 1.5,
-                py: 0.5,
+                px: 2,
+                py: 0.75,
                 fontSize: '0.75rem',
-                background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-                minWidth: 'auto'
+                fontWeight: 600,
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                boxShadow: '0 2px 8px rgba(16, 185, 129, 0.25)',
+                minWidth: 'auto',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                  boxShadow: '0 4px 12px rgba(16, 185, 129, 0.35)',
+                }
               }}
             >
               Use
@@ -396,9 +421,14 @@ const InvoiceTemplatesPage = () => {
               size="small"
               onClick={() => handlePreviewTemplate(params.row.template)}
               sx={{
-                color: '#1d4ed8',
-                backgroundColor: 'rgba(29, 78, 216, 0.08)',
-                '&:hover': { backgroundColor: 'rgba(29, 78, 216, 0.16)' }
+                color: '#6366f1',
+                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                borderRadius: '8px',
+                '&:hover': { 
+                  backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                  transform: 'scale(1.05)'
+                },
+                transition: 'all 0.2s ease'
               }}
             >
               <PreviewIcon fontSize="small" />
@@ -412,8 +442,13 @@ const InvoiceTemplatesPage = () => {
                 onClick={() => navigate(`/templates/edit/${params.row.template.id}`)}
                 sx={{
                   color: '#f59e0b',
-                  backgroundColor: 'rgba(245, 158, 11, 0.08)',
-                  '&:hover': { backgroundColor: 'rgba(245, 158, 11, 0.16)' }
+                  backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                  borderRadius: '8px',
+                  '&:hover': { 
+                    backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                    transform: 'scale(1.05)'
+                  },
+                  transition: 'all 0.2s ease'
                 }}
               >
                 <EditIcon fontSize="small" />
@@ -428,8 +463,13 @@ const InvoiceTemplatesPage = () => {
                 onClick={() => handleDeleteTemplate(params.row.template.id)}
                 sx={{
                   color: '#ef4444',
-                  backgroundColor: 'rgba(239, 68, 68, 0.08)',
-                  '&:hover': { backgroundColor: 'rgba(239, 68, 68, 0.16)' }
+                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                  borderRadius: '8px',
+                  '&:hover': { 
+                    backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                    transform: 'scale(1.05)'
+                  },
+                  transition: 'all 0.2s ease'
                 }}
               >
                 <DeleteIcon fontSize="small" />
@@ -606,22 +646,27 @@ const InvoiceTemplatesPage = () => {
 
       {/* Templates DataGrid */}
       <Paper
-        elevation={3}
+        elevation={0}
         sx={{
           borderRadius: 3,
           overflow: 'hidden',
-          background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-          border: '1px solid rgba(148, 163, 184, 0.1)'
+          background: '#ffffff',
+          border: '1px solid #e5e7eb',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)'
         }}
       >
-        <Box sx={{ p: 3, borderBottom: '1px solid rgba(148, 163, 184, 0.1)' }}>
-          <Typography variant="h6" sx={{ fontWeight: 700, color: '#1f2937', mb: 1 }}>
+        <Box sx={{ 
+          p: 3, 
+          borderBottom: '2px solid #f3f4f6',
+          background: 'linear-gradient(to right, #fafafa 0%, #ffffff 100%)'
+        }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, color: '#111827', mb: 1 }}>
             {selectedDocumentType === 'all' 
               ? `All Templates (${templates.length})`
               : `${getDocumentTypeName(selectedDocumentType)} Templates (${templates.length})`
             }
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{ color: '#6b7280', fontSize: '0.875rem' }}>
             {selectedDocumentType === 'all' 
               ? 'Manage your professional and custom invoice templates across all document types'
               : `Manage templates for ${getDocumentTypeName(selectedDocumentType)} documents`
@@ -630,12 +675,31 @@ const InvoiceTemplatesPage = () => {
         </Box>
 
         {templates.length === 0 && !loading ? (
-          <Box sx={{ p: 6, textAlign: 'center' }}>
-            <Typography variant="h6" color="text.secondary" gutterBottom>
+          <Box sx={{ 
+            p: 8, 
+            textAlign: 'center',
+            background: 'linear-gradient(to bottom, #fafafa 0%, #ffffff 100%)'
+          }}>
+            <Box
+              sx={{
+                width: 80,
+                height: 80,
+                margin: '0 auto 24px',
+                borderRadius: '20px',
+                background: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
+              }}
+            >
+              <DocumentIcon sx={{ fontSize: 40, color: '#9ca3af' }} />
+            </Box>
+            <Typography variant="h6" sx={{ color: '#4b5563', fontWeight: 600, mb: 1 }}>
               No Templates Available
             </Typography>
-            <Typography variant="body2" color="text.secondary" mb={3}>
-              Create your first custom invoice template to get started.
+            <Typography variant="body2" sx={{ color: '#9ca3af', mb: 4, maxWidth: 400, mx: 'auto' }}>
+              Create your first custom invoice template to get started. Templates help you maintain consistent branding across all your documents.
             </Typography>
             <Stack direction="row" spacing={2} justifyContent="center">
               <Button
@@ -643,7 +707,17 @@ const InvoiceTemplatesPage = () => {
                 startIcon={<AddIcon />}
                 onClick={() => navigate('/templates/add')}
                 sx={{
-                  background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'
+                  background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+                  boxShadow: '0 4px 12px rgba(99, 102, 241, 0.25)',
+                  borderRadius: 2,
+                  px: 3,
+                  py: 1.5,
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #4f46e5 0%, #4338ca 100%)',
+                    boxShadow: '0 6px 16px rgba(99, 102, 241, 0.35)',
+                  }
                 }}
               >
                 Create Template
@@ -651,7 +725,19 @@ const InvoiceTemplatesPage = () => {
               <Button
                 variant="outlined"
                 onClick={() => handleOpenDialog()}
-                sx={{ color: '#6b7280', borderColor: '#d1d5db' }}
+                sx={{ 
+                  color: '#6b7280', 
+                  borderColor: '#d1d5db',
+                  borderRadius: 2,
+                  px: 3,
+                  py: 1.5,
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  '&:hover': {
+                    borderColor: '#9ca3af',
+                    backgroundColor: '#f9fafb'
+                  }
+                }}
               >
                 Advanced Mode
               </Button>
@@ -679,27 +765,38 @@ const InvoiceTemplatesPage = () => {
               sx={{
                 border: 'none',
                 '& .MuiDataGrid-cell': {
-                  borderBottom: '1px solid rgba(148, 163, 184, 0.1)',
+                  borderBottom: '1px solid #f3f4f6',
                   display: 'flex',
                   alignItems: 'center',
                 },
                 '& .MuiDataGrid-columnHeader': {
-                  backgroundColor: '#f8fafc',
+                  backgroundColor: '#fafafa',
                   color: '#374151',
-                  fontWeight: 600,
-                  borderBottom: '2px solid rgba(148, 163, 184, 0.2)',
+                  fontWeight: 700,
+                  fontSize: '0.875rem',
+                  borderBottom: '2px solid #e5e7eb',
                 },
-                '& .MuiDataGrid-row:hover': {
-                  backgroundColor: 'rgba(59, 130, 246, 0.04)',
+                '& .MuiDataGrid-row': {
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    backgroundColor: '#fafafa',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+                  }
                 },
                 '& .MuiDataGrid-footerContainer': {
-                  borderTop: '2px solid rgba(148, 163, 184, 0.1)',
-                  backgroundColor: '#f8fafc'
+                  borderTop: '2px solid #e5e7eb',
+                  backgroundColor: '#fafafa'
                 },
                 '& .MuiDataGrid-toolbarContainer': {
                   padding: '16px',
-                  borderBottom: '1px solid rgba(148, 163, 184, 0.1)',
-                  backgroundColor: '#f8fafc'
+                  borderBottom: '1px solid #f3f4f6',
+                  backgroundColor: '#fafafa',
+                  '& .MuiButton-root': {
+                    color: '#6b7280',
+                    '&:hover': {
+                      backgroundColor: '#f3f4f6'
+                    }
+                  }
                 }
               }}
             />
