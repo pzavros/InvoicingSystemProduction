@@ -15,7 +15,9 @@ import {
   ListItemIcon,
   ListItemText,
   Switch,
-  FormControlLabel
+  FormControlLabel,
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import {
   Storage,
@@ -29,6 +31,9 @@ import {
 } from '@mui/icons-material';
 
 const SystemAdminPage = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [debugMode, setDebugMode] = useState(false);
 
@@ -57,31 +62,31 @@ const SystemAdminPage = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" fontWeight="bold" gutterBottom>
+    <Container maxWidth="lg" sx={{ py: { xs: 2, md: 4 } }}>
+      <Box sx={{ mb: { xs: 3, md: 4 } }}>
+        <Typography variant={isMobile ? "h5" : "h4"} fontWeight="bold" gutterBottom>
           System Administration
         </Typography>
-        <Typography variant="body1" color="text.secondary">
+        <Typography variant="body1" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' } }}>
           Advanced system settings and monitoring
         </Typography>
       </Box>
 
       {/* System Statistics */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <Grid container spacing={{ xs: 2, md: 3 }} sx={{ mb: { xs: 3, md: 4 } }}>
         {systemStats.map((stat, index) => (
-          <Grid item xs={12} sm={6} md={3} key={index}>
-            <Card elevation={3} sx={{ borderRadius: 3 }}>
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Grid item xs={6} sm={6} md={3} key={index}>
+            <Card elevation={3} sx={{ borderRadius: { xs: 2, md: 3 } }}>
+              <CardContent sx={{ p: { xs: 1.5, md: 2 } }}>
+                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' }, gap: { xs: 1, md: 2 } }}>
                   <Box sx={{ color: `${stat.color}.main` }}>
-                    {stat.icon}
+                    {React.cloneElement(stat.icon, { fontSize: isMobile ? 'medium' : 'large' })}
                   </Box>
                   <Box>
-                    <Typography variant="h5" fontWeight="bold">
+                    <Typography variant={isMobile ? "h6" : "h5"} fontWeight="bold">
                       {stat.value}
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.75rem', md: '0.875rem' } }}>
                       {stat.label}
                     </Typography>
                   </Box>
@@ -92,22 +97,24 @@ const SystemAdminPage = () => {
         ))}
       </Grid>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={{ xs: 2, md: 3 }}>
         {/* System Health */}
         <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ p: 3, borderRadius: 3 }}>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
+          <Paper elevation={3} sx={{ p: { xs: 2, md: 3 }, borderRadius: { xs: 2, md: 3 } }}>
+            <Typography variant={isMobile ? "subtitle1" : "h6"} fontWeight="bold" gutterBottom>
               System Health
             </Typography>
-            <List dense>
+            <List dense={isMobile}>
               {systemHealth.map((item, index) => (
-                <ListItem key={index}>
-                  <ListItemIcon>
+                <ListItem key={index} sx={{ px: { xs: 0, md: 2 } }}>
+                  <ListItemIcon sx={{ minWidth: { xs: 36, md: 56 } }}>
                     {item.icon}
                   </ListItemIcon>
                   <ListItemText 
                     primary={item.service}
                     secondary={item.status.toUpperCase()}
+                    primaryTypographyProps={{ fontSize: { xs: '0.875rem', md: '1rem' } }}
+                    secondaryTypographyProps={{ fontSize: { xs: '0.75rem', md: '0.875rem' } }}
                   />
                 </ListItem>
               ))}
@@ -117,12 +124,12 @@ const SystemAdminPage = () => {
 
         {/* System Controls */}
         <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ p: 3, borderRadius: 3 }}>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
+          <Paper elevation={3} sx={{ p: { xs: 2, md: 3 }, borderRadius: { xs: 2, md: 3 } }}>
+            <Typography variant={isMobile ? "subtitle1" : "h6"} fontWeight="bold" gutterBottom>
               System Controls
             </Typography>
             
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ mb: { xs: 2, md: 3 } }}>
               <FormControlLabel
                 control={
                   <Switch
@@ -131,14 +138,14 @@ const SystemAdminPage = () => {
                     color="warning"
                   />
                 }
-                label="Maintenance Mode"
+                label={<Typography variant={isMobile ? "body2" : "body1"}>Maintenance Mode</Typography>}
               />
-              <Typography variant="body2" color="text.secondary" sx={{ ml: 4 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ ml: { xs: 3, md: 4 }, fontSize: { xs: '0.75rem', md: '0.875rem' } }}>
                 Temporarily disable user access for system updates
               </Typography>
             </Box>
 
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ mb: { xs: 2, md: 3 } }}>
               <FormControlLabel
                 control={
                   <Switch
@@ -147,28 +154,30 @@ const SystemAdminPage = () => {
                     color="info"
                   />
                 }
-                label="Debug Mode"
+                label={<Typography variant={isMobile ? "body2" : "body1"}>Debug Mode</Typography>}
               />
-              <Typography variant="body2" color="text.secondary" sx={{ ml: 4 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ ml: { xs: 3, md: 4 }, fontSize: { xs: '0.75rem', md: '0.875rem' } }}>
                 Enable detailed logging for troubleshooting
               </Typography>
             </Box>
 
             <Divider sx={{ my: 2 }} />
             
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 1.5, md: 2 } }}>
               <Button
                 variant="outlined"
-                startIcon={<CloudSync />}
+                startIcon={!isMobile && <CloudSync />}
                 fullWidth
+                size={isMobile ? "small" : "medium"}
               >
                 Sync Database
               </Button>
               
               <Button
                 variant="outlined"
-                startIcon={<Build />}
+                startIcon={!isMobile && <Build />}
                 fullWidth
+                size={isMobile ? "small" : "medium"}
               >
                 Clear Cache
               </Button>
@@ -176,8 +185,9 @@ const SystemAdminPage = () => {
               <Button
                 variant="outlined"
                 color="error"
-                startIcon={<Warning />}
+                startIcon={!isMobile && <Warning />}
                 fullWidth
+                size={isMobile ? "small" : "medium"}
               >
                 Restart System
               </Button>
@@ -187,39 +197,45 @@ const SystemAdminPage = () => {
 
         {/* Recent Activity */}
         <Grid item xs={12}>
-          <Paper elevation={3} sx={{ p: 3, borderRadius: 3 }}>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
+          <Paper elevation={3} sx={{ p: { xs: 2, md: 3 }, borderRadius: { xs: 2, md: 3 } }}>
+            <Typography variant={isMobile ? "subtitle1" : "h6"} fontWeight="bold" gutterBottom>
               Recent System Activity
             </Typography>
             
-            <List>
-              <ListItem>
-                <ListItemIcon>
+            <List dense={isMobile}>
+              <ListItem sx={{ px: { xs: 0, md: 2 } }}>
+                <ListItemIcon sx={{ minWidth: { xs: 36, md: 56 } }}>
                   <CheckCircle color="success" />
                 </ListItemIcon>
                 <ListItemText 
                   primary="Database backup completed"
                   secondary="2 hours ago"
+                  primaryTypographyProps={{ fontSize: { xs: '0.875rem', md: '1rem' } }}
+                  secondaryTypographyProps={{ fontSize: { xs: '0.75rem', md: '0.875rem' } }}
                 />
               </ListItem>
               
-              <ListItem>
-                <ListItemIcon>
+              <ListItem sx={{ px: { xs: 0, md: 2 } }}>
+                <ListItemIcon sx={{ minWidth: { xs: 36, md: 56 } }}>
                   <Warning color="warning" />
                 </ListItemIcon>
                 <ListItemText 
                   primary="High memory usage detected"
                   secondary="4 hours ago"
+                  primaryTypographyProps={{ fontSize: { xs: '0.875rem', md: '1rem' } }}
+                  secondaryTypographyProps={{ fontSize: { xs: '0.75rem', md: '0.875rem' } }}
                 />
               </ListItem>
               
-              <ListItem>
-                <ListItemIcon>
+              <ListItem sx={{ px: { xs: 0, md: 2 } }}>
+                <ListItemIcon sx={{ minWidth: { xs: 36, md: 56 } }}>
                   <Security color="info" />
                 </ListItemIcon>
                 <ListItemText 
                   primary="Security patch applied"
                   secondary="1 day ago"
+                  primaryTypographyProps={{ fontSize: { xs: '0.875rem', md: '1rem' } }}
+                  secondaryTypographyProps={{ fontSize: { xs: '0.75rem', md: '0.875rem' } }}
                 />
               </ListItem>
             </List>
@@ -227,9 +243,9 @@ const SystemAdminPage = () => {
         </Grid>
       </Grid>
 
-      <Box sx={{ mt: 3 }}>
-        <Alert severity="warning">
-          <Typography variant="body2">
+      <Box sx={{ mt: { xs: 2, md: 3 } }}>
+        <Alert severity="warning" sx={{ fontSize: { xs: '0.8rem', md: '0.875rem' } }}>
+          <Typography variant="body2" sx={{ fontSize: { xs: '0.8rem', md: '0.875rem' } }}>
             <strong>Caution:</strong> These are advanced system controls. 
             Improper use may affect system stability and user experience.
           </Typography>

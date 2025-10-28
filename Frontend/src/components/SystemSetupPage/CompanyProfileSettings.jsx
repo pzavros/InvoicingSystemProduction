@@ -22,6 +22,8 @@ import {
   LinearProgress,
   CircularProgress,
   Backdrop,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import {
   Business as BusinessIcon,
@@ -46,6 +48,9 @@ import {
 import { getSystemSetup, updateSystemSetup } from "./api";
 
 const CompanyProfileSettings = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  
   const [companyInfo, setCompanyInfo] = useState({
     name: "",
     companyNo: "",
@@ -331,13 +336,13 @@ const CompanyProfileSettings = () => {
       <Box
         sx={{
           display: 'flex',
-          flexWrap: 'wrap',
+          flexDirection: { xs: 'column', md: 'row' },
           justifyContent: 'space-between',
           alignItems: { xs: 'flex-start', md: 'center' },
-          gap: 3,
-          mb: 4,
-          p: 3,
-          borderRadius: 3,
+          gap: { xs: 2, md: 3 },
+          mb: { xs: 3, md: 4 },
+          p: { xs: 2, md: 3 },
+          borderRadius: { xs: 2, md: 3 },
           background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
           border: '1px solid rgba(34, 197, 94, 0.18)',
           boxShadow: '0 4px 12px rgba(34, 197, 94, 0.12)',
@@ -356,12 +361,12 @@ const CompanyProfileSettings = () => {
           }
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, minWidth: 280 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: { xs: '100%', md: 'auto' } }}>
           <Box
             sx={{
-              width: 56,
-              height: 56,
-              borderRadius: '16px',
+              width: { xs: 48, md: 56 },
+              height: { xs: 48, md: 56 },
+              borderRadius: { xs: '14px', md: '16px' },
               background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
               display: 'flex',
               alignItems: 'center',
@@ -370,11 +375,11 @@ const CompanyProfileSettings = () => {
               animation: 'scaleIn 0.5s ease-out 0.2s both'
             }}
           >
-            <BusinessIcon sx={{ color: 'white', fontSize: 26 }} />
+            <BusinessIcon sx={{ color: 'white', fontSize: { xs: 22, md: 26 } }} />
           </Box>
-          <Box sx={{ animation: 'slideInLeft 0.6s ease-out 0.1s both' }}>
+          <Box sx={{ animation: 'slideInLeft 0.6s ease-out 0.1s both', flex: 1 }}>
             <Typography
-              variant="h5"
+              variant={isMobile ? "h6" : "h5"}
               component="h1"
               sx={{
                 fontWeight: 'bold',
@@ -388,10 +393,11 @@ const CompanyProfileSettings = () => {
               Company Settings
             </Typography>
             <Typography
-              variant="subtitle2"
+              variant={isMobile ? "caption" : "subtitle2"}
               sx={{
                 color: 'text.secondary',
-                fontWeight: 'medium'
+                fontWeight: 'medium',
+                display: { xs: 'none', sm: 'block' }
               }}
             >
               Configure your business profile and banking details to keep your invoices accurate.
@@ -405,12 +411,12 @@ const CompanyProfileSettings = () => {
             flexDirection: 'column',
             alignItems: { xs: 'flex-start', md: 'flex-end' },
             gap: 1.5,
-            minWidth: { xs: '100%', md: 320 },
+            width: { xs: '100%', md: 320 },
             animation: 'slideInRight 0.6s ease-out 0.2s both'
           }}
         >
           <Stack direction="row" alignItems="center" spacing={1.5}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#047857' }}>
+            <Typography variant={isMobile ? "caption" : "subtitle2"} sx={{ fontWeight: 600, color: '#047857' }}>
               Setup Progress
             </Typography>
             {formProgress === 100 && (
@@ -427,12 +433,12 @@ const CompanyProfileSettings = () => {
               />
             )}
           </Stack>
-          <Box sx={{ width: { xs: '100%', md: 240 } }}>
+          <Box sx={{ width: '100%' }}>
             <LinearProgress
               variant="determinate"
               value={formProgress}
               sx={{
-                height: 8,
+                height: { xs: 6, md: 8 },
                 borderRadius: 4,
                 backgroundColor: 'rgba(16, 185, 129, 0.15)',
                 '& .MuiLinearProgress-bar': {
@@ -442,18 +448,18 @@ const CompanyProfileSettings = () => {
               }}
             />
           </Box>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant={isMobile ? "caption" : "body2"} color="text.secondary">
             {Math.round(formProgress)}% complete{hasUnsavedChanges ? ' • Unsaved changes' : ''}
           </Typography>
         </Box>
       </Box>
       {/* Main Content */}
-      <Box sx={{ maxWidth: 1400, mx: 'auto', p: 3 }}>
+      <Box sx={{ maxWidth: 1400, mx: 'auto', p: { xs: 1, sm: 2, md: 3 } }}>
         {/* Tab Navigation */}        <Paper
           elevation={0}
           sx={{
-            mb: 4,
-            borderRadius: 3,
+            mb: { xs: 2, md: 4 },
+            borderRadius: { xs: 2, md: 3 },
             background: 'rgba(255,255,255,0.98)',
             border: '1px solid rgba(0,0,0,0.08)',
             animation: 'fadeInUp 0.6s ease-out 0.3s both'
@@ -462,6 +468,7 @@ const CompanyProfileSettings = () => {
           <Tabs
             value={activeTab}
             onChange={handleTabChange}
+            variant={isMobile ? "fullWidth" : "standard"}
             sx={{
               '& .MuiTabs-indicator': {
                 height: 3,
@@ -471,24 +478,26 @@ const CompanyProfileSettings = () => {
             }}
           >
             <Tab
-              icon={<BusinessIcon />}
-              label="Company Profile"
+              icon={isMobile ? undefined : <BusinessIcon />}
+              iconPosition={isMobile ? undefined : "start"}
+              label={isMobile ? "Company" : "Company Profile"}
               sx={{
-                minHeight: 70,
+                minHeight: { xs: 56, md: 70 },
                 fontWeight: 600,
                 textTransform: 'none',
-                fontSize: '1rem',
+                fontSize: { xs: '0.875rem', md: '1rem' },
                 '&.Mui-selected': { color: '#667eea' }
               }}
             />
             <Tab
-              icon={<BankIcon />}
-              label="Banking Details"
+              icon={isMobile ? undefined : <BankIcon />}
+              iconPosition={isMobile ? undefined : "start"}
+              label={isMobile ? "Banking" : "Banking Details"}
               sx={{
-                minHeight: 70,
+                minHeight: { xs: 56, md: 70 },
                 fontWeight: 600,
                 textTransform: 'none',
-                fontSize: '1rem',
+                fontSize: { xs: '0.875rem', md: '1rem' },
                 '&.Mui-selected': { color: '#667eea' }
               }}
             />
@@ -501,16 +510,16 @@ const CompanyProfileSettings = () => {
             {activeTab === 0 && (              <Paper
                 elevation={0}
                 sx={{
-                  p: 4,
-                  borderRadius: 3,
+                  p: { xs: 2, sm: 3, md: 4 },
+                  borderRadius: { xs: 2, md: 3 },
                   background: 'rgba(255,255,255,0.98)',
                   border: '1px solid rgba(0,0,0,0.08)',
                   animation: 'slideInLeft 0.6s ease-out'
                 }}
               >
-                {/* Company Profile Tab */}                <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 4 }}>
-                  <BusinessIcon sx={{ color: '#667eea', fontSize: 28 }} />
-                  <Typography variant="h5" sx={{ fontWeight: 700, color: '#2c3e50' }}>
+                {/* Company Profile Tab */}                <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: { xs: 3, md: 4 } }}>
+                  <BusinessIcon sx={{ color: '#667eea', fontSize: { xs: 24, md: 28 } }} />
+                  <Typography variant={isMobile ? "h6" : "h5"} sx={{ fontWeight: 700, color: '#2c3e50' }}>
                     Company Information
                   </Typography>
                 </Stack>
@@ -518,8 +527,8 @@ const CompanyProfileSettings = () => {
                 {/* Logo Upload Section */}
                 <Box
                   sx={{
-                    mb: 4,
-                    p: 3,
+                    mb: { xs: 3, md: 4 },
+                    p: { xs: 2, md: 3 },
                     border: '2px dashed #e0e0e0',
                     borderRadius: 2,
                     textAlign: 'center',
@@ -538,8 +547,8 @@ const CompanyProfileSettings = () => {
                         src={logoPreview}
                         alt="Company Logo"
                         sx={{
-                          maxWidth: 200,
-                          maxHeight: 120,
+                          maxWidth: { xs: 150, md: 200 },
+                          maxHeight: { xs: 90, md: 120 },
                           borderRadius: 2,
                           boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                           animation: 'scaleIn 0.5s ease-out'
@@ -548,20 +557,21 @@ const CompanyProfileSettings = () => {
                     ) : (
                       <Avatar
                         sx={{
-                          width: 80,
-                          height: 80,
+                          width: { xs: 64, md: 80 },
+                          height: { xs: 64, md: 80 },
                           backgroundColor: '#f5f5f5',
                           border: '2px solid #e0e0e0'
                         }}
                       >
-                        <CameraIcon sx={{ fontSize: 40, color: '#999' }} />
+                        <CameraIcon sx={{ fontSize: { xs: 32, md: 40 }, color: '#999' }} />
                       </Avatar>
                     )}
-                      <Stack direction="row" spacing={2} alignItems="center">
+                      <Stack direction={isMobile ? "column" : "row"} spacing={2} alignItems="center" sx={{ width: isMobile ? '100%' : 'auto' }}>
                       <Button
                         variant="outlined"
                         component="label"
                         startIcon={<UploadIcon />}
+                        fullWidth={isMobile}
                         sx={{
                           borderRadius: 2,
                           fontWeight: 600,
@@ -587,6 +597,7 @@ const CompanyProfileSettings = () => {
                         <Button
                           variant="text"
                           startIcon={<RefreshIcon />}
+                          fullWidth={isMobile}
                           onClick={refreshLogoPreview}
                           sx={{
                             borderRadius: 2,
@@ -603,7 +614,7 @@ const CompanyProfileSettings = () => {
                       )}
                     </Stack>
                     
-                    <Typography variant="caption" sx={{ color: '#666', maxWidth: 300 }}>
+                    <Typography variant="caption" sx={{ color: '#666', maxWidth: 300, px: 1 }}>
                       Upload your company logo. Recommended size: 400x200px. Max file size: 2MB.
                     </Typography>
                   </Stack>
@@ -800,16 +811,16 @@ const CompanyProfileSettings = () => {
             {activeTab === 1 && (              <Paper
                 elevation={0}
                 sx={{
-                  p: 4,
-                  borderRadius: 3,
+                  p: { xs: 2, sm: 3, md: 4 },
+                  borderRadius: { xs: 2, md: 3 },
                   background: 'rgba(255,255,255,0.98)',
                   border: '1px solid rgba(0,0,0,0.08)',
                   animation: 'slideInRight 0.6s ease-out'
                 }}
               >
-                {/* Banking Details Tab */}                <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 4 }}>
-                  <BankIcon sx={{ color: '#667eea', fontSize: 28 }} />
-                  <Typography variant="h5" sx={{ fontWeight: 700, color: '#2c3e50' }}>
+                {/* Banking Details Tab */}                <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: { xs: 3, md: 4 } }}>
+                  <BankIcon sx={{ color: '#667eea', fontSize: { xs: 24, md: 28 } }} />
+                  <Typography variant={isMobile ? "h6" : "h5"} sx={{ fontWeight: 700, color: '#2c3e50' }}>
                     Banking Information
                   </Typography>                </Stack>
 
@@ -954,14 +965,16 @@ const CompanyProfileSettings = () => {
         {/* Action Buttons */}
         <Box
           sx={{
-            mt: 4,
+            mt: { xs: 3, md: 4 },
             display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
             justifyContent: 'space-between',
-            alignItems: 'center',
+            alignItems: { xs: 'stretch', sm: 'center' },
+            gap: 2,
             animation: 'fadeInUp 0.6s ease-out 0.5s both'
           }}
         >
-          <Stack direction="row" alignItems="center" spacing={2}>
+          <Stack direction="row" alignItems="center" spacing={2} sx={{ justifyContent: { xs: 'center', sm: 'flex-start' } }}>
             {hasUnsavedChanges && (
               <Chip
                 icon={<ErrorIcon />}
@@ -977,17 +990,19 @@ const CompanyProfileSettings = () => {
             )}
           </Stack>
 
-          <Stack direction="row" spacing={2}>
+          <Stack direction={isMobile ? "column-reverse" : "row"} spacing={2} sx={{ width: { xs: '100%', sm: 'auto' } }}>
             <Button
               variant="outlined"
               onClick={() => window.location.reload()}
-              startIcon={<RefreshIcon />}
+              startIcon={!isMobile && <RefreshIcon />}
+              fullWidth={isMobile}
               sx={{
                 borderRadius: 2,
                 fontWeight: 600,
                 textTransform: 'none',
                 borderColor: '#667eea',
                 color: '#667eea',
+                height: { xs: 44, md: 48 },
                 '&:hover': {
                   backgroundColor: 'rgba(102, 126, 234, 0.05)',
                   borderColor: '#667eea'
@@ -1001,10 +1016,11 @@ const CompanyProfileSettings = () => {
               variant="contained"
               onClick={handleSave}
               disabled={saving}
-              startIcon={saving ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
+              startIcon={saving ? <CircularProgress size={20} color="inherit" /> : !isMobile && <SaveIcon />}
+              fullWidth={isMobile}
               sx={{
-                minWidth: 160,
-                height: 48,
+                minWidth: { xs: '100%', sm: 160 },
+                height: { xs: 44, md: 48 },
                 borderRadius: 2,
                 fontWeight: 600,
                 textTransform: 'none',

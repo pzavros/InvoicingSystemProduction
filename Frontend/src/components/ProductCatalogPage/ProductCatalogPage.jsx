@@ -13,7 +13,9 @@ import {
   Tab,
   Chip,
   IconButton,
-  Tooltip
+  Tooltip,
+  Paper,
+  Badge
 } from "@mui/material";
 import {
   Add as AddIcon,
@@ -116,10 +118,12 @@ const ProductCatalogPage = () => {
       <Box 
         sx={{ 
           display: 'flex', 
+          flexDirection: { xs: 'column', sm: 'row' },
           justifyContent: 'space-between', 
-          alignItems: 'center',
-          mb: 4,
-          p: 3,
+          alignItems: { xs: 'stretch', sm: 'center' },
+          gap: { xs: 2, sm: 0 },
+          mb: { xs: 3, md: 4 },
+          p: { xs: 2, sm: 3 },
           borderRadius: 3,
           background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
           border: '1px solid rgba(16, 185, 129, 0.1)',
@@ -138,11 +142,11 @@ const ProductCatalogPage = () => {
           }
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2 } }}>
           <Box
             sx={{
-              width: 48,
-              height: 48,
+              width: { xs: 40, sm: 48 },
+              height: { xs: 40, sm: 48 },
               borderRadius: '12px',
               background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
               display: 'flex',
@@ -151,7 +155,7 @@ const ProductCatalogPage = () => {
               boxShadow: '0 8px 16px rgba(16, 185, 129, 0.3)'
             }}
           >
-            <InventoryIcon sx={{ color: 'white', fontSize: 24 }} />
+            <InventoryIcon sx={{ color: 'white', fontSize: { xs: 20, sm: 24 } }} />
           </Box>
           <Box>
             <Typography 
@@ -159,6 +163,7 @@ const ProductCatalogPage = () => {
               component="h1" 
               sx={{ 
                 fontWeight: 'bold',
+                fontSize: { xs: '1.25rem', sm: '1.5rem' },
                 background: 'linear-gradient(135deg, #047857 0%, #10b981 100%)',
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
@@ -172,7 +177,9 @@ const ProductCatalogPage = () => {
               variant="subtitle2" 
               sx={{ 
                 color: 'text.secondary',
-                fontWeight: 'medium'
+                fontWeight: 'medium',
+                fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                display: { xs: 'none', sm: 'block' }
               }}
             >
               Manage your products, services, and inventory
@@ -180,7 +187,7 @@ const ProductCatalogPage = () => {
           </Box>
         </Box>
         
-        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
+        <Box sx={{ display: 'flex', gap: { xs: 1, sm: 2 }, alignItems: 'center', flexWrap: 'wrap', justifyContent: { xs: 'space-between', sm: 'flex-end' } }}>
           {/* Low Stock Alert */}
           {lowStockProducts.length > 0 && (
             <Tooltip title={`${lowStockProducts.length} products low in stock`}>
@@ -192,6 +199,8 @@ const ProductCatalogPage = () => {
                   borderRadius: 2,
                   border: '1px solid rgba(245, 158, 11, 0.2)',
                   color: '#d97706',
+                  width: { xs: 40, sm: 44 },
+                  height: { xs: 40, sm: 44 },
                   '&:hover': {
                     backgroundColor: 'rgba(245, 158, 11, 0.2)',
                     transform: 'translateY(-1px)',
@@ -200,7 +209,7 @@ const ProductCatalogPage = () => {
                   transition: 'all 0.3s ease-in-out'
                 }}
               >
-                <WarningIcon />
+                <WarningIcon sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }} />
                 <Chip 
                   label={lowStockProducts.length} 
                   size="small" 
@@ -224,14 +233,16 @@ const ProductCatalogPage = () => {
             variant="contained"
             startIcon={<AddIcon />}
             onClick={handleAddProduct}
+            fullWidth={{ xs: true, sm: false }}
             sx={{ 
               backgroundColor: '#10b981', 
               backgroundImage: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
               boxShadow: '0 8px 16px rgba(16, 185, 129, 0.3)',
               border: 'none',
               borderRadius: 2,
-              px: 3,
+              px: { xs: 2, sm: 3 },
               py: 1.5,
+              fontSize: { xs: '0.875rem', sm: '1rem' },
               fontWeight: 600,
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               '&:hover': { 
@@ -246,118 +257,124 @@ const ProductCatalogPage = () => {
           </Button>
         </Box>
       </Box>      {/* Enhanced Tabs Section */}
-      <Card sx={{ 
-        backgroundColor: '#ffffff',
-        borderRadius: 3,
-        border: '1px solid rgba(148, 163, 184, 0.2)',
-        boxShadow: '0 4px 12px rgba(148, 163, 184, 0.1)',
-        overflow: 'hidden',
-        transition: 'all 0.3s ease-in-out',
-        '&:hover': {
-          boxShadow: '0 8px 20px rgba(148, 163, 184, 0.15)',
-          transform: 'translateY(-1px)'
-        }
-      }}>
-        <Box sx={{ 
-          borderBottom: 1, 
-          borderColor: 'rgba(148, 163, 184, 0.2)',
-          background: 'linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%)'
-        }}>
-          <Tabs 
-            value={activeTab} 
-            onChange={handleTabChange}
-            sx={{
-              '& .MuiTab-root': {
-                color: '#64748b',
-                fontWeight: 600,
-                fontSize: '0.95rem',
-                textTransform: 'none',
-                minHeight: 64,
-                px: 3,
-                transition: 'all 0.3s ease-in-out',
-                '&:hover': {
-                  color: '#10b981',
-                  backgroundColor: 'rgba(16, 185, 129, 0.05)'
-                }
-              },
-              '& .Mui-selected': {
-                color: '#10b981 !important',
-                backgroundColor: 'rgba(16, 185, 129, 0.1) !important',
-                fontWeight: 700
-              },
-              '& .MuiTabs-indicator': {
-                backgroundColor: '#10b981',
-                height: 3,
-                borderRadius: '3px 3px 0 0'
+      <Paper 
+        elevation={2}
+        sx={{ 
+          borderRadius: 3,
+          overflow: 'hidden',
+          mb: 3,
+          background: '#ffffff',
+          border: '1px solid rgba(16, 185, 129, 0.08)',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
+        }}
+      >
+        <Tabs 
+          value={activeTab} 
+          onChange={handleTabChange}
+          variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
+          sx={{
+            borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
+            minHeight: { xs: 56, sm: 64 },
+            px: { xs: 1, sm: 2 },
+            '& .MuiTabs-flexContainer': {
+              gap: { xs: 0.5, sm: 1 }
+            },
+            '& .MuiTabs-scrollButtons': {
+              width: { xs: 32, sm: 40 },
+              '&.Mui-disabled': {
+                opacity: 0.3
               }
-            }}
-          >
-            <Tab 
-              icon={<InventoryIcon />} 
-              iconPosition="start"
-              label="Products & Services" 
-              sx={{
-                '& .MuiSvgIcon-root': {
-                  fontSize: '1.2rem'
-                }
-              }}
-            />
-            <Tab 
-              icon={<CategoryIcon />} 
-              iconPosition="start"
-              label="Categories" 
-              sx={{
-                '& .MuiSvgIcon-root': {
-                  fontSize: '1.2rem'
-                }
-              }}
-            />
-            <Tab 
-              icon={<WarningIcon />} 
-              iconPosition="start"
-              label={`Low Stock ${lowStockProducts.length > 0 ? `(${lowStockProducts.length})` : ''}`}
-              sx={{ 
-                color: lowStockProducts.length > 0 ? '#d97706 !important' : '#64748b',
-                '& .MuiSvgIcon-root': {
-                  fontSize: '1.2rem',
-                  color: lowStockProducts.length > 0 ? '#d97706' : 'inherit'
-                },
-                '&:hover': {
-                  color: lowStockProducts.length > 0 ? '#b45309 !important' : '#10b981 !important'
-                }
-              }}
-            />
-          </Tabs>
-        </Box>
-
-        {/* Tab Panels */}
-        <TabPanel value={activeTab} index={0}>
-          <ProductList
-            products={products}
-            categories={categories}
-            loading={loading}
-            onEditProduct={handleEditProduct}
-            onDeleteProduct={handleProductDeleted}
-            onReloadProducts={loadData}
+            },
+            '& .MuiTab-root': {
+              minHeight: { xs: 56, sm: 64 },
+              fontSize: { xs: '0.8125rem', sm: '0.9375rem' },
+              fontWeight: 600,
+              textTransform: 'none',
+              color: 'text.secondary',
+              px: { xs: 2, sm: 3 },
+              py: { xs: 1.5, sm: 2 },
+              minWidth: { xs: 'auto', sm: 140 },
+              transition: 'all 0.3s ease-in-out',
+              '&:hover': {
+                color: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.04)'
+              },
+              '&.Mui-selected': {
+                color: '#10b981',
+                fontWeight: 700,
+                backgroundColor: 'rgba(16, 185, 129, 0.06)'
+              }
+            },
+            '& .MuiTabs-indicator': {
+              height: 3,
+              borderRadius: '3px 3px 0 0',
+              background: 'linear-gradient(90deg, #10b981 0%, #059669 100%)',
+              boxShadow: '0 -2px 8px rgba(16, 185, 129, 0.3)'
+            }
+          }}
+        >
+          <Tab 
+            icon={<InventoryIcon sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }} />} 
+            iconPosition="start"
+            label="Products & Services" 
           />
-        </TabPanel>
-
-        <TabPanel value={activeTab} index={1}>
-          <CategoryManager
-            categories={categories}
-            onCategoryUpdated={loadData}
-            showNotification={showNotification}
+          <Tab 
+            icon={<CategoryIcon sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }} />} 
+            iconPosition="start"
+            label="Categories" 
           />
-        </TabPanel>
-
-        <TabPanel value={activeTab} index={2}>
-          <LowStockAlert
-            lowStockProducts={lowStockProducts}
-            onInventoryUpdated={loadData}
-            showNotification={showNotification}
+          <Tab 
+            icon={
+              <Badge 
+                badgeContent={lowStockProducts.length} 
+                color="error"
+                sx={{
+                  '& .MuiBadge-badge': {
+                    fontSize: { xs: '0.625rem', sm: '0.75rem' },
+                    minWidth: { xs: 16, sm: 20 },
+                    height: { xs: 16, sm: 20 }
+                  }
+                }}
+              >
+                <WarningIcon sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }} />
+              </Badge>
+            }
+            iconPosition="start"
+            label="Low Stock" 
           />
-        </TabPanel>
-      </Card>
+        </Tabs>
+      </Paper>
+
+      {/* Tab Panels */}
+      <TabPanel value={activeTab} index={0}>
+        <ProductList
+          products={products}
+          categories={categories}
+          loading={loading}
+          onEditProduct={handleEditProduct}
+          onDeleteProduct={handleProductDeleted}
+          onReloadProducts={loadData}
+        />
+      </TabPanel>
+
+      <TabPanel value={activeTab} index={1}>
+        <CategoryManager
+          categories={categories}
+          onCategoryUpdated={loadData}
+          showNotification={showNotification}
+        />
+      </TabPanel>
+
+      <TabPanel value={activeTab} index={2}>
+        <LowStockAlert
+          lowStockProducts={lowStockProducts}
+          categories={categories}
+          onEditProduct={handleEditProduct}
+          onReloadProducts={loadData}
+        />
+      </TabPanel>
 
       {/* Enhanced Notification Snackbar */}
       <Snackbar

@@ -15,8 +15,14 @@ import {
   Paper,
   Divider,
   Link,
+  useMediaQuery,
+  useTheme,
+  IconButton,
+  AppBar,
+  Toolbar,
 } from "@mui/material";
 import { BiPaperPlane, BiCloudDownload } from "react-icons/bi";
+import CloseIcon from '@mui/icons-material/Close';
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { COLOR_THEMES } from "../../utils/colorThemes";
@@ -91,6 +97,9 @@ const GenerateInvoice = (invoiceNumber) => {
 };
 
 const InvoiceModal = (props) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  
   // Default props to avoid runtime errors
   const items = Array.isArray(props.items) ? props.items : [];
   const info = props.info || {};
@@ -358,13 +367,16 @@ const InvoiceModal = (props) => {
         onClose={props.closeModal}
         fullWidth
         maxWidth="lg"
+        fullScreen={isMobile}
         scroll="paper"
         PaperProps={{
           sx: {
             background: surfaceColor,
             boxShadow: '0 10px 30px rgba(0, 0, 0, 0.15)',
-            borderRadius,
+            borderRadius: isMobile ? 0 : borderRadius,
             overflow: 'hidden',
+            m: isMobile ? 0 : undefined,
+            maxHeight: isMobile ? '100vh' : '90vh',
             '@media print': {
               boxShadow: 'none',
               borderRadius: 0,
@@ -377,8 +389,47 @@ const InvoiceModal = (props) => {
           }
         }}
       >
+        {/* Mobile AppBar with Close Button */}
+        {isMobile && (
+          <AppBar 
+            position="sticky" 
+            sx={{ 
+              backgroundColor: templateColors.primary,
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              '@media print': {
+                display: 'none'
+              }
+            }}
+          >
+            <Toolbar sx={{ justifyContent: 'space-between', minHeight: 56 }}>
+              <Typography variant="h6" sx={{ 
+                color: 'white', 
+                fontWeight: 600,
+                fontSize: '1rem'
+              }}>
+                Invoice Preview
+              </Typography>
+              <IconButton
+                edge="end"
+                color="inherit"
+                onClick={props.closeModal}
+                aria-label="close"
+                sx={{
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                  }
+                }}
+              >
+                <CloseIcon />
+              </IconButton>
+            </Toolbar>
+          </AppBar>
+        )}
+        
         <DialogContent sx={{ 
           p: 0,
+          overflow: 'auto',
           '@media print': {
             padding: '0 !important',
             margin: '0 !important'
@@ -405,29 +456,37 @@ const InvoiceModal = (props) => {
             <Box
               sx={{
                 display: "flex",
-                flexDirection: "row",
+                flexDirection: { xs: "column", md: "row" },
                 justifyContent: "space-between",
                 background: headerBackground,
                 color: headerTextColor,
                 width: "100%",
-                p: spacingUnit,
+                p: { xs: 2, sm: spacingUnit },
+                gap: { xs: 2, md: 0 },
                 borderBottom: `1px solid ${templateColors.subtleBorder}`,
                 '@media print': {
-                  borderBottom: '1px solid #000000'
+                  borderBottom: '1px solid #000000',
+                  flexDirection: 'row',
+                  gap: 0
                 }
               }}
             >
               {/* Left side - INVOICE title and details */}
               {sections.showInvoiceHeader !== false && (
-              <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center", width: "50%" }}>
+              <Box sx={{ 
+                display: "flex", 
+                flexDirection: "column", 
+                justifyContent: "center", 
+                width: { xs: "100%", md: "50%" }
+              }}>
                 <Typography
                   variant="h3"
                   sx={{
                     fontWeight: "700",
                     color: isInvoiceCanceled ? "#dc2626" : headerTextColor,
-                    mb: 3,
+                    mb: { xs: 2, md: 3 },
                     fontFamily,
-                    fontSize: { xs: '1.75rem', md: '2.25rem' }
+                    fontSize: { xs: '1.5rem', sm: '1.75rem', md: '2.25rem' }
                   }}
                 >
                   {invoiceTitle}
@@ -438,7 +497,7 @@ const InvoiceModal = (props) => {
                     fontWeight: 500, 
                     color: headerTextColor,
                     mb: 1,
-                    fontSize: '0.95rem',
+                    fontSize: { xs: '0.875rem', sm: '0.95rem' },
                     fontFamily
                   }}
                 >
@@ -450,7 +509,7 @@ const InvoiceModal = (props) => {
                     sx={{ 
                       fontWeight: 500, 
                       color: headerTextColor,
-                      fontSize: '0.95rem',
+                      fontSize: { xs: '0.875rem', sm: '0.95rem' },
                       fontFamily
                     }}
                   >
@@ -465,9 +524,9 @@ const InvoiceModal = (props) => {
                 sx={{
                   display: "flex",
                   flexDirection: "column",
-                  alignItems: logoAlignment,
-                  width: "50%",
-                  textAlign: logoTextAlign
+                  alignItems: { xs: "flex-start", md: logoAlignment },
+                  width: { xs: "100%", md: "50%" },
+                  textAlign: { xs: "left", md: logoTextAlign }
                 }}
               >
                 {shouldRenderLogo && (
@@ -475,7 +534,7 @@ const InvoiceModal = (props) => {
                     sx={{
                       width: "100%",
                       display: "flex",
-                      justifyContent: logoAlignment,
+                      justifyContent: { xs: "flex-start", md: logoAlignment },
                       mb: sections.showCompanyDetails ? 2 : 0
                     }}
                   >
@@ -484,8 +543,8 @@ const InvoiceModal = (props) => {
                       src={logoSrc}
                       alt={`${companyInfo.name || "Company"} logo`}
                       sx={{
-                        maxHeight: 96,
-                        maxWidth: 220,
+                        maxHeight: { xs: 70, sm: 80, md: 96 },
+                        maxWidth: { xs: 150, sm: 180, md: 220 },
                         objectFit: "contain",
                         borderRadius: 2,
                         backgroundColor: "transparent",
@@ -644,21 +703,27 @@ const InvoiceModal = (props) => {
             )}
 
             {/* Body Section */}
-            <Box sx={{ p: 4, color: templateColors.text, background: surfaceColor }}>
+            <Box sx={{ 
+              p: { xs: 2, sm: 3, md: 4 }, 
+              color: templateColors.text, 
+              background: surfaceColor 
+            }}>
               {/* First Row: Billed From and Billed To */}
               {sections.showCompanyInfo !== false && (
-                <Grid container spacing={2} sx={{ mb: 3 }}>
+                <Grid container spacing={{ xs: 2, md: 2 }} sx={{ mb: 3 }}>
                   <Grid item xs={12} md={6}>
                     <Box
                       sx={{
-                        px: 8,
-                        py: 4,
+                        px: { xs: 2, sm: 4, md: 8 },
+                        py: { xs: 2, sm: 3, md: 4 },
                         borderRadius: borderRadius,
                         border: `1px solid ${templateColors.subtleBorder}`,
-                        minHeight: '120px',
+                        minHeight: { xs: '100px', md: '120px' },
                         width: '100%',
                         '@media print': {
-                          border: '1px solid #000000'
+                          border: '1px solid #000000',
+                          px: 8,
+                          py: 4
                         }
                       }}
                     >
@@ -667,29 +732,51 @@ const InvoiceModal = (props) => {
                           fontWeight: 'bold',
                           mb: 2,
                           color: templateColors.text,
-                          fontSize: '0.95rem',
+                          fontSize: { xs: '0.875rem', sm: '0.95rem' },
                           fontFamily
                         }}
                       >
                         Billed From:
                       </Typography>
-                      <Typography sx={{ color: templateColors.text, fontWeight: 500, mb: 1, fontSize: '0.9rem', fontFamily }}>{props.info.billFrom || ''}</Typography>
-                      <Typography sx={{ color: templateColors.textSecondary, fontWeight: 400, mb: 1, fontSize: '0.85rem', fontFamily }}>{props.info.billFromAddress || ''}</Typography>
-                      <Typography sx={{ color: templateColors.textSecondary, fontWeight: 400, fontSize: '0.85rem', fontFamily }}>{props.info.billFromEmail || ''}</Typography>
+                      <Typography sx={{ 
+                        color: templateColors.text, 
+                        fontWeight: 500, 
+                        mb: 1, 
+                        fontSize: { xs: '0.8125rem', sm: '0.9rem' }, 
+                        fontFamily,
+                        wordBreak: 'break-word'
+                      }}>{props.info.billFrom || ''}</Typography>
+                      <Typography sx={{ 
+                        color: templateColors.textSecondary, 
+                        fontWeight: 400, 
+                        mb: 1, 
+                        fontSize: { xs: '0.75rem', sm: '0.85rem' }, 
+                        fontFamily,
+                        wordBreak: 'break-word'
+                      }}>{props.info.billFromAddress || ''}</Typography>
+                      <Typography sx={{ 
+                        color: templateColors.textSecondary, 
+                        fontWeight: 400, 
+                        fontSize: { xs: '0.75rem', sm: '0.85rem' }, 
+                        fontFamily,
+                        wordBreak: 'break-word'
+                      }}>{props.info.billFromEmail || ''}</Typography>
                     </Box>
                   </Grid>
                   {sections.showClientDetails !== false && (
                     <Grid item xs={12} md={6}>
                       <Box
                         sx={{
-                          px: 8,
-                          py: 4,
+                          px: { xs: 2, sm: 4, md: 8 },
+                          py: { xs: 2, sm: 3, md: 4 },
                           borderRadius: borderRadius,
                           border: `1px solid ${templateColors.subtleBorder}`,
-                          minHeight: '120px',
+                          minHeight: { xs: '100px', md: '120px' },
                           width: '100%',
                           '@media print': {
-                            border: '1px solid #000000'
+                            border: '1px solid #000000',
+                            px: 8,
+                            py: 4
                           }
                         }}
                       >
@@ -698,15 +785,35 @@ const InvoiceModal = (props) => {
                             fontWeight: 'bold',
                             mb: 2,
                             color: templateColors.text,
-                            fontSize: '0.95rem',
+                            fontSize: { xs: '0.875rem', sm: '0.95rem' },
                             fontFamily
                           }}
                         >
                           Billed To:
                         </Typography>
-                        <Typography sx={{ color: templateColors.text, fontWeight: 500, mb: 1, fontSize: '0.9rem', fontFamily }}>{props.info.billTo || ''}</Typography>
-                        <Typography sx={{ color: templateColors.textSecondary, fontWeight: 400, mb: 1, fontSize: '0.85rem', fontFamily }}>{props.info.billToAddress || ''}</Typography>
-                        <Typography sx={{ color: templateColors.textSecondary, fontWeight: 400, fontSize: '0.85rem', fontFamily }}>{props.info.billToEmail || ''}</Typography>
+                        <Typography sx={{ 
+                          color: templateColors.text, 
+                          fontWeight: 500, 
+                          mb: 1, 
+                          fontSize: { xs: '0.8125rem', sm: '0.9rem' }, 
+                          fontFamily,
+                          wordBreak: 'break-word'
+                        }}>{props.info.billTo || ''}</Typography>
+                        <Typography sx={{ 
+                          color: templateColors.textSecondary, 
+                          fontWeight: 400, 
+                          mb: 1, 
+                          fontSize: { xs: '0.75rem', sm: '0.85rem' }, 
+                          fontFamily,
+                          wordBreak: 'break-word'
+                        }}>{props.info.billToAddress || ''}</Typography>
+                        <Typography sx={{ 
+                          color: templateColors.textSecondary, 
+                          fontWeight: 400, 
+                          fontSize: { xs: '0.75rem', sm: '0.85rem' }, 
+                          fontFamily,
+                          wordBreak: 'break-word'
+                        }}>{props.info.billToEmail || ''}</Typography>
                       </Box>
                     </Grid>
                   )}
@@ -722,27 +829,33 @@ const InvoiceModal = (props) => {
                     boxShadow: 'none',
                     border: `1px solid ${templateColors.subtleBorder}`,
                     borderRadius: borderRadius,
-                    overflow: 'hidden',
+                    overflow: isMobile ? 'auto' : 'hidden',
+                    overflowX: isMobile ? 'auto' : 'visible',
                     '@media print': {
                       border: '1px solid #000000',
-                      boxShadow: 'none'
+                      boxShadow: 'none',
+                      overflow: 'visible'
                     }
                   }}
                 >
-                  <Table>
+                  <Table sx={{ minWidth: isMobile ? 600 : 'auto' }}>
                     <TableHead sx={{ background: tableHeaderBackground }}>
                       <TableRow sx={sections.highlightTotals ? { background: totalBackgroundColor } : undefined}>
                         <TableCell sx={{ 
                           width: "70px", 
                           color: tableHeaderTextColor, 
                           fontWeight: "600",
-                          fontSize: '0.9rem',
-                          py: 2,
+                          fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.9rem' },
+                          py: { xs: 1.5, md: 2 },
+                          px: { xs: 1, md: 2 },
                           fontFamily,
                           border: `1px solid ${templateColors.subtleBorder}`,
                           '@media print': {
                             border: '1px solid #000000',
-                            backgroundColor: surfaceColor
+                            backgroundColor: surfaceColor,
+                            fontSize: '0.9rem',
+                            py: 2,
+                            px: 2
                           }
                         }}>
                           QTY
@@ -750,13 +863,17 @@ const InvoiceModal = (props) => {
                         <TableCell sx={{ 
                           color: tableHeaderTextColor, 
                           fontWeight: "600",
-                          fontSize: '0.9rem',
-                          py: 2,
+                          fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.9rem' },
+                          py: { xs: 1.5, md: 2 },
+                          px: { xs: 1, md: 2 },
                           fontFamily,
                           border: `1px solid ${templateColors.subtleBorder}`,
                           '@media print': {
                             border: '1px solid #000000',
-                            backgroundColor: surfaceColor
+                            backgroundColor: surfaceColor,
+                            fontSize: '0.9rem',
+                            py: 2,
+                            px: 2
                           }
                         }}>
                           DESCRIPTION
@@ -765,28 +882,36 @@ const InvoiceModal = (props) => {
                           width: "100px", 
                           color: tableHeaderTextColor, 
                           fontWeight: "600",
-                          fontSize: '0.9rem',
-                          py: 2,
+                          fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.9rem' },
+                          py: { xs: 1.5, md: 2 },
+                          px: { xs: 1, md: 2 },
                           fontFamily,
                           border: `1px solid ${templateColors.subtleBorder}`,
                           '@media print': {
                             border: '1px solid #000000',
-                            backgroundColor: surfaceColor
+                            backgroundColor: surfaceColor,
+                            fontSize: '0.9rem',
+                            py: 2,
+                            px: 2
                           }
                         }}>
-                          UNIT PRICE
+                          PRICE
                         </TableCell>
                         <TableCell align="right" sx={{ 
                           width: "120px", 
                           color: tableHeaderTextColor, 
                           fontWeight: "600",
-                          fontSize: '0.9rem',
-                          py: 2,
+                          fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.9rem' },
+                          py: { xs: 1.5, md: 2 },
+                          px: { xs: 1, md: 2 },
                           fontFamily,
                           border: `1px solid ${templateColors.subtleBorder}`,
                           '@media print': {
                             border: '1px solid #000000',
-                            backgroundColor: surfaceColor
+                            backgroundColor: surfaceColor,
+                            fontSize: '0.9rem',
+                            py: 2,
+                            px: 2
                           }
                         }}>
                           TOTAL
@@ -807,12 +932,16 @@ const InvoiceModal = (props) => {
                             width: "70px",
                             fontWeight: 500,
                             color: templateColors.text,
-                            py: 2,
-                            fontSize: '0.9rem',
+                            py: { xs: 1.5, md: 2 },
+                            px: { xs: 1, md: 2 },
+                            fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.9rem' },
                             fontFamily,
                             border: `1px solid ${templateColors.subtleBorder}`,
                             '@media print': {
-                              border: '1px solid #000000'
+                              border: '1px solid #000000',
+                              fontSize: '0.9rem',
+                              py: 2,
+                              px: 2
                             }
                           }}>
                             {item.itemQuantity}
@@ -820,12 +949,16 @@ const InvoiceModal = (props) => {
                           <TableCell sx={{
                             color: templateColors.text,
                             fontWeight: 400,
-                            py: 2,
-                            fontSize: '0.9rem',
+                            py: { xs: 1.5, md: 2 },
+                            px: { xs: 1, md: 2 },
+                            fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.9rem' },
                             fontFamily,
                             border: `1px solid ${templateColors.subtleBorder}`,
                             '@media print': {
-                              border: '1px solid #000000'
+                              border: '1px solid #000000',
+                              fontSize: '0.9rem',
+                              py: 2,
+                              px: 2
                             }
                           }}>
                             {item.itemName}
@@ -835,12 +968,16 @@ const InvoiceModal = (props) => {
                             width: "100px",
                             fontWeight: 500,
                             color: templateColors.text,
-                            py: 2,
-                            fontSize: '0.9rem',
+                            py: { xs: 1.5, md: 2 },
+                            px: { xs: 1, md: 2 },
+                            fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.9rem' },
                             fontFamily,
                             border: `1px solid ${templateColors.subtleBorder}`,
                             '@media print': {
-                              border: '1px solid #000000'
+                              border: '1px solid #000000',
+                              fontSize: '0.9rem',
+                              py: 2,
+                              px: 2
                             }
                           }}>
                             {formatCurrency(item.itemPrice)}
@@ -849,12 +986,16 @@ const InvoiceModal = (props) => {
                             width: "120px",
                             fontWeight: 600,
                             color: templateColors.text,
-                            py: 2,
-                            fontSize: '0.9rem',
+                            py: { xs: 1.5, md: 2 },
+                            px: { xs: 1, md: 2 },
+                            fontSize: { xs: '0.75rem', sm: '0.85rem', md: '0.9rem' },
                             fontFamily,
                             border: `1px solid ${templateColors.subtleBorder}`,
                             '@media print': {
-                              border: '1px solid #000000'
+                              border: '1px solid #000000',
+                              fontSize: '0.9rem',
+                              py: 2,
+                              px: 2
                             }
                           }}>
                             {formatCurrency(item.itemPrice * item.itemQuantity)}
@@ -1206,8 +1347,8 @@ const InvoiceModal = (props) => {
           </Box>
           {/* Action Buttons */}
           <Box sx={{ 
-            pb: 4, 
-            px: 4,
+            pb: { xs: 2, sm: 3, md: 4 }, 
+            px: { xs: 2, sm: 3, md: 4 },
             background: surfaceColor,
             borderTop: `1px solid ${templateColors.subtleBorder}`,
             '@media print': {
@@ -1223,10 +1364,10 @@ const InvoiceModal = (props) => {
                     background: `linear-gradient(135deg, ${templateColors.primary} 0%, ${templateColors.accent} 100%)`,
                     color: 'white',
                     fontWeight: 600,
-                    fontSize: '0.95rem',
+                    fontSize: { xs: '0.875rem', sm: '0.95rem' },
                     textTransform: 'none',
                     borderRadius: borderRadius,
-                    py: 1.5,
+                    py: { xs: 1.25, sm: 1.5 },
                     border: 'none',
                     fontFamily,
                     boxShadow: `0 4px 15px ${templateColors.accent}55`
@@ -1235,8 +1376,8 @@ const InvoiceModal = (props) => {
                 >
                   <BiCloudDownload
                     style={{
-                      width: "18px",
-                      height: "18px",
+                      width: isMobile ? "16px" : "18px",
+                      height: isMobile ? "16px" : "18px",
                       marginRight: "8px",
                     }}
                   />

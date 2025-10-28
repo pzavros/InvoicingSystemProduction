@@ -13,7 +13,13 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Button
+  Button,
+  Card,
+  CardContent,
+  CardActions,
+  Divider,
+  useMediaQuery,
+  useTheme
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -31,6 +37,9 @@ import {
 import { deleteClient } from "./api";
 
 const ClientList = ({ clients, loading, onEditClient, onDeleteClient, onReloadClients }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [clientToDelete, setClientToDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
@@ -283,6 +292,299 @@ const ClientList = ({ clients, loading, onEditClient, onDeleteClient, onReloadCl
     );
   }
 
+  // Mobile Card View
+  if (isMobile) {
+    return (
+      <Box sx={{ width: '100%' }}>
+        {clients.map((client) => (
+          <Card 
+            key={client.id}
+            sx={{ 
+              mb: 2, 
+              borderRadius: 2,
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+              '&:hover': {
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+              }
+            }}
+          >
+            <CardContent sx={{ pb: 1 }}>
+              {/* Client Header with Avatar and Status */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flex: 1 }}>
+                  <Avatar
+                    sx={{
+                      backgroundColor: '#10b981',
+                      color: 'white',
+                      width: 48,
+                      height: 48,
+                      fontSize: '0.9rem',
+                      fontWeight: 600
+                    }}
+                  >
+                    {getInitials(client.name)}
+                  </Avatar>
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1rem', mb: 0.5 }}>
+                      {client.name}
+                    </Typography>
+                    {client.company && client.company !== 'Individual' && (
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <BusinessIcon sx={{ fontSize: 14, color: '#6b7280' }} />
+                        <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.85rem' }} noWrap>
+                          {client.company}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
+                </Box>
+                <Chip
+                  label={client.isActive ? "Active" : "Inactive"}
+                  size="small"
+                  sx={{
+                    backgroundColor: client.isActive ? 'rgba(16, 185, 129, 0.1)' : 'rgba(156, 163, 175, 0.1)',
+                    color: client.isActive ? '#059669' : '#6b7280',
+                    border: client.isActive ? '1px solid rgba(16, 185, 129, 0.2)' : '1px solid rgba(156, 163, 175, 0.2)',
+                    fontWeight: 500,
+                    fontSize: '0.7rem',
+                  }}
+                />
+              </Box>
+
+              {/* Contact Info */}
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 1.5 }}>
+                {client.email && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <EmailIcon sx={{ fontSize: 16, color: '#6b7280' }} />
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        fontSize: '0.85rem', 
+                        color: '#374151',
+                        wordBreak: 'break-all'
+                      }}
+                    >
+                      {client.email}
+                    </Typography>
+                  </Box>
+                )}
+                
+                {client.phone && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <PhoneIcon sx={{ fontSize: 16, color: '#6b7280' }} />
+                    <Typography variant="body2" sx={{ fontSize: '0.85rem', color: '#374151' }}>
+                      {client.phone}
+                    </Typography>
+                  </Box>
+                )}
+
+                {client.address && (
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                    <LocationIcon sx={{ fontSize: 16, color: '#6b7280', mt: 0.2 }} />
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        fontSize: '0.85rem', 
+                        color: '#374151',
+                        flex: 1
+                      }}
+                    >
+                      {client.city && client.state 
+                        ? `${client.city}, ${client.state}` 
+                        : client.address}
+                    </Typography>
+                  </Box>
+                )}
+
+                {client.website && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <WebsiteIcon sx={{ fontSize: 16, color: '#6b7280' }} />
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        fontSize: '0.85rem', 
+                        color: '#2563eb',
+                        wordBreak: 'break-all'
+                      }}
+                    >
+                      {client.website}
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+            </CardContent>
+
+            {/* Invoice Stats (if available) - Outside CardContent for full width */}
+            {(client.totalInvoiceCount > 0 || client.totalInvoiceAmount > 0 || client.lastInvoiceDate) && (
+              <>
+                <Divider />
+                <Box sx={{ py: 2 }}>
+                  <Box 
+                    sx={{ 
+                      display: 'flex', 
+                      flexDirection: 'column',
+                      gap: 1.5,
+                      width: '100%',
+                      px: 2
+                    }}
+                  >
+                    {client.totalInvoiceCount > 0 && (
+                      <Box 
+                        sx={{ 
+                          textAlign: 'center',
+                          p: 1.5,
+                          borderRadius: 2,
+                          backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                          border: '1px solid rgba(16, 185, 129, 0.1)',
+                          width: '100%'
+                        }}
+                      >
+                        <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem', mb: 0.5 }}>
+                          Invoices
+                        </Typography>
+                        <Typography variant="h5" sx={{ fontWeight: 600, color: '#10b981' }}>
+                          {client.totalInvoiceCount}
+                        </Typography>
+                      </Box>
+                    )}
+                    {client.totalInvoiceAmount > 0 && (
+                      <Box 
+                        sx={{ 
+                          textAlign: 'center',
+                          p: 1.5,
+                          borderRadius: 2,
+                          backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                          border: '1px solid rgba(16, 185, 129, 0.1)',
+                          width: '100%'
+                        }}
+                      >
+                        <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem', mb: 0.5 }}>
+                          Total Amount
+                        </Typography>
+                        <Typography variant="h5" sx={{ fontWeight: 600, color: '#10b981' }}>
+                          {formatCurrency(client.totalInvoiceAmount)}
+                        </Typography>
+                      </Box>
+                    )}
+                    {client.lastInvoiceDate && (
+                      <Box 
+                        sx={{ 
+                          textAlign: 'center',
+                          p: 1.5,
+                          borderRadius: 2,
+                          backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                          border: '1px solid rgba(16, 185, 129, 0.1)',
+                          width: '100%'
+                        }}
+                      >
+                        <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem', mb: 0.5 }}>
+                          Last Invoice
+                        </Typography>
+                        <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.1rem', color: '#374151' }}>
+                          {formatDate(client.lastInvoiceDate)}
+                        </Typography>
+                      </Box>
+                    )}
+                  </Box>
+                </Box>
+              </>
+            )}
+
+            <Divider />
+
+            {/* Action Buttons */}
+            <CardActions sx={{ justifyContent: 'center', p: 1.5, gap: 2 }}>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<EditIcon />}
+                onClick={() => onEditClient(client)}
+                sx={{
+                  color: '#10b981',
+                  borderColor: 'rgba(16, 185, 129, 0.3)',
+                  backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                  flex: 1,
+                  '&:hover': {
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderColor: '#10b981',
+                  },
+                }}
+              >
+                Edit
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<DeleteIcon />}
+                onClick={() => handleDeleteClick(client)}
+                sx={{
+                  color: '#dc2626',
+                  borderColor: 'rgba(220, 38, 38, 0.3)',
+                  backgroundColor: 'rgba(220, 38, 38, 0.05)',
+                  flex: 1,
+                  '&:hover': {
+                    backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                    borderColor: '#dc2626',
+                  },
+                }}
+              >
+                Delete
+              </Button>
+            </CardActions>
+          </Card>
+        ))}
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog
+          open={deleteDialogOpen}
+          onClose={handleDeleteCancel}
+          fullScreen={isMobile}
+          aria-labelledby="delete-dialog-title"
+          aria-describedby="delete-dialog-description"
+        >
+          <DialogTitle id="delete-dialog-title" sx={{ color: '#dc2626', fontWeight: 600 }}>
+            Delete Client
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="delete-dialog-description">
+              Are you sure you want to delete{" "}
+              <strong>{clientToDelete?.name}</strong>? This action cannot be undone.
+              All associated data will be permanently removed.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions sx={{ p: 3, pt: 1 }}>
+            <Button 
+              onClick={handleDeleteCancel}
+              variant="outlined"
+              sx={{ 
+                borderColor: '#d1d5db',
+                color: '#6b7280',
+                '&:hover': { borderColor: '#9ca3af', backgroundColor: 'rgba(156, 163, 175, 0.1)' }
+              }}
+              disabled={deleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDeleteConfirm}
+              variant="contained"
+              sx={{ 
+                backgroundColor: '#dc2626',
+                '&:hover': { backgroundColor: '#b91c1c' }
+              }}
+              disabled={deleting}
+              startIcon={deleting ? <CircularProgress size={16} /> : null}
+            >
+              {deleting ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
+    );
+  }
+
+  // Desktop DataGrid View
+
   // Calculate dynamic height based on number of records
   const calculateGridHeight = () => {
     const headerHeight = 64;
@@ -477,6 +779,7 @@ const ClientList = ({ clients, loading, onEditClient, onDeleteClient, onReloadCl
       <Dialog
         open={deleteDialogOpen}
         onClose={handleDeleteCancel}
+        fullScreen={isMobile}
         aria-labelledby="delete-dialog-title"
         aria-describedby="delete-dialog-description"
       >

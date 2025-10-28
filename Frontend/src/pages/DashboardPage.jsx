@@ -41,7 +41,7 @@ export default function DashboardPage() {
   const chartsRendered = 4;
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
+    <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 3, md: 4 } }}>
       <Fade in={true} timeout={800}>
         <Box>
           <Box
@@ -50,9 +50,9 @@ export default function DashboardPage() {
               flexWrap: 'wrap',
               justifyContent: 'space-between',
               alignItems: { xs: 'flex-start', md: 'center' },
-              gap: 3,
-              mb: 4,
-              p: 3,
+              gap: { xs: 2, sm: 3 },
+              mb: { xs: 3, md: 4 },
+              p: { xs: 2, sm: 3 },
               borderRadius: 3,
               background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
               border: '1px solid rgba(79, 70, 229, 0.18)',
@@ -71,11 +71,11 @@ export default function DashboardPage() {
               }
             }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, minWidth: 280 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2 }, minWidth: { xs: '100%', sm: 280 } }}>
               <Box
                 sx={{
-                  width: 56,
-                  height: 56,
+                  width: { xs: 48, sm: 56 },
+                  height: { xs: 48, sm: 56 },
                   borderRadius: '16px',
                   background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
                   display: 'flex',
@@ -84,7 +84,7 @@ export default function DashboardPage() {
                   boxShadow: '0 10px 18px rgba(79, 70, 229, 0.35)'
                 }}
               >
-                <InsightsIcon sx={{ color: 'white', fontSize: 26 }} />
+                <InsightsIcon sx={{ color: 'white', fontSize: { xs: 22, sm: 26 } }} />
               </Box>
               <Box>
                 <Typography
@@ -92,6 +92,7 @@ export default function DashboardPage() {
                   component="h1"
                   sx={{
                     fontWeight: 'bold',
+                    fontSize: { xs: '1.25rem', sm: '1.5rem' },
                     background: 'linear-gradient(135deg, #4338ca 0%, #7c3aed 100%)',
                     backgroundClip: 'text',
                     WebkitBackgroundClip: 'text',
@@ -105,7 +106,9 @@ export default function DashboardPage() {
                   variant="subtitle2"
                   sx={{
                     color: 'text.secondary',
-                    fontWeight: 'medium'
+                    fontWeight: 'medium',
+                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                    display: { xs: 'none', sm: 'block' }
                   }}
                 >
                   Track revenue, invoice volume, and yearly performance at a glance.
@@ -116,7 +119,8 @@ export default function DashboardPage() {
             <Stack
               spacing={0.5}
               sx={{
-                minWidth: { xs: '100%', md: 320 }
+                minWidth: { xs: '100%', md: 320 },
+                display: { xs: 'none', md: 'flex' }
               }}
             >
               <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#4f46e5' }}>
@@ -138,20 +142,20 @@ export default function DashboardPage() {
             <Paper
               elevation={4}
               sx={{
-                p: 3,
-                mb: 4,
+                p: { xs: 2, sm: 3 },
+                mb: { xs: 3, md: 4 },
                 borderRadius: 3,
                 background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
                 border: '1px solid rgba(79, 70, 229, 0.1)',
                 backdropFilter: 'blur(10px)',
                 transition: 'all 0.3s ease-in-out',
                 '&:hover': {
-                  transform: 'translateY(-2px)',
+                  transform: { xs: 'none', md: 'translateY(-2px)' },
                   boxShadow: '0 12px 24px rgba(79, 70, 229, 0.12)'
                 }
               }}
             >
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 'medium', color: 'text.primary' }}>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 'medium', color: 'text.primary', fontSize: { xs: '1rem', sm: '1.25rem' } }}>
                 Filter Options
               </Typography>
               <Stack
@@ -159,7 +163,7 @@ export default function DashboardPage() {
                 spacing={2}
                 alignItems="center"
               >
-                <FormControl size="small" sx={{ minWidth: 120 }}>
+                <FormControl size="small" sx={{ minWidth: 120, width: { xs: '100%', sm: 'auto' } }}>
                   <InputLabel>Month</InputLabel>
                   <Select
                     value={month}
@@ -181,7 +185,7 @@ export default function DashboardPage() {
                   </Select>
                 </FormControl>
 
-                <FormControl size="small" sx={{ minWidth: 120 }}>
+                <FormControl size="small" sx={{ minWidth: 120, width: { xs: '100%', sm: 'auto' } }}>
                   <InputLabel>Year</InputLabel>
                   <Select
                     value={year}
@@ -209,9 +213,9 @@ export default function DashboardPage() {
           <Box
             sx={{
               display: 'grid',
-              gap: 3,
+              gap: { xs: 2, sm: 3 },
               gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-              mb: 4
+              mb: { xs: 3, md: 4 }
             }}
           >
             <Grow in={true} timeout={800}>
@@ -226,7 +230,7 @@ export default function DashboardPage() {
             </Grow>
           </Box>
 
-          <Box sx={{ mb: 3 }}>
+          <Box sx={{ mb: { xs: 2, sm: 3 } }}>
             <Grow in={true} timeout={1200}>
               <Box>
                 <AnnualEarningsChart initialYear={currentYear} />

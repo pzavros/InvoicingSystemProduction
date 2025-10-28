@@ -12,7 +12,13 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  CircularProgress
+  CircularProgress,
+  Card,
+  CardContent,
+  CardActions,
+  Divider,
+  useMediaQuery,
+  useTheme
 } from "@mui/material";
 import {
   Edit as EditIcon,
@@ -36,6 +42,9 @@ const ProductList = ({
   onDeleteProduct,
   onReloadProducts
 }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  
   // Dialog states
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
@@ -399,6 +408,279 @@ const ProductList = ({
       </Box>
     );
   }
+
+  // Mobile Card View
+  if (isMobile) {
+    return (
+      <Box sx={{ width: '100%' }}>
+        {products.map((product) => (
+          <Card 
+            key={product.id}
+            sx={{ 
+              mb: 2, 
+              borderRadius: 2,
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+              '&:hover': {
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+              }
+            }}
+          >
+            <CardContent sx={{ pb: 1 }}>
+              {/* Product Name & Status */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1rem', flex: 1 }}>
+                  {product.name}
+                </Typography>
+                <Chip
+                  label={product.isActive ? "Active" : "Inactive"}
+                  size="small"
+                  sx={{
+                    backgroundColor: product.isActive ? 'rgba(16, 185, 129, 0.1)' : 'rgba(107, 114, 128, 0.1)',
+                    color: product.isActive ? '#059669' : '#4b5563',
+                    border: product.isActive ? '1px solid rgba(16, 185, 129, 0.2)' : '1px solid rgba(107, 114, 128, 0.2)',
+                    fontWeight: 500,
+                    fontSize: '0.7rem',
+                  }}
+                />
+              </Box>
+
+              {/* Description */}
+              {product.description && (
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5, fontSize: '0.85rem' }}>
+                  {product.description}
+                </Typography>
+              )}
+
+              {/* Category & Price */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                <Chip
+                  label={getCategoryName(product.categoryId)}
+                  variant="outlined"
+                  size="small"
+                  sx={{
+                    backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                    color: '#2563eb',
+                    border: '1px solid rgba(59, 130, 246, 0.2)',
+                    fontSize: '0.7rem',
+                  }}
+                />
+                <Typography variant="h6" sx={{ fontWeight: 600, color: '#059669', fontSize: '1.1rem' }}>
+                  €{(product.unitPrice || 0).toFixed(2)}
+                </Typography>
+              </Box>
+
+              {/* Stock Info */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
+                  Stock:
+                </Typography>
+                {product.trackInventory ? (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 500, fontSize: '0.85rem' }}>
+                      {product.stockQuantity} {product.unit}
+                    </Typography>
+                    {(() => {
+                      if (product.stockQuantity <= 0) {
+                        return (
+                          <Chip
+                            label="Out of Stock"
+                            size="small"
+                            sx={{
+                              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                              color: '#dc2626',
+                              border: '1px solid rgba(239, 68, 68, 0.2)',
+                              fontSize: '0.65rem',
+                              height: '20px',
+                            }}
+                          />
+                        );
+                      } else if (product.stockQuantity <= product.minStockLevel) {
+                        return (
+                          <Chip
+                            label="Low Stock"
+                            size="small"
+                            sx={{
+                              backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                              color: '#d97706',
+                              border: '1px solid rgba(245, 158, 11, 0.2)',
+                              fontSize: '0.65rem',
+                              height: '20px',
+                            }}
+                          />
+                        );
+                      } else {
+                        return (
+                          <Chip
+                            label="In Stock"
+                            size="small"
+                            sx={{
+                              backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                              color: '#059669',
+                              border: '1px solid rgba(16, 185, 129, 0.2)',
+                              fontSize: '0.65rem',
+                              height: '20px',
+                            }}
+                          />
+                        );
+                      }
+                    })()}
+                  </Box>
+                ) : (
+                  <Typography variant="body2" sx={{ color: '#9ca3af', fontStyle: 'italic', fontSize: '0.85rem' }}>
+                    Not tracked
+                  </Typography>
+                )}
+              </Box>
+
+              {/* Tax Info */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
+                  Tax:
+                </Typography>
+                <Typography variant="body2" sx={{ 
+                  fontWeight: 500,
+                  color: product.isTaxable ? '#374151' : '#9ca3af',
+                  fontSize: '0.85rem'
+                }}>
+                  {product.isTaxable ? `${product.taxRate}%` : "No Tax"}
+                </Typography>
+              </Box>
+            </CardContent>
+
+            <Divider />
+
+            {/* Action Buttons */}
+            <CardActions sx={{ justifyContent: 'space-around', p: 1 }}>
+              <IconButton
+                size="small"
+                onClick={() => onEditProduct(product)}
+                sx={{
+                  color: '#2563eb',
+                  backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                  borderRadius: 1.5,
+                  '&:hover': {
+                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                  },
+                }}
+              >
+                <EditIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+              {product.trackInventory && (
+                <IconButton
+                  size="small"
+                  onClick={() => handleInventoryClick(product)}
+                  sx={{
+                    color: '#059669',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderRadius: 1.5,
+                    '&:hover': {
+                      backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                    },
+                  }}
+                >
+                  <InventoryIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              )}
+              <IconButton
+                size="small"
+                onClick={() => handlePriceHistoryClick(product)}
+                sx={{
+                  color: '#7c3aed',
+                  backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                  borderRadius: 1.5,
+                  '&:hover': {
+                    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                  },
+                }}
+              >
+                <HistoryIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() => handleDeleteClick(product)}
+                sx={{
+                  color: '#dc2626',
+                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                  borderRadius: 1.5,
+                  '&:hover': {
+                    backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                  },
+                }}
+              >
+                <DeleteIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            </CardActions>
+          </Card>
+        ))}
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog
+          open={deleteDialogOpen}
+          onClose={handleDeleteCancel}
+          fullScreen={isMobile}
+          aria-labelledby="delete-dialog-title"
+          aria-describedby="delete-dialog-description"
+        >
+          <DialogTitle id="delete-dialog-title" sx={{ color: '#dc2626', fontWeight: 600 }}>
+            Delete Product
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="delete-dialog-description">
+              Are you sure you want to delete{" "}
+              <strong>"{productToDelete?.name}"</strong>? This action cannot be undone and will permanently remove this product from your catalog.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions sx={{ p: 3, pt: 1 }}>
+            <Button 
+              onClick={handleDeleteCancel}
+              variant="outlined"
+              sx={{ 
+                borderColor: '#d1d5db',
+                color: '#6b7280',
+                '&:hover': { borderColor: '#9ca3af', backgroundColor: 'rgba(156, 163, 175, 0.1)' }
+              }}
+              disabled={deleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDeleteConfirm}
+              variant="contained"
+              sx={{ 
+                backgroundColor: '#dc2626',
+                '&:hover': { backgroundColor: '#b91c1c' }
+              }}
+              disabled={deleting}
+              startIcon={deleting ? <CircularProgress size={16} /> : null}
+            >
+              {deleting ? "Deleting..." : "Delete Product"}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Inventory Management Dialog */}
+        {inventoryDialogOpen && (
+          <ProductInventoryDialog
+            open={inventoryDialogOpen}
+            product={selectedProduct}
+            onClose={() => setInventoryDialogOpen(false)}
+            onInventoryUpdated={onReloadProducts}
+          />
+        )}
+
+        {/* Price History Dialog */}
+        {priceHistoryDialogOpen && (
+          <ProductPriceHistoryDialog
+            open={priceHistoryDialogOpen}
+            product={selectedProduct}
+            onClose={() => setPriceHistoryDialogOpen(false)}
+          />
+        )}
+      </Box>
+    );
+  }
+
+  // Desktop DataGrid View
 
   return (
     <Box sx={{ width: '100%' }}>

@@ -15,7 +15,11 @@ import {
   Fade,
   Grow,
   Menu,
-  MenuItem
+  MenuItem,
+  useMediaQuery,
+  useTheme,
+  AppBar,
+  Toolbar
 } from '@mui/material';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import HomeIcon from '@mui/icons-material/Home';
@@ -23,6 +27,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import CloseIcon from '@mui/icons-material/Close';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -44,11 +49,24 @@ export default function NavBar() {
   const { user: currentUser, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [hoveredItem, setHoveredItem] = useState(null);
   const [userMenuAnchor, setUserMenuAnchor] = useState(null);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
   const handleDrawerToggle = () => {
-    setSidebarOpen(!sidebarOpen);
+    if (isMobile) {
+      setMobileDrawerOpen(!mobileDrawerOpen);
+    } else {
+      setSidebarOpen(!sidebarOpen);
+    }
+  };
+
+  const handleMobileItemClick = () => {
+    if (isMobile) {
+      setMobileDrawerOpen(false);
+    }
   };
 
   const handleUserMenuClick = (event) => {
@@ -70,6 +88,7 @@ export default function NavBar() {
   };
 
   const drawerWidth = sidebarOpen ? 260 : 70;
+  const effectiveDrawerOpen = isMobile ? true : sidebarOpen; // Always show full width on mobile drawer
   
   const navItems = [
     { 
@@ -161,32 +180,17 @@ export default function NavBar() {
       color: '#ea580c'
     },
   ];
-  return (
-    <Drawer
-      variant="permanent"
-      sx={{
-        width: drawerWidth,
-        flexShrink: 0,
-        '& .MuiDrawer-paper': {
-          width: drawerWidth,
-          boxSizing: 'border-box',
-          background: 'linear-gradient(145deg, #1e293b 0%, #0f172a 50%, #020617 100%)',
-          color: 'white',
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          overflowX: 'hidden',
-          borderRight: '1px solid rgba(148, 163, 184, 0.1)',
-          backdropFilter: 'blur(20px)',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-        },
-      }}
-    >
+  
+  // Drawer content component (reused for both mobile and desktop)
+  const drawerContent = (
+    <>
       {/* Enhanced Header Section */}
       <Fade in timeout={800}>
         <Box sx={{
           display: 'flex',
           alignItems: 'center',
-          padding: '32px 24px', // Increased padding to make header taller
-          justifyContent: sidebarOpen ? 'space-between' : 'center',
+          padding: { xs: '24px 16px', md: '32px 24px' },
+          justifyContent: effectiveDrawerOpen ? 'space-between' : 'center',
           background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
           borderBottom: '1px solid rgba(148, 163, 184, 0.1)',
           position: 'relative',
@@ -206,8 +210,8 @@ export default function NavBar() {
             '100%': { transform: 'translateX(100%)' }
           }
         }}>
-          {sidebarOpen && (
-            <Grow in={sidebarOpen} timeout={600}>
+          {effectiveDrawerOpen && (
+            <Grow in={effectiveDrawerOpen} timeout={600}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Avatar sx={{ 
                   bgcolor: 'transparent', 
@@ -249,7 +253,7 @@ export default function NavBar() {
               </Box>
             </Grow>
           )}
-          <Tooltip title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"} placement="right">
+          <Tooltip title={effectiveDrawerOpen ? (isMobile ? "Close menu" : "Collapse sidebar") : "Expand sidebar"} placement="right">
             <IconButton 
               onClick={handleDrawerToggle} 
               sx={{ 
@@ -265,7 +269,7 @@ export default function NavBar() {
                 }
               }}
             >
-              {sidebarOpen ? <ChevronLeftIcon /> : <MenuIcon />}
+              {isMobile ? <CloseIcon /> : (sidebarOpen ? <ChevronLeftIcon /> : <MenuIcon />)}
             </IconButton>
           </Tooltip>
         </Box>
@@ -281,18 +285,19 @@ export default function NavBar() {
             <Grow in timeout={600 + index * 100} key={item.text}>
               <Box sx={{ mb: 1 }}>
                 <Tooltip 
-                  title={!sidebarOpen ? `${item.text} - ${item.description}` : ""} 
+                  title={!effectiveDrawerOpen ? `${item.text} - ${item.description}` : ""} 
                   placement="right"
                   arrow
                 >
                   <ListItem
                     component={Link}
                     to={item.path}
+                    onClick={handleMobileItemClick}
                     onMouseEnter={() => setHoveredItem(item.text)}
                     onMouseLeave={() => setHoveredItem(null)}
                     sx={{
                       minHeight: 56,
-                      justifyContent: sidebarOpen ? 'initial' : 'center',
+                      justifyContent: effectiveDrawerOpen ? 'initial' : 'center',
                       px: 2,
                       mx: 1,
                       borderRadius: 3,
@@ -331,7 +336,7 @@ export default function NavBar() {
                     <ListItemIcon
                       sx={{
                         minWidth: 0,
-                        mr: sidebarOpen ? 2 : 'auto',
+                        mr: effectiveDrawerOpen ? 2 : 'auto',
                         justifyContent: 'center',
                         color: isActive ? item.color : 'rgba(255, 255, 255, 0.8)',
                         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -341,8 +346,8 @@ export default function NavBar() {
                     >
                       {item.icon}
                     </ListItemIcon>
-                    {sidebarOpen && (
-                      <Fade in={sidebarOpen} timeout={400}>
+                    {effectiveDrawerOpen && (
+                      <Fade in={effectiveDrawerOpen} timeout={400}>
                         <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 1 }}>
                           <ListItemText
                             primary={item.text}
@@ -397,7 +402,7 @@ export default function NavBar() {
         <>
           <Box sx={{ px: 2, py: 1 }}>
             <Divider sx={{ borderColor: 'rgba(148, 163, 184, 0.2)' }} />
-            {sidebarOpen && (
+            {effectiveDrawerOpen && (
               <Typography 
                 variant="caption" 
                 sx={{ 
@@ -423,18 +428,19 @@ export default function NavBar() {
                 <Grow in timeout={800 + index * 100} key={item.text}>
                   <Box sx={{ mb: 1 }}>
                     <Tooltip 
-                      title={!sidebarOpen ? `${item.text} - ${item.description}` : ""} 
+                      title={!effectiveDrawerOpen ? `${item.text} - ${item.description}` : ""} 
                       placement="right"
                       arrow
                     >
                       <ListItem
                         component={Link}
                         to={item.path}
+                        onClick={handleMobileItemClick}
                         onMouseEnter={() => setHoveredItem(item.text)}
                         onMouseLeave={() => setHoveredItem(null)}
                         sx={{
                           minHeight: 56,
-                          justifyContent: sidebarOpen ? 'initial' : 'center',
+                          justifyContent: effectiveDrawerOpen ? 'initial' : 'center',
                           px: 2,
                           mx: 1,
                           borderRadius: 3,
@@ -473,7 +479,7 @@ export default function NavBar() {
                         <ListItemIcon
                           sx={{
                             minWidth: 0,
-                            mr: sidebarOpen ? 2 : 'auto',
+                            mr: effectiveDrawerOpen ? 2 : 'auto',
                             justifyContent: 'center',
                             color: isActive ? item.color : 'rgba(255, 255, 255, 0.8)',
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -483,8 +489,8 @@ export default function NavBar() {
                         >
                           {item.icon}
                         </ListItemIcon>
-                        {sidebarOpen && (
-                          <Fade in={sidebarOpen} timeout={400}>
+                        {effectiveDrawerOpen && (
+                          <Fade in={effectiveDrawerOpen} timeout={400}>
                             <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 1 }}>
                               <ListItemText
                                 primary={item.text}
@@ -563,16 +569,16 @@ export default function NavBar() {
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <Avatar
                   sx={{
-                    width: sidebarOpen ? 40 : 32,
-                    height: sidebarOpen ? 40 : 32,
+                    width: effectiveDrawerOpen ? 40 : 32,
+                    height: effectiveDrawerOpen ? 40 : 32,
                     background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-                    fontSize: sidebarOpen ? '1rem' : '0.8rem',
+                    fontSize: effectiveDrawerOpen ? '1rem' : '0.8rem',
                     transition: 'all 0.3s ease'
                   }}
                 >
                   {currentUser?.firstName?.[0]}{currentUser?.lastName?.[0]}
                 </Avatar>
-                {sidebarOpen && (
+                {effectiveDrawerOpen && (
                   <Box sx={{ minWidth: 0, flex: 1 }}>
                     <Typography
                       variant="body2"
@@ -608,7 +614,7 @@ export default function NavBar() {
 
           {/* Version Info */}
           <Box sx={{ p: 2, textAlign: 'center' }}>
-            {sidebarOpen ? (
+            {effectiveDrawerOpen ? (
               <Box>
                 <Typography 
                   variant="caption" 
@@ -640,6 +646,105 @@ export default function NavBar() {
           </Box>
         </Box>
       </Fade>
+    </>
+  );
+  
+  return (
+    <>
+      {/* Mobile Top AppBar */}
+      {isMobile && (
+        <AppBar
+          position="fixed"
+          sx={{
+            background: 'linear-gradient(145deg, #1e293b 0%, #0f172a 50%, #020617 100%)',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+          }}
+        >
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2 }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexGrow: 1 }}>
+              <Avatar sx={{ 
+                bgcolor: 'transparent', 
+                background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
+                width: 28, 
+                height: 28,
+              }}>
+                <BusinessIcon sx={{ fontSize: 16 }} />
+              </Avatar>
+              <Typography 
+                variant="h6" 
+                noWrap 
+                component="div" 
+                sx={{ 
+                  fontWeight: 700,
+                  fontSize: '1rem'
+                }}
+              >
+                Invoicing
+              </Typography>
+            </Box>
+          </Toolbar>
+        </AppBar>
+      )}
+
+      {/* Mobile Drawer (Temporary) */}
+      {isMobile && (
+        <Drawer
+          variant="temporary"
+          open={mobileDrawerOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true, // Better mobile performance
+          }}
+          sx={{
+            display: { xs: 'block', md: 'none' },
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
+              width: 280,
+              background: 'linear-gradient(145deg, #1e293b 0%, #0f172a 50%, #020617 100%)',
+              color: 'white',
+              borderRight: '1px solid rgba(148, 163, 184, 0.1)',
+              backdropFilter: 'blur(20px)',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            },
+          }}
+        >
+          {drawerContent}
+        </Drawer>
+      )}
+
+      {/* Desktop Drawer (Permanent) */}
+      {!isMobile && (
+        <Drawer
+          variant="permanent"
+          sx={{
+            display: { xs: 'none', md: 'block' },
+            width: drawerWidth,
+            flexShrink: 0,
+            '& .MuiDrawer-paper': {
+              width: drawerWidth,
+              boxSizing: 'border-box',
+              background: 'linear-gradient(145deg, #1e293b 0%, #0f172a 50%, #020617 100%)',
+              color: 'white',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              overflowX: 'hidden',
+              borderRight: '1px solid rgba(148, 163, 184, 0.1)',
+              backdropFilter: 'blur(20px)',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            },
+          }}
+        >
+          {drawerContent}
+        </Drawer>
+      )}
 
       {/* User Menu */}
       <Menu
@@ -689,6 +794,6 @@ export default function NavBar() {
           <ListItemText primary="Logout" primaryTypographyProps={{ color: '#ef4444' }} />
         </MenuItem>
       </Menu>
-    </Drawer>
+    </>
   );
 }

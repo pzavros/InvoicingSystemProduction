@@ -1,6 +1,6 @@
 // src/components/ReportPage/ReportPage.jsx
 import React, { useState } from 'react';
-import { Grid, Typography, Box, Button, Snackbar, Alert, Drawer, IconButton, Divider, Fade, Grow, Paper } from '@mui/material';
+import { Grid, Typography, Box, Button, Snackbar, Alert, Drawer, IconButton, Divider, Fade, Grow, Paper, useMediaQuery, useTheme } from '@mui/material';
 import { Assessment as ReportIcon, ChevronLeft, ChevronRight, Settings, TrendingUp, FileDownload as DownloadIcon } from '@mui/icons-material';
 import ColumnSelector from './ColumnSelector';
 import ReportFilters from './ReportFilters';
@@ -12,10 +12,33 @@ import { exportReportToExcel } from './api';
 const DRAWER_WIDTH = 340;
 
 const ReportPage = () => {
-  // Set default filter values for testing
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  
+  // Get first day of current month and today's date
+  const getDefaultDates = () => {
+    const today = new Date();
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    
+    const formatDate = (date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+    
+    return {
+      startDate: formatDate(firstDayOfMonth),
+      endDate: formatDate(today)
+    };
+  };
+  
+  const defaultDates = getDefaultDates();
+  
+  // Set default filter values
   const [filters, setFilters] = useState({
-    startDate: '2024-01-01',
-    endDate: '2024-12-31',
+    startDate: defaultDates.startDate,
+    endDate: defaultDates.endDate,
     status: 'all'
   });
 
@@ -23,7 +46,7 @@ const ReportPage = () => {
   const [exportLoading, setExportLoading] = useState(false);
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'info' });
   const [showReport, setShowReport] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(true);
+  const [drawerOpen, setDrawerOpen] = useState(!isMobile); // Closed by default on mobile
 
   const [selectedColumns, setSelectedColumns] = useState([
     'invoiceNumber',
@@ -107,12 +130,181 @@ const ReportPage = () => {
   return (
     <Box sx={{ 
       display: 'flex', 
-      height: '100vh', 
+      height: { xs: 'auto', md: '100vh' },
+      minHeight: { xs: '100vh', md: 'auto' },
       width: '100%', 
       position: 'relative',
-      backgroundColor: '#f8fafc'
+      backgroundColor: '#f8fafc',
+      flexDirection: { xs: 'column', md: 'row' }
     }}>
       {/* Collapsible Drawer - Column Selector & Export */}
+      {isMobile ? (
+        /* Mobile: Full-screen Drawer */
+        <Drawer
+          anchor="left"
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          PaperProps={{
+            sx: {
+              width: '100%',
+              maxWidth: '100vw',
+              backgroundColor: '#ffffff'
+            }
+          }}
+        >
+          <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            {/* Drawer Header */}
+            <Box sx={{ 
+              p: 2,
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'space-between',
+              borderBottom: '1px solid rgba(79, 70, 229, 0.1)',
+              background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
+              minHeight: '64px',
+              position: 'relative',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '3px',
+                background: 'linear-gradient(90deg, #4f46e5 0%, #7c3aed 50%, #3b82f6 100%)',
+              }
+            }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <Box
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: '10px',
+                    background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)'
+                  }}
+                >
+                  <Settings sx={{ color: 'white', fontSize: 18 }} />
+                </Box>
+                <Typography variant="h6" sx={{ 
+                  fontWeight: 'bold',
+                  color: '#000000',
+                  fontSize: '1.125rem'
+                }}>
+                  Report Settings
+                </Typography>
+              </Box>
+              <IconButton 
+                onClick={() => setDrawerOpen(false)}
+                size="small"
+                sx={{ 
+                  backgroundColor: '#f3f4f6',
+                  '&:hover': { 
+                    backgroundColor: '#e5e7eb',
+                    transform: 'scale(1.05)'
+                  },
+                  transition: 'all 0.2s'
+                }}
+              >
+                <ChevronLeft />
+              </IconButton>
+            </Box>
+
+            {/* Scrollable Content */}
+            <Box sx={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
+              {/* Column Selector Section */}
+              <Box sx={{ p: 2 }}>
+                <Typography variant="subtitle2" sx={{ 
+                  mb: 1.5, 
+                  fontWeight: 'bold', 
+                  color: '#000000',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  fontSize: '0.75rem'
+                }}>
+                  Select Columns
+                </Typography>
+                <ColumnSelector 
+                  selectedColumns={selectedColumns}
+                  onColumnsChange={setSelectedColumns}
+                />
+              </Box>
+
+              <Divider sx={{ borderColor: 'rgba(79, 70, 229, 0.08)' }} />
+
+              {/* Export Section */}
+              <Box sx={{ p: 2 }}>
+                <Typography variant="subtitle2" sx={{ 
+                  mb: 2, 
+                  fontWeight: 'bold', 
+                  color: '#4f46e5',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  fontSize: '0.75rem'
+                }}>
+                  Export Options
+                </Typography>
+                <ReportExports 
+                  onExport={handleExport}
+                  loading={exportLoading}
+                  reportType="logistics"
+                />
+              </Box>
+            </Box>
+
+            {/* Selected Info Footer */}
+            <Box sx={{ 
+              p: 2, 
+              background: 'linear-gradient(145deg, #f8fafc 0%, #ffffff 100%)',
+              borderTop: '1px solid rgba(79, 70, 229, 0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1
+            }}>
+              <Box
+                sx={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  backgroundColor: selectedColumns.length > 0 ? '#10b981' : '#94a3b8',
+                  boxShadow: selectedColumns.length > 0 ? '0 0 8px rgba(16, 185, 129, 0.5)' : 'none'
+                }}
+              />
+              <Typography variant="caption" sx={{ 
+                color: 'text.secondary',
+                fontWeight: 'medium'
+              }}>
+                {selectedColumns.length} column{selectedColumns.length !== 1 ? 's' : ''} selected
+              </Typography>
+            </Box>
+
+            {/* Close Button */}
+            <Box sx={{ p: 2, borderTop: '1px solid rgba(79, 70, 229, 0.1)' }}>
+              <Button
+                fullWidth
+                variant="contained"
+                onClick={() => setDrawerOpen(false)}
+                sx={{
+                  background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+                  color: 'white',
+                  borderRadius: 2,
+                  py: 1.5,
+                  fontWeight: 'medium',
+                  textTransform: 'none',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #4338ca 0%, #6d28d9 100%)',
+                  }
+                }}
+              >
+                Apply & Close
+              </Button>
+            </Box>
+          </Box>
+        </Drawer>
+      ) : (
+        /* Desktop: Side Drawer */
       <Fade in={drawerOpen} timeout={300}>
         <Box
           sx={{
@@ -262,13 +454,15 @@ const ReportPage = () => {
           )}
         </Box>
       </Fade>
+      )}
 
       {/* Main Content Area */}
       <Box sx={{ 
         flexGrow: 1, 
         display: 'flex', 
         flexDirection: 'column',
-        height: '100%',
+        height: { xs: 'auto', md: '100%' },
+        minHeight: { xs: 'calc(100vh - 64px)', md: 'auto' },
         position: 'relative',
         overflow: 'hidden'
       }}>
@@ -276,10 +470,10 @@ const ReportPage = () => {
         {!drawerOpen && (
           <Fade in={!drawerOpen} timeout={300}>
             <Box sx={{ 
-              position: 'absolute', 
-              left: 16, 
-              top: '50%', 
-              transform: 'translateY(-50%)',
+              position: { xs: 'fixed', md: 'absolute' },
+              right: { xs: 16, md: 16 },
+              top: { xs: 16, md: 16 },
+              transform: 'none',
               zIndex: 1200
             }}>
               <IconButton
@@ -288,7 +482,7 @@ const ReportPage = () => {
                   background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
                   color: 'white',
                   borderRadius: '12px',
-                  padding: '12px',
+                  padding: { xs: '10px', md: '12px' },
                   boxShadow: '0 8px 24px rgba(79, 70, 229, 0.4)',
                   '&:hover': {
                     background: 'linear-gradient(135deg, #4338ca 0%, #6d28d9 100%)',
@@ -298,7 +492,7 @@ const ReportPage = () => {
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                 }}
               >
-                <ChevronRight />
+                <Settings />
               </IconButton>
             </Box>
           </Fade>
@@ -324,19 +518,27 @@ const ReportPage = () => {
         </Grow>
 
         {/* Report Display Section */}
-        <Box sx={{ flex: 1, overflow: 'hidden', p: 2 }}>
+        <Box sx={{ 
+          flex: 1, 
+          overflow: 'auto',
+          p: { xs: 1, sm: 2 },
+          display: 'flex',
+          flexDirection: 'column'
+        }}>
           <Fade in={true} timeout={1000}>
             <Paper
               elevation={2}
               sx={{
-                height: '100%',
-                borderRadius: 3,
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                borderRadius: { xs: 2, md: 3 },
                 overflow: 'hidden',
                 background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
                 border: '1px solid rgba(79, 70, 229, 0.1)',
                 transition: 'all 0.3s ease',
                 '&:hover': {
-                  boxShadow: '0 8px 24px rgba(79, 70, 229, 0.12)'
+                  boxShadow: { xs: 'none', md: '0 8px 24px rgba(79, 70, 229, 0.12)' }
                 }
               }}
             >
@@ -355,16 +557,22 @@ const ReportPage = () => {
         {/* Status Footer */}
         <Fade in={true} timeout={1200}>
           <Box sx={{ 
-            p: 2, 
+            p: { xs: 1.5, sm: 2 },
             background: 'linear-gradient(145deg, #f8fafc 0%, #ffffff 100%)',
             borderTop: '1px solid rgba(79, 70, 229, 0.1)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: 2
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: { xs: 1.5, sm: 2 }
           }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: { xs: 1, sm: 2 },
+              flexWrap: 'wrap',
+              justifyContent: { xs: 'center', sm: 'flex-start' }
+            }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Box
                   sx={{
@@ -375,53 +583,56 @@ const ReportPage = () => {
                     boxShadow: data?.length > 0 ? '0 0 8px rgba(16, 185, 129, 0.5)' : 'none'
                   }}
                 />
-                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'medium' }}>
-                  {data?.length || 0} records loaded
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'medium', fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
+                  {data?.length || 0} records
                 </Typography>
               </Box>
-              <Divider orientation="vertical" flexItem sx={{ borderColor: 'rgba(79, 70, 229, 0.1)' }} />
-              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'medium' }}>
-                {selectedColumns.length} columns selected
+              <Divider orientation="vertical" flexItem sx={{ borderColor: 'rgba(79, 70, 229, 0.1)', display: { xs: 'none', sm: 'block' } }} />
+              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'medium', fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
+                {selectedColumns.length} columns
               </Typography>
               {error && (
                 <>
-                  <Divider orientation="vertical" flexItem sx={{ borderColor: 'rgba(239, 68, 68, 0.2)' }} />
-                  <Typography variant="caption" sx={{ color: '#ef4444', fontWeight: 'medium' }}>
+                  <Divider orientation="vertical" flexItem sx={{ borderColor: 'rgba(239, 68, 68, 0.2)', display: { xs: 'none', sm: 'block' } }} />
+                  <Typography variant="caption" sx={{ color: '#ef4444', fontWeight: 'medium', fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
                     Error: {error}
                   </Typography>
                 </>
               )}
               {loading && (
                 <>
-                  <Divider orientation="vertical" flexItem sx={{ borderColor: 'rgba(79, 70, 229, 0.1)' }} />
-                  <Typography variant="caption" sx={{ color: '#4f46e5', fontWeight: 'medium' }}>
+                  <Divider orientation="vertical" flexItem sx={{ borderColor: 'rgba(79, 70, 229, 0.1)', display: { xs: 'none', sm: 'block' } }} />
+                  <Typography variant="caption" sx={{ color: '#4f46e5', fontWeight: 'medium', fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
                     Loading...
                   </Typography>
                 </>
               )}
             </Box>
-            <Box sx={{ display: 'flex', gap: 1 }}>
+            <Box sx={{ display: 'flex', gap: 1, width: { xs: '100%', sm: 'auto' } }}>
               <Button 
                 size="small" 
                 variant="outlined" 
                 onClick={handleRunReport}
-                startIcon={<ChevronRight />}
+                startIcon={<ChevronRight sx={{ fontSize: { xs: 16, sm: 18 } }} />}
+                fullWidth={isMobile}
                 sx={{
                   borderColor: '#4f46e5',
                   color: '#4f46e5',
                   borderRadius: 2,
                   textTransform: 'none',
                   fontWeight: 'medium',
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                  py: { xs: 0.75, sm: 1 },
                   '&:hover': {
                     borderColor: '#4338ca',
                     backgroundColor: 'rgba(79, 70, 229, 0.04)',
-                    transform: 'translateY(-1px)',
-                    boxShadow: '0 4px 12px rgba(79, 70, 229, 0.15)'
+                    transform: { xs: 'none', md: 'translateY(-1px)' },
+                    boxShadow: { xs: 'none', md: '0 4px 12px rgba(79, 70, 229, 0.15)' }
                   },
                   transition: 'all 0.2s'
                 }}
               >
-                Reload Data
+                {isMobile ? 'Reload' : 'Reload Data'}
               </Button>
               <Button 
                 size="small" 
@@ -472,19 +683,22 @@ const ReportPage = () => {
                   document.body.removeChild(a);
                   window.URL.revokeObjectURL(url);
                 }}
-                startIcon={<DownloadIcon />}
+                startIcon={<DownloadIcon sx={{ fontSize: { xs: 16, sm: 18 } }} />}
                 disabled={!data || data.length === 0}
+                fullWidth={isMobile}
                 sx={{
                   background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
                   color: 'white',
                   borderRadius: 2,
                   textTransform: 'none',
                   fontWeight: 'medium',
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                  py: { xs: 0.75, sm: 1 },
                   boxShadow: '0 2px 8px rgba(79, 70, 229, 0.25)',
                   '&:hover': {
                     background: 'linear-gradient(135deg, #4338ca 0%, #6d28d9 100%)',
-                    transform: 'translateY(-1px)',
-                    boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)'
+                    transform: { xs: 'none', md: 'translateY(-1px)' },
+                    boxShadow: { xs: '0 2px 8px rgba(79, 70, 229, 0.25)', md: '0 4px 12px rgba(79, 70, 229, 0.3)' }
                   },
                   '&:disabled': {
                     background: 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
@@ -494,7 +708,7 @@ const ReportPage = () => {
                   transition: 'all 0.2s'
                 }}
               >
-                Export CSV
+                {isMobile ? 'CSV' : 'Export CSV'}
               </Button>
             </Box>
           </Box>

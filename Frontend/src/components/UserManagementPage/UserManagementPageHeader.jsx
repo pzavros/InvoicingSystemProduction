@@ -6,7 +6,9 @@ import {
   Button,
   Card,
   CardContent,
-  Grid
+  Grid,
+  useTheme,
+  useMediaQuery
 } from '@mui/material';
 import {
   PersonAdd,
@@ -21,26 +23,32 @@ const UserManagementPageHeader = ({
   activeUsers,
   onAddUser 
 }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  
   return (
     <Box sx={{ mb: 4 }}>
       <Box sx={{ 
         display: 'flex', 
+        flexDirection: { xs: 'column', sm: 'row' },
         justifyContent: 'space-between', 
-        alignItems: 'center',
+        alignItems: { xs: 'flex-start', sm: 'center' },
+        gap: 2,
         mb: 3
       }}>
         <Box>
-          <Typography variant="h4" fontWeight="bold" gutterBottom>
+          <Typography variant={isMobile ? "h5" : "h4"} fontWeight="bold" gutterBottom>
             User Management
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body1" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' } }}>
             Manage system users and their permissions
           </Typography>
         </Box>
         <Button
           variant="contained"
-          startIcon={<PersonAdd />}
+          startIcon={!isMobile && <PersonAdd />}
           onClick={onAddUser}
+          fullWidth={isMobile}
           sx={{ 
             borderRadius: 2,
             textTransform: 'none',
@@ -51,19 +59,19 @@ const UserManagementPageHeader = ({
         </Button>
       </Box>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={3} sx={{ borderRadius: 3 }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+      <Grid container spacing={{ xs: 2, md: 3 }}>
+        <Grid item xs={12} sm={6} md={4}>
+          <Card elevation={3} sx={{ borderRadius: { xs: 2, md: 3 } }}>
+            <CardContent sx={{ p: { xs: 2, md: 3 } }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, md: 2 } }}>
                 <Box sx={{ color: 'primary.main' }}>
-                  <People fontSize="large" />
+                  <People fontSize={isMobile ? "medium" : "large"} />
                 </Box>
                 <Box>
-                  <Typography variant="h5" fontWeight="bold">
+                  <Typography variant={isMobile ? "h6" : "h5"} fontWeight="bold">
                     {totalUsers}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.8rem', md: '0.875rem' } }}>
                     Total Users
                   </Typography>
                 </Box>
@@ -72,18 +80,18 @@ const UserManagementPageHeader = ({
           </Card>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={3} sx={{ borderRadius: 3 }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Grid item xs={12} sm={6} md={4}>
+          <Card elevation={3} sx={{ borderRadius: { xs: 2, md: 3 } }}>
+            <CardContent sx={{ p: { xs: 2, md: 3 } }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, md: 2 } }}>
                 <Box sx={{ color: 'success.main' }}>
-                  <Person fontSize="large" />
+                  <Person fontSize={isMobile ? "medium" : "large"} />
                 </Box>
                 <Box>
-                  <Typography variant="h5" fontWeight="bold">
+                  <Typography variant={isMobile ? "h6" : "h5"} fontWeight="bold">
                     {activeUsers}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.8rem', md: '0.875rem' } }}>
                     Active Users
                   </Typography>
                 </Box>
@@ -92,18 +100,18 @@ const UserManagementPageHeader = ({
           </Card>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={3} sx={{ borderRadius: 3 }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Grid item xs={12} sm={6} md={4}>
+          <Card elevation={3} sx={{ borderRadius: { xs: 2, md: 3 } }}>
+            <CardContent sx={{ p: { xs: 2, md: 3 } }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, md: 2 } }}>
                 <Box sx={{ color: 'warning.main' }}>
-                  <AdminPanelSettings fontSize="large" />
+                  <AdminPanelSettings fontSize={isMobile ? "medium" : "large"} />
                 </Box>
                 <Box>
-                  <Typography variant="h5" fontWeight="bold">
+                  <Typography variant={isMobile ? "h6" : "h5"} fontWeight="bold">
                     {adminUsers}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.8rem', md: '0.875rem' } }}>
                     Admin Users
                   </Typography>
                 </Box>

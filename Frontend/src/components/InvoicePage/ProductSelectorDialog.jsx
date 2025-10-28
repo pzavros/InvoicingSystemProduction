@@ -24,7 +24,12 @@ import {
   MenuItem,
   Checkbox,
   Alert,
-  CircularProgress
+  CircularProgress,
+  useMediaQuery,
+  useTheme,
+  Card,
+  CardContent,
+  Stack
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
@@ -45,6 +50,8 @@ const ProductSelectorDialog = ({
   const [selectedCategory, setSelectedCategory] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   // Fetch products and categories when dialog opens
   useEffect(() => {
@@ -143,15 +150,17 @@ const ProductSelectorDialog = ({
       onClose={handleClose}
       maxWidth="lg"
       fullWidth
+      fullScreen={isMobile}
       PaperProps={{
         sx: {
-          height: '80vh',
+          height: isMobile ? '100vh' : '80vh',
           background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9))',
           backdropFilter: 'blur(20px)',
           boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
-          borderRadius: '20px',
+          borderRadius: isMobile ? 0 : '20px',
           border: '1px solid rgba(255, 255, 255, 0.2)',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          m: isMobile ? 0 : undefined
         }
       }}
     >
@@ -159,6 +168,8 @@ const ProductSelectorDialog = ({
         background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08))',
         borderBottom: '1px solid rgba(102, 126, 234, 0.15)',
         position: 'relative',
+        py: { xs: 2, sm: 3 },
+        px: { xs: 2, sm: 3 },
         '&::before': {
           content: '""',
           position: 'absolute',
@@ -175,22 +186,23 @@ const ProductSelectorDialog = ({
             color: '#2d3748',
             display: 'flex',
             alignItems: 'center',
-            gap: 1
+            gap: 1,
+            fontSize: { xs: '1rem', sm: '1.25rem' }
           }}>
             <Box sx={{
-              width: 32,
-              height: 32,
+              width: { xs: 28, sm: 32 },
+              height: { xs: 28, sm: 32 },
               borderRadius: '8px',
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: 'white',
-              fontSize: '16px'
+              fontSize: { xs: '14px', sm: '16px' }
             }}>
               🛍️
             </Box>
-            Select Products for Invoice
+            Select Products{isMobile ? '' : ' for Invoice'}
           </Typography>
           <IconButton 
             onClick={handleClose} 
@@ -198,6 +210,8 @@ const ProductSelectorDialog = ({
             sx={{
               backgroundColor: 'rgba(239, 68, 68, 0.1)',
               color: '#dc2626',
+              width: { xs: 36, sm: 40 },
+              height: { xs: 36, sm: 40 },
               '&:hover': {
                 backgroundColor: 'rgba(239, 68, 68, 0.2)',
                 transform: 'scale(1.1)'
@@ -205,7 +219,7 @@ const ProductSelectorDialog = ({
               transition: 'all 0.2s ease'
             }}
           >
-            <CloseIcon />
+            <CloseIcon fontSize={isMobile ? 'small' : 'medium'} />
           </IconButton>
         </Box>
       </DialogTitle><DialogContent>
@@ -216,8 +230,8 @@ const ProductSelectorDialog = ({
         )}
 
         {/* Search and Filter Section */}        <Box sx={{ 
-          mb: 3, 
-          p: 3,
+          mb: { xs: 2, sm: 3 }, 
+          p: { xs: 2, sm: 3 },
           background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7))',
           backdropFilter: 'blur(10px)',
           borderRadius: '16px',
@@ -230,19 +244,26 @@ const ProductSelectorDialog = ({
             color: '#2d3748',
             display: 'flex',
             alignItems: 'center',
-            gap: 1
+            gap: 1,
+            fontSize: { xs: '0.875rem', sm: '1rem' }
           }}>
             🔍 Search & Filter Products
           </Typography>
-          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>          <TextField
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: 2, 
+            flexWrap: 'wrap' 
+          }}>          <TextField
             label="Search Products"
             variant="outlined"
             size="small"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            fullWidth={isMobile}
             sx={{ 
               flexGrow: 1, 
-              minWidth: 250,
+              minWidth: { xs: '100%', sm: 250 },
               '& .MuiOutlinedInput-root': {
                 borderRadius: '12px',
                 backgroundColor: 'rgba(255, 255, 255, 0.8)',
@@ -268,24 +289,28 @@ const ProductSelectorDialog = ({
             }}
           />
           
-          <FormControl size="small" sx={{ 
-            minWidth: 200,
-            '& .MuiOutlinedInput-root': {
-              borderRadius: '12px',
-              backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                transform: 'translateY(-1px)',
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
-              },
-              '&.Mui-focused': {
-                backgroundColor: 'rgba(255, 255, 255, 1)',
-                boxShadow: '0 0 0 3px rgba(102, 126, 234, 0.1)',
-                transform: 'translateY(-1px)'
+          <FormControl 
+            size="small" 
+            fullWidth={isMobile}
+            sx={{ 
+              minWidth: { xs: '100%', sm: 200 },
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '12px',
+                backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                  transform: 'translateY(-1px)',
+                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
+                },
+                '&.Mui-focused': {
+                  backgroundColor: 'rgba(255, 255, 255, 1)',
+                  boxShadow: '0 0 0 3px rgba(102, 126, 234, 0.1)',
+                  transform: 'translateY(-1px)'
+                }
               }
-            }
-          }}>
+            }}
+          >
             <InputLabel>Category</InputLabel>
             <Select
               value={selectedCategory}
@@ -309,7 +334,208 @@ const ProductSelectorDialog = ({
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>          <CircularProgress />
           </Box>
+        ) : isMobile ? (
+          // Mobile Card Layout
+          <Stack spacing={2} sx={{ maxHeight: 'calc(100vh - 380px)', overflow: 'auto', pb: 2 }}>
+            {filteredProducts.length === 0 ? (
+              <Box sx={{ 
+                textAlign: 'center', 
+                py: 4,
+                px: 2
+              }}>
+                <Typography color="textSecondary">
+                  {searchTerm || selectedCategory 
+                    ? 'No products found matching your criteria.'
+                    : 'No products available.'
+                  }
+                </Typography>
+              </Box>
+            ) : (
+              filteredProducts.map((product) => {
+                const isSelected = multipleSelection && 
+                  selectedProducts.find(p => p.id === product.id);
+                const category = categories.find(c => c.id === product.categoryId);
+                
+                return (
+                  <Card
+                    key={product.id}
+                    onClick={!multipleSelection ? () => handleProductSelect(product) : undefined}
+                    sx={{
+                      borderRadius: '16px',
+                      overflow: 'hidden',
+                      background: isSelected 
+                        ? 'linear-gradient(145deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15))'
+                        : 'linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9))',
+                      backdropFilter: 'blur(20px)',
+                      boxShadow: isSelected 
+                        ? '0 4px 20px rgba(102, 126, 234, 0.3)'
+                        : '0 4px 16px rgba(0, 0, 0, 0.08)',
+                      border: isSelected 
+                        ? '2px solid #667eea'
+                        : '1px solid rgba(255, 255, 255, 0.2)',
+                      position: 'relative',
+                      cursor: !multipleSelection ? 'pointer' : 'default',
+                      transition: 'all 0.3s ease',
+                      '&:active': {
+                        transform: 'scale(0.98)'
+                      },
+                      '&:before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: '3px',
+                        background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)'
+                      }
+                    }}
+                  >
+                    <CardContent sx={{ p: 2 }}>
+                      {/* Header with checkbox and product name */}
+                      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 2 }}>
+                        {multipleSelection && (
+                          <Checkbox
+                            checked={!!isSelected}
+                            onChange={() => handleProductSelect(product)}
+                            sx={{ 
+                              p: 0,
+                              mt: 0.5,
+                              '& .MuiSvgIcon-root': {
+                                fontSize: '1.5rem'
+                              }
+                            }}
+                          />
+                        )}
+                        <Box sx={{ flexGrow: 1 }}>
+                          <Typography 
+                            variant="subtitle1" 
+                            sx={{ 
+                              fontWeight: 700,
+                              color: '#2d3748',
+                              mb: 0.5,
+                              fontSize: '1rem'
+                            }}
+                          >
+                            📦 {product.name}
+                          </Typography>
+                          {product.description && (
+                            <Typography 
+                              variant="body2" 
+                              color="textSecondary"
+                              sx={{ 
+                                fontSize: '0.8125rem',
+                                lineHeight: 1.4
+                              }}
+                            >
+                              {product.description}
+                            </Typography>
+                          )}
+                        </Box>
+                      </Box>
+
+                      {/* Product details grid */}
+                      <Box sx={{ 
+                        display: 'grid', 
+                        gridTemplateColumns: '1fr 1fr',
+                        gap: 2,
+                        pt: 2,
+                        borderTop: '1px solid rgba(102, 126, 234, 0.1)'
+                      }}>
+                        <Box>
+                          <Typography 
+                            variant="caption" 
+                            sx={{ 
+                              color: '#667eea',
+                              fontWeight: 700,
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.5px',
+                              fontSize: '0.65rem',
+                              display: 'block',
+                              mb: 0.5
+                            }}
+                          >
+                            🏷️ Category
+                          </Typography>
+                          <Typography 
+                            variant="body2"
+                            sx={{ 
+                              fontWeight: 600,
+                              color: '#2d3748',
+                              fontSize: '0.875rem'
+                            }}
+                          >
+                            {category?.name || 'Uncategorized'}
+                          </Typography>
+                        </Box>
+
+                        <Box>
+                          <Typography 
+                            variant="caption" 
+                            sx={{ 
+                              color: '#667eea',
+                              fontWeight: 700,
+                              textTransform: 'uppercase',
+                              letterSpacing: '0.5px',
+                              fontSize: '0.65rem',
+                              display: 'block',
+                              mb: 0.5
+                            }}
+                          >
+                            💰 Price
+                          </Typography>
+                          <Typography 
+                            variant="h6"
+                            sx={{ 
+                              fontWeight: 700,
+                              color: '#667eea',
+                              fontSize: '1.1rem'
+                            }}
+                          >
+                            {currency}{(product.unitPrice || 0).toFixed(2)}
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      {/* Stock status */}
+                      <Box sx={{ mt: 2 }}>
+                        <Typography 
+                          variant="caption" 
+                          sx={{ 
+                            color: '#667eea',
+                            fontWeight: 700,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.5px',
+                            fontSize: '0.65rem',
+                            display: 'block',
+                            mb: 0.5
+                          }}
+                        >
+                          📊 Stock Status
+                        </Typography>
+                        {product.trackInventory ? (
+                          <Chip
+                            label={`${product.stockQuantity} - ${getStockStatusText(product.stockQuantity, product.minStockLevel)}`}
+                            color={getStockStatusColor(product.stockQuantity, product.minStockLevel)}
+                            size="small"
+                            sx={{ 
+                              fontWeight: 600,
+                              fontSize: '0.75rem'
+                            }}
+                          />
+                        ) : (
+                          <Typography variant="body2" color="textSecondary" sx={{ fontSize: '0.875rem' }}>
+                            Service
+                          </Typography>
+                        )}
+                      </Box>
+                    </CardContent>
+                  </Card>
+                );
+              })
+            )}
+          </Stack>
         ) : (
+          // Desktop Table Layout
           <TableContainer
             component={Paper} 
             sx={{ 
@@ -415,7 +641,7 @@ const ProductSelectorDialog = ({
                             backgroundColor: 'rgba(25, 118, 210, 0.08)'
                           } : {}
                         }}
-                      >                        {multipleSelection && (
+                      >{multipleSelection && (
                           <TableCell padding="checkbox" sx={{ width: '60px' }}>
                             <Checkbox
                               checked={!!isSelected}
@@ -472,21 +698,24 @@ const ProductSelectorDialog = ({
           </TableContainer>
         )}
       </DialogContent>      <DialogActions sx={{ 
-        p: 3, 
+        p: { xs: 2, sm: 3 }, 
         background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05))',
         borderTop: '1px solid rgba(102, 126, 234, 0.1)',
-        gap: 2
+        gap: { xs: 1, sm: 2 },
+        flexDirection: { xs: 'column-reverse', sm: 'row' }
       }}>
         <Button 
           onClick={handleClose}
+          fullWidth={isMobile}
           sx={{
             borderRadius: '12px',
             textTransform: 'none',
             fontWeight: 600,
             px: 3,
-            py: 1.5,
+            py: { xs: 1.25, sm: 1.5 },
             color: '#64748b',
             border: '1px solid rgba(100, 116, 139, 0.2)',
+            fontSize: { xs: '0.875rem', sm: '1rem' },
             '&:hover': {
               backgroundColor: 'rgba(100, 116, 139, 0.05)',
               borderColor: 'rgba(100, 116, 139, 0.3)',
@@ -504,12 +733,14 @@ const ProductSelectorDialog = ({
             onClick={handleAddSelectedProducts}
             disabled={selectedProducts.length === 0}
             startIcon={<AddShoppingCartIcon />}
+            fullWidth={isMobile}
             sx={{
               borderRadius: '12px',
               textTransform: 'none',
               fontWeight: 600,
               px: 3,
-              py: 1.5,
+              py: { xs: 1.25, sm: 1.5 },
+              fontSize: { xs: '0.875rem', sm: '1rem' },
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               boxShadow: '0 8px 25px rgba(102, 126, 234, 0.3)',
               '&:hover': {

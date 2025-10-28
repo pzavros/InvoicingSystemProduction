@@ -28,7 +28,7 @@ import AdminRoute from './components/ReusableComponents/AdminRoute';
 import { SubscriptionProvider } from './utils/SubscriptionContext';
 import { AuthProvider, useAuth } from './utils/AuthContext';
 import './App.css';
-import { Box } from '@mui/material';
+import { Box, useMediaQuery, useTheme } from '@mui/material';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { SidebarProvider, SidebarContext } from './components/StaticComponents/SidebarContext';
 import { useContext } from 'react';
@@ -36,7 +36,13 @@ import { useContext } from 'react';
 function MainContent() {
   const { sidebarOpen } = useContext(SidebarContext);
   const { authenticated } = useAuth();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  
+  // On mobile, sidebar is always hidden from layout (drawer overlay)
+  // On desktop, sidebar pushes content
   const drawerWidth = sidebarOpen ? 240 : 65;
+  const shouldOffsetContent = authenticated && !isMobile;
 
   return (
     <Box
@@ -44,9 +50,10 @@ function MainContent() {
       sx={{
         flexGrow: 1,
         p: 0,
-        ml: authenticated ? `${drawerWidth}px` : 0,
-        width: authenticated ? `calc(100vw - ${drawerWidth}px)` : '100vw',
-        height: '100vh',
+        ml: shouldOffsetContent ? `${drawerWidth}px` : 0,
+        mt: isMobile ? '64px' : 0, // Top margin for mobile AppBar
+        width: shouldOffsetContent ? `calc(100vw - ${drawerWidth}px)` : '100vw',
+        height: isMobile ? 'calc(100vh - 64px)' : '100vh',
         overflow: 'auto',
         transition: 'margin 0.3s ease, width 0.3s ease',
         backgroundColor: '#f8fafc',

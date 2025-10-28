@@ -35,7 +35,13 @@ import {
   FormGroup,
   FormControlLabel,
   FormLabel,
-  ListItemText
+  ListItemText,
+  Card,
+  CardContent,
+  CardActions,
+  Divider,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import { visuallyHidden } from '@mui/utils'; // Corrected import for TableSortLabel accessibility
 import { useNavigate } from 'react-router-dom';
@@ -216,6 +222,8 @@ const headCells = [
 export default function InvoiceList() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   
   const [invoices, setInvoices] = useState([]);
   const [filteredInvoices, setFilteredInvoices] = useState([]);
@@ -617,10 +625,12 @@ export default function InvoiceList() {
       <Box 
         sx={{ 
           display: 'flex', 
+          flexDirection: { xs: 'column', sm: 'row' },
           justifyContent: 'space-between', 
-          alignItems: 'center',
-          mb: 4,
-          p: 3,
+          alignItems: { xs: 'stretch', sm: 'center' },
+          gap: { xs: 2, sm: 0 },
+          mb: { xs: 3, md: 4 },
+          p: { xs: 2, sm: 3 },
           borderRadius: 3,
           background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
           border: '1px solid rgba(59, 130, 246, 0.1)',
@@ -639,11 +649,11 @@ export default function InvoiceList() {
           }
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2 } }}>
           <Box
             sx={{
-              width: 48,
-              height: 48,
+              width: { xs: 40, sm: 48 },
+              height: { xs: 40, sm: 48 },
               borderRadius: '12px',
               background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
               display: 'flex',
@@ -652,7 +662,7 @@ export default function InvoiceList() {
               boxShadow: '0 8px 16px rgba(59, 130, 246, 0.3)'
             }}
           >
-            <ReceiptIcon sx={{ color: 'white', fontSize: 24 }} />
+            <ReceiptIcon sx={{ color: 'white', fontSize: { xs: 20, sm: 24 } }} />
           </Box>
           <Box>
             <Typography 
@@ -660,6 +670,7 @@ export default function InvoiceList() {
               component="h1" 
               sx={{ 
                 fontWeight: 'bold',
+                fontSize: { xs: '1.25rem', sm: '1.5rem' },
                 background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
@@ -673,7 +684,9 @@ export default function InvoiceList() {
               variant="subtitle2" 
               sx={{ 
                 color: 'text.secondary',
-                fontWeight: 'medium'
+                fontWeight: 'medium',
+                fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                display: { xs: 'none', sm: 'block' }
               }}
             >
               Manage and track all your invoices
@@ -685,14 +698,16 @@ export default function InvoiceList() {
           variant="contained"
           startIcon={<AddIcon />}
           onClick={handleCreateInvoice}
+          fullWidth={{ xs: true, sm: false }}
           sx={{ 
             backgroundColor: '#10b981', 
             backgroundImage: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
             boxShadow: '0 8px 16px rgba(16, 185, 129, 0.3)',
             border: 'none',
             borderRadius: 2,
-            px: 3,
+            px: { xs: 2, sm: 3 },
             py: 1.5,
+            fontSize: { xs: '0.875rem', sm: '1rem' },
             fontWeight: 600,
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             '&:hover': { 
@@ -709,8 +724,8 @@ export default function InvoiceList() {
       {/* Enhanced Search and Filter Section */}
       <Box 
         sx={{ 
-          p: 3, 
-          mb: 3, 
+          p: { xs: 2, sm: 3 }, 
+          mb: { xs: 2, sm: 3 }, 
           borderRadius: 3,
           background: 'linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%)',
           border: '1px solid rgba(148, 163, 184, 0.2)',
@@ -718,7 +733,7 @@ export default function InvoiceList() {
           transition: 'all 0.3s ease-in-out',
           '&:hover': {
             boxShadow: '0 8px 20px rgba(148, 163, 184, 0.15)',
-            transform: 'translateY(-1px)'
+            transform: { xs: 'none', md: 'translateY(-1px)' }
           }
         }}
       >
@@ -728,12 +743,13 @@ export default function InvoiceList() {
             mb: 2, 
             fontWeight: 'medium', 
             color: 'text.primary',
+            fontSize: { xs: '1rem', sm: '1.25rem' },
             display: 'flex',
             alignItems: 'center',
             gap: 1
           }}
         >
-          <SearchIcon sx={{ color: '#6b7280' }} />
+          <SearchIcon sx={{ color: '#6b7280', fontSize: { xs: 20, sm: 24 } }} />
           Search & Filter
         </Typography>
         
@@ -772,7 +788,7 @@ export default function InvoiceList() {
               ),
             }}
           />        
-        <FormControl size="small" sx={{ minWidth: 150 }}>
+        <FormControl size="small" sx={{ minWidth: { xs: '100%', md: 150 } }}>
           <InputLabel id="status-select-filter-label">Status</InputLabel>
           <Select
             labelId="status-select-filter-label"
@@ -821,7 +837,7 @@ export default function InvoiceList() {
           </Select>
         </FormControl>
         
-        <FormControl size="small" sx={{ minWidth: 150 }}>
+        <FormControl size="small" sx={{ minWidth: { xs: '100%', md: 150 } }}>
           <InputLabel id="date-filter-label">Date</InputLabel>
           <Select
             labelId="date-filter-label"
@@ -987,12 +1003,12 @@ export default function InvoiceList() {
               flexDirection: 'column',
               justifyContent: 'center', 
               alignItems: 'center',
-              p: 6,
+              p: { xs: 4, sm: 6 },
               gap: 2
             }}
           >
             <CircularProgress 
-              size={48}
+              size={{ xs: 40, sm: 48 }}
               sx={{ 
                 color: '#3b82f6',
                 '& .MuiCircularProgress-circle': {
@@ -1004,7 +1020,8 @@ export default function InvoiceList() {
               variant="body1" 
               sx={{ 
                 color: 'text.secondary',
-                fontWeight: 'medium'
+                fontWeight: 'medium',
+                fontSize: { xs: '0.875rem', sm: '1rem' }
               }}
             >
               Loading invoices...
@@ -1014,7 +1031,7 @@ export default function InvoiceList() {
           <Alert 
             severity="error" 
             sx={{ 
-              m: 3,
+              m: { xs: 2, sm: 3 },
               borderRadius: 2,
               background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
               border: '1px solid #fecaca',
@@ -1022,7 +1039,8 @@ export default function InvoiceList() {
                 color: '#dc2626'
               },
               '& .MuiAlert-message': {
-                fontWeight: 'medium'
+                fontWeight: 'medium',
+                fontSize: { xs: '0.875rem', sm: '1rem' }
               }
             }}
           >
@@ -1031,7 +1049,7 @@ export default function InvoiceList() {
         ) : filteredInvoices.length === 0 ? (
           <Box 
             sx={{ 
-              p: 6, 
+              p: { xs: 4, sm: 6 }, 
               textAlign: 'center',
               display: 'flex',
               flexDirection: 'column',
@@ -1041,8 +1059,8 @@ export default function InvoiceList() {
           >
             <Box
               sx={{
-                width: 64,
-                height: 64,
+                width: { xs: 56, sm: 64 },
+                height: { xs: 56, sm: 64 },
                 borderRadius: '50%',
                 background: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)',
                 display: 'flex',
@@ -1051,13 +1069,14 @@ export default function InvoiceList() {
                 mb: 1
               }}
             >
-              <ReceiptIcon sx={{ fontSize: 32, color: '#9ca3af' }} />
+              <ReceiptIcon sx={{ fontSize: { xs: 28, sm: 32 }, color: '#9ca3af' }} />
             </Box>
             <Typography 
               variant="h6"
               sx={{ 
                 color: 'text.primary',
-                fontWeight: 'medium'
+                fontWeight: 'medium',
+                fontSize: { xs: '1.125rem', sm: '1.25rem' }
               }}
             >
               No invoices found
@@ -1066,7 +1085,8 @@ export default function InvoiceList() {
               variant="body2"
               sx={{ 
                 color: 'text.secondary',
-                maxWidth: 400
+                maxWidth: 400,
+                fontSize: { xs: '0.875rem', sm: '1rem' }
               }}
             >
               {searchTerm || activeStatusFilters !== 'all' || dateFilter !== 'all' 
@@ -1082,9 +1102,10 @@ export default function InvoiceList() {
                   mt: 2,
                   background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                   borderRadius: 2,
-                  px: 3,
+                  px: { xs: 2, sm: 3 },
                   py: 1.5,
                   fontWeight: 600,
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
                   textTransform: 'none',
                   boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
                   '&:hover': { 
@@ -1099,8 +1120,232 @@ export default function InvoiceList() {
               </Button>            )}          </Box>
         ) : (
           <>
-            <TableContainer>
-              <Table sx={{ minWidth: 750 }} aria-label="invoices table">
+            {/* Mobile Card View */}
+            {isMobile ? (
+              <Box sx={{ p: 2 }}>
+                {filteredInvoices
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((invoice) => {
+                    const isItemSelected = isSelected(invoice.id);
+                    const isDeleted = invoice.statusName?.toLowerCase() === 'deleted';
+                    const docTypeMeta = getDocumentTypeMeta(invoice.documentTypeId);
+                    const totalValue = Number(invoice.total ?? 0);
+
+                    return (
+                      <Card 
+                        key={invoice.id}
+                        sx={{ 
+                          mb: 2, 
+                          borderRadius: 2,
+                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                          border: isItemSelected ? '2px solid #3b82f6' : '1px solid #e5e7eb',
+                          backgroundColor: isDeleted ? 'rgba(239, 68, 68, 0.05)' : 'white',
+                          '&:hover': {
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+                          }
+                        }}
+                      >
+                        <CardContent sx={{ pb: 1 }}>
+                          {/* Header: Invoice Number and Status */}
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5 }}>
+                            <Box sx={{ flex: 1 }}>
+                              <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1rem', mb: 0.5 }}>
+                                Invoice #{invoice.invoiceNumber}
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>
+                                {formatDate(invoice.dateOfIssue)}
+                              </Typography>
+                            </Box>
+                            <StatusBadge status={invoice.statusName || 'Unknown'} />
+                          </Box>
+
+                          {/* Client */}
+                          <Box sx={{ mb: 1.5 }}>
+                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 600 }}>
+                              Client
+                            </Typography>
+                            <Typography variant="body1" sx={{ fontWeight: 500, fontSize: '0.9rem', mt: 0.5 }}>
+                              {invoice.billTo}
+                            </Typography>
+                          </Box>
+
+                          {/* Document Type and Amount */}
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                            <Box>
+                              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 600 }}>
+                                Type
+                              </Typography>
+                              <Box sx={{ mt: 0.5 }}>
+                                <Chip
+                                  label={docTypeMeta.label}
+                                  size="small"
+                                  sx={{
+                                    backgroundColor: docTypeMeta.backgroundColor,
+                                    color: docTypeMeta.color,
+                                    border: docTypeMeta.border,
+                                    fontWeight: 600,
+                                    fontSize: '0.7rem',
+                                  }}
+                                />
+                              </Box>
+                            </Box>
+                            <Box sx={{ textAlign: 'right' }}>
+                              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 600 }}>
+                                Amount
+                              </Typography>
+                              <Typography variant="h6" sx={{ fontWeight: 600, color: '#059669', fontSize: '1.1rem', mt: 0.5 }}>
+                                {(invoice.currency?.symbol || '$')}{totalValue.toFixed(2)}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        </CardContent>
+
+                        <Divider />
+
+                        {/* Action Buttons */}
+                        <CardActions sx={{ justifyContent: 'space-between', p: 1.5 }}>
+                          <Box sx={{ display: 'flex', gap: 1 }}>
+                            <Button
+                              variant="outlined"
+                              size="small"
+                              startIcon={<ViewIcon />}
+                              onClick={() => handleViewInvoice(invoice)}
+                              sx={{
+                                color: '#3b82f6',
+                                borderColor: 'rgba(59, 130, 246, 0.3)',
+                                backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                                fontSize: '0.75rem',
+                                '&:hover': {
+                                  backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                  borderColor: '#3b82f6',
+                                },
+                              }}
+                            >
+                              View
+                            </Button>
+                            <Button
+                              variant="outlined"
+                              size="small"
+                              startIcon={<EditIcon />}
+                              onClick={() => handleEditInvoice(invoice)}
+                              disabled={isDeleted}
+                              sx={{
+                                color: isDeleted ? '#9ca3af' : '#8b5cf6',
+                                borderColor: isDeleted ? 'rgba(156, 163, 175, 0.3)' : 'rgba(139, 92, 246, 0.3)',
+                                backgroundColor: isDeleted ? 'rgba(156, 163, 175, 0.05)' : 'rgba(139, 92, 246, 0.05)',
+                                fontSize: '0.75rem',
+                                '&:hover': {
+                                  backgroundColor: isDeleted ? 'rgba(156, 163, 175, 0.05)' : 'rgba(139, 92, 246, 0.1)',
+                                  borderColor: isDeleted ? 'rgba(156, 163, 175, 0.3)' : '#8b5cf6',
+                                },
+                              }}
+                            >
+                              Edit
+                            </Button>
+                          </Box>
+                          <IconButton
+                            size="small"
+                            onClick={() => handleDeleteClick(invoice)}
+                            disabled={isDeleted}
+                            sx={{
+                              color: isDeleted ? '#9ca3af' : '#ef4444',
+                              backgroundColor: isDeleted ? 'rgba(156, 163, 175, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                              borderRadius: 1.5,
+                              '&:hover': {
+                                backgroundColor: isDeleted ? 'rgba(156, 163, 175, 0.1)' : 'rgba(239, 68, 68, 0.2)',
+                              },
+                            }}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </CardActions>
+                      </Card>
+                    );
+                  })}
+                
+                {/* Mobile Pagination */}
+                <Box sx={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  alignItems: 'center',
+                  flexDirection: 'column',
+                  gap: 2,
+                  mt: 3,
+                  p: 2,
+                  backgroundColor: '#f8fafc',
+                  borderRadius: 2
+                }}>
+                  <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
+                    Showing {page * rowsPerPage + 1} - {Math.min((page + 1) * rowsPerPage, filteredInvoices.length)} of {filteredInvoices.length}
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={(e) => handleChangePage(e, page - 1)}
+                      disabled={page === 0}
+                      sx={{
+                        borderColor: '#d1d5db',
+                        color: '#374151',
+                        '&:hover': {
+                          borderColor: '#3b82f6',
+                          backgroundColor: '#f8fafc'
+                        },
+                        '&:disabled': {
+                          borderColor: '#e5e7eb',
+                          color: '#9ca3af'
+                        }
+                      }}
+                    >
+                      Previous
+                    </Button>
+                    <Typography variant="body2" sx={{ fontWeight: 500, mx: 2 }}>
+                      Page {page + 1} of {Math.ceil(filteredInvoices.length / rowsPerPage)}
+                    </Typography>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={(e) => handleChangePage(e, page + 1)}
+                      disabled={page >= Math.ceil(filteredInvoices.length / rowsPerPage) - 1}
+                      sx={{
+                        borderColor: '#d1d5db',
+                        color: '#374151',
+                        '&:hover': {
+                          borderColor: '#3b82f6',
+                          backgroundColor: '#f8fafc'
+                        },
+                        '&:disabled': {
+                          borderColor: '#e5e7eb',
+                          color: '#9ca3af'
+                        }
+                      }}
+                    >
+                      Next
+                    </Button>
+                  </Box>
+                  <FormControl size="small" sx={{ minWidth: 120 }}>
+                    <InputLabel>Per Page</InputLabel>
+                    <Select
+                      value={rowsPerPage}
+                      label="Per Page"
+                      onChange={handleChangeRowsPerPage}
+                      sx={{
+                        borderRadius: 1.5,
+                        backgroundColor: 'white'
+                      }}
+                    >
+                      <MenuItem value={5}>5</MenuItem>
+                      <MenuItem value={10}>10</MenuItem>
+                      <MenuItem value={25}>25</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Box>
+              </Box>
+            ) : (
+              /* Desktop Table View */
+            <>
+            <TableContainer sx={{ overflowX: 'auto' }}>
+              <Table sx={{ minWidth: { xs: 650, md: 750 } }} aria-label="invoices table">
                 <TableHead
                   sx={{
                     background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
@@ -1114,7 +1359,8 @@ export default function InvoiceList() {
                     <TableCell 
                       padding="checkbox"
                       sx={{
-                        backgroundColor: 'transparent'
+                        backgroundColor: 'transparent',
+                        display: { xs: 'none', sm: 'table-cell' }
                       }}
                     >
                       <Checkbox
@@ -1143,12 +1389,16 @@ export default function InvoiceList() {
                         sortDirection={orderBy === headCell.id ? order : false}
                         sx={{
                           fontWeight: 700,
-                          fontSize: '0.875rem',
+                          fontSize: { xs: '0.75rem', sm: '0.875rem' },
                           color: '#374151',
                           textTransform: 'uppercase',
                           letterSpacing: '0.05em',
                           backgroundColor: 'transparent',
-                          ...(headCell.id === 'total' && { paddingRight: '24px' })
+                          ...(headCell.id === 'total' && { paddingRight: '24px' }),
+                          // Hide 'billTo' on xs, show from sm up
+                          ...(headCell.id === 'billTo' && { display: { xs: 'none', sm: 'table-cell' } }),
+                          // Hide 'documentTypeId' on xs/sm, show from md up
+                          ...(headCell.id === 'documentTypeId' && { display: { xs: 'none', md: 'table-cell' } })
                         }}
                       >
                         <TableSortLabel
@@ -1182,7 +1432,7 @@ export default function InvoiceList() {
                     <TableCell 
                       sx={{ 
                         fontWeight: 700,
-                        fontSize: '0.875rem',
+                        fontSize: { xs: '0.75rem', sm: '0.875rem' },
                         color: '#374151',
                         textTransform: 'uppercase',
                         letterSpacing: '0.05em',
@@ -1194,7 +1444,7 @@ export default function InvoiceList() {
                     <TableCell 
                       sx={{ 
                         fontWeight: 700,
-                        fontSize: '0.875rem',
+                        fontSize: { xs: '0.75rem', sm: '0.875rem' },
                         color: '#374151',
                         textTransform: 'uppercase',
                         letterSpacing: '0.05em',
@@ -1229,8 +1479,8 @@ export default function InvoiceList() {
                               backgroundColor: isDeleted 
                                 ? 'rgba(239, 68, 68, 0.08)' 
                                 : 'rgba(59, 130, 246, 0.04)',
-                              transform: 'translateY(-1px)',
-                              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
+                              transform: { xs: 'none', md: 'translateY(-1px)' },
+                              boxShadow: { xs: 'none', md: '0 4px 12px rgba(0, 0, 0, 0.05)' }
                             },
                             '&.Mui-selected': {
                               backgroundColor: 'rgba(59, 130, 246, 0.08)',
@@ -1240,11 +1490,12 @@ export default function InvoiceList() {
                             },
                             '& .MuiTableCell-root': {
                               borderBottom: '1px solid #f1f5f9',
-                              py: 2
+                              py: { xs: 1.5, sm: 2 },
+                              fontSize: { xs: '0.75rem', sm: '0.875rem' }
                             }
                           }}
                         >
-                          <TableCell padding="checkbox">
+                          <TableCell padding="checkbox" sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
                             <Checkbox
                               color="primary"
                               checked={isItemSelected}
@@ -1265,7 +1516,7 @@ export default function InvoiceList() {
                             sx={{
                               fontWeight: 600,
                               color: '#374151',
-                              fontSize: '0.875rem'
+                              fontSize: { xs: '0.75rem', sm: '0.875rem' }
                             }}
                           >
                             {invoice.invoiceNumber}
@@ -1273,7 +1524,7 @@ export default function InvoiceList() {
                           <TableCell
                             sx={{
                               color: '#6b7280',
-                              fontSize: '0.875rem'
+                              fontSize: { xs: '0.75rem', sm: '0.875rem' }
                             }}
                           >
                             {formatDate(invoice.dateOfIssue)}
@@ -1281,8 +1532,9 @@ export default function InvoiceList() {
                           <TableCell
                             sx={{
                               color: '#374151',
-                              fontSize: '0.875rem',
-                              fontWeight: 500
+                              fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                              fontWeight: 500,
+                              display: { xs: 'none', sm: 'table-cell' }
                             }}
                           >
                             {invoice.billTo}
@@ -1290,7 +1542,8 @@ export default function InvoiceList() {
                           <TableCell
                             sx={{
                               color: docTypeMeta.color,
-                              fontSize: '0.75rem'
+                              fontSize: '0.75rem',
+                              display: { xs: 'none', md: 'table-cell' }
                             }}
                           >
                             <Chip
@@ -1317,7 +1570,7 @@ export default function InvoiceList() {
                               paddingRight: '24px',
                               fontWeight: 600,
                               color: '#059669',
-                              fontSize: '0.875rem'
+                              fontSize: { xs: '0.75rem', sm: '0.875rem' }
                             }}
                           >
                             {(invoice.currency?.symbol || '$')}{totalValue.toFixed(2)}
@@ -1326,7 +1579,7 @@ export default function InvoiceList() {
                             <StatusBadge status={invoice.statusName || 'Unknown'} />
                           </TableCell>
                           <TableCell>
-                            <Box sx={{ display: 'flex', gap: 0.5 }}>
+                            <Box sx={{ display: 'flex', gap: { xs: 0.25, sm: 0.5 } }}>
                               <Tooltip title="View Invoice" arrow>
                                 <IconButton 
                                   size="small" 
@@ -1335,6 +1588,8 @@ export default function InvoiceList() {
                                     backgroundColor: 'rgba(59, 130, 246, 0.1)',
                                     color: '#3b82f6',
                                     borderRadius: 1.5,
+                                    width: { xs: 32, sm: 36 },
+                                    height: { xs: 32, sm: 36 },
                                     '&:hover': {
                                       backgroundColor: 'rgba(59, 130, 246, 0.2)',
                                       transform: 'scale(1.1)'
@@ -1342,7 +1597,7 @@ export default function InvoiceList() {
                                     transition: 'all 0.2s ease-in-out'
                                   }}
                                 >
-                                  <ViewIcon fontSize="small" />
+                                  <ViewIcon fontSize="small" sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }} />
                                 </IconButton>
                               </Tooltip>
                               <Tooltip title="Edit Invoice" arrow>
@@ -1354,6 +1609,8 @@ export default function InvoiceList() {
                                     backgroundColor: isDeleted ? 'rgba(156, 163, 175, 0.1)' : 'rgba(139, 92, 246, 0.1)',
                                     color: isDeleted ? '#9ca3af' : '#8b5cf6',
                                     borderRadius: 1.5,
+                                    width: { xs: 32, sm: 36 },
+                                    height: { xs: 32, sm: 36 },
                                     '&:hover': {
                                       backgroundColor: isDeleted ? 'rgba(156, 163, 175, 0.1)' : 'rgba(139, 92, 246, 0.2)',
                                       transform: isDeleted ? 'none' : 'scale(1.1)'
@@ -1364,10 +1621,10 @@ export default function InvoiceList() {
                                     transition: 'all 0.2s ease-in-out'
                                   }}
                                 >
-                                  <EditIcon fontSize="small" />
+                                  <EditIcon fontSize="small" sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }} />
                                 </IconButton>
                               </Tooltip>
-                              <Tooltip title="Delete Invoice" arrow>
+                              <Tooltip title="Delete Invoice" arrow sx={{ display: { xs: 'none', sm: 'block' } }}>
                                 <IconButton 
                                   size="small"
                                   onClick={(e) => { e.stopPropagation(); handleDeleteClick(invoice); }}
@@ -1376,6 +1633,9 @@ export default function InvoiceList() {
                                     backgroundColor: isDeleted ? 'rgba(156, 163, 175, 0.1)' : 'rgba(239, 68, 68, 0.1)',
                                     color: isDeleted ? '#9ca3af' : '#ef4444',
                                     borderRadius: 1.5,
+                                    width: { xs: 32, sm: 36 },
+                                    height: { xs: 32, sm: 36 },
+                                    display: { xs: 'none', sm: 'inline-flex' },
                                     '&:hover': {
                                       backgroundColor: isDeleted ? 'rgba(156, 163, 175, 0.1)' : 'rgba(239, 68, 68, 0.2)',
                                       transform: isDeleted ? 'none' : 'scale(1.1)'
@@ -1386,7 +1646,7 @@ export default function InvoiceList() {
                                     transition: 'all 0.2s ease-in-out'
                                   }}
                                 >
-                                  <DeleteIcon fontSize="small" />
+                                  <DeleteIcon fontSize="small" sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }} />
                                 </IconButton>
                               </Tooltip>
                             </Box>
@@ -1452,16 +1712,19 @@ export default function InvoiceList() {
               }}
             />
           </>
+            )}
+          </>
         )}
       </Paper>
         <Dialog
         open={deleteDialogOpen}
         onClose={handleDeleteCancel}
+        fullScreen={isMobile}
         maxWidth="sm"
         fullWidth
         PaperProps={{
           sx: {
-            borderRadius: 3,
+            borderRadius: isMobile ? 0 : 3,
             background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
             boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
             border: '1px solid rgba(255, 255, 255, 0.2)',
@@ -1526,11 +1789,12 @@ export default function InvoiceList() {
       <Dialog
         open={bulkUpdateDialogOpen}
         onClose={handleBulkUpdateCancel}
+        fullScreen={isMobile}
         maxWidth="sm"
         fullWidth
         PaperProps={{
           sx: {
-            borderRadius: 3,
+            borderRadius: isMobile ? 0 : 3,
             background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
             boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
             border: '1px solid rgba(255, 255, 255, 0.2)',
