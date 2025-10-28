@@ -45,9 +45,11 @@ function MainContent() {
         flexGrow: 1,
         p: 0,
         ml: authenticated ? `${drawerWidth}px` : 0,
-        transition: 'margin 0.3s ease',
+        width: authenticated ? `calc(100vw - ${drawerWidth}px)` : '100vw',
+        height: '100vh',
+        overflow: 'auto',
+        transition: 'margin 0.3s ease, width 0.3s ease',
         backgroundColor: '#f8fafc',
-        minHeight: '100vh',
       }}
     >
       {authenticated && <SubscriptionBanner />}
@@ -112,7 +114,15 @@ function AppContent() {
   const { authenticated } = useAuth();
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ 
+      display: 'flex',
+      width: '100vw',
+      height: '100vh',
+      overflow: 'hidden',
+      position: 'fixed',
+      top: 0,
+      left: 0
+    }}>
       {authenticated && <NavBar />}
       <MainContent />
     </Box>

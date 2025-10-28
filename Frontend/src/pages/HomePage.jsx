@@ -1,6 +1,5 @@
 import React from 'react';
 import { 
-  Container, 
   Typography, 
   Box, 
   Card, 
@@ -16,7 +15,7 @@ import {
   TrendingUp as TrendingUpIcon,
   Assignment as AssignmentIcon 
 } from '@mui/icons-material';
-import Page from '../components/ReusableComponents/Page';
+import PageContainer from '../components/ReusableComponents/PageContainer';
 import InvoiceList from '../components/HomePage/InvoiceList';
 
 const StatCard = ({ title, subtitle, icon: Icon, color, children, delay = 0 }) => (
@@ -127,18 +126,17 @@ const StatCard = ({ title, subtitle, icon: Icon, color, children, delay = 0 }) =
 
 export default function HomePage() {
   return (
-    <Page>
-      <Container maxWidth="xl" sx={{ py: 4 }}>        <Fade in={true} timeout={800}>
-          <Box>
-            {/* Main Content */}
-            <Grow in={true} timeout={1000}>
-              <Box>
-                <InvoiceList />
-              </Box>
-            </Grow>
-          </Box>
-        </Fade>
-      </Container>
-    </Page>
+    <PageContainer maxWidth="xl">
+      <Fade in={true} timeout={800}>
+        <Box>
+          {/* Main Content */}
+          <Grow in={true} timeout={1000}>
+            <Box>
+              <InvoiceList />
+            </Box>
+          </Grow>
+        </Box>
+      </Fade>
+    </PageContainer>
   );
 }
