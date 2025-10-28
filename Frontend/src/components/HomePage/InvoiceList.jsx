@@ -45,11 +45,13 @@ import {
 } from '@mui/material';
 import { visuallyHidden } from '@mui/utils'; // Corrected import for TableSortLabel accessibility
 import { useNavigate } from 'react-router-dom';
-import { Search as SearchIcon, Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, Visibility as ViewIcon, Receipt as ReceiptIcon } from '@mui/icons-material';
+import { Search as SearchIcon, Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, Visibility as ViewIcon, Receipt as ReceiptIcon, Lock as LockIcon } from '@mui/icons-material';
 import { getAllInvoices, deleteInvoice, getAllStatuses, updateBulkInvoiceStatus } from '../InvoicePage/api';
 import { getAllDocumentTypes } from '../DocumentTypePage/api';
 import { useDispatch } from 'react-redux';
 import { formatDate } from '../ReusableComponents/dateUtils';
+import UsageIndicator from '../SubscriptionPage/UsageIndicator';
+import { useSubscription } from '../../utils/SubscriptionContext';
 
 // Create status badges with different colors and modern styling
 const StatusBadge = ({ status }) => {
@@ -224,12 +226,15 @@ export default function InvoiceList() {
   const dispatch = useDispatch();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { canCreate, isPremium } = useSubscription();
   
   const [invoices, setInvoices] = useState([]);
   const [filteredInvoices, setFilteredInvoices] = useState([]);
   const [documentTypes, setDocumentTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  const canCreateInvoice = canCreate?.invoice !== false;
   
   const [searchTerm, setSearchTerm] = useState('');
   const [activeStatusFilters, setActiveStatusFilters] = useState({ draft: true, unpaid: true, paid: true });
@@ -563,7 +568,15 @@ export default function InvoiceList() {
   };
   
   const handleCreateInvoice = () => {
-    navigate('/invoices/create');
+    if (canCreateInvoice) {
+      navigate('/invoices/create');
+    } else {
+      setNotification({
+        open: true,
+        message: "You've reached your monthly invoice limit on the free plan. Upgrade to premium for unlimited invoices.",
+        severity: 'warning'
+      });
+    }
   };
   
   const handleCloseNotification = () => {
@@ -694,33 +707,53 @@ export default function InvoiceList() {
           </Box>
         </Box>
         
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleCreateInvoice}
-          fullWidth={{ xs: true, sm: false }}
-          sx={{ 
-            backgroundColor: '#10b981', 
-            backgroundImage: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-            boxShadow: '0 8px 16px rgba(16, 185, 129, 0.3)',
-            border: 'none',
-            borderRadius: 2,
-            px: { xs: 2, sm: 3 },
-            py: 1.5,
-            fontSize: { xs: '0.875rem', sm: '1rem' },
-            fontWeight: 600,
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            '&:hover': { 
-              backgroundColor: '#059669',
-              backgroundImage: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-              transform: 'translateY(-2px)',
-              boxShadow: '0 12px 24px rgba(16, 185, 129, 0.4)'
-            } 
-          }}
+        <Tooltip 
+          title={!canCreateInvoice ? "You've reached your monthly invoice limit on the free plan. Upgrade to premium for unlimited invoices." : ""}
+          arrow
         >
-          Create Invoice
-        </Button>
-      </Box>      
+          <span>
+            <Button
+              variant="contained"
+              startIcon={canCreateInvoice ? <AddIcon /> : <LockIcon />}
+              onClick={handleCreateInvoice}
+              disabled={!canCreateInvoice}
+              fullWidth={{ xs: true, sm: false }}
+              sx={{ 
+                backgroundColor: canCreateInvoice ? '#10b981' : '#9ca3af',
+                backgroundImage: canCreateInvoice 
+                  ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                  : 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
+                boxShadow: canCreateInvoice ? '0 8px 16px rgba(16, 185, 129, 0.3)' : 'none',
+                border: 'none',
+                borderRadius: 2,
+                px: { xs: 2, sm: 3 },
+                py: 1.5,
+                fontSize: { xs: '0.875rem', sm: '1rem' },
+                fontWeight: 600,
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                '&:hover': canCreateInvoice ? { 
+                  backgroundColor: '#059669',
+                  backgroundImage: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 12px 24px rgba(16, 185, 129, 0.4)'
+                } : {},
+                '&.Mui-disabled': {
+                  color: 'white',
+                  opacity: 0.7
+                }
+              }}
+            >
+              {canCreateInvoice ? 'Create Invoice' : 'Limit Reached'}
+            </Button>
+          </span>
+        </Tooltip>
+      </Box>
+
+      {/* Usage Indicator for Free Tier - Below Header */}
+      <Box sx={{ mb: 3 }}>
+        <UsageIndicator resource="invoice" label="Invoices (This Month)" />
+      </Box>
+
       {/* Enhanced Search and Filter Section */}
       <Box 
         sx={{ 

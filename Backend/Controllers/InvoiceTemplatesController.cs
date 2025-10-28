@@ -12,10 +12,12 @@ namespace InvoicingBackend.Controllers
     public class InvoiceTemplatesController : ControllerBase
     {
         private readonly IInvoiceTemplateService _templateService;
+        private readonly ISubscriptionService _subscriptionService;
 
-        public InvoiceTemplatesController(IInvoiceTemplateService templateService)
+        public InvoiceTemplatesController(IInvoiceTemplateService templateService, ISubscriptionService subscriptionService)
         {
             _templateService = templateService;
+            _subscriptionService = subscriptionService;
         }
 
         // GET: api/invoicetemplates
@@ -125,6 +127,19 @@ namespace InvoicingBackend.Controllers
             {
                 var userId = GetUserId();
                 if (userId == null) return Unauthorized();
+
+                // Check if user can create templates (premium only feature)
+                var canCreate = await _subscriptionService.CanCreateTemplateAsync(userId.Value);
+                if (!canCreate)
+                {
+                    return StatusCode(403, new 
+                    { 
+                        message = "Template creation is a premium feature. Upgrade to premium to create invoice templates.",
+                        limitReached = true,
+                        resource = "templates",
+                        premiumOnly = true
+                    });
+                }
 
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);

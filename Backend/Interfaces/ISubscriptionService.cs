@@ -23,5 +23,21 @@ namespace InvoicingBackend.Interfaces
         Task ProcessExpiredSubscriptionsAsync(); // Background service
         Task SendPaymentRemindersAsync(); // Background service
         Task<bool> ExtendSubscriptionAsync(int userId, int months = 1);
+        
+        // Freemium Tier Management
+        Task<bool> IsPremiumUserAsync(int userId);
+        Task<string> GetUserTierAsync(int userId);
+        Task<SubscriptionUsageDto> GetUsageStatsAsync(int userId);
+        
+        // Limit Checks
+        Task<bool> CanCreateClientAsync(int userId);
+        Task<bool> CanCreateCategoryAsync(int userId);
+        Task<bool> CanCreateProductAsync(int userId);
+        Task<bool> CanCreateInvoiceAsync(int userId);
+        Task<bool> CanCreateTemplateAsync(int userId);
+        
+        // Quota Management
+        Task IncrementInvoiceQuotaAsync(int userId);
+        Task<int> GetCurrentMonthQuotaAsync(int userId);
     }
 }

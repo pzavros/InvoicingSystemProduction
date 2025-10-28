@@ -22,6 +22,8 @@ import { useDispatch } from "react-redux";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import InvoiceItem from "./InvoiceItem";
 import InvoiceModal from "./InvoiceModal";
+import LimitReachedModal from "../SubscriptionPage/LimitReachedModal";
+import { useLimit } from "../../utils/useLimit";
 import { addInvoice, updateInvoice as updateReduxInvoice, updateInvoiceStatus as updateReduxInvoiceStatus } from "../../redux/invoicesSlice";
 import generateRandomId from "../../utils/generateRandomId";
 import { useInvoiceListData } from "../../redux/hooks";
@@ -94,6 +96,9 @@ const InvoiceForm = () => {
   const navigate = useNavigate();
   const isCopy = location.pathname.includes("create");
   const isEdit = location.pathname.includes("edit");
+  
+  // Freemium limit checking
+  const { checkLimit, limitModalOpen, limitModalResource, limitModalInfo, closeLimitModal } = useLimit();
 
   const [isOpen, setIsOpen] = useState(false);
   const [copyId, setCopyId] = useState("");
@@ -737,6 +742,15 @@ const InvoiceForm = () => {
   
 
   const handleAddInvoice = async () => {
+    // For new invoices (not edits), check the limit first
+    if (!isEdit) {
+      const canCreate = checkLimit('invoice');
+      if (!canCreate) {
+        // Limit modal will be shown automatically by useLimit hook
+        return;
+      }
+    }
+    
     try {
       setLoading(true);
       const invoiceData = prepareInvoiceDataForAPI();
@@ -766,11 +780,23 @@ const InvoiceForm = () => {
       
     } catch (error) {
       console.error("Error saving invoice:", error);
-      setNotification({
-        open: true,
-        message: `Failed to ${isEdit ? "update" : "create"} invoice: ${error.message}`,
-        severity: "error",
-      });
+      
+      // Check if it's a limit error from the backend
+      if (error.response?.status === 403 && error.response?.data?.limitReached) {
+        const errorData = error.response.data;
+        setNotification({
+          open: true,
+          message: errorData.message || "You have reached your limit for this resource.",
+          severity: "error",
+        });
+        // The modal will be shown by the checkLimit call above
+      } else {
+        setNotification({
+          open: true,
+          message: `Failed to ${isEdit ? "update" : "create"} invoice: ${error.message}`,
+          severity: "error",
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -1981,6 +2007,14 @@ const InvoiceForm = () => {
           {notification.message}
         </Alert>
       </Snackbar>
+      
+      {/* Freemium Limit Reached Modal */}
+      <LimitReachedModal
+        open={limitModalOpen}
+        onClose={closeLimitModal}
+        resource={limitModalResource}
+        limitInfo={limitModalInfo}
+      />
       </form>
     </Box>
   );

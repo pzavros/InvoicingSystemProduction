@@ -181,5 +181,83 @@ namespace InvoicingBackend.Controllers
                 return StatusCode(500, new { message = "An error occurred while checking access.", error = ex.Message });
             }
         }
+
+        // ============= FREEMIUM ENDPOINTS =============
+
+        // GET: api/subscription/tier
+        [HttpGet("tier")]
+        public async Task<IActionResult> GetTier()
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                var tier = await _subscriptionService.GetUserTierAsync(userId);
+                var isPremium = await _subscriptionService.IsPremiumUserAsync(userId);
+                
+                return Ok(new SubscriptionTierDto
+                {
+                    Tier = tier,
+                    IsPremium = isPremium
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while fetching tier.", error = ex.Message });
+            }
+        }
+
+        // GET: api/subscription/usage
+        [HttpGet("usage")]
+        public async Task<IActionResult> GetUsage()
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                var usage = await _subscriptionService.GetUsageStatsAsync(userId);
+                return Ok(usage);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while fetching usage stats.", error = ex.Message });
+            }
+        }
+
+        // GET: api/subscription/can-create/{resource}
+        [HttpGet("can-create/{resource}")]
+        public async Task<IActionResult> CanCreateResource(string resource)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                bool canCreate = false;
+                
+                switch (resource.ToLower())
+                {
+                    case "client":
+                        canCreate = await _subscriptionService.CanCreateClientAsync(userId);
+                        break;
+                    case "category":
+                        canCreate = await _subscriptionService.CanCreateCategoryAsync(userId);
+                        break;
+                    case "product":
+                        canCreate = await _subscriptionService.CanCreateProductAsync(userId);
+                        break;
+                    case "invoice":
+                        canCreate = await _subscriptionService.CanCreateInvoiceAsync(userId);
+                        break;
+                    case "template":
+                        canCreate = await _subscriptionService.CanCreateTemplateAsync(userId);
+                        break;
+                    default:
+                        return BadRequest(new { message = "Invalid resource type." });
+                }
+                
+                return Ok(new { canCreate, resource });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while checking limits.", error = ex.Message });
+            }
+        }
     }
 }

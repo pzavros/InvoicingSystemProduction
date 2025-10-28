@@ -21,13 +21,16 @@ import {
   Add as AddIcon,
   Inventory as InventoryIcon,
   Category as CategoryIcon,
-  Warning as WarningIcon
+  Warning as WarningIcon,
+  Lock as LockIcon
 } from "@mui/icons-material";
 import ProductList from "./ProductList";
 
 import CategoryManager from "./CategoryManager";
 import LowStockAlert from "./LowStockAlert";
+import UsageIndicator from "../SubscriptionPage/UsageIndicator";
 import { getAllProducts, getAllCategories, getLowStockProducts } from "./api";
+import { useSubscription } from "../../utils/SubscriptionContext";
 
 function TabPanel({ children, value, index, ...other }) {
   return (
@@ -45,6 +48,7 @@ function TabPanel({ children, value, index, ...other }) {
 
 const ProductCatalogPage = () => {
   const navigate = useNavigate();
+  const { canCreate, isPremium } = useSubscription();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [lowStockProducts, setLowStockProducts] = useState([]);
@@ -55,6 +59,8 @@ const ProductCatalogPage = () => {
     message: "",
     severity: "success",
   });
+
+  const canAddProduct = canCreate?.product !== false;
 
   // Load initial data
   useEffect(() => {
@@ -85,7 +91,11 @@ const ProductCatalogPage = () => {
   };
 
   const handleAddProduct = () => {
-    navigate('/products/add');
+    if (canAddProduct) {
+      navigate('/products/add');
+    } else {
+      showNotification("You've reached the maximum number of products on the free plan. Upgrade to premium for unlimited products.", "warning");
+    }
   };
 
   const handleEditProduct = (product) => {
@@ -229,34 +239,56 @@ const ProductCatalogPage = () => {
             </Tooltip>
           )}
           
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleAddProduct}
-            fullWidth={{ xs: true, sm: false }}
-            sx={{ 
-              backgroundColor: '#10b981', 
-              backgroundImage: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-              boxShadow: '0 8px 16px rgba(16, 185, 129, 0.3)',
-              border: 'none',
-              borderRadius: 2,
-              px: { xs: 2, sm: 3 },
-              py: 1.5,
-              fontSize: { xs: '0.875rem', sm: '1rem' },
-              fontWeight: 600,
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              '&:hover': { 
-                backgroundColor: '#059669',
-                backgroundImage: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                transform: 'translateY(-2px)',
-                boxShadow: '0 12px 24px rgba(16, 185, 129, 0.4)'
-              } 
-            }}
+          <Tooltip 
+            title={!canAddProduct ? "You've reached the maximum number of products on the free plan. Upgrade to premium for unlimited products." : ""}
+            arrow
           >
-            Add Product
-          </Button>
+            <span>
+              <Button
+                variant="contained"
+                startIcon={canAddProduct ? <AddIcon /> : <LockIcon />}
+                onClick={handleAddProduct}
+                disabled={!canAddProduct}
+                fullWidth={{ xs: true, sm: false }}
+                sx={{ 
+                  backgroundColor: canAddProduct ? '#10b981' : '#9ca3af',
+                  backgroundImage: canAddProduct 
+                    ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                    : 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
+                  boxShadow: canAddProduct ? '0 8px 16px rgba(16, 185, 129, 0.3)' : 'none',
+                  border: 'none',
+                  borderRadius: 2,
+                  px: { xs: 2, sm: 3 },
+                  py: 1.5,
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                  fontWeight: 600,
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  '&:hover': canAddProduct ? { 
+                    backgroundColor: '#059669',
+                    backgroundImage: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 12px 24px rgba(16, 185, 129, 0.4)'
+                  } : {},
+                  '&.Mui-disabled': {
+                    color: 'white',
+                    opacity: 0.7
+                  }
+                }}
+              >
+                {canAddProduct ? 'Add Product' : 'Limit Reached'}
+              </Button>
+            </span>
+          </Tooltip>
         </Box>
-      </Box>      {/* Enhanced Tabs Section */}
+      </Box>
+
+      {/* Usage Indicators for Free Tier - Below Header */}
+      <Box sx={{ mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+        <UsageIndicator resource="product" label="Products" />
+        <UsageIndicator resource="category" label="Categories" />
+      </Box>
+
+      {/* Enhanced Tabs Section */}
       <Paper 
         elevation={2}
         sx={{ 

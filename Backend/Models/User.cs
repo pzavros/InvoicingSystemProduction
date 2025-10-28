@@ -17,6 +17,9 @@ namespace InvoicingBackend.Models
         public string? SubscriptionPlan { get; set; } // Basic, Premium, etc.
         public bool IsTrialUser { get; set; } = false;
         public bool IsAdmin { get; set; } = false;
+        
+        // Freemium subscription tier
+        public string SubscriptionTier { get; set; } = "free"; // "free" or "premium"
         public DateTime? LastLoginDate { get; set; }
         
         // User Preferences
@@ -42,6 +45,7 @@ namespace InvoicingBackend.Models
         public ICollection<SystemSetup> SystemSetups { get; set; } = new List<SystemSetup>();
         public ICollection<InvoiceTemplate> InvoiceTemplates { get; set; } = new List<InvoiceTemplate>();
         public ICollection<Client> Clients { get; set; } = new List<Client>();
+        public ICollection<InvoiceQuota> InvoiceQuotas { get; set; } = new List<InvoiceQuota>();
         public Subscription? Subscription { get; set; }
     }
 }

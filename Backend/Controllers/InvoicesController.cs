@@ -18,9 +18,13 @@ namespace InvoicingBackend.Controllers
     public class InvoicesController : ControllerBase
     {
         private readonly IInvoiceService _invoiceService;
+        private readonly ISubscriptionService _subscriptionService;
 
-        public InvoicesController(IInvoiceService invoiceService)
-            => _invoiceService = invoiceService;
+        public InvoicesController(IInvoiceService invoiceService, ISubscriptionService subscriptionService)
+        {
+            _invoiceService = invoiceService;
+            _subscriptionService = subscriptionService;
+        }
 
         // Helper method to get current user ID from JWT token
         private int GetCurrentUserId()
@@ -83,7 +87,28 @@ namespace InvoicingBackend.Controllers
             try
             {
                 var userId = GetCurrentUserId();
+                
+                // Check subscription limit for free tier
+                var canCreate = await _subscriptionService.CanCreateInvoiceAsync(userId);
+                if (!canCreate)
+                {
+                    var usage = await _subscriptionService.GetUsageStatsAsync(userId);
+                    return StatusCode(403, new 
+                    { 
+                        message = $"You have reached your monthly invoice limit ({usage.InvoicesThisMonth}/{usage.MaxInvoicesPerMonth}). Upgrade to premium for unlimited invoices.",
+                        limitReached = true,
+                        resource = "invoices",
+                        current = usage.InvoicesThisMonth,
+                        max = usage.MaxInvoicesPerMonth,
+                        resetDate = usage.NextResetDate
+                    });
+                }
+                
                 var created = await _invoiceService.CreateInvoiceAsync(invoiceDto, userId);
+                
+                // Increment the invoice quota for free tier users
+                await _subscriptionService.IncrementInvoiceQuotaAsync(userId);
+                
                 return CreatedAtAction(nameof(GetInvoiceById), new { id = created.Id }, created);
             }
             catch (UnauthorizedAccessException ex)
@@ -133,6 +158,7 @@ namespace InvoicingBackend.Controllers
         }
 
         // DELETE: api/invoice/{id}
+        // NOTE: Deleting an invoice does NOT free up the monthly quota for free tier users
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteInvoice(int id)
         {
@@ -143,6 +169,9 @@ namespace InvoicingBackend.Controllers
                 if (!result)
                     return NotFound(new { message = "Invoice not found." });
 
+                // IMPORTANT: We do NOT decrement the invoice quota when deleting
+                // This is by design to prevent abuse of the free tier
+                
                 return NoContent();
             }
             catch (UnauthorizedAccessException ex)

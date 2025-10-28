@@ -12,10 +12,12 @@ namespace InvoicingBackend.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
+        private readonly ISubscriptionService _subscriptionService;
 
-        public ProductsController(IProductService productService)
+        public ProductsController(IProductService productService, ISubscriptionService subscriptionService)
         {
             _productService = productService;
+            _subscriptionService = subscriptionService;
         }
 
         // Helper method to get current user ID from JWT token
@@ -83,6 +85,19 @@ namespace InvoicingBackend.Controllers
             try
             {
                 var userId = GetCurrentUserId();
+                
+                // Check subscription limit for free tier
+                var canCreate = await _subscriptionService.CanCreateProductAsync(userId);
+                if (!canCreate)
+                {
+                    return StatusCode(403, new 
+                    { 
+                        message = "You have reached the maximum number of products for your free tier. Upgrade to premium for unlimited products.",
+                        limitReached = true,
+                        resource = "products"
+                    });
+                }
+                
                 var createdProduct = await _productService.CreateProductAsync(productDto, userId);
                 return CreatedAtAction(nameof(GetProduct), new { id = createdProduct.Id }, createdProduct);
             }
@@ -194,6 +209,19 @@ namespace InvoicingBackend.Controllers
             try
             {
                 var userId = GetCurrentUserId();
+                
+                // Check subscription limit for free tier
+                var canCreate = await _subscriptionService.CanCreateCategoryAsync(userId);
+                if (!canCreate)
+                {
+                    return StatusCode(403, new 
+                    { 
+                        message = "You have reached the maximum number of categories for your free tier. Upgrade to premium for unlimited categories.",
+                        limitReached = true,
+                        resource = "categories"
+                    });
+                }
+                
                 var createdCategory = await _productService.CreateCategoryAsync(categoryDto, userId);
                 return Ok(createdCategory);
             }
@@ -307,8 +335,13 @@ namespace InvoicingBackend.Controllers
         {
             try
             {
-                var products = await _productService.GetLowStockProductsAsync();
+                var userId = GetCurrentUserId();
+                var products = await _productService.GetLowStockProductsAsync(userId);
                 return Ok(products);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
             }
             catch (Exception ex)
             {

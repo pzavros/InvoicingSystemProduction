@@ -34,7 +34,8 @@ import {
   CheckCircle as ActiveIcon,
   Visibility as PreviewIcon,
   Star as StarIcon,
-  Description as DocumentIcon
+  Description as DocumentIcon,
+  Lock as LockIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -50,9 +51,12 @@ import {
 import SimpleTemplatePreview from './SimpleTemplatePreview';
 import TemplatePreviewModal from './TemplatePreviewModal';
 import TemplateCustomizer from './TemplateCustomizer';
+import { useSubscription } from '../../utils/SubscriptionContext';
+import UsageIndicator from '../SubscriptionPage/UsageIndicator';
 
 const InvoiceTemplatesPage = () => {
   const navigate = useNavigate();
+  const { canCreate, isPremium } = useSubscription();
   const [templates, setTemplates] = useState([]);
   const [documentTypes, setDocumentTypes] = useState([]);
   const [selectedDocumentType, setSelectedDocumentType] = useState('all');
@@ -76,6 +80,8 @@ const InvoiceTemplatesPage = () => {
   });
   const [customizerOpen, setCustomizerOpen] = useState(false);
   const [editingCustomTemplate, setEditingCustomTemplate] = useState(null);
+
+  const canCreateTemplate = canCreate?.template !== false;
 
   const systemTemplates = templates.filter((t) => t.isSystemTemplate);
   const customTemplates = templates.filter((t) => !t.isSystemTemplate);
@@ -125,6 +131,12 @@ const InvoiceTemplatesPage = () => {
   };
 
   const handleOpenDialog = (template = null) => {
+    // Check if user can create templates (premium only)
+    if (!template && !canCreateTemplate) {
+      showNotification('Templates are a premium feature. Upgrade to premium to create custom templates.', 'warning');
+      return;
+    }
+    
     if (template) {
       setEditingTemplate(template);
       setFormData({
@@ -146,8 +158,22 @@ const InvoiceTemplatesPage = () => {
   };
 
   const handleOpenCustomizer = (template = null) => {
+    // Check if user can create templates (premium only)
+    if (!template && !canCreateTemplate) {
+      showNotification('Templates are a premium feature. Upgrade to premium to create custom templates.', 'warning');
+      return;
+    }
+    
     setEditingCustomTemplate(template);
     setCustomizerOpen(true);
+  };
+
+  const handleNavigateToAdd = () => {
+    if (canCreateTemplate) {
+      navigate('/templates/add');
+    } else {
+      showNotification('Templates are a premium feature. Upgrade to premium to create custom templates.', 'warning');
+    }
   };
 
   const handleCloseCustomizer = () => {
@@ -594,54 +620,85 @@ const InvoiceTemplatesPage = () => {
               ))}
             </Select>
           </FormControl>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => navigate('/templates/add')}
-            sx={{
-              backgroundColor: '#1d4ed8',
-              backgroundImage: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%)',
-              boxShadow: '0 8px 16px rgba(59, 130, 246, 0.35)',
-              borderRadius: 2,
-              px: 3,
-              py: 1.5,
-              fontWeight: 600,
-              textTransform: 'none',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              '&:hover': {
-                backgroundImage: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 50%, #2563eb 100%)',
-                transform: 'translateY(-2px)',
-                boxShadow: '0 12px 24px rgba(37, 99, 235, 0.45)'
-              }
-            }}
+          <Tooltip
+            title={!canCreateTemplate ? "Templates are a premium feature. Upgrade to premium to create custom templates." : ""}
+            arrow
           >
-            Create Template
-          </Button>
+            <span>
+              <Button
+                variant="contained"
+                startIcon={canCreateTemplate ? <AddIcon /> : <LockIcon />}
+                onClick={handleNavigateToAdd}
+                disabled={!canCreateTemplate}
+                sx={{
+                  backgroundColor: canCreateTemplate ? '#1d4ed8' : '#9ca3af',
+                  backgroundImage: canCreateTemplate 
+                    ? 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%)'
+                    : 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
+                  boxShadow: canCreateTemplate ? '0 8px 16px rgba(59, 130, 246, 0.35)' : 'none',
+                  borderRadius: 2,
+                  px: 3,
+                  py: 1.5,
+                  fontWeight: 600,
+                  textTransform: 'none',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  '&:hover': canCreateTemplate ? {
+                    backgroundImage: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 50%, #2563eb 100%)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 12px 24px rgba(37, 99, 235, 0.45)'
+                  } : {},
+                  '&.Mui-disabled': {
+                    color: 'white',
+                    opacity: 0.7
+                  }
+                }}
+              >
+                {canCreateTemplate ? 'Create Template' : 'Premium Only'}
+              </Button>
+            </span>
+          </Tooltip>
 
-          <Button
-            variant="outlined"
-            startIcon={<AddIcon />}
-            onClick={() => handleOpenDialog()}
-            sx={{
-              borderColor: 'rgba(148, 163, 184, 0.6)',
-              color: '#334155',
-              fontWeight: 600,
-              borderRadius: 2,
-              px: 3,
-              py: 1.5,
-              textTransform: 'none',
-              backgroundColor: 'rgba(255, 255, 255, 0.6)',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                borderColor: 'rgba(59, 130, 246, 0.6)',
-                backgroundColor: 'rgba(59, 130, 246, 0.08)',
-                boxShadow: '0 8px 16px rgba(59, 130, 246, 0.15)'
-              }
-            }}
+          <Tooltip
+            title={!canCreateTemplate ? "Templates are a premium feature. Upgrade to premium to create custom templates." : ""}
+            arrow
           >
-            Advanced Mode
-          </Button>
+            <span>
+              <Button
+                variant="outlined"
+                startIcon={canCreateTemplate ? <AddIcon /> : <LockIcon />}
+                onClick={() => handleOpenDialog()}
+                disabled={!canCreateTemplate}
+                sx={{
+                  borderColor: canCreateTemplate ? 'rgba(148, 163, 184, 0.6)' : '#9ca3af',
+                  color: canCreateTemplate ? '#334155' : '#6b7280',
+                  fontWeight: 600,
+                  borderRadius: 2,
+                  px: 3,
+                  py: 1.5,
+                  textTransform: 'none',
+                  backgroundColor: canCreateTemplate ? 'rgba(255, 255, 255, 0.6)' : 'transparent',
+                  transition: 'all 0.3s ease',
+                  '&:hover': canCreateTemplate ? {
+                    borderColor: 'rgba(59, 130, 246, 0.6)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                    boxShadow: '0 8px 16px rgba(59, 130, 246, 0.15)'
+                  } : {},
+                  '&.Mui-disabled': {
+                    borderColor: '#d1d5db',
+                    opacity: 0.6
+                  }
+                }}
+              >
+                {canCreateTemplate ? 'Advanced Mode' : 'Premium Only'}
+              </Button>
+            </span>
+          </Tooltip>
         </Stack>
+      </Box>
+
+      {/* Usage Indicator for Free Tier - Below Header */}
+      <Box sx={{ mb: 3 }}>
+        <UsageIndicator resource="template" label="Templates" />
       </Box>
 
       {/* Templates DataGrid */}

@@ -38,6 +38,7 @@ import Section from '../ReusableComponents/Section';
 import { subscriptionAPI } from './subscriptionAPI';
 import { useSubscription } from '../../utils/SubscriptionContext';
 import PaymentDialog from './PaymentDialog';
+import UsageDashboard from './UsageDashboard';
 
 const SubscriptionPage = () => {
   const { subscriptionStatus, loading: subscriptionLoading, refreshStatus } = useSubscription();
@@ -202,19 +203,10 @@ const SubscriptionPage = () => {
     );
   }
 
-  const monthlyPriceLabel = subscriptionStatus?.monthlyPrice != null
-    ? `€${subscriptionStatus.monthlyPrice.toFixed(2)} per month`
-    : 'Price unavailable';
-
-  const nextBillingLabel = subscriptionStatus?.isTrialActive && subscriptionStatus?.trialEndDate
-    ? `Trial ends ${formatDate(subscriptionStatus.trialEndDate)}`
-    : subscriptionStatus?.nextPaymentDate
-      ? `Next payment ${formatDate(subscriptionStatus.nextPaymentDate)}`
-      : 'Next payment not scheduled';
-
-  const expiryCountdown = Number.isFinite(subscriptionStatus?.daysUntilExpiry)
-    ? `${subscriptionStatus.daysUntilExpiry} day${subscriptionStatus.daysUntilExpiry === 1 ? '' : 's'} remaining`
-    : 'Expiry information unavailable';
+  // For freemium model, we show fixed pricing
+  const monthlyPrice = 20;
+  const currentTier = subscriptionStatus?.tier || 'free';
+  const isPremium = subscriptionStatus?.isPremium || false;
 
   return (
     <Page>
@@ -229,21 +221,26 @@ const SubscriptionPage = () => {
                 alignItems: { xs: 'flex-start', md: 'center' },
                 gap: 3,
                 mb: 4,
-                p: 3,
+                p: 4,
                 borderRadius: 3,
-                background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-                border: '1px solid rgba(79, 70, 229, 0.18)',
-                boxShadow: '0 4px 12px rgba(79, 70, 229, 0.15)',
+                background: 'linear-gradient(145deg, #ffffff 0%, #faf5ff 100%)',
+                border: '2px solid rgba(139, 92, 246, 0.25)',
+                boxShadow: '0 8px 24px rgba(139, 92, 246, 0.15)',
                 position: 'relative',
                 overflow: 'hidden',
+                transition: 'all 0.3s ease-in-out',
+                '&:hover': {
+                  boxShadow: '0 12px 32px rgba(139, 92, 246, 0.2)',
+                  border: '2px solid rgba(139, 92, 246, 0.35)',
+                },
                 '&::before': {
                   content: '""',
                   position: 'absolute',
                   top: 0,
                   left: 0,
                   right: 0,
-                  height: '4px',
-                  background: 'linear-gradient(90deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%)',
+                  height: '6px',
+                  background: 'linear-gradient(90deg, #8b5cf6 0%, #a855f7 50%, #c084fc 100%)',
                   borderRadius: '3px 3px 0 0'
                 }
               }}
@@ -251,41 +248,46 @@ const SubscriptionPage = () => {
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, minWidth: 260 }}>
                 <Box
                   sx={{
-                    width: 56,
-                    height: 56,
-                    borderRadius: '16px',
-                    background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+                    width: 64,
+                    height: 64,
+                    borderRadius: '18px',
+                    background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    boxShadow: '0 10px 20px rgba(79, 70, 229, 0.35)'
+                    boxShadow: '0 12px 24px rgba(139, 92, 246, 0.4)',
+                    transition: 'transform 0.3s ease',
+                    '&:hover': {
+                      transform: 'scale(1.05) rotate(2deg)'
+                    }
                   }}
                 >
-                  <CreditCard sx={{ color: 'white', fontSize: 26 }} />
+                  <CreditCard sx={{ color: 'white', fontSize: 32 }} />
                 </Box>
                 <Box>
                   <Typography
-                    variant="h5"
+                    variant="h4"
                     component="h1"
                     sx={{
-                      fontWeight: 'bold',
-                      background: 'linear-gradient(135deg, #4338ca 0%, #7c3aed 100%)',
+                      fontWeight: 800,
+                      background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
                       backgroundClip: 'text',
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
-                      mb: 0.5
+                      mb: 0.5,
+                      letterSpacing: '-0.5px'
                     }}
                   >
                     Subscription Management
                   </Typography>
                   <Typography
-                    variant="subtitle2"
+                    variant="body1"
                     sx={{
                       color: 'text.secondary',
-                      fontWeight: 'medium'
+                      fontWeight: 500
                     }}
                   >
-                    Monitor plan status, manage billing, and keep your subscription current.
+                    Monitor your plan, manage billing, and unlock unlimited potential.
                   </Typography>
                 </Box>
               </Box>
@@ -299,28 +301,42 @@ const SubscriptionPage = () => {
                   minWidth: { xs: '100%', md: 'auto' }
                 }}
               >
-                {subscriptionStatus && (
-                  <Stack direction="row" spacing={1.5} alignItems="center">
-                    <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#4f46e5' }}>
-                      Status
-                    </Typography>
-                    {getStatusChip(
-                      subscriptionStatus.status,
-                      subscriptionStatus.isTrialActive,
-                      subscriptionStatus.isActive
-                    )}
-                  </Stack>
-                )}
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#7c3aed' }}>
+                    Current Plan
+                  </Typography>
+                  <Chip
+                    label={isPremium ? 'Premium' : 'Free'}
+                    icon={isPremium ? <Star /> : null}
+                    sx={{
+                      backgroundColor: isPremium ? 'rgba(16, 185, 129, 0.12)' : 'rgba(107, 114, 128, 0.12)',
+                      color: isPremium ? '#059669' : '#4b5563',
+                      border: isPremium ? '2px solid rgba(16, 185, 129, 0.3)' : '2px solid rgba(107, 114, 128, 0.3)',
+                      fontWeight: 700,
+                      borderRadius: 2,
+                      fontSize: '0.8rem',
+                      minWidth: '110px',
+                      height: '32px',
+                      '& .MuiChip-label': {
+                        px: 2,
+                        py: 0.5
+                      },
+                      '& .MuiChip-icon': {
+                        color: 'inherit',
+                        fontSize: '1.1rem'
+                      }
+                    }}
+                  />
+                </Stack>
                 <Stack spacing={0.5}>
-                  <Typography variant="body2" color="text.secondary">
-                    {monthlyPriceLabel}
+                  <Typography variant="body1" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                    {isPremium ? `€${monthlyPrice.toFixed(2)} per month` : 'Free plan with limited features'}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {nextBillingLabel}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {expiryCountdown}
-                  </Typography>
+                  {!isPremium && (
+                    <Typography variant="body2" sx={{ color: '#8b5cf6', fontWeight: 700 }}>
+                      ✨ Upgrade to unlock unlimited access
+                    </Typography>
+                  )}
                 </Stack>
               </Box>
             </Box>
@@ -337,6 +353,13 @@ const SubscriptionPage = () => {
                 </Alert>
               )}
 
+              {/* Usage Dashboard for Free users */}
+              {!isPremium && (
+                <Box sx={{ mb: 4 }}>
+                  <UsageDashboard mode="full" />
+                </Box>
+              )}
+
               <Box
                 sx={{
                   display: 'grid',
@@ -348,151 +371,153 @@ const SubscriptionPage = () => {
                 {/* Subscription Status Card */}
                 <Grow in={true} timeout={600}>
                   <Paper
-                    elevation={4}
+                    elevation={6}
                     sx={{
-                      p: 3,
+                      p: 4,
                       borderRadius: 3,
-                      background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-                      border: '1px solid rgba(79, 70, 229, 0.1)',
+                      background: 'linear-gradient(145deg, #ffffff 0%, #faf5ff 100%)',
+                      border: '2px solid rgba(139, 92, 246, 0.2)',
                       backdropFilter: 'blur(10px)',
+                      position: 'relative',
+                      overflow: 'hidden',
                       transition: 'all 0.3s ease-in-out',
                       '&:hover': {
-                        transform: 'translateY(-2px)',
-                        boxShadow: '0 12px 24px rgba(79, 70, 229, 0.12)'
+                        transform: 'translateY(-4px)',
+                        boxShadow: '0 16px 32px rgba(139, 92, 246, 0.2)',
+                        border: '2px solid rgba(139, 92, 246, 0.35)',
+                      },
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: '4px',
+                        background: 'linear-gradient(90deg, #8b5cf6 0%, #a855f7 100%)',
                       }
                     }}
                   >
-                        <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                          <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary)' }}>
-                            Current Subscription
-                          </Typography>
-                          {subscriptionStatus && getStatusChip(
-                            subscriptionStatus.status,
-                            subscriptionStatus.isTrialActive,
-                            subscriptionStatus.isActive
-                          )}
-                        </Box>
+                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+                      <Typography variant="h5" sx={{ fontWeight: 800, color: '#6d28d9' }}>
+                        Current Plan Status
+                      </Typography>
+                      <Chip
+                        label={isPremium ? 'Premium' : 'Free'}
+                        icon={isPremium ? <Star /> : null}
+                        sx={{
+                          backgroundColor: isPremium ? 'rgba(16, 185, 129, 0.12)' : 'rgba(107, 114, 128, 0.12)',
+                          color: isPremium ? '#059669' : '#4b5563',
+                          border: isPremium ? '2px solid rgba(16, 185, 129, 0.3)' : '2px solid rgba(107, 114, 128, 0.3)',
+                          fontWeight: 700,
+                          borderRadius: 2,
+                          height: '36px',
+                          fontSize: '0.85rem',
+                          '& .MuiChip-icon': {
+                            color: 'inherit',
+                            fontSize: '1.2rem'
+                          }
+                        }}
+                      />
+                    </Box>
 
-                        {subscriptionStatus ? (
-                          <Box
-                            sx={{
-                              display: 'grid',
-                              gap: 2,
-                              gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }
-                            }}
-                          >
-                            <Box>
-                              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                                Monthly Price
-                              </Typography>
-                              <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--color-primary)' }}>
-                                €{subscriptionStatus.monthlyPrice.toFixed(2)}
-                              </Typography>
-                            </Box>
+                    <Box
+                      sx={{
+                        display: 'grid',
+                        gap: 2,
+                        gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          p: 2.5,
+                          borderRadius: 2,
+                          background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(168, 85, 247, 0.08) 100%)',
+                          border: '1px solid rgba(139, 92, 246, 0.2)'
+                        }}
+                      >
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 600 }}>
+                          Plan Type
+                        </Typography>
+                        <Typography variant="h5" sx={{ fontWeight: 800, color: '#7c3aed' }}>
+                          {isPremium ? '✨ Premium' : '🆓 Free Tier'}
+                        </Typography>
+                      </Box>
 
-                            {subscriptionStatus.isTrialActive && subscriptionStatus.trialEndDate && (
-                              <Box>
-                                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                                  Trial Ends
-                                </Typography>
-                                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                                  {formatDate(subscriptionStatus.trialEndDate)}
-                                </Typography>
-                              </Box>
-                            )}
+                      <Box
+                        sx={{
+                          p: 2.5,
+                          borderRadius: 2,
+                          background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(168, 85, 247, 0.08) 100%)',
+                          border: '1px solid rgba(139, 92, 246, 0.2)'
+                        }}
+                      >
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 600 }}>
+                          Monthly Cost
+                        </Typography>
+                        <Typography variant="h5" sx={{ fontWeight: 800, color: isPremium ? '#059669' : '#6b7280' }}>
+                          {isPremium ? `€${monthlyPrice.toFixed(2)}` : '€0.00'}
+                        </Typography>
+                      </Box>
+                    </Box>
 
-                            {subscriptionStatus.nextPaymentDate && !subscriptionStatus.isTrialActive && (
-                              <Box>
-                                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                                  Next Payment
-                                </Typography>
-                                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                                  {formatDate(subscriptionStatus.nextPaymentDate)}
-                                </Typography>
-                              </Box>
-                            )}
+                    <Stack mt={3} direction="row" spacing={2} flexWrap="wrap">
+                      {!isPremium && (
+                        <Button
+                          variant="contained"
+                          onClick={() => setPaymentDialogOpen(true)}
+                          disabled={actionLoading}
+                          startIcon={<Star />}
+                          size="large"
+                          sx={{
+                            background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
+                            boxShadow: '0 6px 16px rgba(139, 92, 246, 0.35)',
+                            borderRadius: 2,
+                            textTransform: 'none',
+                            fontWeight: 700,
+                            px: 4,
+                            py: 1.5,
+                            fontSize: '1rem',
+                            '&:hover': {
+                              background: 'linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)',
+                              boxShadow: '0 8px 20px rgba(139, 92, 246, 0.45)',
+                              transform: 'translateY(-2px)',
+                            },
+                            transition: 'all 0.3s ease'
+                          }}
+                        >
+                          Upgrade to Premium
+                        </Button>
+                      )}
 
-                            <Box>
-                              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
-                                Days Until Expiry
-                              </Typography>
-                              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                                {subscriptionStatus.daysUntilExpiry} days
-                              </Typography>
-                            </Box>
-                          </Box>
-                        ) : (
-                          <Typography variant="body1" color="text.secondary">
-                            No active subscription found
-                          </Typography>
-                        )}
-
-                        <Stack mt={3} direction="row" spacing={2} flexWrap="wrap">
-                          {!subscriptionStatus?.isActive && !subscriptionStatus?.isTrialActive && (
-                            <Button
-                              variant="contained"
-                              onClick={handleStartTrial}
-                              disabled={actionLoading}
-                              startIcon={<Star />}
-                              sx={{
-                                background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
-                                borderRadius: 2,
-                                textTransform: 'none',
-                                fontWeight: 600,
-                                px: 3,
-                                '&:hover': {
-                                  background: 'linear-gradient(135deg, #4338ca 0%, #6d28d9 100%)',
-                                }
-                              }}
-                            >
-                              Start 7-Day Trial
-                            </Button>
-                          )}
-
-                          {subscriptionStatus?.requiresPayment && (
-                            <Button
-                              variant="contained"
-                              onClick={() => setPaymentDialogOpen(true)}
-                              disabled={actionLoading}
-                              startIcon={<Payment />}
-                              sx={{
-                                background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                                borderRadius: 2,
-                                textTransform: 'none',
-                                fontWeight: 600,
-                                px: 3,
-                                '&:hover': {
-                                  background: 'linear-gradient(135deg, #047857 0%, #065f46 100%)',
-                                }
-                              }}
-                            >
-                              Pay €{subscriptionStatus.monthlyPrice.toFixed(2)}
-                            </Button>
-                          )}
-
-                          {subscriptionStatus?.isActive && (
-                            <Button
-                              variant="outlined"
-                              onClick={() => setCancelDialogOpen(true)}
-                              disabled={actionLoading}
-                              startIcon={<Cancel />}
-                              sx={{
-                                borderColor: '#dc2626',
-                                color: '#dc2626',
-                                borderRadius: 2,
-                                textTransform: 'none',
-                                fontWeight: 600,
-                                px: 3,
-                                '&:hover': {
-                                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                                  borderColor: '#dc2626',
-                                }
-                              }}
-                            >
-                              Cancel Subscription
-                            </Button>
-                          )}
-                        </Stack>
+                      {isPremium && (
+                        <Button
+                          variant="outlined"
+                          onClick={() => setCancelDialogOpen(true)}
+                          disabled={actionLoading}
+                          startIcon={<Cancel />}
+                          size="large"
+                          sx={{
+                            borderColor: '#dc2626',
+                            borderWidth: '2px',
+                            color: '#dc2626',
+                            borderRadius: 2,
+                            textTransform: 'none',
+                            fontWeight: 700,
+                            px: 4,
+                            py: 1.5,
+                            '&:hover': {
+                              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                              borderColor: '#dc2626',
+                              borderWidth: '2px',
+                              transform: 'translateY(-2px)',
+                            },
+                            transition: 'all 0.3s ease'
+                          }}
+                        >
+                          Downgrade to Free
+                        </Button>
+                      )}
+                    </Stack>
                       </Paper>
                     </Grow>
 
@@ -501,64 +526,167 @@ const SubscriptionPage = () => {
                   <Paper
                     elevation={4}
                     sx={{
-                      p: 3,
+                      p: 4,
                       borderRadius: 3,
-                      background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-                      border: '1px solid rgba(79, 70, 229, 0.1)',
+                      background: 'linear-gradient(145deg, #ffffff 0%, #faf5ff 100%)',
+                      border: '2px solid rgba(139, 92, 246, 0.3)',
                       backdropFilter: 'blur(10px)',
+                      position: 'relative',
+                      overflow: 'hidden',
                       transition: 'all 0.3s ease-in-out',
                       '&:hover': {
-                        transform: 'translateY(-2px)',
-                        boxShadow: '0 12px 24px rgba(79, 70, 229, 0.12)'
+                        transform: 'translateY(-4px)',
+                        boxShadow: '0 20px 40px rgba(139, 92, 246, 0.25)',
+                        border: '2px solid rgba(139, 92, 246, 0.5)',
+                      },
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: '6px',
+                        background: 'linear-gradient(90deg, #8b5cf6 0%, #a855f7 50%, #c084fc 100%)',
                       }
                     }}
                   >
-                    <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: 'var(--color-text-primary)' }}>
-                      Pricing Plan
-                    </Typography>
-                    <Box textAlign="center" py={2}>
-                      <Typography variant="h3" sx={{ fontWeight: 'bold', color: 'var(--color-primary)' }}>
-                        €20
+                    {/* Premium Badge */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                      <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#6d28d9' }}>
+                        Premium Plan
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        per month
+                      <Chip
+                        icon={<Star sx={{ fontSize: '1rem' }} />}
+                        label="POPULAR"
+                        size="small"
+                        sx={{
+                          background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
+                          color: 'white',
+                          fontWeight: 700,
+                          fontSize: '0.7rem',
+                          letterSpacing: '0.5px',
+                          boxShadow: '0 4px 12px rgba(139, 92, 246, 0.4)'
+                        }}
+                      />
+                    </Box>
+
+                    {/* Price Display */}
+                    <Box 
+                      textAlign="center" 
+                      py={3}
+                      sx={{
+                        background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)',
+                        borderRadius: 2,
+                        mb: 3
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'center', gap: 0.5 }}>
+                        <Typography 
+                          variant="h2" 
+                          sx={{ 
+                            fontWeight: 'bold', 
+                            background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
+                            backgroundClip: 'text',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                          }}
+                        >
+                          €{monthlyPrice}
+                        </Typography>
+                      </Box>
+                      <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 500, mt: 0.5 }}>
+                        per month · billed monthly
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: '#8b5cf6', fontWeight: 600, display: 'block', mt: 1 }}>
+                        Cancel anytime, no commitment
                       </Typography>
                     </Box>
-                    <Typography variant="body2" gutterBottom sx={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>
-                      What's included:
+
+                    {/* Features List */}
+                    <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 700, color: '#6d28d9', mb: 2 }}>
+                      Everything you need to grow:
                     </Typography>
-                    <List dense>
-                      <ListItem sx={{ px: 0 }}>
-                        <ListItemText 
-                          primary="Unlimited invoices" 
-                          primaryTypographyProps={{ fontSize: '0.875rem' }}
-                        />
-                      </ListItem>
-                      <ListItem sx={{ px: 0 }}>
-                        <ListItemText 
-                          primary="Product catalog management" 
-                          primaryTypographyProps={{ fontSize: '0.875rem' }}
-                        />
-                      </ListItem>
-                      <ListItem sx={{ px: 0 }}>
-                        <ListItemText 
-                          primary="Dashboard analytics" 
-                          primaryTypographyProps={{ fontSize: '0.875rem' }}
-                        />
-                      </ListItem>
-                      <ListItem sx={{ px: 0 }}>
-                        <ListItemText 
-                          primary="PDF export" 
-                          primaryTypographyProps={{ fontSize: '0.875rem' }}
-                        />
-                      </ListItem>
-                      <ListItem sx={{ px: 0 }}>
-                        <ListItemText 
-                          primary="Email support" 
-                          primaryTypographyProps={{ fontSize: '0.875rem' }}
-                        />
-                      </ListItem>
-                    </List>
+                    <Stack spacing={1.5}>
+                      {[
+                        { icon: '∞', text: 'Unlimited clients, categories & products', highlight: true },
+                        { icon: '📄', text: 'Unlimited invoices every month' },
+                        { icon: '🎨', text: 'Custom invoice templates' },
+                        { icon: '✨', text: 'Professional PDFs with no watermarks' },
+                        { icon: '📊', text: 'Advanced dashboard analytics' },
+                        { icon: '⚡', text: 'Priority email support' }
+                      ].map((feature, index) => (
+                        <Box 
+                          key={index}
+                          sx={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: 1.5,
+                            p: 1.5,
+                            borderRadius: 2,
+                            background: feature.highlight ? 'rgba(139, 92, 246, 0.08)' : 'transparent',
+                            transition: 'all 0.2s ease',
+                            '&:hover': {
+                              background: 'rgba(139, 92, 246, 0.12)',
+                              transform: 'translateX(4px)'
+                            }
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              width: 32,
+                              height: 32,
+                              borderRadius: '8px',
+                              background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '1.1rem',
+                              flexShrink: 0
+                            }}
+                          >
+                            {feature.icon}
+                          </Box>
+                          <Typography 
+                            variant="body2" 
+                            sx={{ 
+                              fontWeight: feature.highlight ? 600 : 500,
+                              color: feature.highlight ? '#6d28d9' : 'text.primary',
+                              flex: 1
+                            }}
+                          >
+                            {feature.text}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Stack>
+
+                    {/* CTA Button for Free Users */}
+                    {!isPremium && (
+                      <Button
+                        variant="contained"
+                        fullWidth
+                        size="large"
+                        startIcon={<Star />}
+                        onClick={() => setPaymentDialogOpen(true)}
+                        sx={{
+                          mt: 3,
+                          py: 1.5,
+                          background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
+                          boxShadow: '0 8px 20px rgba(139, 92, 246, 0.4)',
+                          borderRadius: 2,
+                          textTransform: 'none',
+                          fontWeight: 700,
+                          fontSize: '1rem',
+                          '&:hover': {
+                            background: 'linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)',
+                            boxShadow: '0 12px 28px rgba(139, 92, 246, 0.5)',
+                            transform: 'translateY(-2px)'
+                          }
+                        }}
+                      >
+                        Upgrade to Premium Now
+                      </Button>
+                    )}
                   </Paper>
                 </Grow>
               </Box>
@@ -566,23 +694,48 @@ const SubscriptionPage = () => {
               {/* Payment History */}
               <Grow in={true} timeout={1000}>
                 <Paper
-                  elevation={4}
+                  elevation={6}
                   sx={{
-                    p: 3,
+                    p: 4,
                     borderRadius: 3,
-                    background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-                    border: '1px solid rgba(79, 70, 229, 0.1)',
+                    background: 'linear-gradient(145deg, #ffffff 0%, #faf5ff 100%)',
+                    border: '2px solid rgba(139, 92, 246, 0.2)',
                     backdropFilter: 'blur(10px)',
+                    position: 'relative',
+                    overflow: 'hidden',
                     transition: 'all 0.3s ease-in-out',
                     '&:hover': {
-                      transform: 'translateY(-2px)',
-                      boxShadow: '0 12px 24px rgba(79, 70, 229, 0.12)'
+                      transform: 'translateY(-4px)',
+                      boxShadow: '0 16px 32px rgba(139, 92, 246, 0.2)',
+                      border: '2px solid rgba(139, 92, 246, 0.35)',
+                    },
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: '4px',
+                      background: 'linear-gradient(90deg, #8b5cf6 0%, #a855f7 100%)',
                     }
                   }}
                 >
-                  <Box display="flex" alignItems="center" gap={1} mb={3}>
-                    <History sx={{ color: 'var(--color-primary)' }} />
-                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary)' }}>
+                  <Box display="flex" alignItems="center" gap={2} mb={3}>
+                    <Box
+                      sx={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: '12px',
+                        background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 6px 16px rgba(139, 92, 246, 0.3)'
+                      }}
+                    >
+                      <History sx={{ color: 'white', fontSize: 24 }} />
+                    </Box>
+                    <Typography variant="h5" sx={{ fontWeight: 800, color: '#6d28d9' }}>
                       Payment History
                     </Typography>
                   </Box>
@@ -592,10 +745,16 @@ const SubscriptionPage = () => {
                         <Paper 
                           key={payment.id} 
                           sx={{ 
-                            p: 2, 
+                            p: 3, 
                             borderRadius: 2,
-                            background: 'rgba(59, 130, 246, 0.02)',
-                            border: '1px solid rgba(59, 130, 246, 0.1)'
+                            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.04) 0%, rgba(168, 85, 247, 0.04) 100%)',
+                            border: '2px solid rgba(139, 92, 246, 0.15)',
+                            transition: 'all 0.3s ease',
+                            '&:hover': {
+                              border: '2px solid rgba(139, 92, 246, 0.3)',
+                              transform: 'translateX(4px)',
+                              boxShadow: '0 4px 12px rgba(139, 92, 246, 0.15)'
+                            }
                           }}
                         >
                           <Box
@@ -607,42 +766,43 @@ const SubscriptionPage = () => {
                             }}
                           >
                             <Box>
-                              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                              <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, fontWeight: 600, display: 'block' }}>
                                 Amount
                               </Typography>
-                              <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--color-primary)' }}>
+                              <Typography variant="h5" sx={{ fontWeight: 800, color: '#8b5cf6' }}>
                                 €{payment.amount.toFixed(2)}
                               </Typography>
                             </Box>
                             <Box>
-                              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                              <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, fontWeight: 600, display: 'block' }}>
                                 Date
                               </Typography>
-                              <Typography variant="body1">
+                              <Typography variant="body1" sx={{ fontWeight: 600 }}>
                                 {formatDate(payment.paymentDate)}
                               </Typography>
                             </Box>
                             <Box>
-                              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                              <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, fontWeight: 600, display: 'block' }}>
                                 Status
                               </Typography>
                               <Chip
                                 label={payment.status}
                                 size="small"
                                 sx={{
-                                  backgroundColor: payment.status === 'Succeeded' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(107, 114, 128, 0.1)',
+                                  backgroundColor: payment.status === 'Succeeded' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(107, 114, 128, 0.12)',
                                   color: payment.status === 'Succeeded' ? '#059669' : '#4b5563',
-                                  border: payment.status === 'Succeeded' ? '1px solid rgba(16, 185, 129, 0.2)' : '1px solid rgba(107, 114, 128, 0.2)',
-                                  fontWeight: 600,
+                                  border: payment.status === 'Succeeded' ? '2px solid rgba(16, 185, 129, 0.3)' : '2px solid rgba(107, 114, 128, 0.3)',
+                                  fontWeight: 700,
                                   borderRadius: 2,
+                                  height: '28px'
                                 }}
                               />
                             </Box>
                             <Box>
-                              <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                              <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, fontWeight: 600, display: 'block' }}>
                                 Description
                               </Typography>
-                              <Typography variant="body2">
+                              <Typography variant="body2" sx={{ fontWeight: 500 }}>
                                 {payment.description || 'Monthly subscription'}
                               </Typography>
                             </Box>
@@ -651,9 +811,24 @@ const SubscriptionPage = () => {
                       ))}
                     </Stack>
                   ) : (
-                    <Typography variant="body2" color="text.secondary">
-                      No payment history available
-                    </Typography>
+                    <Box
+                      sx={{
+                        textAlign: 'center',
+                        py: 6,
+                        px: 3,
+                        borderRadius: 2,
+                        background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%)',
+                        border: '2px dashed rgba(139, 92, 246, 0.2)'
+                      }}
+                    >
+                      <Payment sx={{ fontSize: 48, color: '#a855f7', mb: 2, opacity: 0.5 }} />
+                      <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.secondary', mb: 1 }}>
+                        No payment history yet
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Your payment transactions will appear here once you upgrade to Premium
+                      </Typography>
+                    </Box>
                   )}
                 </Paper>
               </Grow>
@@ -662,10 +837,11 @@ const SubscriptionPage = () => {
               <PaymentDialog
                 open={paymentDialogOpen}
                 onClose={() => setPaymentDialogOpen(false)}
-                amount={subscriptionStatus?.monthlyPrice || 20}
+                amount={monthlyPrice}
                 onSuccess={() => {
                   setPaymentDialogOpen(false);
-                  setSuccess('Payment processed successfully!');
+                  setSuccess('Payment processed successfully! You are now on the Premium plan.');
+                  refreshStatus();
                   fetchSubscriptionData();
                 }}
                 onError={(error) => {
@@ -673,50 +849,91 @@ const SubscriptionPage = () => {
                 }}
               />
 
-              {/* Cancel Confirmation Dialog */}
+              {/* Cancel/Downgrade Confirmation Dialog */}
               <Dialog 
                 open={cancelDialogOpen} 
                 onClose={() => setCancelDialogOpen(false)}
                 PaperProps={{
                   sx: {
                     borderRadius: 3,
-                    background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
+                    background: 'linear-gradient(145deg, #ffffff 0%, #fef2f2 100%)',
+                    border: '2px solid rgba(220, 38, 38, 0.2)',
                   }
                 }}
               >
-                <DialogTitle sx={{ fontWeight: 'bold', color: 'var(--color-text-primary)' }}>
-                  Cancel Subscription
+                <DialogTitle sx={{ fontWeight: 800, color: '#dc2626', fontSize: '1.5rem' }}>
+                  ⚠️ Downgrade to Free Plan
                 </DialogTitle>
                 <DialogContent>
-                  <Typography>
-                    Are you sure you want to cancel your subscription? You will lose access to all features
-                    at the end of your current billing period.
+                  <Typography variant="body1" sx={{ fontWeight: 600, mb: 2 }}>
+                    Are you sure you want to downgrade to the Free plan? You will lose access to:
                   </Typography>
+                  <Stack spacing={1.5}>
+                    {[
+                      '❌ Unlimited clients (limited to 1)',
+                      '❌ Unlimited categories (limited to 1)',
+                      '❌ Unlimited products (limited to 1)',
+                      '❌ Unlimited invoices (limited to 3/month)',
+                      '❌ Custom invoice templates',
+                      '❌ PDF exports without watermarks'
+                    ].map((item, index) => (
+                      <Box
+                        key={index}
+                        sx={{
+                          p: 1.5,
+                          borderRadius: 2,
+                          background: 'rgba(220, 38, 38, 0.05)',
+                          border: '1px solid rgba(220, 38, 38, 0.15)'
+                        }}
+                      >
+                        <Typography variant="body2" sx={{ fontWeight: 600, color: '#dc2626' }}>
+                          {item}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Stack>
                 </DialogContent>
-                <DialogActions sx={{ p: 3 }}>
+                <DialogActions sx={{ p: 3, gap: 2 }}>
                   <Button 
                     onClick={() => setCancelDialogOpen(false)} 
                     disabled={actionLoading}
-                    sx={{ textTransform: 'none', borderRadius: 2 }}
+                    variant="contained"
+                    size="large"
+                    sx={{ 
+                      textTransform: 'none', 
+                      borderRadius: 2,
+                      fontWeight: 700,
+                      px: 3,
+                      background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
+                      '&:hover': {
+                        background: 'linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)',
+                      }
+                    }}
                   >
-                    Keep Subscription
+                    Keep Premium
                   </Button>
                   <Button
                     onClick={handleCancelSubscription}
                     disabled={actionLoading}
+                    variant="outlined"
+                    size="large"
                     startIcon={actionLoading && <CircularProgress size={16} />}
                     sx={{
-                      backgroundColor: '#dc2626',
-                      color: 'white',
+                      borderColor: '#dc2626',
+                      borderWidth: '2px',
+                      color: '#dc2626',
                       borderRadius: 2,
                       textTransform: 'none',
-                      fontWeight: 600,
+                      fontWeight: 700,
+                      px: 3,
                       '&:hover': {
-                        backgroundColor: '#b91c1c',
+                        backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                        borderColor: '#dc2626',
+                        borderWidth: '2px',
                       }
                     }}
                   >
-                    Cancel Subscription
+                    Downgrade to Free
                   </Button>
                 </DialogActions>
               </Dialog>

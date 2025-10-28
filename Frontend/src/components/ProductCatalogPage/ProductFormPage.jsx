@@ -24,6 +24,8 @@ import {
   Save as SaveIcon
 } from "@mui/icons-material";
 import { createProduct, updateProduct, getProductById, getAllCategories } from "./api";
+import LimitReachedModal from "../SubscriptionPage/LimitReachedModal";
+import { useLimit } from "../../utils/useLimit";
 
 /** ---------- Form Components ---------- **/
 const FormGrid = ({ size, children }) => (
@@ -45,6 +47,9 @@ const ProductFormPage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditing = Boolean(id);
+  
+  // Freemium limit checking
+  const { checkLimit, limitModalOpen, limitModalResource, closeLimitModal } = useLimit();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -161,6 +166,15 @@ const ProductFormPage = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!validateForm()) return;
+    
+    // For new products (not edits), check the limit first
+    if (!isEditing) {
+      const canCreate = checkLimit('product');
+      if (!canCreate) {
+        // Limit modal will be shown automatically by useLimit hook
+        return;
+      }
+    }
 
     try {
       setSaving(true);
@@ -196,13 +210,22 @@ const ProductFormPage = () => {
 
       setTimeout(() => navigate("/products"), 1200);
     } catch (error) {
-      setNotification({
-        show: true,
-        message: `Error ${isEditing ? "updating" : "creating"} product: ${
-          error.message
-        }`,
-        severity: "error"
-      });
+      // Check if it's a limit error from the backend
+      if (error.response?.status === 403 && error.response?.data?.limitReached) {
+        setNotification({
+          show: true,
+          message: error.response.data.message || "You have reached your limit for this resource.",
+          severity: "error"
+        });
+      } else {
+        setNotification({
+          show: true,
+          message: `Error ${isEditing ? "updating" : "creating"} product: ${
+            error.message
+          }`,
+          severity: "error"
+        });
+      }
     } finally {
       setSaving(false);
     }
@@ -524,6 +547,13 @@ const ProductFormPage = () => {
           </Box>
         </FormGrid>
       </Grid>
+      
+      {/* Freemium Limit Reached Modal */}
+      <LimitReachedModal
+        open={limitModalOpen}
+        onClose={closeLimitModal}
+        resource={limitModalResource}
+      />
     </Grid>
   );
 };

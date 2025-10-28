@@ -671,6 +671,58 @@ namespace Backend.Migrations
                     b.ToTable("InvoiceItems");
                 });
 
+            modelBuilder.Entity("InvoicingBackend.Models.InvoiceQuota", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("DateDeleted")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("DateEntered")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DateModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("EnteredBy")
+                        .HasColumnType("text");
+
+                    b.Property<int>("InvoicesCreated")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Month")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bytea");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "Month")
+                        .IsUnique();
+
+                    b.ToTable("InvoiceQuotas");
+                });
+
             modelBuilder.Entity("InvoicingBackend.Models.InvoiceTemplate", b =>
                 {
                     b.Property<int>("Id")
@@ -1289,6 +1341,10 @@ namespace Backend.Migrations
                     b.Property<string>("SubscriptionPlan")
                         .HasColumnType("text");
 
+                    b.Property<string>("SubscriptionTier")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.ToTable("Users");
@@ -1397,6 +1453,16 @@ namespace Backend.Migrations
                     b.Navigation("Invoice");
 
                     b.Navigation("Product");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("InvoicingBackend.Models.InvoiceQuota", b =>
+                {
+                    b.HasOne("InvoicingBackend.Models.User", "User")
+                        .WithMany("InvoiceQuotas")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("User");
                 });
@@ -1533,6 +1599,8 @@ namespace Backend.Migrations
             modelBuilder.Entity("InvoicingBackend.Models.User", b =>
                 {
                     b.Navigation("Clients");
+
+                    b.Navigation("InvoiceQuotas");
 
                     b.Navigation("InvoiceTemplates");
 

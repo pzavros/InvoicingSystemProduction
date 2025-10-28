@@ -23,6 +23,7 @@ namespace InvoicingBackend.Data
         public DbSet<InvoiceTemplate> InvoiceTemplates { get; set; }
         public DbSet<DocumentType> DocumentTypes { get; set; }
         public DbSet<Client> Clients { get; set; }
+        public DbSet<InvoiceQuota> InvoiceQuotas { get; set; }
         
         // Webpage Models
         public DbSet<WaitlistEntry> WaitlistEntries { get; set; }
@@ -159,6 +160,18 @@ namespace InvoicingBackend.Data
                 .WithMany(dt => dt.Templates)
                 .HasForeignKey(t => t.DocumentTypeId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            // User → InvoiceQuotas relationship (One-to-Many)
+            modelBuilder.Entity<InvoiceQuota>()
+                .HasOne(iq => iq.User)
+                .WithMany(u => u.InvoiceQuotas)
+                .HasForeignKey(iq => iq.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Unique constraint on UserId + Month for InvoiceQuota
+            modelBuilder.Entity<InvoiceQuota>()
+                .HasIndex(iq => new { iq.UserId, iq.Month })
+                .IsUnique();
 
         }
     }

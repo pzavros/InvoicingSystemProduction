@@ -15,6 +15,8 @@ export const useSubscription = () => {
 export const SubscriptionProvider = ({ children }) => {
   const { authenticated } = useAuth();
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
+  const [subscriptionTier, setSubscriptionTier] = useState(null);
+  const [usageStats, setUsageStats] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [initialized, setInitialized] = useState(false);
@@ -45,11 +47,26 @@ export const SubscriptionProvider = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await subscriptionAPI.getStatus();
+      
+      // Fetch tier, usage stats, and old subscription status in parallel
+      const [tierResponse, usageResponse] = await Promise.all([
+        subscriptionAPI.getTier(),
+        subscriptionAPI.getUsage(),
+      ]);
       
       // Only update state if the request wasn't aborted
       if (!abortController.current?.signal.aborted) {
-        setSubscriptionStatus(response.data);
+        setSubscriptionTier(tierResponse.data);
+        setUsageStats(usageResponse.data);
+        
+        // For backward compatibility, keep old subscription status structure
+        // but mark everyone as having access (since freemium allows everyone in)
+        setSubscriptionStatus({
+          isActive: true, // Everyone has access now (free or premium)
+          isPremium: tierResponse.data.isPremium,
+          tier: tierResponse.data.tier,
+        });
+        
         setInitialized(true);
       }
     } catch (error) {
@@ -58,6 +75,8 @@ export const SubscriptionProvider = ({ children }) => {
         console.error('Error checking subscription status:', error);
         setError(error.response?.data?.message || 'Failed to check subscription status');
         setSubscriptionStatus(null);
+        setSubscriptionTier(null);
+        setUsageStats(null);
         setInitialized(true);
       }
     } finally {
@@ -74,6 +93,8 @@ export const SubscriptionProvider = ({ children }) => {
     } else if (!authenticated) {
       // Clear subscription status when user logs out
       setSubscriptionStatus(null);
+      setSubscriptionTier(null);
+      setUsageStats(null);
       setInitialized(false);
       setLoading(false);
       setError(null);
@@ -88,7 +109,7 @@ export const SubscriptionProvider = ({ children }) => {
       if (authenticated && !loading) {
         checkSubscriptionStatus(true); // Force periodic refresh
       }
-    }, 600000); // Check every 10 minutes (further reduced frequency)
+    }, 300000); // Check every 5 minutes
 
     return () => clearInterval(interval);
   }, [authenticated, initialized, loading, checkSubscriptionStatus]);
@@ -102,6 +123,8 @@ export const SubscriptionProvider = ({ children }) => {
           checkSubscriptionStatus(true);
         } else if (!authenticated) {
           setSubscriptionStatus(null);
+          setSubscriptionTier(null);
+          setUsageStats(null);
           setLoading(false);
           setInitialized(false);
           setError(null);
@@ -124,14 +147,33 @@ export const SubscriptionProvider = ({ children }) => {
 
   const value = {
     subscriptionStatus,
+    subscriptionTier,
+    usageStats,
     loading,
     error,
     initialized,
     refreshStatus: checkSubscriptionStatus,
-    hasAccess: subscriptionStatus?.IsActive || subscriptionStatus?.isActive || false,
-    isInTrial: subscriptionStatus?.IsTrialActive || subscriptionStatus?.isTrialActive || false,
-    requiresPayment: subscriptionStatus?.RequiresPayment || subscriptionStatus?.requiresPayment || false,
-    daysUntilExpiry: subscriptionStatus?.DaysUntilExpiry || subscriptionStatus?.daysUntilExpiry || 0,
+    
+    // Everyone has access now (free or premium)
+    hasAccess: true,
+    
+    // Premium status
+    isPremium: subscriptionTier?.isPremium || false,
+    tier: subscriptionTier?.tier || 'free',
+    
+    // Usage limits
+    canCreate: {
+      client: usageStats?.canCreateClient || false,
+      category: usageStats?.canCreateCategory || false,
+      product: usageStats?.canCreateProduct || false,
+      invoice: usageStats?.canCreateInvoice || false,
+      template: usageStats?.canCreateTemplate || false,
+    },
+    
+    // For backward compatibility
+    isInTrial: false,
+    requiresPayment: false,
+    daysUntilExpiry: 0,
   };
 
   return (

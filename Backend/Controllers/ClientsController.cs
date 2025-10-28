@@ -12,10 +12,12 @@ namespace InvoicingBackend.Controllers
     public class ClientsController : ControllerBase
     {
         private readonly IClientService _clientService;
+        private readonly ISubscriptionService _subscriptionService;
 
-        public ClientsController(IClientService clientService)
+        public ClientsController(IClientService clientService, ISubscriptionService subscriptionService)
         {
             _clientService = clientService;
+            _subscriptionService = subscriptionService;
         }
 
         private int GetCurrentUserId()
@@ -108,6 +110,18 @@ namespace InvoicingBackend.Controllers
                 var userId = GetCurrentUserId();
                 if (userId == 0)
                     return Unauthorized("Invalid user token");
+
+                // Check subscription limit for free tier
+                var canCreate = await _subscriptionService.CanCreateClientAsync(userId);
+                if (!canCreate)
+                {
+                    return StatusCode(403, new 
+                    { 
+                        message = "You have reached the maximum number of clients for your free tier. Upgrade to premium for unlimited clients.",
+                        limitReached = true,
+                        resource = "clients"
+                    });
+                }
 
                 var userName = GetCurrentUserName();
 

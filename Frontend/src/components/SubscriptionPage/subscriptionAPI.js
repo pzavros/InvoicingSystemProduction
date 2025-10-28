@@ -60,6 +60,17 @@ export const subscriptionAPI = {
   
   // Check access
   checkAccess: () => api.get('/api/subscription/check-access'),
+  
+  // ============= FREEMIUM ENDPOINTS =============
+  
+  // Get user's subscription tier (free or premium)
+  getTier: () => api.get('/api/subscription/tier'),
+  
+  // Get usage statistics and limits
+  getUsage: () => api.get('/api/subscription/usage'),
+  
+  // Check if user can create a specific resource
+  canCreateResource: (resource) => api.get(`/api/subscription/can-create/${resource}`),
 };
 
 export default subscriptionAPI;

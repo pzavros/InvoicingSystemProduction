@@ -2,6 +2,7 @@ using InvoicingBackend.Data;
 using InvoicingBackend.DTOs;
 using InvoicingBackend.Interfaces;
 using InvoicingBackend.Models;
+using InvoicingBackend.Utils;
 using Microsoft.EntityFrameworkCore;
 
 namespace InvoicingBackend.Services
@@ -107,6 +108,13 @@ namespace InvoicingBackend.Services
             subscription.Status = SubscriptionStatus.Cancelled;
             subscription.MarkAsModified(userId.ToString());
 
+            // Downgrade user to free tier
+            var user = await _context.Users.FindAsync(userId);
+            if (user != null)
+            {
+                user.SubscriptionTier = "free";
+            }
+
             await _context.SaveChangesAsync();
             return true;
         }
@@ -149,12 +157,36 @@ namespace InvoicingBackend.Services
             var subscription = await _context.Subscriptions
                 .FirstOrDefaultAsync(s => s.UserId == userId && !s.IsDeleted);
 
+            var now = DateTime.UtcNow;
+
+            // If no subscription exists (freemium user upgrading to premium), create one
             if (subscription == null)
             {
-                throw new InvalidOperationException("No subscription found for user");
+                subscription = new Subscription
+                {
+                    UserId = userId,
+                    MonthlyPrice = amount,
+                    StartDate = now,
+                    EndDate = now.AddMonths(1),
+                    NextPaymentDate = now.AddMonths(1),
+                    Status = SubscriptionStatus.Active,
+                    TrialEndDate = null,
+                    PaymentFailureCount = 0,
+                    DateEntered = now,
+                    EnteredBy = userId.ToString()
+                };
+                _context.Subscriptions.Add(subscription);
+                
+                // Upgrade user to premium tier
+                var user = await _context.Users.FindAsync(userId);
+                if (user != null)
+                {
+                    user.SubscriptionTier = "premium";
+                }
+                
+                // Save to get the subscription ID
+                await _context.SaveChangesAsync();
             }
-
-            var now = DateTime.UtcNow;
 
             // For now, we'll simulate successful payment (manual implementation)
             // Later you can integrate with Stripe here
@@ -238,6 +270,166 @@ namespace InvoicingBackend.Services
 
             // TODO: Implement email reminder logic
             // For now, just log or handle reminders as needed
+        }
+
+        // ============= FREEMIUM TIER MANAGEMENT =============
+
+        public async Task<bool> IsPremiumUserAsync(int userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            return user?.SubscriptionTier == SubscriptionLimits.PREMIUM_TIER;
+        }
+
+        public async Task<string> GetUserTierAsync(int userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            return user?.SubscriptionTier ?? SubscriptionLimits.FREE_TIER;
+        }
+
+        public async Task<SubscriptionUsageDto> GetUsageStatsAsync(int userId)
+        {
+            var user = await _context.Users
+                .Include(u => u.Clients)
+                .Include(u => u.Products)
+                .Include(u => u.InvoiceTemplates)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                throw new InvalidOperationException("User not found");
+            }
+
+            var isPremium = user.SubscriptionTier == SubscriptionLimits.PREMIUM_TIER;
+            
+            // Get counts
+            var clientsCount = await _context.Clients.CountAsync(c => c.UserId == userId && !c.IsDeleted);
+            var categoriesCount = await _context.ProductCategories.CountAsync(pc => pc.UserId == userId && !pc.IsDeleted);
+            var productsCount = await _context.Products.CountAsync(p => p.UserId == userId && !p.IsDeleted);
+            var templatesCount = await _context.InvoiceTemplates.CountAsync(t => t.UserId == userId && !t.IsDeleted);
+            
+            // Get current month's invoice quota
+            var currentMonth = DateTime.UtcNow.ToString("yyyy-MM");
+            var invoicesThisMonth = await GetCurrentMonthQuotaAsync(userId);
+            
+            // Calculate next reset date (first day of next month)
+            var now = DateTime.UtcNow;
+            var nextResetDate = new DateTime(now.Year, now.Month, 1).AddMonths(1);
+            
+            // Determine limits based on tier
+            var maxClients = isPremium ? SubscriptionLimits.Premium.MaxClients : SubscriptionLimits.Free.MaxClients;
+            var maxCategories = isPremium ? SubscriptionLimits.Premium.MaxCategories : SubscriptionLimits.Free.MaxCategories;
+            var maxProducts = isPremium ? SubscriptionLimits.Premium.MaxProducts : SubscriptionLimits.Free.MaxProducts;
+            var maxInvoices = isPremium ? SubscriptionLimits.Premium.MaxInvoicesPerMonth : SubscriptionLimits.Free.MaxInvoicesPerMonth;
+            var maxTemplates = isPremium ? SubscriptionLimits.Premium.MaxTemplates : SubscriptionLimits.Free.MaxTemplates;
+            
+            return new SubscriptionUsageDto
+            {
+                Tier = user.SubscriptionTier,
+                IsPremium = isPremium,
+                
+                ClientsCount = clientsCount,
+                CategoriesCount = categoriesCount,
+                ProductsCount = productsCount,
+                InvoicesThisMonth = invoicesThisMonth,
+                TemplatesCount = templatesCount,
+                
+                MaxClients = maxClients,
+                MaxCategories = maxCategories,
+                MaxProducts = maxProducts,
+                MaxInvoicesPerMonth = maxInvoices,
+                MaxTemplates = maxTemplates,
+                
+                CanCreateClient = isPremium || clientsCount < maxClients,
+                CanCreateCategory = isPremium || categoriesCount < maxCategories,
+                CanCreateProduct = isPremium || productsCount < maxProducts,
+                CanCreateInvoice = isPremium || invoicesThisMonth < maxInvoices,
+                CanCreateTemplate = isPremium,
+                
+                CurrentMonth = currentMonth,
+                NextResetDate = nextResetDate
+            };
+        }
+
+        public async Task<bool> CanCreateClientAsync(int userId)
+        {
+            var isPremium = await IsPremiumUserAsync(userId);
+            if (isPremium) return true;
+            
+            var count = await _context.Clients.CountAsync(c => c.UserId == userId && !c.IsDeleted);
+            return count < SubscriptionLimits.Free.MaxClients;
+        }
+
+        public async Task<bool> CanCreateCategoryAsync(int userId)
+        {
+            var isPremium = await IsPremiumUserAsync(userId);
+            if (isPremium) return true;
+            
+            var count = await _context.ProductCategories.CountAsync(pc => pc.UserId == userId && !pc.IsDeleted);
+            return count < SubscriptionLimits.Free.MaxCategories;
+        }
+
+        public async Task<bool> CanCreateProductAsync(int userId)
+        {
+            var isPremium = await IsPremiumUserAsync(userId);
+            if (isPremium) return true;
+            
+            var count = await _context.Products.CountAsync(p => p.UserId == userId && !p.IsDeleted);
+            return count < SubscriptionLimits.Free.MaxProducts;
+        }
+
+        public async Task<bool> CanCreateInvoiceAsync(int userId)
+        {
+            var isPremium = await IsPremiumUserAsync(userId);
+            if (isPremium) return true;
+            
+            var invoicesThisMonth = await GetCurrentMonthQuotaAsync(userId);
+            return invoicesThisMonth < SubscriptionLimits.Free.MaxInvoicesPerMonth;
+        }
+
+        public async Task<bool> CanCreateTemplateAsync(int userId)
+        {
+            // Templates are premium-only
+            return await IsPremiumUserAsync(userId);
+        }
+
+        public async Task IncrementInvoiceQuotaAsync(int userId)
+        {
+            var currentMonth = DateTime.UtcNow.ToString("yyyy-MM");
+            
+            var quota = await _context.InvoiceQuotas
+                .FirstOrDefaultAsync(q => q.UserId == userId && q.Month == currentMonth && !q.IsDeleted);
+            
+            if (quota == null)
+            {
+                // Create new quota record for this month
+                quota = new InvoiceQuota
+                {
+                    UserId = userId,
+                    Month = currentMonth,
+                    InvoicesCreated = 1,
+                    DateEntered = DateTime.UtcNow,
+                    EnteredBy = userId.ToString()
+                };
+                _context.InvoiceQuotas.Add(quota);
+            }
+            else
+            {
+                // Increment existing quota
+                quota.InvoicesCreated++;
+                quota.MarkAsModified(userId.ToString());
+            }
+            
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<int> GetCurrentMonthQuotaAsync(int userId)
+        {
+            var currentMonth = DateTime.UtcNow.ToString("yyyy-MM");
+            
+            var quota = await _context.InvoiceQuotas
+                .FirstOrDefaultAsync(q => q.UserId == userId && q.Month == currentMonth && !q.IsDeleted);
+            
+            return quota?.InvoicesCreated ?? 0;
         }
 
         private SubscriptionDto MapToDto(Subscription subscription)
