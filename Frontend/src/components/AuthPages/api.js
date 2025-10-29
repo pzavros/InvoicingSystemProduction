@@ -54,6 +54,52 @@ export const loginUser = async (credentials) => {
   }
 };
 
+// Verify email with OTP
+export const verifyEmail = async (verificationData) => {
+  try {
+    const response = await authApi.post("/api/auth/verify-email", verificationData);
+    return response.data;
+  } catch (error) {
+    console.error("Error verifying email:", error);
+    throw error;
+  }
+};
+
+// Resend verification code
+export const resendVerification = async (emailData) => {
+  try {
+    const response = await authApi.post("/api/auth/resend-verification", emailData);
+    return response.data;
+  } catch (error) {
+    console.error("Error resending verification:", error);
+    throw error;
+  }
+};
+
+// Forgot password - send reset code
+export const forgotPassword = async (emailData) => {
+  try {
+    const response = await authApi.post("/api/auth/forgot-password", emailData);
+    return response.data;
+  } catch (error) {
+    console.error("Error sending reset code:", error);
+    const message = error.response?.data?.message || error.message || 'Failed to send reset code';
+    throw new Error(message);
+  }
+};
+
+// Reset password with code
+export const resetPassword = async (resetData) => {
+  try {
+    const response = await authApi.post("/api/auth/reset-password", resetData);
+    return response.data;
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    const message = error.response?.data?.message || error.message || 'Failed to reset password';
+    throw new Error(message);
+  }
+};
+
 // Get user profile
 export const getUserProfile = async () => {
   try {

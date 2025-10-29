@@ -30,15 +30,8 @@ const PaymentDialog = ({ open, onClose, amount, isTrial = false, onSuccess, onEr
       setError(null);
 
       if (isTrial) {
-        // For trial, call the trial endpoint with €0.00 authorization
-        const paymentData = {
-          amount: 0,
-          currency: 'EUR',
-          description: '7-day free trial - Card authorization',
-        };
-        
-        // Process €0.00 payment to authorize card and start trial
-        await subscriptionAPI.processPayment(paymentData);
+        // For trial, call the trial endpoint directly
+        await subscriptionAPI.startTrial();
       } else {
         // Regular payment processing
         const paymentData = {

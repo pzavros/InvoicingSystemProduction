@@ -242,6 +242,96 @@ namespace InvoicingBackend.Controllers
             }
         }
 
+        // POST: api/auth/verify-email
+        [HttpPost("verify-email")]
+        public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailDto verifyDto)
+        {
+            if (verifyDto == null)
+                return BadRequest(new { message = "Invalid verification data." });
+
+            try
+            {
+                var result = await _userService.VerifyEmailAsync(verifyDto.Email, verifyDto.VerificationCode);
+                
+                if (!result)
+                    return BadRequest(new { message = "Invalid or expired verification code." });
+
+                return Ok(new { message = "Email verified successfully! You can now log in." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred during verification.", error = ex.Message });
+            }
+        }
+
+        // POST: api/auth/resend-verification
+        [HttpPost("resend-verification")]
+        public async Task<IActionResult> ResendVerification([FromBody] ResendVerificationDto resendDto)
+        {
+            if (resendDto == null)
+                return BadRequest(new { message = "Invalid request data." });
+
+            try
+            {
+                var result = await _userService.ResendVerificationEmailAsync(resendDto.Email);
+                
+                if (!result)
+                    return BadRequest(new { message = "User not found or already verified." });
+
+                return Ok(new { message = "Verification email sent successfully. Please check your inbox." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while sending verification email.", error = ex.Message });
+            }
+        }
+
+        // POST: api/auth/forgot-password
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotDto)
+        {
+            if (forgotDto == null || string.IsNullOrEmpty(forgotDto.Email))
+                return BadRequest(new { message = "Email is required." });
+
+            try
+            {
+                var result = await _userService.ForgotPasswordAsync(forgotDto.Email);
+                
+                // Always return success to prevent email enumeration
+                return Ok(new { message = "If an account exists with this email, a password reset code has been sent." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while processing your request.", error = ex.Message });
+            }
+        }
+
+        // POST: api/auth/reset-password
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetDto)
+        {
+            if (resetDto == null)
+                return BadRequest(new { message = "Invalid reset data." });
+
+            try
+            {
+                var result = await _userService.ResetPasswordAsync(
+                    resetDto.Email, 
+                    resetDto.ResetToken, 
+                    resetDto.NewPassword
+                );
+                
+                if (!result)
+                    return BadRequest(new { message = "Invalid or expired reset token." });
+
+                return Ok(new { message = "Password has been reset successfully. You can now log in with your new password." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while resetting password.", error = ex.Message });
+            }
+        }
+
         private int GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

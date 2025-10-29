@@ -60,14 +60,20 @@ namespace InvoicingBackend.Services
                 return null; // Passwords don't match
             }
 
-            // Create new user
+            // Generate verification token (6-digit code)
+            var verificationToken = GenerateRandomCode(6);
+
+            // Create new user (account is locked until verified)
             var user = new User
             {
                 Email = registerDto.Email,
                 FirstName = registerDto.FirstName,
                 LastName = registerDto.LastName,
                 PasswordHash = HashPassword(registerDto.Password),
-                IsActive = true,
+                IsActive = false, // Account locked until verified
+                IsEmailVerified = false,
+                EmailVerificationToken = verificationToken,
+                EmailVerificationTokenExpiry = DateTime.UtcNow.AddHours(48), // 48 hours to verify
                 IsTrialUser = true,
                 SubscriptionExpiryDate = DateTime.UtcNow.AddDays(30), // 30-day trial
                 SubscriptionPlan = "Trial",
@@ -77,14 +83,22 @@ namespace InvoicingBackend.Services
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            // Generate JWT token
-            var token = await GenerateJwtTokenAsync(user);
+            // Send verification email
+            var verificationUrl = $"{GetBaseUrl()}/verify-email?code={verificationToken}&email={Uri.EscapeDataString(user.Email)}";
+            await _emailService.SendAccountVerificationEmailAsync(
+                user.Email,
+                $"{user.FirstName} {user.LastName}",
+                verificationToken,
+                verificationUrl
+            );
 
+            // Return response indicating email verification needed
             return new AuthResponseDto
             {
-                Token = token,
+                Token = string.Empty, // No token until verified
                 User = MapToUserDto(user),
-                ExpiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpirationInMinutes)
+                ExpiresAt = DateTime.UtcNow,
+                Message = "REGISTRATION_SUCCESS" // Flag indicating successful registration, pending verification
             };
         }
 
@@ -93,15 +107,41 @@ namespace InvoicingBackend.Services
             var user = await _context.Users
                 .Include(u => u.Subscription)
                 .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
-            if (user == null || !user.IsActive)
+            
+            if (user == null)
             {
-                return null; // User not found or inactive
+                return null; // User not found
             }
 
             // Verify password
             if (!await VerifyPasswordAsync(loginDto.Password, user.PasswordHash))
             {
                 return null; // Invalid password
+            }
+
+            // Check if email is verified
+            if (!user.IsEmailVerified)
+            {
+                // Return user data with flag indicating verification needed
+                return new AuthResponseDto
+                {
+                    Token = string.Empty,
+                    User = MapToUserDto(user),
+                    ExpiresAt = DateTime.UtcNow,
+                    Message = "VERIFICATION_REQUIRED" // Special flag for frontend
+                };
+            }
+
+            // Check if account is active
+            if (!user.IsActive)
+            {
+                return new AuthResponseDto
+                {
+                    Token = string.Empty,
+                    User = MapToUserDto(user),
+                    ExpiresAt = DateTime.UtcNow,
+                    Message = "ACCOUNT_DEACTIVATED"
+                };
             }
 
             // Update last login date
@@ -336,70 +376,186 @@ namespace InvoicingBackend.Services
             return true;
         }
 
+        // ==================== EMAIL VERIFICATION METHODS ====================
+
+        public async Task<bool> VerifyEmailAsync(string email, string verificationCode)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            
+            if (user == null || user.IsEmailVerified)
+                return false;
+
+            // Check if verification token matches and hasn't expired
+            if (user.EmailVerificationToken != verificationCode)
+                return false;
+
+            if (user.EmailVerificationTokenExpiry == null || DateTime.UtcNow > user.EmailVerificationTokenExpiry)
+                return false;
+
+            // Verify email and activate account
+            user.IsEmailVerified = true;
+            user.IsActive = true;
+            user.EmailVerificationToken = null;
+            user.EmailVerificationTokenExpiry = null;
+            user.DateModified = DateTime.UtcNow;
+            user.ModifiedBy = "System";
+
+            await _context.SaveChangesAsync();
+
+            // Send welcome email after verification
+            var loginUrl = $"{GetBaseUrl()}/login";
+            await _emailService.SendWelcomeEmailAsync(
+                user.Email,
+                $"{user.FirstName} {user.LastName}",
+                loginUrl
+            );
+
+            return true;
+        }
+
+        public async Task<bool> ResendVerificationEmailAsync(string email)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            
+            if (user == null || user.IsEmailVerified)
+                return false;
+
+            // Generate new verification token
+            var verificationToken = GenerateRandomCode(6);
+            user.EmailVerificationToken = verificationToken;
+            user.EmailVerificationTokenExpiry = DateTime.UtcNow.AddHours(48);
+
+            await _context.SaveChangesAsync();
+
+            // Resend verification email
+            var verificationUrl = $"{GetBaseUrl()}/verify-email?code={verificationToken}&email={Uri.EscapeDataString(user.Email)}";
+            await _emailService.SendAccountVerificationEmailAsync(
+                user.Email,
+                $"{user.FirstName} {user.LastName}",
+                verificationToken,
+                verificationUrl
+            );
+
+            return true;
+        }
+
+        // ==================== PASSWORD RESET METHODS ====================
+
+        // Forgot Password (for users NOT logged in)
+        public async Task<bool> ForgotPasswordAsync(string email)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            
+            if (user == null)
+            {
+                // Don't reveal if user exists - return success anyway for security
+                return true;
+            }
+
+            // Generate 6-digit OTP token
+            user.PasswordResetToken = new Random().Next(100000, 999999).ToString();
+            user.PasswordResetTokenExpiry = DateTime.UtcNow.AddHours(1); // 1 hour expiry
+            
+            await _context.SaveChangesAsync();
+
+            // Send password reset email
+            try
+            {
+                var emailResult = await _emailService.SendPasswordResetEmailAsync(
+                    user.Email, 
+                    user.FirstName, 
+                    user.PasswordResetToken
+                );
+                
+                return emailResult.Success;
+            }
+            catch (Exception)
+            {
+                // Clear the token if email failed
+                user.PasswordResetToken = null;
+                user.PasswordResetTokenExpiry = null;
+                await _context.SaveChangesAsync();
+                return false;
+            }
+        }
+
+        public async Task<bool> ResetPasswordAsync(string email, string resetToken, string newPassword)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            
+            if (user == null)
+                return false;
+
+            // Validate reset token
+            if (string.IsNullOrEmpty(user.PasswordResetToken) || 
+                user.PasswordResetToken != resetToken)
+                return false;
+
+            // Check if token expired
+            if (user.PasswordResetTokenExpiry == null || 
+                user.PasswordResetTokenExpiry < DateTime.UtcNow)
+                return false;
+
+            // Update password
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            
+            // Clear reset token
+            user.PasswordResetToken = null;
+            user.PasswordResetTokenExpiry = null;
+            
+            user.DateModified = DateTime.UtcNow;
+            user.ModifiedBy = user.Email;
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        // ==================== HELPER METHODS ====================
+
+        private string GenerateRandomCode(int length)
+        {
+            var random = new Random();
+            return random.Next((int)Math.Pow(10, length - 1), (int)Math.Pow(10, length)).ToString();
+        }
+
+        private string GetBaseUrl()
+        {
+            return "https://e-nvoicing.com"; // TODO: Move to configuration
+        }
+
         private UserDto MapToUserDto(User user)
         {
-            // Derive subscription status from Subscriptions table
-            var now = DateTime.UtcNow;
-            var subscription = user.Subscription;
-            
             string subscriptionTier = "free";
-            string subscriptionStatus = "Free";
+            string subscriptionStatus = "active";
             DateTime? subscriptionEndDate = null;
             bool isPremium = false;
             bool isInTrial = false;
-            
-            if (user.IsAdmin)
+
+            if (user.Subscription != null)
             {
-                subscriptionTier = "premium";
-                subscriptionStatus = "Admin";
-                isPremium = true;
-            }
-            else if (subscription != null && !subscription.IsDeleted)
-            {
-                // Check if trial is active (must have Status=Trial AND TrialEndDate in future)
-                isInTrial = subscription.Status == SubscriptionStatus.Trial && 
-                           subscription.TrialEndDate.HasValue && 
-                           now < subscription.TrialEndDate.Value;
+                subscriptionStatus = user.Subscription.Status.ToString().ToLower();
+                subscriptionEndDate = user.Subscription.EndDate;
                 
-                // Check if premium subscription is active
-                bool isActiveSubscription = subscription.Status == SubscriptionStatus.Active && now < subscription.EndDate;
-                
-                if (isInTrial)
-                {
-                    subscriptionTier = "premium"; // Trial users have premium access
-                    subscriptionStatus = "Trial";
-                    subscriptionEndDate = subscription.TrialEndDate;
-                    isPremium = true;
-                }
-                else if (isActiveSubscription)
+                if (user.Subscription.Status == SubscriptionStatus.Active)
                 {
                     subscriptionTier = "premium";
-                    subscriptionEndDate = subscription.EndDate;
                     isPremium = true;
-                    
-                    // Distinguish between granted (admin-granted) and paid premium
-                    if (subscription.MonthlyPrice == 0)
-                    {
-                        subscriptionStatus = "Premium (Granted)";
-                    }
-                    else
-                    {
-                        subscriptionStatus = "Premium";
-                    }
                 }
-                else
+                
+                if (user.Subscription.TrialEndDate.HasValue && user.Subscription.TrialEndDate.Value > DateTime.UtcNow)
                 {
-                    subscriptionTier = "free";
-                    subscriptionStatus = "Free";
-                    isPremium = false;
+                    isInTrial = true;
                 }
             }
-            
-            // Update user's SubscriptionTier field to match (for backward compatibility)
-            if (user.SubscriptionTier != subscriptionTier)
+            else if (user.SubscriptionTier == "premium")
             {
-                user.SubscriptionTier = subscriptionTier;
-                // Note: This will be saved on next SaveChanges, but won't cause issues
+                subscriptionTier = "premium";
+                isPremium = true;
+            }
+            else if (!string.IsNullOrEmpty(user.SubscriptionTier))
+            {
+                subscriptionTier = user.SubscriptionTier;
             }
             
             return new UserDto
@@ -410,6 +566,7 @@ namespace InvoicingBackend.Services
                 LastName = user.LastName,
                 IsActive = user.IsActive,
                 IsAdmin = user.IsAdmin,
+                IsEmailVerified = user.IsEmailVerified,
                 LastLoginDate = user.LastLoginDate,
                 DateEntered = user.DateEntered,
                 EnteredBy = user.EnteredBy,

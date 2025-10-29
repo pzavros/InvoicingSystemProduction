@@ -1,0 +1,24 @@
+<h2>New Contact Form Submission</h2>
+<p>A new contact form has been submitted on the E-nvoicing platform.</p>
+
+<div class="info-box">
+    <p><strong>Submission Details:</strong></p>
+    <p>Name: <strong>{{USER_NAME}}</strong></p>
+    <p>Email: <strong>{{USER_EMAIL}}</strong></p>
+    <p>Subject: <strong>{{SUBJECT}}</strong></p>
+    <p>Submitted: <strong>{{SUBMISSION_DATE}}</strong></p>
+    <p>Reference: <strong>{{REFERENCE_ID}}</strong></p>
+</div>
+
+<div class="info-box">
+    <p><strong>Message:</strong></p>
+    <p>{{MESSAGE}}</p>
+</div>
+
+{{USER_INFO}}
+
+<div class="button-container">
+    <a href="mailto:{{USER_EMAIL}}" class="button">Reply to {{USER_NAME}}</a>
+</div>
+
+<p>Please respond to this inquiry as soon as possible.</p>

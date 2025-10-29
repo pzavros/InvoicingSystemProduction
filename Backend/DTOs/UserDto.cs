@@ -10,6 +10,7 @@ namespace InvoicingBackend.DTOs
         public required string LastName { get; set; }
         public bool IsActive { get; set; }
         public bool IsAdmin { get; set; }
+        public bool IsEmailVerified { get; set; }
         public DateTime? LastLoginDate { get; set; }
         public DateTime DateEntered { get; set; }
         public string? EnteredBy { get; set; }

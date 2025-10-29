@@ -1305,6 +1305,12 @@ namespace Backend.Migrations
                     b.Property<bool>("EmailNotifications")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("EmailVerificationToken")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("EmailVerificationTokenExpiry")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("EnteredBy")
                         .HasColumnType("text");
 
@@ -1316,6 +1322,9 @@ namespace Backend.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<bool>("IsAdmin")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsEmailVerified")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("IsTrialUser")
@@ -1343,6 +1352,12 @@ namespace Backend.Migrations
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<string>("PasswordResetToken")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("PasswordResetTokenExpiry")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("SubscriptionExpiryDate")
                         .HasColumnType("timestamp with time zone");

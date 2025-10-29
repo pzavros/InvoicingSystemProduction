@@ -1,0 +1,18 @@
+<h2>Invoice {{INVOICE_NUMBER}}</h2>
+<p>Dear {{CLIENT_NAME}},</p>
+<p>Thank you for your business! Please find attached your {{DOCUMENT_TYPE}} <strong>{{INVOICE_NUMBER}}</strong>.</p>
+
+<div class="info-box">
+    <p><strong>Invoice Details:</strong></p>
+    <p>Invoice Number: <strong>{{INVOICE_NUMBER}}</strong></p>
+    <p>Issue Date: <strong>{{ISSUE_DATE}}</strong></p>
+    <p>Due Date: <strong>{{DUE_DATE}}</strong></p>
+    <p>Total Amount: <strong>{{TOTAL_AMOUNT}}</strong></p>
+</div>
+
+{{PAYMENT_INFO}}
+
+<p>If you have any questions about this invoice, please don't hesitate to contact us.</p>
+
+<p>Best regards,<br>
+<strong>{{SENDER_NAME}}</strong></p>

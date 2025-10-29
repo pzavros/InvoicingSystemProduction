@@ -21,15 +21,14 @@ import {
   Person as PersonIcon,
   Visibility,
   VisibilityOff,
-  PersonAdd as PersonAddIcon
+  PersonAdd as PersonAddIcon,
+  CheckCircle as CheckCircleIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { registerUser } from './api';
-import { useAuth } from '../../utils/AuthContext';
 
 const RegisterForm = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     firstName: '',
@@ -41,6 +40,8 @@ const RegisterForm = () => {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
 
   const handleChange = (e) => {
     setFormData({
@@ -62,29 +63,47 @@ const RegisterForm = () => {
     return true;
   };
 
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
 
-    if (!validateForm()) {
-      setLoading(false);
+    // Validation
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
       return;
     }
 
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
+    setLoading(true);
     try {
-      const response = await registerUser(formData);
-      login(response);
-      navigate('/dashboard');
-    } catch (error) {
-      if (error.response?.status === 400) {
-        setError('User already exists or invalid data provided');
+      const response = await registerUser({
+        email: formData.email,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword
+      });
+
+      // Check if registration requires email verification
+      if (response.message === 'REGISTRATION_SUCCESS') {
+        setRegisteredEmail(formData.email);
+        setRegistrationSuccess(true);
       } else {
-        setError('An error occurred. Please try again.');
+        setError('Registration failed. Please try again.');
       }
+    } catch (err) {
+      setError(err.message || 'Failed to create account');
     } finally {
       setLoading(false);
     }
+  };
+  
+  const handleGoToLogin = () => {
+    navigate('/login', { state: { email: registeredEmail } });
   };
 
   return (
@@ -110,52 +129,118 @@ const RegisterForm = () => {
             }}
           >
             <CardContent sx={{ p: 4 }}>
-              <Grow in={true} timeout={1000}>
-                <Box sx={{ textAlign: 'center', mb: 4 }}>
+              {/* Success State */}
+              {registrationSuccess ? (
+                <Box sx={{ textAlign: 'center' }}>
                   <Box
                     sx={{
                       width: 80,
                       height: 80,
                       borderRadius: '20px',
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       margin: '0 auto',
                       mb: 3,
-                      boxShadow: '0 10px 30px rgba(102, 126, 234, 0.3)'
+                      boxShadow: '0 10px 30px rgba(16, 185, 129, 0.3)'
                     }}
                   >
-                    <PersonAddIcon sx={{ color: 'white', fontSize: 32 }} />
+                    <CheckCircleIcon sx={{ color: 'white', fontSize: 40 }} />
                   </Box>
                   <Typography
                     variant="h4"
                     sx={{
                       fontWeight: 'bold',
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                       backgroundClip: 'text',
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
-                      mb: 1
+                      mb: 2
                     }}
                   >
-                    Create Account
+                    Registration Successful!
                   </Typography>
-                  <Typography variant="body1" color="text.secondary">
-                    Start your 30-day free trial today
+                  <Typography variant="body1" sx={{ mb: 1, color: 'text.primary', fontWeight: 500 }}>
+                    A verification code has been sent to
                   </Typography>
-                </Box>
-              </Grow>
-
-              {error && (
-                <Fade in={true}>
-                  <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
-                    {error}
+                  <Typography variant="body1" sx={{ mb: 3, color: 'primary.main', fontWeight: 600 }}>
+                    {registeredEmail}
+                  </Typography>
+                  <Alert severity="info" sx={{ mb: 3, borderRadius: 2, textAlign: 'left' }}>
+                    Please check your email inbox and click the <strong>Login</strong> button below. 
+                    You will be prompted to enter the verification code to activate your account.
                   </Alert>
-                </Fade>
-              )}
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    size="large"
+                    onClick={handleGoToLogin}
+                    sx={{
+                      py: 1.5,
+                      borderRadius: 2,
+                      textTransform: 'none',
+                      fontSize: '1.1rem',
+                      fontWeight: 600,
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+                      '&:hover': {
+                        background: 'linear-gradient(135deg, #5568d3 0%, #63408b 100%)',
+                        boxShadow: '0 6px 20px rgba(102, 126, 234, 0.6)',
+                      }
+                    }}
+                  >
+                    Go to Login & Verify
+                  </Button>
+                </Box>
+              ) : (
+                <>
+                  <Grow in={true} timeout={1000}>
+                    <Box sx={{ textAlign: 'center', mb: 4 }}>
+                      <Box
+                        sx={{
+                          width: 80,
+                          height: 80,
+                          borderRadius: '20px',
+                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          margin: '0 auto',
+                          mb: 3,
+                          boxShadow: '0 10px 30px rgba(102, 126, 234, 0.3)'
+                        }}
+                      >
+                        <PersonAddIcon sx={{ color: 'white', fontSize: 32 }} />
+                      </Box>
+                      <Typography
+                        variant="h4"
+                        sx={{
+                          fontWeight: 'bold',
+                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                          backgroundClip: 'text',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                          mb: 1
+                        }}
+                      >
+                        Create Account
+                      </Typography>
+                      <Typography variant="body1" color="text.secondary">
+                        Start your 30-day free trial today
+                      </Typography>
+                    </Box>
+                  </Grow>
 
-              <Box component="form" onSubmit={handleSubmit}>
+                  {error && (
+                    <Fade in={true}>
+                      <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
+                        {error}
+                      </Alert>
+                    </Fade>
+                  )}
+
+                  <Box component="form" onSubmit={handleSubmit}>
                 <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
                   <TextField
                     fullWidth
@@ -312,6 +397,8 @@ const RegisterForm = () => {
                   </Link>
                 </Box>
               </Box>
+                </>
+              )}
             </CardContent>
           </Card>
         </Fade>

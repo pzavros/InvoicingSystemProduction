@@ -29,9 +29,18 @@ namespace InvoicingBackend.Models
         public bool EmailNotifications { get; set; } = true;
         public bool DarkMode { get; set; } = false;
         
-        // OTP for password change
+        // OTP for password change (for logged-in users)
         public string? PasswordChangeOtp { get; set; }
         public DateTime? PasswordChangeOtpExpiry { get; set; }
+        
+        // Password reset (for forgot password - not logged in)
+        public string? PasswordResetToken { get; set; }
+        public DateTime? PasswordResetTokenExpiry { get; set; }
+        
+        // Email verification
+        public bool IsEmailVerified { get; set; } = false;
+        public string? EmailVerificationToken { get; set; }
+        public DateTime? EmailVerificationTokenExpiry { get; set; }
         
         // Audit trail for User
         public DateTime DateEntered { get; set; } = DateTime.UtcNow;

@@ -1,0 +1,7 @@
+namespace InvoicingBackend.DTOs
+{
+    public class ResendVerificationDto
+    {
+        public required string Email { get; set; }
+    }
+}

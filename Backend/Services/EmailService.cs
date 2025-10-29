@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 using Azure.Identity;
 using InvoicingBackend.DTOs;
 using InvoicingBackend.Interfaces;
+using InvoicingBackend.Models;
 // alias YOUR EmailSettings model to avoid clash with Microsoft.Graph.Models.EmailSettings
 using AppEmailSettings = InvoicingBackend.Models.EmailSettings;
 
@@ -19,11 +21,13 @@ namespace InvoicingBackend.Services
     {
         private readonly AppEmailSettings _emailSettings;
         private readonly ILogger<EmailService> _logger;
+        private readonly EmailTemplateService _templateService;
 
         public EmailService(IOptions<AppEmailSettings> emailSettings, ILogger<EmailService> logger)
         {
             _emailSettings = emailSettings.Value;
             _logger = logger;
+            _templateService = new EmailTemplateService();
         }
 
         public async Task<EmailResponseDto> SendEmailAsync(string to, string subject, string body, bool isHtml = true)
@@ -70,70 +74,388 @@ catch (Exception ex)
 
 }
 
-        public async Task<EmailResponseDto> SendInvoiceEmailAsync(string to, string invoiceNumber, byte[] pdfContent)
-        {
-            var subject = $"Invoice {invoiceNumber}";
-            var body = $@"
-<html>
-  <body>
-    <h2>Invoice {invoiceNumber}</h2>
-    <p>Dear Customer,</p>
-    <p>Please find attached your invoice #{invoiceNumber}.</p>
-    <p>Thank you for your business!</p>
-    <br>
-    <p>Best regards,<br>{_emailSettings.FromName}</p>
-  </body>
-</html>";
+        // ==================== INVOICE-RELATED EMAILS ====================
 
-            var dto = new EmailDto
+        public async Task<EmailResponseDto> SendInvoiceEmailAsync(Invoice invoice, byte[] pdfContent, string? ccEmail = null)
+        {
+            try
             {
-                To = to, Subject = subject, Body = body, IsHtml = true,
-                Attachments = new List<EmailAttachmentDto>
+                var documentType = invoice.DocumentType?.Name ?? "Invoice";
+                var currencySymbol = invoice.Currency?.Symbol ?? "$";
+                
+                var paymentInfo = string.Empty;
+                if (!string.IsNullOrEmpty(invoice.BankName) || !string.IsNullOrEmpty(invoice.AccountNo))
                 {
-                    new EmailAttachmentDto
-                    {
-                        FileName = $"Invoice_{invoiceNumber}.pdf",
-                        Content = pdfContent,
-                        ContentType = "application/pdf"
-                    }
+                    paymentInfo = "<div class=\"info-box\"><p><strong>Payment Information:</strong></p>";
+                    if (!string.IsNullOrEmpty(invoice.BankName))
+                        paymentInfo += $"<p>Bank: {invoice.BankName}</p>";
+                    if (!string.IsNullOrEmpty(invoice.AccountName))
+                        paymentInfo += $"<p>Account Name: {invoice.AccountName}</p>";
+                    if (!string.IsNullOrEmpty(invoice.AccountNo))
+                        paymentInfo += $"<p>Account Number: {invoice.AccountNo}</p>";
+                    if (!string.IsNullOrEmpty(invoice.Iban))
+                        paymentInfo += $"<p>IBAN: {invoice.Iban}</p>";
+                    if (!string.IsNullOrEmpty(invoice.Swift))
+                        paymentInfo += $"<p>SWIFT: {invoice.Swift}</p>";
+                    paymentInfo += "</div>";
                 }
-            };
-            return await SendEmailAsync(dto);
+
+                var body = _templateService.RenderSendInvoiceEmail(
+                    clientName: invoice.BillTo,
+                    invoiceNumber: invoice.InvoiceNumber,
+                    documentType: documentType,
+                    issueDate: invoice.DateOfIssue.ToString("MMMM dd, yyyy"),
+                    dueDate: invoice.DueDate.ToString("MMMM dd, yyyy"),
+                    totalAmount: $"{currencySymbol}{invoice.Total:N2}",
+                    senderName: invoice.BillFrom,
+                    paymentInfo: paymentInfo,
+                    companyName: invoice.CompanyName,
+                    companyEmail: invoice.CompanyEmail,
+                    companyWebsite: invoice.Website
+                );
+
+                var emailDto = new EmailDto
+                {
+                    To = invoice.BillToEmail,
+                    Subject = $"{documentType} {invoice.InvoiceNumber}",
+                    Body = body,
+                    IsHtml = true,
+                    Cc = !string.IsNullOrEmpty(ccEmail) ? new List<string> { ccEmail } : null,
+                    Attachments = new List<EmailAttachmentDto>
+                    {
+                        new EmailAttachmentDto
+                        {
+                            FileName = $"{documentType}_{invoice.InvoiceNumber}.pdf",
+                            Content = pdfContent,
+                            ContentType = "application/pdf"
+                        }
+                    }
+                };
+
+                return await SendEmailAsync(emailDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send invoice email for {InvoiceNumber}", invoice.InvoiceNumber);
+                return new EmailResponseDto { Success = false, Message = $"Failed to send email: {ex.Message}" };
+            }
         }
 
-        public Task<EmailResponseDto> SendWelcomeEmailAsync(string to, string userName)
-            => SendEmailAsync(to, "Welcome to Our Invoicing System",
-$@"<html><body>
-<h2>Welcome {userName}!</h2>
-<p>Thank you for registering with our invoicing system.</p>
-<p>You can now start creating and managing your invoices.</p>
-<p>If you have any questions, please don't hesitate to contact us.</p>
-<br><p>Best regards,<br>{_emailSettings.FromName}</p>
-</body></html>", true);
+        public async Task<EmailResponseDto> SendInvoicePaymentReminderAsync(Invoice invoice, string? ccEmail = null)
+        {
+            try
+            {
+                var currencySymbol = invoice.Currency?.Symbol ?? "$";
+                var daysUntilDue = (invoice.DueDate - DateTime.Now).Days;
+                var dueStatus = daysUntilDue switch
+                {
+                    < 0 => $" and is now {Math.Abs(daysUntilDue)} days overdue",
+                    0 => " and is due today",
+                    1 => " tomorrow",
+                    _ => $" in {daysUntilDue} days"
+                };
 
-        public Task<EmailResponseDto> SendPasswordResetEmailAsync(string to, string resetToken)
-            => SendEmailAsync(to, "Password Reset Request",
-$@"<html><body>
-<h2>Password Reset Request</h2>
-<p>You have requested to reset your password.</p>
-<p>Your password reset token is: <strong>{resetToken}</strong></p>
-<p>This token will expire in 24 hours.</p>
-<p>If you did not request this password reset, please ignore this email.</p>
-<br><p>Best regards,<br>{_emailSettings.FromName}</p>
-</body></html>", true);
+                var paymentInfo = string.Empty;
+                if (!string.IsNullOrEmpty(invoice.BankName) || !string.IsNullOrEmpty(invoice.AccountNo))
+                {
+                    paymentInfo = "<div class=\"info-box\"><p><strong>Payment Information:</strong></p>";
+                    if (!string.IsNullOrEmpty(invoice.BankName))
+                        paymentInfo += $"<p>Bank: {invoice.BankName}</p>";
+                    if (!string.IsNullOrEmpty(invoice.AccountName))
+                        paymentInfo += $"<p>Account Name: {invoice.AccountName}</p>";
+                    if (!string.IsNullOrEmpty(invoice.AccountNo))
+                        paymentInfo += $"<p>Account Number: {invoice.AccountNo}</p>";
+                    if (!string.IsNullOrEmpty(invoice.Iban))
+                        paymentInfo += $"<p>IBAN: {invoice.Iban}</p>";
+                    if (!string.IsNullOrEmpty(invoice.Swift))
+                        paymentInfo += $"<p>SWIFT: {invoice.Swift}</p>";
+                    paymentInfo += "</div>";
+                }
 
-        public Task<EmailResponseDto> SendPasswordChangeOtpEmailAsync(string to, string userName, string otp)
-            => SendEmailAsync(to, "Password Change Verification Code",
-$@"<html><body style='font-family: Arial, sans-serif;'>
-<h2>Password Change Verification</h2>
-<p>Hello {userName},</p>
-<p>Please use the following verification code:</p>
-<div style='background-color:#f5f5f5;padding:20px;text-align:center;margin:20px 0;'>
-  <h1 style='color:#333;font-size:32px;letter-spacing:5px;margin:0;'>{otp}</h1>
-</div>
-<p>This code will expire in 5 minutes.</p>
-<br><p>Best regards,<br>The E-nvoicing Team</p>
-</body></html>", true);
+                var body = _templateService.RenderInvoicePaymentReminderEmail(
+                    clientName: invoice.BillTo,
+                    invoiceNumber: invoice.InvoiceNumber,
+                    issueDate: invoice.DateOfIssue.ToString("MMMM dd, yyyy"),
+                    dueDate: invoice.DueDate.ToString("MMMM dd, yyyy"),
+                    totalAmount: $"{currencySymbol}{invoice.Total:N2}",
+                    senderName: invoice.BillFrom,
+                    dueStatus: dueStatus,
+                    paymentInfo: paymentInfo,
+                    companyName: invoice.CompanyName,
+                    companyEmail: invoice.CompanyEmail
+                );
+
+                var emailDto = new EmailDto
+                {
+                    To = invoice.BillToEmail,
+                    Subject = $"Payment Reminder - Invoice {invoice.InvoiceNumber}",
+                    Body = body,
+                    IsHtml = true,
+                    Cc = !string.IsNullOrEmpty(ccEmail) ? new List<string> { ccEmail } : null
+                };
+
+                return await SendEmailAsync(emailDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send payment reminder for {InvoiceNumber}", invoice.InvoiceNumber);
+                return new EmailResponseDto { Success = false, Message = $"Failed to send email: {ex.Message}" };
+            }
+        }
+
+        public async Task<EmailResponseDto> SendInvoicePaidConfirmationAsync(Invoice invoice, byte[] pdfContent, string? ccEmail = null)
+        {
+            try
+            {
+                var currencySymbol = invoice.Currency?.Symbol ?? "$";
+
+                var body = _templateService.RenderInvoicePaidConfirmationEmail(
+                    clientName: invoice.BillTo,
+                    invoiceNumber: invoice.InvoiceNumber,
+                    paymentDate: DateTime.Now.ToString("MMMM dd, yyyy"),
+                    totalAmount: $"{currencySymbol}{invoice.Total:N2}",
+                    senderName: invoice.BillFrom,
+                    companyName: invoice.CompanyName,
+                    companyEmail: invoice.CompanyEmail
+                );
+
+                var emailDto = new EmailDto
+                {
+                    To = invoice.BillToEmail,
+                    Subject = $"Payment Confirmation - Invoice {invoice.InvoiceNumber}",
+                    Body = body,
+                    IsHtml = true,
+                    Cc = !string.IsNullOrEmpty(ccEmail) ? new List<string> { ccEmail } : null,
+                    Attachments = new List<EmailAttachmentDto>
+                    {
+                        new EmailAttachmentDto
+                        {
+                            FileName = $"Receipt_{invoice.InvoiceNumber}.pdf",
+                            Content = pdfContent,
+                            ContentType = "application/pdf"
+                        }
+                    }
+                };
+
+                return await SendEmailAsync(emailDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send payment confirmation for {InvoiceNumber}", invoice.InvoiceNumber);
+                return new EmailResponseDto { Success = false, Message = $"Failed to send email: {ex.Message}" };
+            }
+        }
+
+        // ==================== USER ACCOUNT EMAILS ====================
+
+        public async Task<EmailResponseDto> SendWelcomeEmailAsync(string to, string userName, string loginUrl)
+        {
+            try
+            {
+                var body = _templateService.RenderWelcomeEmail(userName, loginUrl);
+                return await SendEmailAsync(to, "Welcome to E-nvoicing!", body, true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send welcome email to {Email}", to);
+                return new EmailResponseDto { Success = false, Message = $"Failed to send email: {ex.Message}" };
+            }
+        }
+
+        public async Task<EmailResponseDto> SendPasswordResetEmailAsync(string to, string userName, string resetToken)
+        {
+            try
+            {
+                var body = _templateService.RenderPasswordResetEmail(userName, resetToken);
+                return await SendEmailAsync(to, "Password Reset Request", body, true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send password reset email to {Email}", to);
+                return new EmailResponseDto { Success = false, Message = $"Failed to send email: {ex.Message}" };
+            }
+        }
+
+        public async Task<EmailResponseDto> SendPasswordChangeOtpEmailAsync(string to, string userName, string otp)
+        {
+            try
+            {
+                var body = _templateService.RenderPasswordChangeOtpEmail(userName, otp);
+                return await SendEmailAsync(to, "Password Change Verification Code", body, true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send OTP email to {Email}", to);
+                return new EmailResponseDto { Success = false, Message = $"Failed to send email: {ex.Message}" };
+            }
+        }
+
+        public async Task<EmailResponseDto> SendAccountVerificationEmailAsync(string to, string userName, string verificationCode, string verificationUrl)
+        {
+            try
+            {
+                var body = _templateService.RenderAccountVerificationEmail(userName, verificationCode, verificationUrl);
+                return await SendEmailAsync(to, "Verify Your Email Address", body, true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send verification email to {Email}", to);
+                return new EmailResponseDto { Success = false, Message = $"Failed to send email: {ex.Message}" };
+            }
+        }
+
+        // ==================== CONTACT/SUPPORT EMAILS ====================
+
+        public async Task<EmailResponseDto> SendContactFormSubmissionAsync(string to, string userName, string message, string referenceId, string? ccEmail = null)
+        {
+            try
+            {
+                var body = _templateService.RenderContactFormSubmissionEmail(
+                    userName, 
+                    to, 
+                    message, 
+                    referenceId, 
+                    DateTime.Now.ToString("MMMM dd, yyyy HH:mm")
+                );
+                
+                var emailDto = new EmailDto
+                {
+                    To = to,
+                    Subject = "We Received Your Message",
+                    Body = body,
+                    IsHtml = true,
+                    Cc = !string.IsNullOrEmpty(ccEmail) ? new List<string> { ccEmail } : null
+                };
+                
+                return await SendEmailAsync(emailDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send contact form submission email to {Email}", to);
+                return new EmailResponseDto { Success = false, Message = $"Failed to send email: {ex.Message}" };
+            }
+        }
+
+        public async Task<EmailResponseDto> SendAdminContactNotificationAsync(
+            string adminEmail, 
+            string userName, 
+            string userEmail, 
+            string subject, 
+            string message, 
+            string referenceId, 
+            string? userInfo = null,
+            string? ccEmail = null)
+        {
+            try
+            {
+                var body = _templateService.RenderAdminContactNotificationEmail(
+                    userName,
+                    userEmail,
+                    subject,
+                    message,
+                    referenceId,
+                    DateTime.Now.ToString("MMMM dd, yyyy HH:mm"),
+                    userInfo
+                );
+                
+                var emailDto = new EmailDto
+                {
+                    To = adminEmail,
+                    Subject = $"New Contact: {subject}",
+                    Body = body,
+                    IsHtml = true,
+                    Cc = !string.IsNullOrEmpty(ccEmail) ? new List<string> { ccEmail } : null
+                };
+                
+                return await SendEmailAsync(emailDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send admin notification email to {Email}", adminEmail);
+                return new EmailResponseDto { Success = false, Message = $"Failed to send email: {ex.Message}" };
+            }
+        }
+
+        // ==================== SUBSCRIPTION EMAILS ====================
+
+        public async Task<EmailResponseDto> SendTrialStartedEmailAsync(
+            string to, 
+            string userName, 
+            DateTime trialStartDate, 
+            DateTime trialEndDate, 
+            string dashboardUrl)
+        {
+            try
+            {
+                var duration = (trialEndDate - trialStartDate).Days;
+                var body = _templateService.RenderTrialStartedEmail(
+                    userName,
+                    trialStartDate.ToString("MMMM dd, yyyy"),
+                    trialEndDate.ToString("MMMM dd, yyyy"),
+                    $"{duration} days",
+                    dashboardUrl
+                );
+                return await SendEmailAsync(to, "Your Free Trial Has Started!", body, true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send trial started email to {Email}", to);
+                return new EmailResponseDto { Success = false, Message = $"Failed to send email: {ex.Message}" };
+            }
+        }
+
+        public async Task<EmailResponseDto> SendSubscriptionCancelledEmailAsync(
+            string to, 
+            string userName, 
+            DateTime cancellationDate, 
+            DateTime accessEndDate, 
+            string planName, 
+            string feedbackUrl)
+        {
+            try
+            {
+                var body = _templateService.RenderSubscriptionCancelledEmail(
+                    userName,
+                    cancellationDate.ToString("MMMM dd, yyyy"),
+                    accessEndDate.ToString("MMMM dd, yyyy"),
+                    planName,
+                    "10", // Free invoice limit - could be configurable
+                    feedbackUrl
+                );
+                return await SendEmailAsync(to, "Subscription Cancelled", body, true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send subscription cancelled email to {Email}", to);
+                return new EmailResponseDto { Success = false, Message = $"Failed to send email: {ex.Message}" };
+            }
+        }
+
+        public async Task<EmailResponseDto> SendPremiumUpgradeEmailAsync(
+            string to,
+            string userName,
+            DateTime startDate,
+            DateTime nextBillingDate,
+            decimal monthlyPrice,
+            string dashboardUrl)
+        {
+            try
+            {
+                var body = _templateService.RenderPremiumUpgradeEmail(
+                    userName,
+                    startDate.ToString("MMMM dd, yyyy"),
+                    nextBillingDate.ToString("MMMM dd, yyyy"),
+                    monthlyPrice.ToString("0.00"),
+                    dashboardUrl
+                );
+                return await SendEmailAsync(to, "Welcome to E-nvoicing Premium! 🌟", body, true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send premium upgrade email to {Email}", to);
+                return new EmailResponseDto { Success = false, Message = $"Failed to send email: {ex.Message}" };
+            }
+        }
 
         // ----------------- Helpers -----------------
 

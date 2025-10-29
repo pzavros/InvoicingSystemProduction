@@ -4,18 +4,23 @@ using InvoicingBackend.Interfaces;
 using InvoicingBackend.Models;
 using InvoicingBackend.Utils;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace InvoicingBackend.Services
 {
     public class SubscriptionService : ISubscriptionService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IEmailService _emailService;
+        private readonly ILogger<SubscriptionService> _logger;
         private const decimal MONTHLY_PRICE = 20.00m; // €20
         private const int TRIAL_DAYS = 7;
 
-        public SubscriptionService(ApplicationDbContext context)
+        public SubscriptionService(ApplicationDbContext context, IEmailService emailService, ILogger<SubscriptionService> logger)
         {
             _context = context;
+            _emailService = emailService;
+            _logger = logger;
         }
 
         public async Task<SubscriptionDto?> GetUserSubscriptionAsync(int userId)
@@ -163,6 +168,41 @@ namespace InvoicingBackend.Services
             
             await _context.SaveChangesAsync();
 
+            // Send trial started email
+            if (user != null)
+            {
+                try
+                {
+                    _logger.LogInformation("Attempting to send trial started email to {Email}", user.Email);
+                    var dashboardUrl = "https://e-nvoicing.com/dashboard";
+                    var result = await _emailService.SendTrialStartedEmailAsync(
+                        user.Email,
+                        $"{user.FirstName} {user.LastName}",
+                        subscription.StartDate,
+                        trialEndDate,
+                        dashboardUrl
+                    );
+                    
+                    if (result.Success)
+                    {
+                        _logger.LogInformation("Trial started email sent successfully to {Email}", user.Email);
+                    }
+                    else
+                    {
+                        _logger.LogError("Failed to send trial started email to {Email}: {Message}", user.Email, result.Message);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Exception while sending trial started email to {Email}", user.Email);
+                    // Don't fail subscription creation if email fails
+                }
+            }
+            else
+            {
+                _logger.LogWarning("User not found after creating trial subscription for UserId {UserId}", userId);
+            }
+
             return MapToDto(subscription);
         }
 
@@ -210,6 +250,59 @@ namespace InvoicingBackend.Services
             }
 
             await _context.SaveChangesAsync();
+
+            // Send cancellation email only if subscription had future time (not already expired)
+            // If subscription was already expired, no need to send cancellation email
+            var shouldSendEmail = subscription.CancelAtPeriodEnd || subscription.EndDate > now;
+            
+            if (shouldSendEmail)
+            {
+                var subscriptionUser = await _context.Users.FindAsync(userId);
+                if (subscriptionUser != null)
+                {
+                    try
+                    {
+                        _logger.LogInformation("Attempting to send subscription cancelled email to {Email}", subscriptionUser.Email);
+                        var accessEndDate = subscription.CancelAtPeriodEnd 
+                            ? subscription.EndDate 
+                            : DateTime.UtcNow;
+                        var feedbackUrl = "https://e-nvoicing.com/feedback";
+                        var planName = subscription.Status == SubscriptionStatus.Trial ? "Trial" : "Premium";
+                        
+                        var result = await _emailService.SendSubscriptionCancelledEmailAsync(
+                            subscriptionUser.Email,
+                            $"{subscriptionUser.FirstName} {subscriptionUser.LastName}",
+                            subscription.CancellationDate ?? DateTime.UtcNow,
+                            accessEndDate,
+                            planName,
+                            feedbackUrl
+                        );
+                        
+                        if (result.Success)
+                        {
+                            _logger.LogInformation("Subscription cancelled email sent successfully to {Email}", subscriptionUser.Email);
+                        }
+                        else
+                        {
+                            _logger.LogError("Failed to send subscription cancelled email to {Email}: {Message}", subscriptionUser.Email, result.Message);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Exception while sending subscription cancelled email to {Email}", subscriptionUser.Email);
+                        // Don't fail cancellation if email fails
+                    }
+                }
+                else
+                {
+                    _logger.LogWarning("User not found when trying to send cancellation email for UserId {UserId}", userId);
+                }
+            }
+            else
+            {
+                _logger.LogInformation("Skipping cancellation email for UserId {UserId} - subscription already expired", userId);
+            }
+
             return true;
         }
 
@@ -350,6 +443,8 @@ namespace InvoicingBackend.Services
                 subscription.NextPaymentDate = now.AddMonths(1);
                 subscription.PaymentFailureCount = 0;
                 subscription.TrialEndDate = null; // Clear trial status when payment is made
+                subscription.CancelAtPeriodEnd = false; // Clear cancellation flag
+                subscription.CancellationDate = null; // Clear cancellation date
                 subscription.MarkAsModified(userId.ToString());
 
                 // Ensure user is upgraded to premium tier
@@ -362,6 +457,42 @@ namespace InvoicingBackend.Services
             }
 
             await _context.SaveChangesAsync();
+
+            // Send email for new premium subscriptions (not trial)
+            if (subscription != null && !isTrial && subscription.Status == SubscriptionStatus.Active)
+            {
+                var user = await _context.Users.FindAsync(userId);
+                if (user != null)
+                {
+                    try
+                    {
+                        _logger.LogInformation("Attempting to send premium upgrade email to {Email}", user.Email);
+                        var dashboardUrl = "https://e-nvoicing.com/dashboard";
+                        var result = await _emailService.SendPremiumUpgradeEmailAsync(
+                            user.Email,
+                            $"{user.FirstName} {user.LastName}",
+                            subscription.StartDate,
+                            subscription.NextPaymentDate ?? subscription.EndDate,
+                            subscription.MonthlyPrice,
+                            dashboardUrl
+                        );
+                        
+                        if (result.Success)
+                        {
+                            _logger.LogInformation("Premium upgrade email sent successfully to {Email}", user.Email);
+                        }
+                        else
+                        {
+                            _logger.LogError("Failed to send premium upgrade email to {Email}: {Message}", user.Email, result.Message);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Exception while sending premium upgrade email to {Email}", user.Email);
+                        // Don't fail payment processing if email fails
+                    }
+                }
+            }
 
             return MapToDto(payment);
         }

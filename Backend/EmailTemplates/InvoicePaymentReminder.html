@@ -1,0 +1,20 @@
+<h2>Payment Reminder</h2>
+<p>Dear {{CLIENT_NAME}},</p>
+<p>This is a friendly reminder that invoice <strong>{{INVOICE_NUMBER}}</strong> is due for payment{{DUE_STATUS}}.</p>
+
+<div class="warning-box">
+    <p><strong>⏰ Payment Details:</strong></p>
+    <p>Invoice Number: <strong>{{INVOICE_NUMBER}}</strong></p>
+    <p>Issue Date: <strong>{{ISSUE_DATE}}</strong></p>
+    <p>Due Date: <strong>{{DUE_DATE}}</strong></p>
+    <p>Amount Due: <strong>{{TOTAL_AMOUNT}}</strong></p>
+</div>
+
+{{PAYMENT_INFO}}
+
+<p>If you have already made this payment, please disregard this reminder. If you have any questions or concerns, please contact us immediately.</p>
+
+<p>Thank you for your prompt attention to this matter.</p>
+
+<p>Best regards,<br>
+<strong>{{SENDER_NAME}}</strong></p>

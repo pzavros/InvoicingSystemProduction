@@ -3,16 +3,23 @@ using Backend.DTOs.Webpage;
 using Backend.Interfaces.Webpage;
 using Backend.Models.Webpage;
 using Microsoft.EntityFrameworkCore;
+using InvoicingBackend.Interfaces;
 
 namespace Backend.Services.Webpage
 {
     public class ContactMessageService : IContactMessageService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IEmailService _emailService;
+        private readonly ILogger<ContactMessageService> _logger;
+        private const string ADMIN_EMAIL = "support@e-nvoicing.com";
+        private const string ADMIN_CC_EMAIL = "panazavros8@gmail.com";
 
-        public ContactMessageService(ApplicationDbContext context)
+        public ContactMessageService(ApplicationDbContext context, IEmailService emailService, ILogger<ContactMessageService> logger)
         {
             _context = context;
+            _emailService = emailService;
+            _logger = logger;
         }
 
         public async Task<ContactMessageDto> CreateMessageAsync(CreateContactMessageDto createDto)
@@ -32,6 +39,70 @@ namespace Backend.Services.Webpage
 
             _context.ContactMessages.Add(contactMessage);
             await _context.SaveChangesAsync();
+
+            var userName = $"{contactMessage.FirstName} {contactMessage.LastName}";
+            var referenceId = $"CM-{contactMessage.Id}";
+
+            // Send confirmation email to the user
+            try
+            {
+                _logger.LogInformation("Sending contact form confirmation email to {Email} for message ID: {MessageId}", 
+                    contactMessage.Email, contactMessage.Id);
+                
+                var userEmailResult = await _emailService.SendContactFormSubmissionAsync(
+                    contactMessage.Email,
+                    userName,
+                    contactMessage.Message,
+                    referenceId,
+                    ccEmail: null // User confirmation doesn't need CC
+                );
+
+                if (userEmailResult.Success)
+                {
+                    _logger.LogInformation("Contact form confirmation email sent successfully to {Email}", contactMessage.Email);
+                }
+                else
+                {
+                    _logger.LogWarning("Failed to send contact form confirmation email to {Email}: {Message}", 
+                        contactMessage.Email, userEmailResult.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error sending contact form confirmation email to {Email}", contactMessage.Email);
+                // Don't fail the request if email fails
+            }
+
+            // Send notification email to admin with CC
+            try
+            {
+                _logger.LogInformation("Sending admin notification email for contact message ID: {MessageId}", contactMessage.Id);
+                
+                var adminEmailResult = await _emailService.SendAdminContactNotificationAsync(
+                    ADMIN_EMAIL,
+                    userName,
+                    contactMessage.Email,
+                    contactMessage.Subject,
+                    contactMessage.Message,
+                    referenceId,
+                    userInfo: $"Source: {contactMessage.Source}",
+                    ccEmail: ADMIN_CC_EMAIL
+                );
+
+                if (adminEmailResult.Success)
+                {
+                    _logger.LogInformation("Admin notification email sent successfully with CC to {CcEmail}", ADMIN_CC_EMAIL);
+                }
+                else
+                {
+                    _logger.LogWarning("Failed to send admin notification email: {Message}", adminEmailResult.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error sending admin notification email for message ID: {MessageId}", contactMessage.Id);
+                // Don't fail the request if email fails
+            }
 
             return MapToDto(contactMessage);
         }

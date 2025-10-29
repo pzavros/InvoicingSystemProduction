@@ -92,6 +92,11 @@ const SubscriptionPage = () => {
       // Refresh subscription status from context
       await refreshStatus();
       await fetchSubscriptionData();
+      
+      // Reload page after 1.5 seconds to ensure all state is refreshed
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (error) {
       console.error('Error cancelling subscription:', error);
       setError(error.response?.data?.message || 'Failed to cancel subscription');
@@ -207,6 +212,15 @@ const SubscriptionPage = () => {
   const monthlyPrice = 20;
   const currentTier = subscriptionStatus?.tier || 'free';
   const isPremium = subscriptionStatus?.isPremium || false;
+  
+  // Check if subscription has actually expired (end date in the past)
+  const hasExpired = subscriptionDetails?.endDate && new Date(subscriptionDetails.endDate) < new Date();
+  
+  // Check if cancellation warning should be shown (cancelled but still has future access)
+  const showCancellationWarning = isPremium && 
+    subscriptionDetails?.cancelAtPeriodEnd && 
+    !hasExpired &&
+    subscriptionDetails?.daysRemainingAfterCancellation > 0;
 
   return (
     <Page>
@@ -354,7 +368,7 @@ const SubscriptionPage = () => {
               )}
 
               {/* Cancellation pending alert */}
-              {isPremium && subscriptionDetails?.cancelAtPeriodEnd && (
+              {showCancellationWarning && (
                 <Alert 
                   severity="warning" 
                   sx={{ 
