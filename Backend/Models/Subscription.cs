@@ -24,6 +24,9 @@ namespace InvoicingBackend.Models
         
         public DateTime? TrialEndDate { get; set; }
         
+        // Track if user has ever used a trial (to prevent multiple trials)
+        public bool HasUsedTrial { get; set; } = false;
+        
         [Required]
         public decimal MonthlyPrice { get; set; } = 20.00m; // €20
         
@@ -40,6 +43,11 @@ namespace InvoicingBackend.Models
         public int PaymentFailureCount { get; set; } = 0;
         
         public DateTime? LastPaymentFailureDate { get; set; }
+        
+        // Track if subscription is cancelled but still active until period end
+        public bool CancelAtPeriodEnd { get; set; } = false;
+        
+        public DateTime? CancellationDate { get; set; } // When user requested cancellation
         
         // Navigation properties
         public new User User { get; set; } = null!;

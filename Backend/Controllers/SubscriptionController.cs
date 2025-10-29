@@ -49,8 +49,10 @@ namespace InvoicingBackend.Controllers
                 var userId = GetCurrentUserId();
                 var subscription = await _subscriptionService.GetUserSubscriptionAsync(userId);
                 
+                // Return null for new users who haven't started a trial or subscription yet
+                // The frontend will handle this by showing the "Start Trial" button
                 if (subscription == null)
-                    return NotFound(new { message = "No subscription found." });
+                    return Ok(null);
 
                 return Ok(subscription);
             }

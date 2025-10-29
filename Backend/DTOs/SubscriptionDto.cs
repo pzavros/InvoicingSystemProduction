@@ -15,6 +15,9 @@ namespace InvoicingBackend.DTOs
         public bool IsTrialActive { get; set; }
         public int DaysUntilExpiry { get; set; }
         public bool IsActive { get; set; }
+        public bool CancelAtPeriodEnd { get; set; }
+        public DateTime? CancellationDate { get; set; }
+        public int DaysRemainingAfterCancellation { get; set; }
     }
 
     public class PaymentDto

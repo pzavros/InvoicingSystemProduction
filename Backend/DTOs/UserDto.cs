@@ -9,15 +9,19 @@ namespace InvoicingBackend.DTOs
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
         public bool IsActive { get; set; }
-        public DateTime? SubscriptionExpiryDate { get; set; }
-        public string? SubscriptionPlan { get; set; }
-        public bool IsTrialUser { get; set; }
         public bool IsAdmin { get; set; }
         public DateTime? LastLoginDate { get; set; }
         public DateTime DateEntered { get; set; }
         public string? EnteredBy { get; set; }
         
-                // User preferences
+        // Subscription Status (derived from Subscriptions table)
+        public string SubscriptionTier { get; set; } = "free"; // "free" or "premium"
+        public string SubscriptionStatus { get; set; } = "Free"; // For display: "Free", "Trial", "Premium", "Premium (Granted)", "Admin"
+        public DateTime? SubscriptionEndDate { get; set; } // When subscription expires
+        public bool IsPremium { get; set; } = false;
+        public bool IsInTrial { get; set; } = false;
+        
+        // User preferences
         public string? Currency { get; set; }
         public string? DateFormat { get; set; }
         public string? Language { get; set; }

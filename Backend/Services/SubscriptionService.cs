@@ -46,6 +46,59 @@ namespace InvoicingBackend.Services
             }
 
             var now = DateTime.UtcNow;
+            
+            // Auto-expire trial if expired
+            if (subscription.Status == SubscriptionStatus.Trial && 
+                subscription.TrialEndDate.HasValue && 
+                now >= subscription.TrialEndDate.Value)
+            {
+                subscription.Status = SubscriptionStatus.Expired;
+                subscription.MarkAsModified(userId.ToString());
+                
+                // Update user tier to free
+                var user = await _context.Users.FindAsync(userId);
+                if (user != null)
+                {
+                    user.SubscriptionTier = "free";
+                }
+                
+                await _context.SaveChangesAsync();
+            }
+            
+            // Auto-cancel subscriptions marked for cancellation at period end
+            if (subscription.CancelAtPeriodEnd && now >= subscription.EndDate)
+            {
+                subscription.Status = SubscriptionStatus.Cancelled;
+                subscription.CancelAtPeriodEnd = false;
+                subscription.TrialEndDate = null;
+                subscription.MarkAsModified(userId.ToString());
+                
+                // Update user tier to free
+                var user = await _context.Users.FindAsync(userId);
+                if (user != null)
+                {
+                    user.SubscriptionTier = "free";
+                }
+                
+                await _context.SaveChangesAsync();
+            }
+            
+            // Auto-expire active subscription if expired (and not marked for cancellation, which is handled above)
+            if (subscription.Status == SubscriptionStatus.Active && now >= subscription.EndDate && !subscription.CancelAtPeriodEnd)
+            {
+                subscription.Status = SubscriptionStatus.Expired;
+                subscription.MarkAsModified(userId.ToString());
+                
+                // Update user tier to free
+                var user = await _context.Users.FindAsync(userId);
+                if (user != null)
+                {
+                    user.SubscriptionTier = "free";
+                }
+                
+                await _context.SaveChangesAsync();
+            }
+            
             var isTrialActive = subscription.TrialEndDate.HasValue && now < subscription.TrialEndDate.Value;
             var isActive = subscription.Status == SubscriptionStatus.Active && now < subscription.EndDate;
             var daysUntilExpiry = isTrialActive 
@@ -71,6 +124,12 @@ namespace InvoicingBackend.Services
             var existingSubscription = await _context.Subscriptions
                 .FirstOrDefaultAsync(s => s.UserId == userId && !s.IsDeleted);
 
+            // Check if user has already used their free trial
+            if (existingSubscription?.HasUsedTrial == true)
+            {
+                throw new InvalidOperationException("You have already used your free trial.");
+            }
+
             if (existingSubscription != null)
             {
                 throw new InvalidOperationException("User already has a subscription");
@@ -86,6 +145,7 @@ namespace InvoicingBackend.Services
                 StartDate = now,
                 EndDate = trialEndDate, // Trial period
                 TrialEndDate = trialEndDate,
+                HasUsedTrial = true, // Mark that trial has been used
                 MonthlyPrice = MONTHLY_PRICE,
                 NextPaymentDate = trialEndDate,
                 DateEntered = now,
@@ -93,6 +153,14 @@ namespace InvoicingBackend.Services
             };
 
             _context.Subscriptions.Add(subscription);
+            
+            // Update user tier to premium during trial
+            var user = await _context.Users.FindAsync(userId);
+            if (user != null)
+            {
+                user.SubscriptionTier = "premium";
+            }
+            
             await _context.SaveChangesAsync();
 
             return MapToDto(subscription);
@@ -105,14 +173,40 @@ namespace InvoicingBackend.Services
 
             if (subscription == null) return false;
 
-            subscription.Status = SubscriptionStatus.Cancelled;
-            subscription.MarkAsModified(userId.ToString());
-
-            // Downgrade user to free tier
-            var user = await _context.Users.FindAsync(userId);
-            if (user != null)
+            var now = DateTime.UtcNow;
+            
+            // If subscription has time remaining, mark for cancellation at period end
+            if (subscription.Status == SubscriptionStatus.Active && subscription.EndDate > now)
             {
-                user.SubscriptionTier = "free";
+                // Keep subscription active until period end
+                subscription.CancelAtPeriodEnd = true;
+                subscription.CancellationDate = now;
+                subscription.NextPaymentDate = null; // Prevent future charges
+                subscription.MarkAsModified(userId.ToString());
+            }
+            else if (subscription.Status == SubscriptionStatus.Trial && subscription.TrialEndDate.HasValue && subscription.TrialEndDate.Value > now)
+            {
+                // For trial, also mark for cancellation at period end
+                subscription.CancelAtPeriodEnd = true;
+                subscription.CancellationDate = now;
+                subscription.NextPaymentDate = null; // Prevent auto-billing after trial
+                subscription.MarkAsModified(userId.ToString());
+            }
+            else
+            {
+                // Subscription already expired or no time remaining, cancel immediately
+                subscription.Status = SubscriptionStatus.Cancelled;
+                subscription.TrialEndDate = null;
+                subscription.CancelAtPeriodEnd = false;
+                subscription.CancellationDate = now;
+                subscription.MarkAsModified(userId.ToString());
+
+                // Downgrade user to free tier immediately
+                var user = await _context.Users.FindAsync(userId);
+                if (user != null)
+                {
+                    user.SubscriptionTier = "free";
+                }
             }
 
             await _context.SaveChangesAsync();
@@ -159,22 +253,60 @@ namespace InvoicingBackend.Services
 
             var now = DateTime.UtcNow;
 
-            // If no subscription exists (freemium user upgrading to premium), create one
+            // Check if this is a trial payment (€0.00)
+            bool isTrial = amount == 0;
+
+            // If no subscription exists (freemium user upgrading or starting trial), create one
             if (subscription == null)
             {
-                subscription = new Subscription
+                if (isTrial)
                 {
-                    UserId = userId,
-                    MonthlyPrice = amount,
-                    StartDate = now,
-                    EndDate = now.AddMonths(1),
-                    NextPaymentDate = now.AddMonths(1),
-                    Status = SubscriptionStatus.Active,
-                    TrialEndDate = null,
-                    PaymentFailureCount = 0,
-                    DateEntered = now,
-                    EnteredBy = userId.ToString()
-                };
+                    // Check if user has already used their free trial
+                    var previousSubscription = await _context.Subscriptions
+                        .Where(s => s.UserId == userId && s.IsDeleted)
+                        .FirstOrDefaultAsync(s => s.HasUsedTrial);
+                    
+                    if (previousSubscription != null)
+                    {
+                        throw new InvalidOperationException("You have already used your free trial.");
+                    }
+
+                    // Create trial subscription
+                    var trialEndDate = now.AddDays(TRIAL_DAYS);
+                    subscription = new Subscription
+                    {
+                        UserId = userId,
+                        MonthlyPrice = MONTHLY_PRICE,
+                        StartDate = now,
+                        EndDate = trialEndDate,
+                        NextPaymentDate = trialEndDate,
+                        Status = SubscriptionStatus.Trial,
+                        TrialEndDate = trialEndDate,
+                        HasUsedTrial = true, // Mark trial as used
+                        PaymentFailureCount = 0,
+                        DateEntered = now,
+                        EnteredBy = userId.ToString()
+                    };
+                }
+                else
+                {
+                    // Create regular premium subscription
+                    subscription = new Subscription
+                    {
+                        UserId = userId,
+                        MonthlyPrice = amount,
+                        StartDate = now,
+                        EndDate = now.AddMonths(1),
+                        NextPaymentDate = now.AddMonths(1),
+                        Status = SubscriptionStatus.Active,
+                        TrialEndDate = null,
+                        HasUsedTrial = false, // Direct payment, no trial
+                        PaymentFailureCount = 0,
+                        DateEntered = now,
+                        EnteredBy = userId.ToString()
+                    };
+                }
+                
                 _context.Subscriptions.Add(subscription);
                 
                 // Upgrade user to premium tier
@@ -182,24 +314,26 @@ namespace InvoicingBackend.Services
                 if (user != null)
                 {
                     user.SubscriptionTier = "premium";
+                    user.IsTrialUser = isTrial; // Set trial flag for trial payments
                 }
                 
                 // Save to get the subscription ID
                 await _context.SaveChangesAsync();
             }
 
-            // For now, we'll simulate successful payment (manual implementation)
-            // Later you can integrate with Stripe here
+            // Create payment record (even for €0.00 to track card authorization)
             var payment = new Payment
             {
                 SubscriptionId = subscription.Id,
                 Amount = amount,
                 Currency = "EUR",
-                Status = PaymentStatus.Succeeded, // Simulating success for now
+                Status = PaymentStatus.Succeeded,
                 PaymentDate = now,
                 ProcessedDate = now,
                 PaymentMethodId = paymentMethodId,
-                Description = $"Monthly subscription payment - €{amount}",
+                Description = isTrial 
+                    ? "7-day free trial - Card authorization (€0.00)" 
+                    : $"Monthly subscription payment - €{amount}",
                 UserId = userId,
                 DateEntered = now,
                 EnteredBy = userId.ToString()
@@ -207,13 +341,25 @@ namespace InvoicingBackend.Services
 
             _context.Payments.Add(payment);
 
-            // Update subscription
-            subscription.Status = SubscriptionStatus.Active;
-            subscription.LastPaymentDate = now;
-            subscription.EndDate = now.AddMonths(1); // Extend by 1 month
-            subscription.NextPaymentDate = now.AddMonths(1);
-            subscription.PaymentFailureCount = 0;
-            subscription.MarkAsModified(userId.ToString());
+            // Update subscription only if it's a real payment (not trial)
+            if (!isTrial)
+            {
+                subscription.Status = SubscriptionStatus.Active;
+                subscription.LastPaymentDate = now;
+                subscription.EndDate = now.AddMonths(1); // Extend by 1 month
+                subscription.NextPaymentDate = now.AddMonths(1);
+                subscription.PaymentFailureCount = 0;
+                subscription.TrialEndDate = null; // Clear trial status when payment is made
+                subscription.MarkAsModified(userId.ToString());
+
+                // Ensure user is upgraded to premium tier
+                var currentUser = await _context.Users.FindAsync(userId);
+                if (currentUser != null && currentUser.SubscriptionTier != "premium")
+                {
+                    currentUser.SubscriptionTier = "premium";
+                    currentUser.IsTrialUser = false; // Clear trial flag for paid subscriptions
+                }
+            }
 
             await _context.SaveChangesAsync();
 
@@ -277,12 +423,16 @@ namespace InvoicingBackend.Services
         public async Task<bool> IsPremiumUserAsync(int userId)
         {
             var user = await _context.Users.FindAsync(userId);
+            // Admins are always considered premium users
+            if (user?.IsAdmin == true) return true;
             return user?.SubscriptionTier == SubscriptionLimits.PREMIUM_TIER;
         }
 
         public async Task<string> GetUserTierAsync(int userId)
         {
             var user = await _context.Users.FindAsync(userId);
+            // Admins are always considered premium
+            if (user?.IsAdmin == true) return SubscriptionLimits.PREMIUM_TIER;
             return user?.SubscriptionTier ?? SubscriptionLimits.FREE_TIER;
         }
 
@@ -299,7 +449,8 @@ namespace InvoicingBackend.Services
                 throw new InvalidOperationException("User not found");
             }
 
-            var isPremium = user.SubscriptionTier == SubscriptionLimits.PREMIUM_TIER;
+            // Admins are always considered premium
+            var isPremium = user.IsAdmin || user.SubscriptionTier == SubscriptionLimits.PREMIUM_TIER;
             
             // Get counts
             var clientsCount = await _context.Clients.CountAsync(c => c.UserId == userId && !c.IsDeleted);
@@ -431,16 +582,76 @@ namespace InvoicingBackend.Services
             
             return quota?.InvoicesCreated ?? 0;
         }
-
-        private SubscriptionDto MapToDto(Subscription subscription)
+        
+        // ============= ADMIN OPERATIONS =============
+        
+        public async Task<bool> GrantPremiumAccessAsync(int userId, int months)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return false;
+            
+            // Update user tier to premium and clear trial flag
+            user.SubscriptionTier = SubscriptionLimits.PREMIUM_TIER;
+            user.IsTrialUser = false; // Clear trial flag
+            
+            var now = DateTime.UtcNow;
+            var endDate = now.AddMonths(months);
+            
+            // Find or create subscription
+            var subscription = await _context.Subscriptions
+                .FirstOrDefaultAsync(s => s.UserId == userId && !s.IsDeleted);
+            
+            if (subscription == null)
+            {
+                // Create new subscription
+                subscription = new Subscription
+                {
+                    UserId = userId,
+                    Status = SubscriptionStatus.Active,
+                    StartDate = now,
+                    EndDate = endDate,
+                    TrialEndDate = null,
+                    MonthlyPrice = 0.00m, // Admin granted - no charge
+                    LastPaymentDate = now,
+                    NextPaymentDate = endDate,
+                    DateEntered = now,
+                    EnteredBy = "Admin"
+                };
+                _context.Subscriptions.Add(subscription);
+            }
+            else
+            {
+                // Extend existing subscription
+                subscription.Status = SubscriptionStatus.Active;
+                subscription.EndDate = subscription.EndDate > now 
+                    ? subscription.EndDate.AddMonths(months) 
+                    : endDate;
+                subscription.NextPaymentDate = subscription.EndDate;
+                subscription.DateModified = now;
+                subscription.ModifiedBy = "Admin";
+            }
+            
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        
+        // ============= MAPPING HELPERS =============
+        
+        private static SubscriptionDto MapToDto(Subscription subscription)
         {
             var now = DateTime.UtcNow;
             var isTrialActive = subscription.TrialEndDate.HasValue && now < subscription.TrialEndDate.Value;
             var isActive = subscription.Status == SubscriptionStatus.Active && now < subscription.EndDate;
-            var daysUntilExpiry = isTrialActive 
-                ? (int)(subscription.TrialEndDate!.Value - now).TotalDays
-                : (int)(subscription.EndDate - now).TotalDays;
-
+            
+            var effectiveEndDate = isTrialActive ? subscription.TrialEndDate!.Value : subscription.EndDate;
+            var daysUntilExpiry = (int)Math.Ceiling((effectiveEndDate - now).TotalDays);
+            var daysRemainingAfterCancellation = 0;
+            
+            if (subscription.CancelAtPeriodEnd)
+            {
+                daysRemainingAfterCancellation = (int)Math.Ceiling((effectiveEndDate - now).TotalDays);
+            }
+            
             return new SubscriptionDto
             {
                 Id = subscription.Id,
@@ -452,14 +663,16 @@ namespace InvoicingBackend.Services
                 MonthlyPrice = subscription.MonthlyPrice,
                 LastPaymentDate = subscription.LastPaymentDate,
                 NextPaymentDate = subscription.NextPaymentDate,
-                PaymentFailureCount = subscription.PaymentFailureCount,
                 IsTrialActive = isTrialActive,
-                DaysUntilExpiry = Math.Max(0, daysUntilExpiry),
-                IsActive = isActive || isTrialActive
+                IsActive = isActive || isTrialActive,
+                DaysUntilExpiry = daysUntilExpiry > 0 ? daysUntilExpiry : 0,
+                CancelAtPeriodEnd = subscription.CancelAtPeriodEnd,
+                CancellationDate = subscription.CancellationDate,
+                DaysRemainingAfterCancellation = daysRemainingAfterCancellation > 0 ? daysRemainingAfterCancellation : 0
             };
         }
-
-        private PaymentDto MapToDto(Payment payment)
+        
+        private static PaymentDto MapToDto(Payment payment)
         {
             return new PaymentDto
             {

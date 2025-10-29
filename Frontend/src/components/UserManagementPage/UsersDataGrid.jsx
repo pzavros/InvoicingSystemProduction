@@ -35,9 +35,11 @@ import {
   Person as PersonIcon,
   Security as SecurityIcon,
   Email as EmailIcon,
-  CalendarToday as CalendarIcon
+  CalendarToday as CalendarIcon,
+  CardGiftcard as GiftIcon,
+  Star as StarIcon
 } from '@mui/icons-material';
-import { updateUserAdminStatus } from './api';
+import { updateUserAdminStatus, grantPremiumAccess } from './api';
 
 const CustomToolbar = () => {
   return (
@@ -63,6 +65,13 @@ const UsersDataGrid = ({
     open: false,
     user: null,
     loading: false
+  });
+  
+  const [premiumDialog, setPremiumDialog] = useState({
+    open: false,
+    user: null,
+    loading: false,
+    months: 1
   });
 
   const handleAdminStatusClick = (user) => {
@@ -97,6 +106,43 @@ const UsersDataGrid = ({
       
       if (onNotification) {
         onNotification('Failed to update admin status', 'error');
+      }
+    }
+  };
+  
+  const handlePremiumClick = (user) => {
+    setPremiumDialog({
+      open: true,
+      user: user,
+      loading: false,
+      months: 1
+    });
+  };
+  
+  const handleGrantPremium = async () => {
+    try {
+      setPremiumDialog(prev => ({ ...prev, loading: true }));
+      
+      await grantPremiumAccess(premiumDialog.user.id, premiumDialog.months);
+      
+      setPremiumDialog({ open: false, user: null, loading: false, months: 1 });
+      
+      if (onReloadUsers) {
+        await onReloadUsers();
+      }
+      
+      if (onNotification) {
+        onNotification(
+          `Premium access granted to ${premiumDialog.user.firstName} ${premiumDialog.user.lastName} for ${premiumDialog.months} month(s)`,
+          'success'
+        );
+      }
+    } catch (error) {
+      console.error('Error granting premium access:', error);
+      setPremiumDialog(prev => ({ ...prev, loading: false }));
+      
+      if (onNotification) {
+        onNotification('Failed to grant premium access', 'error');
       }
     }
   };
@@ -153,17 +199,35 @@ const UsersDataGrid = ({
       )
     },
     {
-      field: 'subscriptionPlan',
+      field: 'subscriptionStatus',
       headerName: 'Subscription',
-      width: 150,
-      renderCell: (params) => (
-        <Chip
-          label={params.value || 'Free'}
-          color={params.value === 'Premium' ? 'primary' : 'default'}
-          variant="outlined"
-          size="small"
-        />
-      )
+      width: 180,
+      renderCell: (params) => {
+        const status = params.value || 'Free';
+        let color = 'default';
+        let variant = 'outlined';
+        
+        if (status === 'Admin') {
+          color = 'error';
+          variant = 'filled';
+        } else if (status === 'Premium' || status === 'Premium (Granted)') {
+          color = 'success';
+          variant = 'filled';
+        } else if (status === 'Trial') {
+          color = 'info';
+          variant = 'filled';
+        }
+        
+        return (
+          <Chip
+            label={status}
+            color={color}
+            variant={variant}
+            size="small"
+            sx={{ fontWeight: 600 }}
+          />
+        );
+      }
     },
     {
       field: 'lastLoginDate',
@@ -187,7 +251,7 @@ const UsersDataGrid = ({
       field: 'actions',
       type: 'actions',
       headerName: 'Actions',
-      width: 120,
+      width: 150,
       getActions: (params) => [
         <GridActionsCellItem
           key="edit"
@@ -208,6 +272,17 @@ const UsersDataGrid = ({
           }
           label="Admin Status"
           onClick={() => handleAdminStatusClick(params.row)}
+        />,
+        <GridActionsCellItem
+          key="premium"
+          icon={
+            <Tooltip title="Grant Premium Access">
+              <StarIcon />
+            </Tooltip>
+          }
+          label="Grant Premium"
+          onClick={() => handlePremiumClick(params.row)}
+          showInMenu
         />
       ]
     }
@@ -286,12 +361,20 @@ const UsersDataGrid = ({
                     variant="outlined"
                     size="small"
                   />
-                  {user.subscriptionPlan && (
+                  {user.subscriptionStatus && (
                     <Chip
-                      label={user.subscriptionPlan}
-                      color={user.subscriptionPlan === 'Premium' ? 'primary' : 'default'}
-                      variant="outlined"
+                      label={user.subscriptionStatus}
+                      color={
+                        user.subscriptionStatus === 'Admin' ? 'error' :
+                        user.subscriptionStatus === 'Premium' || user.subscriptionStatus === 'Premium (Granted)' ? 'success' :
+                        user.subscriptionStatus === 'Trial' ? 'info' :
+                        'default'
+                      }
+                      variant={
+                        user.subscriptionStatus === 'Free' ? 'outlined' : 'filled'
+                      }
                       size="small"
+                      sx={{ fontWeight: 600 }}
                     />
                   )}
                 </Box>
@@ -357,6 +440,24 @@ const UsersDataGrid = ({
                 >
                   {user.isAdmin ? 'Remove Admin' : 'Make Admin'}
                 </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<StarIcon />}
+                  onClick={() => handlePremiumClick(user)}
+                  sx={{
+                    color: '#8b5cf6',
+                    borderColor: 'rgba(139, 92, 246, 0.3)',
+                    backgroundColor: 'rgba(139, 92, 246, 0.05)',
+                    flex: 1,
+                    '&:hover': {
+                      backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                      borderColor: '#8b5cf6',
+                    },
+                  }}
+                >
+                  Premium
+                </Button>
               </CardActions>
             </Card>
           ))}
@@ -417,6 +518,91 @@ const UsersDataGrid = ({
               color={adminDialog.user?.isAdmin ? 'error' : 'warning'}
             >
               {adminDialog.loading ? 'Updating...' : (adminDialog.user?.isAdmin ? 'Remove Admin' : 'Make Admin')}
+            </Button>
+          </DialogActions>
+        </Dialog>
+        
+        {/* Grant Premium Access Dialog */}
+        <Dialog
+          open={premiumDialog.open}
+          onClose={() => !premiumDialog.loading && setPremiumDialog({ open: false, user: null, loading: false, months: 1 })}
+          fullScreen={isMobile}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <StarIcon sx={{ color: '#8b5cf6' }} />
+              Grant Premium Access
+            </Box>
+          </DialogTitle>
+          <DialogContent>
+            <Typography variant="body1" gutterBottom sx={{ mb: 3 }}>
+              Grant premium access to <strong>{premiumDialog.user?.firstName} {premiumDialog.user?.lastName}</strong>
+            </Typography>
+            
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 600 }}>
+                Duration (months)
+              </Typography>
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                {[1, 2, 3, 6, 12].map((months) => (
+                  <Button
+                    key={months}
+                    variant={premiumDialog.months === months ? 'contained' : 'outlined'}
+                    size="small"
+                    onClick={() => setPremiumDialog(prev => ({ ...prev, months }))}
+                    disabled={premiumDialog.loading}
+                    sx={{
+                      minWidth: '60px',
+                      bgcolor: premiumDialog.months === months ? '#8b5cf6' : 'transparent',
+                      borderColor: '#8b5cf6',
+                      color: premiumDialog.months === months ? 'white' : '#8b5cf6',
+                      '&:hover': {
+                        bgcolor: premiumDialog.months === months ? '#7c3aed' : 'rgba(139, 92, 246, 0.1)',
+                        borderColor: '#7c3aed',
+                      }
+                    }}
+                  >
+                    {months}
+                  </Button>
+                ))}
+              </Box>
+            </Box>
+            
+            <Box sx={{ p: 2, bgcolor: 'rgba(139, 92, 246, 0.05)', borderRadius: 1, border: '1px solid rgba(139, 92, 246, 0.2)' }}>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                This will grant the user:
+              </Typography>
+              <Box component="ul" sx={{ m: 0, pl: 2.5 }}>
+                <Typography component="li" variant="body2" color="text.secondary">Unlimited clients, categories, products</Typography>
+                <Typography component="li" variant="body2" color="text.secondary">Unlimited invoices per month</Typography>
+                <Typography component="li" variant="body2" color="text.secondary">Access to custom templates</Typography>
+                <Typography component="li" variant="body2" color="text.secondary">PDF exports without watermarks</Typography>
+              </Box>
+            </Box>
+          </DialogContent>
+          <DialogActions sx={{ p: 3, pt: 1 }}>
+            <Button 
+              onClick={() => setPremiumDialog({ open: false, user: null, loading: false, months: 1 })}
+              disabled={premiumDialog.loading}
+              variant="outlined"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleGrantPremium}
+              disabled={premiumDialog.loading}
+              variant="contained"
+              startIcon={<GiftIcon />}
+              sx={{
+                bgcolor: '#8b5cf6',
+                '&:hover': {
+                  bgcolor: '#7c3aed',
+                }
+              }}
+            >
+              {premiumDialog.loading ? 'Granting...' : `Grant ${premiumDialog.months} Month${premiumDialog.months > 1 ? 's' : ''}`}
             </Button>
           </DialogActions>
         </Dialog>
@@ -500,6 +686,89 @@ const UsersDataGrid = ({
             color={adminDialog.user?.isAdmin ? 'error' : 'warning'}
           >
             {adminDialog.loading ? 'Updating...' : (adminDialog.user?.isAdmin ? 'Remove Admin' : 'Make Admin')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      
+      {/* Grant Premium Access Dialog */}
+      <Dialog
+        open={premiumDialog.open}
+        onClose={() => !premiumDialog.loading && setPremiumDialog({ open: false, user: null, loading: false, months: 1 })}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <StarIcon sx={{ color: '#8b5cf6' }} />
+            Grant Premium Access
+          </Box>
+        </DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" gutterBottom sx={{ mb: 3 }}>
+            Grant premium access to <strong>{premiumDialog.user?.firstName} {premiumDialog.user?.lastName}</strong>
+          </Typography>
+          
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 600 }}>
+              Duration (months)
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+              {[1, 2, 3, 6, 12].map((months) => (
+                <Button
+                  key={months}
+                  variant={premiumDialog.months === months ? 'contained' : 'outlined'}
+                  size="small"
+                  onClick={() => setPremiumDialog(prev => ({ ...prev, months }))}
+                  disabled={premiumDialog.loading}
+                  sx={{
+                    minWidth: '60px',
+                    bgcolor: premiumDialog.months === months ? '#8b5cf6' : 'transparent',
+                    borderColor: '#8b5cf6',
+                    color: premiumDialog.months === months ? 'white' : '#8b5cf6',
+                    '&:hover': {
+                      bgcolor: premiumDialog.months === months ? '#7c3aed' : 'rgba(139, 92, 246, 0.1)',
+                      borderColor: '#7c3aed',
+                    }
+                  }}
+                >
+                  {months}
+                </Button>
+              ))}
+            </Box>
+          </Box>
+          
+          <Box sx={{ p: 2, bgcolor: 'rgba(139, 92, 246, 0.05)', borderRadius: 1, border: '1px solid rgba(139, 92, 246, 0.2)' }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              This will grant the user:
+            </Typography>
+            <Box component="ul" sx={{ m: 0, pl: 2.5 }}>
+              <Typography component="li" variant="body2" color="text.secondary">Unlimited clients, categories, products</Typography>
+              <Typography component="li" variant="body2" color="text.secondary">Unlimited invoices per month</Typography>
+              <Typography component="li" variant="body2" color="text.secondary">Access to custom templates</Typography>
+              <Typography component="li" variant="body2" color="text.secondary">PDF exports without watermarks</Typography>
+            </Box>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button 
+            onClick={() => setPremiumDialog({ open: false, user: null, loading: false, months: 1 })}
+            disabled={premiumDialog.loading}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleGrantPremium}
+            disabled={premiumDialog.loading}
+            variant="contained"
+            startIcon={<GiftIcon />}
+            sx={{
+              bgcolor: '#8b5cf6',
+              '&:hover': {
+                bgcolor: '#7c3aed',
+              }
+            }}
+          >
+            {premiumDialog.loading ? 'Granting...' : `Grant ${premiumDialog.months} Month${premiumDialog.months > 1 ? 's' : ''}`}
           </Button>
         </DialogActions>
       </Dialog>

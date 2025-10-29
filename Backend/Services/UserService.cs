@@ -28,7 +28,9 @@ namespace InvoicingBackend.Services
 
         public async Task<UserDto?> GetUserByIdAsync(int id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _context.Users
+                .Include(u => u.Subscription)
+                .FirstOrDefaultAsync(u => u.Id == id);
             if (user == null) return null;
 
             return MapToUserDto(user);
@@ -36,7 +38,9 @@ namespace InvoicingBackend.Services
 
         public async Task<UserDto?> GetUserByEmailAsync(string email)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            var user = await _context.Users
+                .Include(u => u.Subscription)
+                .FirstOrDefaultAsync(u => u.Email == email);
             if (user == null) return null;
 
             return MapToUserDto(user);
@@ -86,7 +90,9 @@ namespace InvoicingBackend.Services
 
         public async Task<AuthResponseDto?> LoginUserAsync(LoginDto loginDto)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == loginDto.Email);
+            var user = await _context.Users
+                .Include(u => u.Subscription)
+                .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
             if (user == null || !user.IsActive)
             {
                 return null; // User not found or inactive
@@ -121,8 +127,7 @@ namespace InvoicingBackend.Services
             user.FirstName = userDto.FirstName;
             user.LastName = userDto.LastName;
             user.IsActive = userDto.IsActive;
-            user.SubscriptionPlan = userDto.SubscriptionPlan;
-            user.SubscriptionExpiryDate = userDto.SubscriptionExpiryDate;
+            // Subscription fields are now managed via Subscriptions table only
 
             await _context.SaveChangesAsync();
             return true;
@@ -143,7 +148,17 @@ namespace InvoicingBackend.Services
             var user = await _context.Users.FindAsync(userId);
             if (user == null || !user.IsActive) return false;
 
-            return user.SubscriptionExpiryDate > DateTime.UtcNow;
+            // Check subscription via Subscriptions table
+            var subscription = await _context.Subscriptions
+                .FirstOrDefaultAsync(s => s.UserId == userId && !s.IsDeleted);
+            
+            if (subscription == null) return false;
+            
+            var now = DateTime.UtcNow;
+            var isTrialActive = subscription.TrialEndDate.HasValue && now < subscription.TrialEndDate.Value;
+            var isActive = subscription.Status == SubscriptionStatus.Active && now < subscription.EndDate;
+            
+            return isTrialActive || isActive || user.IsAdmin;
         }
 
         public Task<string> GenerateJwtTokenAsync(User user)
@@ -156,8 +171,7 @@ namespace InvoicingBackend.Services
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
-                new Claim("subscription_plan", user.SubscriptionPlan ?? "None"),
-                new Claim("is_trial", user.IsTrialUser.ToString()),
+                new Claim("subscription_tier", user.SubscriptionTier ?? "free"),
                 new Claim("IsAdmin", user.IsAdmin.ToString())
             };
 
@@ -187,6 +201,7 @@ namespace InvoicingBackend.Services
         public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
         {
             var users = await _context.Users
+                .Include(u => u.Subscription)
                 .OrderBy(u => u.LastName)
                 .ThenBy(u => u.FirstName)
                 .ToListAsync();
@@ -323,6 +338,70 @@ namespace InvoicingBackend.Services
 
         private UserDto MapToUserDto(User user)
         {
+            // Derive subscription status from Subscriptions table
+            var now = DateTime.UtcNow;
+            var subscription = user.Subscription;
+            
+            string subscriptionTier = "free";
+            string subscriptionStatus = "Free";
+            DateTime? subscriptionEndDate = null;
+            bool isPremium = false;
+            bool isInTrial = false;
+            
+            if (user.IsAdmin)
+            {
+                subscriptionTier = "premium";
+                subscriptionStatus = "Admin";
+                isPremium = true;
+            }
+            else if (subscription != null && !subscription.IsDeleted)
+            {
+                // Check if trial is active (must have Status=Trial AND TrialEndDate in future)
+                isInTrial = subscription.Status == SubscriptionStatus.Trial && 
+                           subscription.TrialEndDate.HasValue && 
+                           now < subscription.TrialEndDate.Value;
+                
+                // Check if premium subscription is active
+                bool isActiveSubscription = subscription.Status == SubscriptionStatus.Active && now < subscription.EndDate;
+                
+                if (isInTrial)
+                {
+                    subscriptionTier = "premium"; // Trial users have premium access
+                    subscriptionStatus = "Trial";
+                    subscriptionEndDate = subscription.TrialEndDate;
+                    isPremium = true;
+                }
+                else if (isActiveSubscription)
+                {
+                    subscriptionTier = "premium";
+                    subscriptionEndDate = subscription.EndDate;
+                    isPremium = true;
+                    
+                    // Distinguish between granted (admin-granted) and paid premium
+                    if (subscription.MonthlyPrice == 0)
+                    {
+                        subscriptionStatus = "Premium (Granted)";
+                    }
+                    else
+                    {
+                        subscriptionStatus = "Premium";
+                    }
+                }
+                else
+                {
+                    subscriptionTier = "free";
+                    subscriptionStatus = "Free";
+                    isPremium = false;
+                }
+            }
+            
+            // Update user's SubscriptionTier field to match (for backward compatibility)
+            if (user.SubscriptionTier != subscriptionTier)
+            {
+                user.SubscriptionTier = subscriptionTier;
+                // Note: This will be saved on next SaveChanges, but won't cause issues
+            }
+            
             return new UserDto
             {
                 Id = user.Id,
@@ -330,13 +409,15 @@ namespace InvoicingBackend.Services
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 IsActive = user.IsActive,
-                SubscriptionExpiryDate = user.SubscriptionExpiryDate,
-                SubscriptionPlan = user.SubscriptionPlan,
-                IsTrialUser = user.IsTrialUser,
                 IsAdmin = user.IsAdmin,
                 LastLoginDate = user.LastLoginDate,
                 DateEntered = user.DateEntered,
                 EnteredBy = user.EnteredBy,
+                SubscriptionTier = subscriptionTier,
+                SubscriptionStatus = subscriptionStatus,
+                SubscriptionEndDate = subscriptionEndDate,
+                IsPremium = isPremium,
+                IsInTrial = isInTrial,
                 Currency = user.Currency,
                 DateFormat = user.DateFormat,
                 Language = user.Language,

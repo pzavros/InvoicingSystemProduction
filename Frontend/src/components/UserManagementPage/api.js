@@ -58,6 +58,19 @@ export const updateUserAdminStatus = async (userId, isAdmin) => {
   }
 };
 
+// Grant premium access to user (Admin only)
+export const grantPremiumAccess = async (userId, months) => {
+  try {
+    const response = await adminApi.post(`/api/admin/users/${userId}/grant-premium`, {
+      months: months
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error granting premium access:', error);
+    throw error;
+  }
+};
+
 // Update user profile (for editing user details)
 export const updateUser = async (userId, userData) => {
   try {

@@ -43,12 +43,14 @@ import UsageDashboard from './UsageDashboard';
 const SubscriptionPage = () => {
   const { subscriptionStatus, loading: subscriptionLoading, refreshStatus } = useSubscription();
   const [payments, setPayments] = useState([]);
+  const [subscriptionDetails, setSubscriptionDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [isTrialMode, setIsTrialMode] = useState(false); // Track if opening dialog for trial
 
   useEffect(() => {
     fetchSubscriptionData();
@@ -57,30 +59,28 @@ const SubscriptionPage = () => {
     const fetchSubscriptionData = async () => {
     try {
       setLoading(true);
-      const paymentsResponse = await subscriptionAPI.getPayments();
+      const [paymentsResponse, subscriptionResponse] = await Promise.all([
+        subscriptionAPI.getPayments(),
+        subscriptionAPI.getSubscription()
+      ]);
       setPayments(paymentsResponse.data);
+      // Handle null subscription for new users who haven't started trial yet
+      setSubscriptionDetails(subscriptionResponse.data || null);
     } catch (error) {
       console.error('Error fetching payment data:', error);
-      setError('Failed to load payment data');
+      // Don't show error for new users without subscription
+      if (error.response?.status !== 404) {
+        setError('Failed to load payment data');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const handleStartTrial = async () => {
-    try {
-      setActionLoading(true);
-      await subscriptionAPI.startTrial();
-      setSuccess('7-day trial started successfully!');
-      // Refresh subscription status from context
-      await refreshStatus();
-      await fetchSubscriptionData();
-    } catch (error) {
-      console.error('Error starting trial:', error);
-      setError(error.response?.data?.message || 'Failed to start trial');
-    } finally {
-      setActionLoading(false);
-    }
+    // Open payment dialog in trial mode (€0.00 charge)
+    setIsTrialMode(true);
+    setPaymentDialogOpen(true);
   };
 
   const handleCancelSubscription = async () => {
@@ -353,6 +353,58 @@ const SubscriptionPage = () => {
                 </Alert>
               )}
 
+              {/* Cancellation pending alert */}
+              {isPremium && subscriptionDetails?.cancelAtPeriodEnd && (
+                <Alert 
+                  severity="warning" 
+                  sx={{ 
+                    mb: 3,
+                    background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(251, 191, 36, 0.08) 100%)',
+                    border: '2px solid rgba(245, 158, 11, 0.3)',
+                    borderRadius: 2,
+                    '& .MuiAlert-icon': {
+                      color: '#f59e0b'
+                    }
+                  }}
+                  icon={<Warning />}
+                >
+                  <Typography variant="body1" sx={{ fontWeight: 600, color: '#b45309', mb: 1 }}>
+                    ⚠️ Subscription Cancelled - Access Until {new Date(subscriptionDetails.endDate).toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    You've cancelled your subscription. You'll continue to have Premium access for {subscriptionDetails.daysRemainingAfterCancellation} more day{subscriptionDetails.daysRemainingAfterCancellation !== 1 ? 's' : ''}, until the end of your current billing period. After that, you'll be downgraded to the Free plan.
+                  </Typography>
+                </Alert>
+              )}
+
+              {/* Trial offer for new users */}
+              {!isPremium && !subscriptionDetails && (
+                <Alert 
+                  severity="info" 
+                  sx={{ 
+                    mb: 3,
+                    background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(168, 85, 247, 0.08) 100%)',
+                    border: '2px solid rgba(139, 92, 246, 0.3)',
+                    borderRadius: 2,
+                    '& .MuiAlert-icon': {
+                      color: '#8b5cf6'
+                    }
+                  }}
+                  icon={<Star />}
+                >
+                  <Typography variant="body1" sx={{ fontWeight: 600, color: '#6d28d9', mb: 1 }}>
+                    🎉 Welcome! Start Your Free Trial
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    Get 7 days of full Premium access with unlimited invoices, clients, and all features. No credit card required!
+                  </Typography>
+                </Alert>
+              )}
+
               {/* Usage Dashboard for Free users */}
               {!isPremium && (
                 <Box sx={{ mb: 4 }}>
@@ -424,7 +476,7 @@ const SubscriptionPage = () => {
                       sx={{
                         display: 'grid',
                         gap: 2,
-                        gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }
+                        gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' }
                       }}
                     >
                       <Box
@@ -458,13 +510,78 @@ const SubscriptionPage = () => {
                           {isPremium ? `€${monthlyPrice.toFixed(2)}` : '€0.00'}
                         </Typography>
                       </Box>
+
+                      {isPremium && subscriptionDetails?.endDate && (
+                        <Box
+                          sx={{
+                            p: 2.5,
+                            borderRadius: 2,
+                            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(168, 85, 247, 0.08) 100%)',
+                            border: '1px solid rgba(139, 92, 246, 0.2)',
+                            gridColumn: { xs: '1', sm: '1 / -1', md: 'auto' }
+                          }}
+                        >
+                          <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 600 }}>
+                            {subscriptionDetails.monthlyPrice === 0 ? 'Premium Until' : 'Renews On'}
+                          </Typography>
+                          <Typography variant="h5" sx={{ fontWeight: 800, color: '#7c3aed' }}>
+                            {new Date(subscriptionDetails.endDate).toLocaleDateString('en-US', { 
+                              year: 'numeric', 
+                              month: 'long', 
+                              day: 'numeric' 
+                            })}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                            {(() => {
+                              const daysLeft = Math.ceil((new Date(subscriptionDetails.endDate) - new Date()) / (1000 * 60 * 60 * 24));
+                              if (daysLeft < 0) return 'Expired';
+                              if (daysLeft === 0) return 'Expires today';
+                              if (daysLeft === 1) return '1 day remaining';
+                              return `${daysLeft} days remaining`;
+                            })()}
+                          </Typography>
+                        </Box>
+                      )}
                     </Box>
 
                     <Stack mt={3} direction="row" spacing={2} flexWrap="wrap">
-                      {!isPremium && (
+                      {/* Show Start Trial button for new users with no subscription */}
+                      {!isPremium && !subscriptionDetails && (
                         <Button
                           variant="contained"
-                          onClick={() => setPaymentDialogOpen(true)}
+                          onClick={handleStartTrial}
+                          disabled={actionLoading}
+                          startIcon={<Star />}
+                          size="large"
+                          sx={{
+                            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                            boxShadow: '0 6px 16px rgba(16, 185, 129, 0.35)',
+                            borderRadius: 2,
+                            textTransform: 'none',
+                            fontWeight: 700,
+                            px: 4,
+                            py: 1.5,
+                            fontSize: '1rem',
+                            '&:hover': {
+                              background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                              boxShadow: '0 8px 20px rgba(16, 185, 129, 0.45)',
+                              transform: 'translateY(-2px)',
+                            },
+                            transition: 'all 0.3s ease'
+                          }}
+                        >
+                          Start 7-Day Free Trial
+                        </Button>
+                      )}
+
+                      {/* Show Upgrade button for free users who have had a trial */}
+                      {!isPremium && subscriptionDetails && (
+                        <Button
+                          variant="contained"
+                          onClick={() => {
+                            setIsTrialMode(false);
+                            setPaymentDialogOpen(true);
+                          }}
                           disabled={actionLoading}
                           startIcon={<Star />}
                           size="large"
@@ -489,7 +606,7 @@ const SubscriptionPage = () => {
                         </Button>
                       )}
 
-                      {isPremium && (
+                      {isPremium && !subscriptionDetails?.cancelAtPeriodEnd && (
                         <Button
                           variant="outlined"
                           onClick={() => setCancelDialogOpen(true)}
@@ -514,8 +631,29 @@ const SubscriptionPage = () => {
                             transition: 'all 0.3s ease'
                           }}
                         >
-                          Downgrade to Free
+                          Cancel Subscription
                         </Button>
+                      )}
+
+                      {isPremium && subscriptionDetails?.cancelAtPeriodEnd && (
+                        <Chip
+                          label={`Cancels on ${new Date(subscriptionDetails.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
+                          icon={<Schedule />}
+                          sx={{
+                            backgroundColor: 'rgba(245, 158, 11, 0.12)',
+                            color: '#b45309',
+                            border: '2px solid rgba(245, 158, 11, 0.3)',
+                            fontWeight: 700,
+                            borderRadius: 2,
+                            height: '42px',
+                            fontSize: '0.9rem',
+                            px: 2,
+                            '& .MuiChip-icon': {
+                              color: 'inherit',
+                              fontSize: '1.2rem'
+                            }
+                          }}
+                        />
                       )}
                     </Stack>
                       </Paper>
@@ -661,13 +799,42 @@ const SubscriptionPage = () => {
                     </Stack>
 
                     {/* CTA Button for Free Users */}
-                    {!isPremium && (
+                    {!isPremium && !subscriptionDetails && (
                       <Button
                         variant="contained"
                         fullWidth
                         size="large"
                         startIcon={<Star />}
-                        onClick={() => setPaymentDialogOpen(true)}
+                        onClick={handleStartTrial}
+                        sx={{
+                          mt: 3,
+                          py: 1.5,
+                          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                          boxShadow: '0 8px 20px rgba(16, 185, 129, 0.4)',
+                          borderRadius: 2,
+                          textTransform: 'none',
+                          fontWeight: 700,
+                          fontSize: '1rem',
+                          '&:hover': {
+                            background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                            boxShadow: '0 12px 28px rgba(16, 185, 129, 0.5)',
+                            transform: 'translateY(-2px)'
+                          }
+                        }}
+                      >
+                        Start 7-Day Free Trial
+                      </Button>
+                    )}
+                    {!isPremium && subscriptionDetails && (
+                      <Button
+                        variant="contained"
+                        fullWidth
+                        size="large"
+                        startIcon={<Star />}
+                        onClick={() => {
+                          setIsTrialMode(false);
+                          setPaymentDialogOpen(true);
+                        }}
                         sx={{
                           mt: 3,
                           py: 1.5,
@@ -836,16 +1003,25 @@ const SubscriptionPage = () => {
               {/* Payment Dialog */}
               <PaymentDialog
                 open={paymentDialogOpen}
-                onClose={() => setPaymentDialogOpen(false)}
-                amount={monthlyPrice}
+                onClose={() => {
+                  setPaymentDialogOpen(false);
+                  setIsTrialMode(false);
+                }}
+                amount={isTrialMode ? 0 : monthlyPrice}
+                isTrial={isTrialMode}
                 onSuccess={() => {
                   setPaymentDialogOpen(false);
-                  setSuccess('Payment processed successfully! You are now on the Premium plan.');
+                  setIsTrialMode(false);
+                  setSuccess(isTrialMode 
+                    ? '7-day free trial started successfully! Enjoy full Premium access.' 
+                    : 'Payment processed successfully! You are now on the Premium plan.'
+                  );
                   refreshStatus();
                   fetchSubscriptionData();
                 }}
                 onError={(error) => {
                   setError(error);
+                  setIsTrialMode(false);
                 }}
               />
 
@@ -862,11 +1038,37 @@ const SubscriptionPage = () => {
                 }}
               >
                 <DialogTitle sx={{ fontWeight: 800, color: '#dc2626', fontSize: '1.5rem' }}>
-                  ⚠️ Downgrade to Free Plan
+                  ⚠️ Cancel Subscription
                 </DialogTitle>
                 <DialogContent>
+                  {subscriptionDetails?.endDate && (
+                    <Alert 
+                      severity="info" 
+                      sx={{ 
+                        mb: 3,
+                        background: 'rgba(59, 130, 246, 0.08)',
+                        border: '1px solid rgba(59, 130, 246, 0.2)',
+                      }}
+                    >
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        Don't worry! You'll keep Premium access until{' '}
+                        <strong>
+                          {new Date(subscriptionDetails.endDate).toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                          })}
+                        </strong>
+                        {' '}({(() => {
+                          const daysLeft = Math.ceil((new Date(subscriptionDetails.endDate) - new Date()) / (1000 * 60 * 60 * 24));
+                          return daysLeft === 1 ? '1 day' : `${daysLeft} days`;
+                        })()}).
+                      </Typography>
+                    </Alert>
+                  )}
+                  
                   <Typography variant="body1" sx={{ fontWeight: 600, mb: 2 }}>
-                    Are you sure you want to downgrade to the Free plan? You will lose access to:
+                    After your current period ends, you will lose access to:
                   </Typography>
                   <Stack spacing={1.5}>
                     {[

@@ -12,10 +12,12 @@ namespace InvoicingBackend.Controllers
     public class AdminController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly ISubscriptionService _subscriptionService;
 
-        public AdminController(IUserService userService)
+        public AdminController(IUserService userService, ISubscriptionService subscriptionService)
         {
             _userService = userService;
+            _subscriptionService = subscriptionService;
         }
 
         // GET: api/admin/users
@@ -90,10 +92,35 @@ namespace InvoicingBackend.Controllers
             }
             return userId;
         }
+        
+        // POST: api/admin/users/{id}/grant-premium
+        [HttpPost("users/{id}/grant-premium")]
+        [Authorize]
+        [AdminAuth]
+        public async Task<IActionResult> GrantPremiumAccess(int id, [FromBody] GrantPremiumDto dto)
+        {
+            try
+            {
+                var result = await _subscriptionService.GrantPremiumAccessAsync(id, dto.Months);
+                if (!result)
+                    return NotFound(new { message = "User not found." });
+
+                return Ok(new { message = $"Premium access granted for {dto.Months} month(s)." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while granting premium access.", error = ex.Message });
+            }
+        }
     }
 
     public class UpdateAdminStatusDto
     {
         public bool IsAdmin { get; set; }
+    }
+    
+    public class GrantPremiumDto
+    {
+        public int Months { get; set; }
     }
 }

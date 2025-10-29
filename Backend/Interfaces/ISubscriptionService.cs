@@ -39,5 +39,8 @@ namespace InvoicingBackend.Interfaces
         // Quota Management
         Task IncrementInvoiceQuotaAsync(int userId);
         Task<int> GetCurrentMonthQuotaAsync(int userId);
+        
+        // Admin Operations
+        Task<bool> GrantPremiumAccessAsync(int userId, int months);
     }
 }

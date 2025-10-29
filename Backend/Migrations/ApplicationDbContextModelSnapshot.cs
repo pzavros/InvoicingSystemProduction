@@ -1110,6 +1110,12 @@ namespace Backend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("CancelAtPeriodEnd")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("CancellationDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTime?>("DateDeleted")
                         .HasColumnType("timestamp with time zone");
 
@@ -1127,6 +1133,9 @@ namespace Backend.Migrations
 
                     b.Property<string>("EnteredBy")
                         .HasColumnType("text");
+
+                    b.Property<bool>("HasUsedTrial")
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
