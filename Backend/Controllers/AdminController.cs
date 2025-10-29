@@ -9,6 +9,8 @@ namespace InvoicingBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize] // Require authentication for ALL endpoints
+    [AdminAuth] // Require admin role for ALL endpoints
     public class AdminController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -22,8 +24,6 @@ namespace InvoicingBackend.Controllers
 
         // GET: api/admin/users
         [HttpGet("users")]
-        [Authorize]
-        [AdminAuth]
         public async Task<IActionResult> GetAllUsers()
         {
             try
@@ -39,8 +39,6 @@ namespace InvoicingBackend.Controllers
 
         // PUT: api/admin/users/{id}/admin-status
         [HttpPut("users/{id}/admin-status")]
-        [Authorize]
-        [AdminAuth]
         public async Task<IActionResult> UpdateAdminStatus(int id, [FromBody] UpdateAdminStatusDto dto)
         {
             try
@@ -95,8 +93,6 @@ namespace InvoicingBackend.Controllers
         
         // POST: api/admin/users/{id}/grant-premium
         [HttpPost("users/{id}/grant-premium")]
-        [Authorize]
-        [AdminAuth]
         public async Task<IActionResult> GrantPremiumAccess(int id, [FromBody] GrantPremiumDto dto)
         {
             try

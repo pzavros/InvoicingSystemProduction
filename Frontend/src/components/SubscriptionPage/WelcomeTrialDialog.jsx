@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import {
   Dialog,
   DialogTitle,
@@ -14,6 +15,7 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
+  Chip
 } from '@mui/material';
 import {
   Star,
@@ -22,11 +24,16 @@ import {
   Dashboard,
   Inventory,
   Assessment,
+  Close as CloseIcon,
+  Security as SecurityIcon,
+  CheckCircle as CheckCircleIcon
 } from '@mui/icons-material';
 import { subscriptionAPI } from './subscriptionAPI';
 import { useSubscription } from '../../utils/SubscriptionContext';
 
-const WelcomeTrialDialog = ({ open, onClose }) => {
+const MONTHLY_PRICE = parseFloat(import.meta.env.VITE_SUBSCRIPTION_MONTHLY_PRICE || '13.99');
+
+function WelcomeTrialDialog({ open, onClose, onStartTrial }) {
   const [starting, setStarting] = useState(false);
   const { refreshStatus } = useSubscription();
 
@@ -106,7 +113,7 @@ const WelcomeTrialDialog = ({ open, onClose }) => {
               7-Day Free Trial
             </Typography>
             <Typography variant="h6" color="text.secondary" gutterBottom sx={{ fontWeight: 600 }}>
-              Then €20/month
+              Then €{MONTHLY_PRICE.toFixed(2)}/month
             </Typography>
             <Typography variant="body1" paragraph sx={{ mt: 2 }}>
               Start your free trial today and explore all the features our invoicing system has to offer.
@@ -164,7 +171,7 @@ const WelcomeTrialDialog = ({ open, onClose }) => {
           borderRadius: 2,
           border: '1px solid rgba(59, 130, 246, 0.1)'
         }}>
-          After your trial ends, continue with full access for just €20/month.
+          After your trial ends, continue with full access for just €{MONTHLY_PRICE.toFixed(2)}/month.
           Cancel anytime during or after the trial period.
         </Typography>
       </DialogContent>

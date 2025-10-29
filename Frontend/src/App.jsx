@@ -108,7 +108,7 @@ function MainContent() {
 
 function App() {
   return (
-    <Router>
+    <Router basename="/app">
       <ScrollToTop />
       <AuthProvider>
         <SubscriptionProvider>

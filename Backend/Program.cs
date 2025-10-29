@@ -3,6 +3,7 @@ using InvoicingBackend.Interfaces;
 using InvoicingBackend.Services;
 using InvoicingBackend.Models;
 using InvoicingBackend.Utils;
+using InvoicingBackend.Middleware;
 using Backend.Interfaces.Webpage;
 using Backend.Services.Webpage;
 using Microsoft.EntityFrameworkCore;
@@ -96,7 +97,29 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = jwtSettings!.Issuer,
             ValidAudience = jwtSettings.Audience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.SecretKey)),
-            ClockSkew = TimeSpan.Zero
+            ClockSkew = TimeSpan.Zero, // No tolerance for expired tokens
+            RequireExpirationTime = true,
+            RequireSignedTokens = true
+        };
+        
+        // Security: Don't expose detailed JWT validation errors in production
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                // Log the error for debugging (visible in server logs)
+                // Don't add to headers as exception messages may contain invalid characters
+                return Task.CompletedTask;
+            },
+            OnChallenge = context =>
+            {
+                // Customize 401 response
+                context.HandleResponse();
+                context.Response.StatusCode = 401;
+                context.Response.ContentType = "application/json";
+                var result = System.Text.Json.JsonSerializer.Serialize(new { message = "Unauthorized access. Please login." });
+                return context.Response.WriteAsync(result);
+            }
         };
     });
 
@@ -145,6 +168,8 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// SECURITY: Only enable Swagger in Development environment
+// Never expose API documentation in production
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -157,6 +182,15 @@ app.UseStaticFiles();
 // ---------------------- Use forwarded headers + select CORS policy ----------------------
 // Use forwarded headers early so authentication and URL-generation see the correct proto/host.
 app.UseForwardedHeaders();
+
+// Add security headers to all responses
+app.UseSecurityHeaders();
+
+// Add rate limiting to prevent abuse (100 requests per minute per IP)
+if (app.Environment.IsProduction())
+{
+    app.UseRateLimiting(requestLimit: 100, timeWindowSeconds: 60);
+}
 
 // If we're in Production, enable the named policy for the frontend domain.
 // Otherwise (Development) use the default policy that allows localhost dev ports.
@@ -171,16 +205,21 @@ else
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Add admin audit logging after authentication/authorization
+app.UseAdminAuditLogging();
+
 app.MapControllers();
 
 // ─── APPLY MIGRATIONS ON STARTUP ──────────────────────────────────────────────────
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
     db.Database.Migrate();
     
     // Seed demo users
-    await UserSeeder.SeedUsersAsync(db);
+    await UserSeeder.SeedUsersAsync(db, configuration);
     
     // Seed admin user
     await AdminSeeder.SeedAdminUserAsync(db);

@@ -634,7 +634,7 @@ const AboutUs = () => {
                     Email Support
                   </Typography>
                   <Button
-                    href="mailto:panazavros8@gmail.com"
+                    href="mailto:support@e-nvoicing.com"
                     sx={{
                       color: '#667eea',
                       fontWeight: 600,
@@ -646,60 +646,13 @@ const AboutUs = () => {
                       }
                     }}
                   >
-                    panazavros8@gmail.com
+                    support@e-nvoicing.com
                   </Button>
                 </CardContent>
               </Card>
             </Grid>
 
-            <Grid item xs={12} md={4}>
-              <Card sx={{
-                height: '100%',
-                background: 'white',
-                borderRadius: 3,
-                border: '2px solid #43e97b20',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-5px)',
-                  boxShadow: '0 10px 30px #43e97b30',
-                  borderColor: '#43e97b40'
-                }
-              }}>
-                <CardContent sx={{ p: 3, textAlign: 'center' }}>
-                  <Box sx={{
-                    width: 56,
-                    height: 56,
-                    background: '#43e97b',
-                    borderRadius: 2,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'white',
-                    mx: 'auto',
-                    mb: 2
-                  }}>
-                    <PhoneIcon sx={{ fontSize: 28 }} />
-                  </Box>
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, color: '#2c3e50' }}>
-                    Phone Support
-                  </Typography>
-                  <Button
-                    href="tel:+35797667089"
-                    sx={{
-                      color: '#43e97b',
-                      fontWeight: 600,
-                      textTransform: 'none',
-                      fontSize: '0.9rem',
-                      '&:hover': {
-                        backgroundColor: 'transparent',
-                        textDecoration: 'underline'
-                      }
-                    }}
-                  >
-                    +357 97667089
-                  </Button>
-                </CardContent>
-              </Card>            </Grid>          </Grid>
+            {/* Phone Support - Removed */}          </Grid>
           </Box>        </Box>
       </Container>
 

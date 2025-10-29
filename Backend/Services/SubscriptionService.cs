@@ -13,14 +13,25 @@ namespace InvoicingBackend.Services
         private readonly ApplicationDbContext _context;
         private readonly IEmailService _emailService;
         private readonly ILogger<SubscriptionService> _logger;
-        private const decimal MONTHLY_PRICE = 20.00m; // €20
+        private readonly IConfiguration _configuration;
         private const int TRIAL_DAYS = 7;
 
-        public SubscriptionService(ApplicationDbContext context, IEmailService emailService, ILogger<SubscriptionService> logger)
+        public SubscriptionService(
+            ApplicationDbContext context, 
+            IEmailService emailService, 
+            ILogger<SubscriptionService> logger,
+            IConfiguration configuration)
         {
             _context = context;
             _emailService = emailService;
             _logger = logger;
+            _configuration = configuration;
+        }
+
+        private decimal GetMonthlyPrice()
+        {
+            var priceString = _configuration["SUBSCRIPTION_MONTHLY_PRICE"] ?? "13.99";
+            return decimal.Parse(priceString);
         }
 
         public async Task<SubscriptionDto?> GetUserSubscriptionAsync(int userId)
@@ -45,7 +56,7 @@ namespace InvoicingBackend.Services
                     IsActive = false,
                     IsTrialActive = false,
                     Status = "No Subscription",
-                    MonthlyPrice = MONTHLY_PRICE,
+                    MonthlyPrice = GetMonthlyPrice(),
                     RequiresPayment = true
                 };
             }
@@ -151,7 +162,7 @@ namespace InvoicingBackend.Services
                 EndDate = trialEndDate, // Trial period
                 TrialEndDate = trialEndDate,
                 HasUsedTrial = true, // Mark that trial has been used
-                MonthlyPrice = MONTHLY_PRICE,
+                MonthlyPrice = GetMonthlyPrice(),
                 NextPaymentDate = trialEndDate,
                 DateEntered = now,
                 EnteredBy = userId.ToString()
@@ -369,7 +380,7 @@ namespace InvoicingBackend.Services
                     subscription = new Subscription
                     {
                         UserId = userId,
-                        MonthlyPrice = MONTHLY_PRICE,
+                        MonthlyPrice = GetMonthlyPrice(),
                         StartDate = now,
                         EndDate = trialEndDate,
                         NextPaymentDate = trialEndDate,

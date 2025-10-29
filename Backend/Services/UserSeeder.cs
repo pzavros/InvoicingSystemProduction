@@ -1,12 +1,13 @@
 using InvoicingBackend.Data;
 using InvoicingBackend.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace InvoicingBackend.Services
 {
     public static class UserSeeder
     {
-        public static async Task SeedUsersAsync(ApplicationDbContext context)
+        public static async Task SeedUsersAsync(ApplicationDbContext context, IConfiguration configuration)
         {
             // Check if any users exist
             if (await context.Users.AnyAsync())
@@ -15,6 +16,7 @@ namespace InvoicingBackend.Services
             }
 
             var now = DateTime.UtcNow;
+            var monthlyPrice = decimal.Parse(configuration["SUBSCRIPTION_MONTHLY_PRICE"] ?? "13.99");
 
             // Create admin user
             var adminUser = new User
@@ -55,7 +57,7 @@ namespace InvoicingBackend.Services
                 StartDate = now,
                 EndDate = now.AddYears(1),
                 TrialEndDate = null, // Admin doesn't have trial
-                MonthlyPrice = 20.00m,
+                MonthlyPrice = monthlyPrice,
                 LastPaymentDate = now,
                 NextPaymentDate = now.AddMonths(1),
                 DateEntered = now,
@@ -69,7 +71,7 @@ namespace InvoicingBackend.Services
                 StartDate = now,
                 EndDate = now.AddDays(30), // 30-day trial
                 TrialEndDate = now.AddDays(30),
-                MonthlyPrice = 20.00m,
+                MonthlyPrice = monthlyPrice,
                 NextPaymentDate = now.AddDays(30),
                 DateEntered = now,
                 EnteredBy = "System"

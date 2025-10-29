@@ -28,7 +28,7 @@ namespace InvoicingBackend.Models
         public bool HasUsedTrial { get; set; } = false;
         
         [Required]
-        public decimal MonthlyPrice { get; set; } = 20.00m; // €20
+        public decimal MonthlyPrice { get; set; } = 13.99m; // Default price, can be overridden from config
         
         public DateTime? LastPaymentDate { get; set; }
         

@@ -212,32 +212,67 @@ export default function NavBar() {
         }}>
           {effectiveDrawerOpen && (
             <Grow in={effectiveDrawerOpen} timeout={600}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Avatar sx={{ 
-                  bgcolor: 'transparent', 
-                  background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-                  width: 32, 
-                  height: 32,
-                  boxShadow: '0 8px 32px rgba(59, 130, 246, 0.3)'
-                }}>
-                  <BusinessIcon sx={{ fontSize: 18 }} />
-                </Avatar>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                {/* Logo Container */}
+                <Box
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: '12px',
+                    background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1.5px solid rgba(102, 126, 234, 0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    boxShadow: '0 4px 16px rgba(102, 126, 234, 0.15)',
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: '-100%',
+                      width: '100%',
+                      height: '100%',
+                      background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent)',
+                      animation: 'logoShine 4s infinite',
+                    },
+                    '@keyframes logoShine': {
+                      '0%': { left: '-100%' },
+                      '100%': { left: '100%' }
+                    }
+                  }}
+                >
+                  <Box
+                    component="img"
+                    src={`${import.meta.env.BASE_URL}media/logo.svg`}
+                    alt="E-Nvoicing Logo"
+                    sx={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      borderRadius: '10px',
+                      filter: 'drop-shadow(0 2px 4px rgba(102, 126, 234, 0.2))'
+                    }}
+                  />
+                </Box>
                 <Box>
                   <Typography 
                     variant="h6" 
                     noWrap 
                     component="div" 
                     sx={{ 
-                      background: 'linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%)',
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                       backgroundClip: 'text',
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
                       fontWeight: 700,
                       fontSize: '1.1rem',
-                      letterSpacing: '0.5px'
+                      letterSpacing: '-0.02em'
                     }}
                   >
-                    Invoicing
+                    E-Nvoicing
                   </Typography>
                   <Typography 
                     variant="caption" 
@@ -247,11 +282,40 @@ export default function NavBar() {
                       fontWeight: 500
                     }}
                   >
-                    Business Suite
+                    Beta
                   </Typography>
                 </Box>
               </Box>
             </Grow>
+          )}
+          {!effectiveDrawerOpen && (
+            <Box
+              sx={{
+                width: 40,
+                height: 40,
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
+                backdropFilter: 'blur(10px)',
+                border: '1.5px solid rgba(102, 126, 234, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 16px rgba(102, 126, 234, 0.15)',
+              }}
+            >
+              <Box
+                component="img"
+                src={`${import.meta.env.BASE_URL}media/logo.svg`}
+                alt="E-Nvoicing Logo"
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  borderRadius: '10px',
+                  filter: 'drop-shadow(0 2px 4px rgba(102, 126, 234, 0.2))'
+                }}
+              />
+            </Box>
           )}
           <Tooltip title={effectiveDrawerOpen ? (isMobile ? "Close menu" : "Collapse sidebar") : "Expand sidebar"} placement="right">
             <IconButton 
@@ -670,25 +734,50 @@ export default function NavBar() {
             >
               <MenuIcon />
             </IconButton>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexGrow: 1 }}>
-              <Avatar sx={{ 
-                bgcolor: 'transparent', 
-                background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-                width: 28, 
-                height: 28,
-              }}>
-                <BusinessIcon sx={{ fontSize: 16 }} />
-              </Avatar>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexGrow: 1 }}>
+              {/* Logo in Mobile AppBar */}
+              <Box
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: '10px',
+                  background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
+                  backdropFilter: 'blur(10px)',
+                  border: '1.5px solid rgba(102, 126, 234, 0.2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 12px rgba(102, 126, 234, 0.15)',
+                }}
+              >
+                <Box
+                  component="img"
+                  src={`${import.meta.env.BASE_URL}media/logo.svg`}
+                  alt="E-Nvoicing Logo"
+                  sx={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    borderRadius: '8px',
+                    filter: 'drop-shadow(0 2px 4px rgba(102, 126, 234, 0.2))'
+                  }}
+                />
+              </Box>
               <Typography 
                 variant="h6" 
                 noWrap 
                 component="div" 
                 sx={{ 
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
                   fontWeight: 700,
-                  fontSize: '1rem'
+                  fontSize: '1.05rem',
+                  letterSpacing: '-0.02em'
                 }}
               >
-                Invoicing
+                E-Nvoicing
               </Typography>
             </Box>
           </Toolbar>

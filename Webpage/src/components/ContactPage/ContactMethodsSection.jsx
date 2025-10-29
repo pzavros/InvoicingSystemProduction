@@ -21,28 +21,8 @@ const ContactMethodsSection = () => {
       action: 'Send Email',
       onClick: () => window.open('mailto:support@e-nvoicing.com?subject=E-Nvoicing Inquiry', '_blank')
     },
-    {
-      icon: <Chat sx={{ fontSize: 40 }} />,
-      title: 'WhatsApp Chat',
-      description: 'Quick responses via WhatsApp messaging',
-      contact: '+357 97667089',
-      action: 'Chat on WhatsApp',
-      onClick: () => {
-        // Try to detect if mobile, use api.whatsapp.com for better compatibility
-        const message = encodeURIComponent('Hello! I would like to know more about E-Nvoicing');
-        const whatsappUrl = `https://api.whatsapp.com/send?phone=35797667089&text=${message}`;
-        window.open(whatsappUrl, '_blank');
-      }
-    },
-    // Phone Support - Commented out for now
-    // {
-    //   icon: <Phone sx={{ fontSize: 40 }} />,
-    //   title: 'Phone Support',
-    //   description: 'Speak directly with our support team',
-    //   contact: '+357 97667089',
-    //   action: 'Call Now',
-    //   onClick: () => window.open('tel:+35797667089', '_blank')
-    // },
+    // WhatsApp Support - Removed
+    // Phone Support - Removed
     {
       icon: <Support sx={{ fontSize: 40 }} />,
       title: 'Technical Support',

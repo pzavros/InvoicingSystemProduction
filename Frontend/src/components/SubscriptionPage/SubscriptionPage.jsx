@@ -209,7 +209,7 @@ const SubscriptionPage = () => {
   }
 
   // For freemium model, we show fixed pricing
-  const monthlyPrice = 20;
+  const monthlyPrice = parseFloat(import.meta.env.VITE_SUBSCRIPTION_MONTHLY_PRICE || '13.99');
   const currentTier = subscriptionStatus?.tier || 'free';
   const isPremium = subscriptionStatus?.isPremium || false;
   

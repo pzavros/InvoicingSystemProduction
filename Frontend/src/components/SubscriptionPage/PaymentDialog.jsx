@@ -20,6 +20,8 @@ import {
 } from '@mui/icons-material';
 import { subscriptionAPI } from './subscriptionAPI';
 
+const MONTHLY_PRICE = parseFloat(import.meta.env.VITE_SUBSCRIPTION_MONTHLY_PRICE || '13.99');
+
 const PaymentDialog = ({ open, onClose, amount, isTrial = false, onSuccess, onError }) => {
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState(null);
@@ -125,7 +127,7 @@ const PaymentDialog = ({ open, onClose, amount, isTrial = false, onSuccess, onEr
             </Box>
             {isTrial && (
               <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-                Your card will be authorized but not charged. After 7 days, you'll be automatically charged €20.00/month unless you cancel.
+                Your card will be authorized but not charged. After 7 days, you'll be automatically charged €{MONTHLY_PRICE.toFixed(2)}/month unless you cancel.
               </Typography>
             )}
             <Divider sx={{ my: 1 }} />

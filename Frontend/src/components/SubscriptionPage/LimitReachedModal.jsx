@@ -20,6 +20,8 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
+const MONTHLY_PRICE = parseFloat(import.meta.env.VITE_SUBSCRIPTION_MONTHLY_PRICE || '13.99');
+
 const LimitReachedModal = ({ open, onClose, resource, limitInfo }) => {
   const navigate = useNavigate();
 
@@ -142,7 +144,7 @@ const LimitReachedModal = ({ open, onClose, resource, limitInfo }) => {
           }}
         >
           <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-            €20/month
+            €{MONTHLY_PRICE.toFixed(2)}/month
           </Typography>
           <Typography variant="body2">
             Cancel anytime. No hidden fees.

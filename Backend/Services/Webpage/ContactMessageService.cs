@@ -13,7 +13,6 @@ namespace Backend.Services.Webpage
         private readonly IEmailService _emailService;
         private readonly ILogger<ContactMessageService> _logger;
         private const string ADMIN_EMAIL = "support@e-nvoicing.com";
-        private const string ADMIN_CC_EMAIL = "panazavros8@gmail.com";
 
         public ContactMessageService(ApplicationDbContext context, IEmailService emailService, ILogger<ContactMessageService> logger)
         {
@@ -86,12 +85,12 @@ namespace Backend.Services.Webpage
                     contactMessage.Message,
                     referenceId,
                     userInfo: $"Source: {contactMessage.Source}",
-                    ccEmail: ADMIN_CC_EMAIL
+                    ccEmail: null
                 );
 
                 if (adminEmailResult.Success)
                 {
-                    _logger.LogInformation("Admin notification email sent successfully with CC to {CcEmail}", ADMIN_CC_EMAIL);
+                    _logger.LogInformation("Admin notification email sent successfully");
                 }
                 else
                 {
