@@ -27,7 +27,7 @@ import {
 import ProductList from "./ProductList";
 
 import CategoryManager from "./CategoryManager";
-import LowStockAlert from "./LowStockAlert";
+import LowStockAlert from "./LowStockAlert.jsx";
 import UsageIndicator from "../SubscriptionPage/UsageIndicator";
 import { getAllProducts, getAllCategories, getLowStockProducts } from "./api";
 import { useSubscription } from "../../utils/SubscriptionContext";
