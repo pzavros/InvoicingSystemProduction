@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }) => {
     // Dispatch custom event to notify other components
     window.dispatchEvent(new CustomEvent('authStateChange'));
     
-    window.location.href = '/login';
+    window.location.href = '/app/login';
   };
 
   const value = {
