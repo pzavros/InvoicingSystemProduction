@@ -9,51 +9,31 @@ namespace InvoicingBackend.Services
     {
         public static async Task SeedAdminUserAsync(ApplicationDbContext context)
         {
-            // List of admin users to seed
-            var adminUsers = new[]
+            // Single admin user to seed
+            var adminEmail = "support@e-nvoicing.com";
+
+            // Check if this admin user already exists
+            var existingAdmin = await context.Users.FirstOrDefaultAsync(u => u.Email == adminEmail);
+            if (existingAdmin != null) return;
+
+            // Create admin user
+            var adminUser = new User
             {
-                new
-                {
-                    Email = "admin@invoicesystem.com",
-                    FirstName = "System",
-                    LastName = "Administrator",
-                    Password = "Admin123!"
-                },
-                new
-                {
-                    Email = "support@e-nvoicing.com",
-                    FirstName = "Support",
-                    LastName = "Team",
-                    Password = "Admin123!"
-                }
+                Email = adminEmail,
+                FirstName = "Support",
+                LastName = "Team",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
+                IsActive = true,
+                IsAdmin = true,
+                IsTrialUser = false,
+                IsEmailVerified = true, // Admin users are pre-verified
+                SubscriptionExpiryDate = DateTime.UtcNow.AddYears(10), // Long expiry for admin
+                SubscriptionPlan = "Admin",
+                EnteredBy = "System",
+                DateEntered = DateTime.UtcNow
             };
 
-            foreach (var adminData in adminUsers)
-            {
-                // Check if this admin user already exists
-                var existingAdmin = await context.Users.FirstOrDefaultAsync(u => u.Email == adminData.Email);
-                if (existingAdmin != null) continue;
-
-                // Create admin user
-                var adminUser = new User
-                {
-                    Email = adminData.Email,
-                    FirstName = adminData.FirstName,
-                    LastName = adminData.LastName,
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(adminData.Password),
-                    IsActive = true,
-                    IsAdmin = true,
-                    IsTrialUser = false,
-                    IsEmailVerified = true, // Admin users are pre-verified
-                    SubscriptionExpiryDate = DateTime.UtcNow.AddYears(10), // Long expiry for admin
-                    SubscriptionPlan = "Admin",
-                    EnteredBy = "System",
-                    DateEntered = DateTime.UtcNow
-                };
-
-                context.Users.Add(adminUser);
-            }
-
+            context.Users.Add(adminUser);
             await context.SaveChangesAsync();
         }
     }
