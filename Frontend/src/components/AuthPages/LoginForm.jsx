@@ -51,12 +51,12 @@ const LoginForm = () => {
   const [otpLoading, setOtpLoading] = useState(false);
   const [resendMessage, setResendMessage] = useState('');
   
-  // Auto-logout if user is already authenticated
+  // Redirect to dashboard if already authenticated (but don't logout)
   useEffect(() => {
     if (authenticated) {
-      logout();
+      navigate('/dashboard', { replace: true });
     }
-  }, [authenticated, logout]);
+  }, [authenticated, navigate]);
   
   // Pre-fill email if coming from registration
   useEffect(() => {

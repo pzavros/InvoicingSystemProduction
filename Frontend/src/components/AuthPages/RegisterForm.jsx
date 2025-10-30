@@ -30,7 +30,7 @@ import { useAuth } from '../../utils/AuthContext';
 
 const RegisterForm = () => {
   const navigate = useNavigate();
-  const { logout, authenticated } = useAuth();
+  const { authenticated } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     firstName: '',
@@ -45,12 +45,12 @@ const RegisterForm = () => {
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState('');
 
-  // Auto-logout if user is already authenticated
+  // Redirect to dashboard if already authenticated
   useEffect(() => {
     if (authenticated) {
-      logout();
+      navigate('/dashboard', { replace: true });
     }
-  }, [authenticated, logout]);
+  }, [authenticated, navigate]);
 
   const handleChange = (e) => {
     setFormData({
