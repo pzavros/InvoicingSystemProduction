@@ -47,8 +47,8 @@ const PreferencesCard = ({
   };
 
   const currencies = [
-    { value: 'USD', label: 'US Dollar ($)' },
     { value: 'EUR', label: 'Euro (€)' },
+    { value: 'USD', label: 'US Dollar ($)' },
     { value: 'GBP', label: 'British Pound (£)' },
     { value: 'CAD', label: 'Canadian Dollar ($)' },
     { value: 'AUD', label: 'Australian Dollar ($)' }
@@ -80,7 +80,7 @@ const PreferencesCard = ({
           select
           name="currency"
           label="Default Currency"
-          value={preferences?.currency || 'USD'}
+          value={preferences?.currency || 'EUR'}
           onChange={handlePreferenceChange}
           disabled={updating}
           size="small"

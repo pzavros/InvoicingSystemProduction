@@ -27,7 +27,7 @@ const useProfileData = () => {
   });
 
   const [preferences, setPreferences] = useState({
-    currency: 'USD',
+    currency: 'EUR',
     dateFormat: 'MM/DD/YYYY',
     language: 'English',
     emailNotifications: true,
@@ -58,7 +58,7 @@ const useProfileData = () => {
       
       // Set preferences from profile data
       setPreferences({
-        currency: profileData.currency || 'USD',
+        currency: profileData.currency || 'EUR',
         dateFormat: profileData.dateFormat || 'MM/DD/YYYY',
         language: profileData.language || 'English',
         emailNotifications: profileData.emailNotifications ?? true,

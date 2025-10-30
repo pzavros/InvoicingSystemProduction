@@ -23,7 +23,7 @@ namespace InvoicingBackend.Models
         public DateTime? LastLoginDate { get; set; }
         
         // User Preferences
-        public string? Currency { get; set; } = "USD";
+        public string? Currency { get; set; } = "EUR";
         public string? DateFormat { get; set; } = "MM/DD/YYYY";
         public string? Language { get; set; } = "English";
         public bool EmailNotifications { get; set; } = true;

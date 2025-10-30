@@ -265,7 +265,7 @@ const InvoiceForm = () => {
         const fallbackCurrency =
           preferredCurrency ||
           systemCurrency ||
-          currenciesData.find(c => (c.code || "").toUpperCase() === "USD") ||
+          currenciesData.find(c => (c.code || "").toUpperCase() === "EUR") ||
           currenciesData[0] ||
           null;
 
@@ -275,8 +275,8 @@ const InvoiceForm = () => {
             fallbackCurrency?.symbol ||
             fallbackCurrency?.code ||
             profileData?.currency ||
-            "$",
-          code: (fallbackCurrency?.code || profileData?.currency || "USD")?.toUpperCase(),
+            "€",
+          code: (fallbackCurrency?.code || profileData?.currency || "EUR")?.toUpperCase(),
         };
         
         if (isEdit && params.id) {
