@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Card,
@@ -26,9 +26,11 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { registerUser } from './api';
+import { useAuth } from '../../utils/AuthContext';
 
 const RegisterForm = () => {
   const navigate = useNavigate();
+  const { logout, authenticated } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     firstName: '',
@@ -42,6 +44,13 @@ const RegisterForm = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState('');
+
+  // Auto-logout if user is already authenticated
+  useEffect(() => {
+    if (authenticated) {
+      logout();
+    }
+  }, [authenticated, logout]);
 
   const handleChange = (e) => {
     setFormData({

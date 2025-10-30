@@ -521,7 +521,7 @@ namespace InvoicingBackend.Services
 
         private string GetBaseUrl()
         {
-            return "https://e-nvoicing.com"; // TODO: Move to configuration
+            return "https://e-nvoicing.com/app"; // TODO: Move to configuration
         }
 
         private UserDto MapToUserDto(User user)

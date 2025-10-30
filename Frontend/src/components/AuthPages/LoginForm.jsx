@@ -35,7 +35,7 @@ import { useAuth } from '../../utils/AuthContext';
 const LoginForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { login, logout, authenticated } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -50,6 +50,13 @@ const LoginForm = () => {
   const [otpError, setOtpError] = useState('');
   const [otpLoading, setOtpLoading] = useState(false);
   const [resendMessage, setResendMessage] = useState('');
+  
+  // Auto-logout if user is already authenticated
+  useEffect(() => {
+    if (authenticated) {
+      logout();
+    }
+  }, [authenticated, logout]);
   
   // Pre-fill email if coming from registration
   useEffect(() => {

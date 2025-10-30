@@ -218,10 +218,7 @@ using (var scope = app.Services.CreateScope())
     var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
     db.Database.Migrate();
     
-    // Seed demo users
-    await UserSeeder.SeedUsersAsync(db, configuration);
-    
-    // Seed admin user
+    // Seed admin user (support@e-nvoicing.com)
     await AdminSeeder.SeedAdminUserAsync(db);
     
     // Document types are seeded via migration

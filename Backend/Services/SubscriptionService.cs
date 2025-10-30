@@ -185,7 +185,7 @@ namespace InvoicingBackend.Services
                 try
                 {
                     _logger.LogInformation("Attempting to send trial started email to {Email}", user.Email);
-                    var dashboardUrl = "https://e-nvoicing.com/dashboard";
+                    var dashboardUrl = "https://e-nvoicing.com/app/dashboard";
                     var result = await _emailService.SendTrialStartedEmailAsync(
                         user.Email,
                         $"{user.FirstName} {user.LastName}",
@@ -277,7 +277,7 @@ namespace InvoicingBackend.Services
                         var accessEndDate = subscription.CancelAtPeriodEnd 
                             ? subscription.EndDate 
                             : DateTime.UtcNow;
-                        var feedbackUrl = "https://e-nvoicing.com/feedback";
+                        var feedbackUrl = "https://e-nvoicing.com/feedback"; // Main website feedback, not in /app
                         var planName = subscription.Status == SubscriptionStatus.Trial ? "Trial" : "Premium";
                         
                         var result = await _emailService.SendSubscriptionCancelledEmailAsync(
@@ -478,7 +478,7 @@ namespace InvoicingBackend.Services
                     try
                     {
                         _logger.LogInformation("Attempting to send premium upgrade email to {Email}", user.Email);
-                        var dashboardUrl = "https://e-nvoicing.com/dashboard";
+                        var dashboardUrl = "https://e-nvoicing.com/app/dashboard";
                         var result = await _emailService.SendPremiumUpgradeEmailAsync(
                             user.Email,
                             $"{user.FirstName} {user.LastName}",
