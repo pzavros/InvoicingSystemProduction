@@ -284,6 +284,20 @@ const ProductFormPage = () => {
             required
             size="small"
             fullWidth
+            sx={{
+              backgroundColor: '#ffffff',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#d1d5db',
+                borderWidth: '1.5px'
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#9ca3af'
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#3b82f6',
+                borderWidth: '2px'
+              }
+            }}
           />
           {errors.name && (
             <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
@@ -301,6 +315,20 @@ const ProductFormPage = () => {
               value={formData.categoryId}
               onChange={handleChange("categoryId")}
               displayEmpty
+              sx={{
+                backgroundColor: '#ffffff',
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#d1d5db',
+                  borderWidth: '1.5px'
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#9ca3af'
+                },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#3b82f6',
+                  borderWidth: '2px'
+                }
+              }}
             >
               <MenuItem value="">None</MenuItem>
               {categories.map((category) => (
@@ -323,6 +351,20 @@ const ProductFormPage = () => {
             multiline
             rows={3}
             fullWidth
+            sx={{
+              backgroundColor: '#ffffff',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#d1d5db',
+                borderWidth: '1.5px'
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#9ca3af'
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#3b82f6',
+                borderWidth: '2px'
+              }
+            }}
           />
         </FormGrid>
 
@@ -342,6 +384,20 @@ const ProductFormPage = () => {
             size="small"
             fullWidth
             startAdornment={<InputAdornment position="start">€</InputAdornment>}
+            sx={{
+              backgroundColor: '#ffffff',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#d1d5db',
+                borderWidth: '1.5px'
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#9ca3af'
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#3b82f6',
+                borderWidth: '2px'
+              }
+            }}
           />
           {errors.unitPrice && (
             <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
@@ -360,6 +416,20 @@ const ProductFormPage = () => {
             placeholder="e.g., pcs, kg, hours"
             size="small"
             fullWidth
+            sx={{
+              backgroundColor: '#ffffff',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#d1d5db',
+                borderWidth: '1.5px'
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#9ca3af'
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#3b82f6',
+                borderWidth: '2px'
+              }
+            }}
           />
         </FormGrid>
 
@@ -388,6 +458,20 @@ const ProductFormPage = () => {
               size="small"
               fullWidth
               endAdornment={<InputAdornment position="end">%</InputAdornment>}
+              sx={{
+                backgroundColor: '#ffffff',
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#d1d5db',
+                  borderWidth: '1.5px'
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#9ca3af'
+                },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#3b82f6',
+                  borderWidth: '2px'
+                }
+              }}
             />
             {errors.taxRate && (
               <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
@@ -426,6 +510,20 @@ const ProductFormPage = () => {
                 size="small"
                 fullWidth
                 inputProps={{ min: 0 }}
+                sx={{
+                  backgroundColor: '#ffffff',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#d1d5db',
+                    borderWidth: '1.5px'
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#9ca3af'
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#3b82f6',
+                    borderWidth: '2px'
+                  }
+                }}
               />
               {errors.stockQuantity && (
                 <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
@@ -446,6 +544,20 @@ const ProductFormPage = () => {
                 size="small"
                 fullWidth
                 inputProps={{ min: 0 }}
+                sx={{
+                  backgroundColor: '#ffffff',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#d1d5db',
+                    borderWidth: '1.5px'
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#9ca3af'
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#3b82f6',
+                    borderWidth: '2px'
+                  }
+                }}
               />
               {errors.minStockLevel && (
                 <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>

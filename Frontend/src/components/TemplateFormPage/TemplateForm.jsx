@@ -98,7 +98,8 @@ const TemplateForm = () => {
     },
     customColors: {
       primary: ""
-    }
+    },
+    disclaimer: ""
   });
 
   const [documentTypes, setDocumentTypes] = useState([]);
@@ -236,7 +237,8 @@ const TemplateForm = () => {
         },
         customColors: {
           primary: parsedConfig.customColors?.primary || ""
-        }
+        },
+        disclaimer: parsedConfig.disclaimer || ""
       });
     } catch (error) {
       setNotification({
@@ -408,7 +410,8 @@ const TemplateForm = () => {
       layout: {
         borderRadius: formData.borderRadius,
         spacing: formData.spacing
-      }
+      },
+      disclaimer: formData.disclaimer || ""
     };
   };
 
@@ -980,6 +983,42 @@ const TemplateForm = () => {
                 sx={{ color: "#374151", fontWeight: 500 }}
               />
             </FormGrid>
+
+            {/* Disclaimer Customization - Only for Quotation and Proforma */}
+            {(formData.type === 'quote' || formData.type === 'proforma') && (
+              <>
+                <SectionTitle>⚠️ Disclaimer Settings</SectionTitle>
+                
+                <FormGrid size={{ xs: 12 }}>
+                  <FormLabel sx={{ 
+                    display: "block", 
+                    mb: 1, 
+                    fontWeight: 600, 
+                    color: "#374151" 
+                  }}>
+                    Disclaimer Text
+                  </FormLabel>
+                  <OutlinedInput
+                    fullWidth
+                    multiline
+                    rows={4}
+                    size="small"
+                    placeholder={formData.type === 'quote' 
+                      ? "Enter disclaimer text for quotations (e.g., validity period, terms & conditions)..." 
+                      : "Enter disclaimer text for proforma invoices (e.g., informational purposes, not a tax invoice)..."}
+                    value={formData.disclaimer}
+                    onChange={(e) => handleInputChange('disclaimer', e.target.value)}
+                    sx={{
+                      backgroundColor: "rgba(255, 255, 255, 0.8)",
+                      borderRadius: "12px"
+                    }}
+                  />
+                  <Typography variant="caption" sx={{ display: 'block', color: '#6b7280', mt: 0.5 }}>
+                    This disclaimer will appear at the bottom of {formData.type === 'quote' ? 'quotation' : 'proforma invoice'} documents
+                  </Typography>
+                </FormGrid>
+              </>
+            )}
 
             {/* Status */}
             <SectionTitle>⚡ Template Status</SectionTitle>

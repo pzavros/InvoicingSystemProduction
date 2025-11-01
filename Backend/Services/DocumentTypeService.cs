@@ -51,6 +51,8 @@ namespace InvoicingBackend.Services
                 Code = documentType.Code,
                 NumberPrefix = documentType.NumberPrefix,
                 DisplayName = documentType.DisplayName,
+                Category = documentType.Category,
+                CountsForLogistics = documentType.CountsForLogistics,
                 RequiresTaxInfo = documentType.RequiresTaxInfo,
                 IsQuotation = documentType.IsQuotation,
                 IsProforma = documentType.IsProforma,

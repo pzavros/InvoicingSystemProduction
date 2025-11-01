@@ -254,6 +254,20 @@ const ClientFormPage = () => {
             required
             size="small"
             fullWidth
+            sx={{
+              backgroundColor: '#ffffff',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#d1d5db',
+                borderWidth: '1.5px'
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#9ca3af'
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#3b82f6',
+                borderWidth: '2px'
+              }
+            }}
           />
           {errors.name && (
             <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
@@ -274,6 +288,20 @@ const ClientFormPage = () => {
             required
             size="small"
             fullWidth
+            sx={{
+              backgroundColor: '#ffffff',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#d1d5db',
+                borderWidth: '1.5px'
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#9ca3af'
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#3b82f6',
+                borderWidth: '2px'
+              }
+            }}
           />
           {errors.email && (
             <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
@@ -291,6 +319,20 @@ const ClientFormPage = () => {
             onChange={handleChange("company")}
             size="small"
             fullWidth
+            sx={{
+              backgroundColor: '#ffffff',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#d1d5db',
+                borderWidth: '1.5px'
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#9ca3af'
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#3b82f6',
+                borderWidth: '2px'
+              }
+            }}
           />
         </FormGrid>
 
@@ -303,6 +345,20 @@ const ClientFormPage = () => {
             onChange={handleChange("phone")}
             size="small"
             fullWidth
+            sx={{
+              backgroundColor: '#ffffff',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#d1d5db',
+                borderWidth: '1.5px'
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#9ca3af'
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#3b82f6',
+                borderWidth: '2px'
+              }
+            }}
           />
         </FormGrid>
 
@@ -316,6 +372,20 @@ const ClientFormPage = () => {
             placeholder="https://example.com"
             size="small"
             fullWidth
+            sx={{
+              backgroundColor: '#ffffff',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#d1d5db',
+                borderWidth: '1.5px'
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#9ca3af'
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#3b82f6',
+                borderWidth: '2px'
+              }
+            }}
           />
         </FormGrid>
 
@@ -328,6 +398,20 @@ const ClientFormPage = () => {
             onChange={handleChange("taxNumber")}
             size="small"
             fullWidth
+            sx={{
+              backgroundColor: '#ffffff',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#d1d5db',
+                borderWidth: '1.5px'
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#9ca3af'
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#3b82f6',
+                borderWidth: '2px'
+              }
+            }}
           />
         </FormGrid>
 
@@ -343,6 +427,20 @@ const ClientFormPage = () => {
             onChange={handleChange("address")}
             size="small"
             fullWidth
+            sx={{
+              backgroundColor: '#ffffff',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#d1d5db',
+                borderWidth: '1.5px'
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#9ca3af'
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#3b82f6',
+                borderWidth: '2px'
+              }
+            }}
           />
         </FormGrid>
 
@@ -355,6 +453,20 @@ const ClientFormPage = () => {
             onChange={handleChange("city")}
             size="small"
             fullWidth
+            sx={{
+              backgroundColor: '#ffffff',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#d1d5db',
+                borderWidth: '1.5px'
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#9ca3af'
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#3b82f6',
+                borderWidth: '2px'
+              }
+            }}
           />
         </FormGrid>
 
@@ -367,6 +479,20 @@ const ClientFormPage = () => {
             onChange={handleChange("state")}
             size="small"
             fullWidth
+            sx={{
+              backgroundColor: '#ffffff',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#d1d5db',
+                borderWidth: '1.5px'
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#9ca3af'
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#3b82f6',
+                borderWidth: '2px'
+              }
+            }}
           />
         </FormGrid>
 
@@ -379,6 +505,20 @@ const ClientFormPage = () => {
             onChange={handleChange("postalCode")}
             size="small"
             fullWidth
+            sx={{
+              backgroundColor: '#ffffff',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#d1d5db',
+                borderWidth: '1.5px'
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#9ca3af'
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#3b82f6',
+                borderWidth: '2px'
+              }
+            }}
           />
         </FormGrid>
 
@@ -391,6 +531,20 @@ const ClientFormPage = () => {
             onChange={handleChange("country")}
             size="small"
             fullWidth
+            sx={{
+              backgroundColor: '#ffffff',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#d1d5db',
+                borderWidth: '1.5px'
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#9ca3af'
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#3b82f6',
+                borderWidth: '2px'
+              }
+            }}
           />
         </FormGrid>
 
@@ -420,6 +574,20 @@ const ClientFormPage = () => {
             inputProps={{ min: 0 }}
             size="small"
             fullWidth
+            sx={{
+              backgroundColor: '#ffffff',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#d1d5db',
+                borderWidth: '1.5px'
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#9ca3af'
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#3b82f6',
+                borderWidth: '2px'
+              }
+            }}
           />
         </FormGrid>
 
@@ -433,6 +601,20 @@ const ClientFormPage = () => {
             placeholder="e.g., 978 (EUR)"
             size="small"
             fullWidth
+            sx={{
+              backgroundColor: '#ffffff',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#d1d5db',
+                borderWidth: '1.5px'
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#9ca3af'
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#3b82f6',
+                borderWidth: '2px'
+              }
+            }}
           />
         </FormGrid>
 
@@ -450,6 +632,20 @@ const ClientFormPage = () => {
             multiline
             rows={4}
             fullWidth
+            sx={{
+              backgroundColor: '#ffffff',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#d1d5db',
+                borderWidth: '1.5px'
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#9ca3af'
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#3b82f6',
+                borderWidth: '2px'
+              }
+            }}
           />
         </FormGrid>
 

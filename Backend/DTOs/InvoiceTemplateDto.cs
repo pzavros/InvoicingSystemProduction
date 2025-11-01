@@ -9,6 +9,7 @@ namespace InvoicingBackend.DTOs
         public bool IsActive { get; set; } = false;
         public bool IsSystemTemplate { get; set; } = false;
         public int? DocumentTypeId { get; set; }
+        public string? DocumentTypeName { get; set; }
         public byte[]? PreviewImage { get; set; }
         public DateTime DateEntered { get; set; }
     }

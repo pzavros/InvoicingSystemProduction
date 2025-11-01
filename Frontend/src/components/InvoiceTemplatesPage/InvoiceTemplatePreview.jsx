@@ -96,7 +96,16 @@ const buildSectionsConfig = (sectionsRaw = {}) => ({
   bankInfoBackground: sectionsRaw.bankInfoBackground ?? true,
 });
 
-const InvoiceTemplatePreview = ({ templateConfig = {}, templateMeta = null, containerSx = {} }) => {
+const InvoiceTemplatePreview = ({ 
+  templateConfig = {}, 
+  templateMeta = null, 
+  containerSx = {},
+  invoiceData = null,
+  items = null,
+  formatCurrency = null,
+  companyLogo = null,
+  logoMimeType = null
+}) => {
   const sections = useMemo(
     () => buildSectionsConfig(templateConfig.sections),
     [templateConfig.sections]
@@ -135,17 +144,17 @@ const InvoiceTemplatePreview = ({ templateConfig = {}, templateMeta = null, cont
   const sampleInvoiceData = {
     isOpen: true,
     id: 'preview-001',
-    currencyCode: templateConfig.currencyCode || undefined,
-    currencySymbol: templateConfig.currencySymbol || templateConfig.currency || '$',
+    currencyCode: templateConfig.currencyCode || 'EUR',
+    currencySymbol: templateConfig.currencySymbol || templateConfig.currency || '€',
     invoiceNumber: '001',
-    dateOfIssue: new Date().toISOString().split('T')[0],
-    dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    dateOfIssue: new Date().toLocaleDateString('en-GB'),
+    dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB'),
     billTo: 'John Smith',
     billToEmail: 'john.smith@example.com',
-    billToAddress: '123 Main Street, New York, NY 10001',
+    billToAddress: '123 Main Street, London, UK',
     billFrom: 'Your Company Name',
     billFromEmail: 'hello@yourcompany.com',
-    address: '456 Business Ave, Suite 100, New York, NY 10002',
+    address: '456 Business Avenue, Limassol, Cyprus',
     notes: 'Thank you for your business! Payment is due within 30 days.',
     total: '1,150.00',
     subTotal: '1,000.00',
@@ -162,6 +171,7 @@ const InvoiceTemplatePreview = ({ templateConfig = {}, templateMeta = null, cont
       itemDescription: 'Complete website redesign and development',
       itemPrice: '500.00',
       itemQuantity: 1,
+      itemTaxRate: 10,
     },
     {
       itemId: 2,
@@ -169,6 +179,7 @@ const InvoiceTemplatePreview = ({ templateConfig = {}, templateMeta = null, cont
       itemDescription: '3-month SEO campaign and optimization',
       itemPrice: '300.00',
       itemQuantity: 1,
+      itemTaxRate: 10,
     },
     {
       itemId: 3,
@@ -176,8 +187,13 @@ const InvoiceTemplatePreview = ({ templateConfig = {}, templateMeta = null, cont
       itemDescription: 'Blog posts and marketing content',
       itemPrice: '250.00',
       itemQuantity: 1,
+      itemTaxRate: 10,
     },
   ];
+
+  // Use provided data if available, otherwise use sample data
+  const displayData = invoiceData || sampleInvoiceData;
+  const displayItems = items || sampleItems;
 
   const parseAmount = (value) => {
     if (typeof value === 'number') {
@@ -192,54 +208,79 @@ const InvoiceTemplatePreview = ({ templateConfig = {}, templateMeta = null, cont
   };
 
   const calculateTotals = () => {
-    const subtotal = sampleItems.reduce((sum, item) => {
+    const subtotal = displayItems.reduce((sum, item) => {
       const price = parseAmount(item.itemPrice);
       const quantity = parseAmount(item.itemQuantity ?? 1);
       return sum + price * quantity;
     }, 0);
 
-    const discountRate = parseAmount(sampleInvoiceData.discountRate);
+    const discountRate = parseAmount(displayData.discountRate);
     const rateDiscount = discountRate > 0 ? subtotal * (discountRate / 100) : 0;
-    const providedDiscount = parseAmount(sampleInvoiceData.discountAmount);
+    const providedDiscount = parseAmount(displayData.discountAmount);
     const discountAmount = Math.min(
       subtotal,
       providedDiscount > 0 ? providedDiscount : rateDiscount
     );
 
-    const taxRate = parseAmount(sampleInvoiceData.taxRate);
-    const taxAmount = taxRate > 0
-      ? (subtotal - discountAmount) * (taxRate / 100)
-      : 0;
+    // Calculate VAT breakdown by rate
+    const vatBreakdown = {};
+    let totalTaxAmount = 0;
 
-    const total = Math.max(subtotal - discountAmount + taxAmount, 0);
+    displayItems.forEach((item) => {
+      const itemPrice = parseAmount(item.itemPrice);
+      const itemQuantity = parseAmount(item.itemQuantity ?? 1);
+      const itemTotal = itemPrice * itemQuantity;
+      const itemTaxRate = item.itemTaxRate !== undefined && item.itemTaxRate !== null 
+        ? parseAmount(item.itemTaxRate) 
+        : 0;
+
+      if (itemTaxRate > 0) {
+        // Apply discount proportionally to this item
+        const itemDiscountAmount = discountAmount > 0 ? (itemTotal / subtotal) * discountAmount : 0;
+        const itemNetAmount = itemTotal - itemDiscountAmount;
+        const itemVatAmount = itemNetAmount * (itemTaxRate / 100);
+
+        if (!vatBreakdown[itemTaxRate]) {
+          vatBreakdown[itemTaxRate] = 0;
+        }
+        vatBreakdown[itemTaxRate] += itemVatAmount;
+        totalTaxAmount += itemVatAmount;
+      }
+    });
+
+    const total = Math.max(subtotal - discountAmount + totalTaxAmount, 0);
 
     return {
       subtotal,
       discountAmount,
-      taxAmount,
+      taxAmount: totalTaxAmount,
+      vatBreakdown,
       total,
     };
   };
 
-  const { subtotal, discountAmount, taxAmount, total } = calculateTotals();
+  const { subtotal, discountAmount, taxAmount, vatBreakdown, total } = calculateTotals();
 
-  const formatCurrency = (value) => {
+  const defaultFormatCurrency = (value) => {
     const numeric = Number.isFinite(value) ? value : parseAmount(value);
-    if (sampleInvoiceData.currencyCode) {
+    if (displayData.currencyCode) {
       try {
         return new Intl.NumberFormat(undefined, {
           style: 'currency',
-          currency: sampleInvoiceData.currencyCode.toUpperCase(),
+          currency: displayData.currencyCode.toUpperCase(),
         }).format(numeric);
       } catch (error) {
         console.warn('Failed to format currency with code:', error);
       }
     }
 
-    const symbol = sampleInvoiceData.currencySymbol || '$';
+    const symbol = displayData.currencySymbol || '$';
     const needsSpace = symbol && !/\s$/.test(symbol);
     return `${symbol}${needsSpace ? ' ' : ''}${numeric.toFixed(2)}`.trim();
   };
+
+  // Use provided formatCurrency if available, otherwise use default
+  const currencyFormatter = formatCurrency || defaultFormatCurrency;
 
   const tableBorderStyle = sections.tableBorder !== false ? '1px solid #e0e0e0' : 'none';
   const tableRadius = sections.tableStyle === 'rounded' ? borderRadius : 0;
@@ -278,7 +319,7 @@ const InvoiceTemplatePreview = ({ templateConfig = {}, templateMeta = null, cont
                     : 'INVOICE'}
             </Typography>
             <Typography variant="h6" sx={{ color: textSecondary, mt: 1 }}>
-              #{sampleInvoiceData.invoiceNumber}
+              #{displayData.invoiceNumber}
             </Typography>
           </Box>
 
@@ -288,17 +329,30 @@ const InvoiceTemplatePreview = ({ templateConfig = {}, templateMeta = null, cont
                 sx={{
                   width: logoDimension,
                   height: logoDimension,
-                  backgroundColor: '#f0f0f0',
+                  backgroundColor: companyLogo ? 'transparent' : '#f0f0f0',
                   borderRadius: logoSettings.style === 'circle' ? '50%' : borderRadius,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   mx: 'auto',
+                  overflow: 'hidden',
                 }}
               >
-                <Typography variant="caption" sx={{ color: '#999' }}>
-                  Logo
-                </Typography>
+                {companyLogo ? (
+                  <img
+                    src={companyLogo}
+                    alt="Company Logo"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'contain',
+                    }}
+                  />
+                ) : (
+                  <Typography variant="caption" sx={{ color: '#999' }}>
+                    Logo
+                  </Typography>
+                )}
               </Box>
             )}
           </Box>
@@ -326,12 +380,12 @@ const InvoiceTemplatePreview = ({ templateConfig = {}, templateMeta = null, cont
             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1, color: primary }}>
               From:
             </Typography>
-            <Typography variant="body2">{sampleInvoiceData.billFrom}</Typography>
+            <Typography variant="body2">{displayData.billFrom}</Typography>
             <Typography variant="body2" sx={{ color: textSecondary }}>
-              {sampleInvoiceData.billFromEmail}
+              {displayData.billFromEmail}
             </Typography>
             <Typography variant="body2" sx={{ color: textSecondary }}>
-              {sampleInvoiceData.address}
+              {displayData.address}
             </Typography>
           </Grid>
           {sections.showClientDetails !== false && (
@@ -339,12 +393,12 @@ const InvoiceTemplatePreview = ({ templateConfig = {}, templateMeta = null, cont
               <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1, color: primary }}>
                 To:
               </Typography>
-              <Typography variant="body2">{sampleInvoiceData.billTo}</Typography>
+              <Typography variant="body2">{displayData.billTo}</Typography>
               <Typography variant="body2" sx={{ color: textSecondary }}>
-                {sampleInvoiceData.billToEmail}
+                {displayData.billToEmail}
               </Typography>
               <Typography variant="body2" sx={{ color: textSecondary }}>
-                {sampleInvoiceData.billToAddress}
+                {displayData.billToAddress}
               </Typography>
             </Grid>
           )}
@@ -355,12 +409,12 @@ const InvoiceTemplatePreview = ({ templateConfig = {}, templateMeta = null, cont
         <Grid container spacing={4} sx={{ mb: 4 }}>
           <Grid item xs={12} md={6}>
             <Typography variant="body2" sx={{ color: textSecondary }}>
-              <strong>Date Issued:</strong> {sampleInvoiceData.dateOfIssue}
+              <strong>Date Issued:</strong> {displayData.dateOfIssue}
             </Typography>
           </Grid>
           <Grid item xs={12} md={6}>
             <Typography variant="body2" sx={{ color: textSecondary }}>
-              <strong>Due Date:</strong> {sampleInvoiceData.dueDate}
+              <strong>Due Date:</strong> {displayData.dueDate}
             </Typography>
           </Grid>
         </Grid>
@@ -391,12 +445,17 @@ const InvoiceTemplatePreview = ({ templateConfig = {}, templateMeta = null, cont
                 <TableCell>Description</TableCell>
                 <TableCell align="center">Qty</TableCell>
                 <TableCell align="center">Rate</TableCell>
+                <TableCell align="center">VAT %</TableCell>
                 <TableCell align="center">Amount</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {sampleItems.map((item) => {
+              {displayItems.map((item) => {
                 const amount = parseAmount(item.itemPrice) * parseAmount(item.itemQuantity ?? 1);
+                const itemVatRate = item.itemTaxRate !== undefined && item.itemTaxRate !== null 
+                  ? parseAmount(item.itemTaxRate) 
+                  : 0;
+                
                 return (
                   <TableRow
                     key={item.itemId}
@@ -419,8 +478,9 @@ const InvoiceTemplatePreview = ({ templateConfig = {}, templateMeta = null, cont
                       )}
                     </TableCell>
                     <TableCell align="center">{item.itemQuantity}</TableCell>
-                    <TableCell align="center">{formatCurrency(item.itemPrice)}</TableCell>
-                    <TableCell align="center">{formatCurrency(amount)}</TableCell>
+                    <TableCell align="center">{currencyFormatter(item.itemPrice)}</TableCell>
+                    <TableCell align="center">{itemVatRate}%</TableCell>
+                    <TableCell align="center">{currencyFormatter(amount)}</TableCell>
                   </TableRow>
                 );
               })}
@@ -434,22 +494,36 @@ const InvoiceTemplatePreview = ({ templateConfig = {}, templateMeta = null, cont
           <Box sx={{ minWidth: 240 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
               <Typography variant="body2">Subtotal:</Typography>
-              <Typography variant="body2">{formatCurrency(subtotal)}</Typography>
+              <Typography variant="body2">{currencyFormatter(subtotal)}</Typography>
             </Box>
-            {sections.showTax !== false && (
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                <Typography variant="body2">
-                  Tax ({sampleInvoiceData.taxRate}%):
-                </Typography>
-                <Typography variant="body2">{formatCurrency(taxAmount)}</Typography>
-              </Box>
-            )}
-            {sections.showDiscount !== false && (
+            {sections.showDiscount !== false && discountAmount > 0 && (
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                 <Typography variant="body2">Discount:</Typography>
                 <Typography variant="body2" sx={{ color: '#dc2626', fontWeight: 500 }}>
-                  {formatCurrency(discountAmount)}
+                  -{currencyFormatter(discountAmount)}
                 </Typography>
+              </Box>
+            )}
+            {sections.showTax !== false && Object.keys(vatBreakdown).length > 0 && (
+              <>
+                {Object.entries(vatBreakdown)
+                  .sort(([rateA], [rateB]) => parseFloat(rateB) - parseFloat(rateA))
+                  .map(([rate, amount]) => (
+                    <Box key={rate} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                      <Typography variant="body2">
+                        VAT ({rate}%):
+                      </Typography>
+                      <Typography variant="body2">{currencyFormatter(amount)}</Typography>
+                    </Box>
+                  ))}
+              </>
+            )}
+            {sections.showTax !== false && Object.keys(vatBreakdown).length === 0 && (
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                <Typography variant="body2">
+                  VAT (0%):
+                </Typography>
+                <Typography variant="body2">{currencyFormatter(0)}</Typography>
               </Box>
             )}
             <Divider sx={{ my: 1 }} />
@@ -458,7 +532,7 @@ const InvoiceTemplatePreview = ({ templateConfig = {}, templateMeta = null, cont
                 Total:
               </Typography>
               <Typography variant="h6" sx={{ fontWeight: 'bold', color: primary }}>
-                {formatCurrency(total)}
+                {currencyFormatter(total)}
               </Typography>
             </Box>
           </Box>
@@ -480,7 +554,7 @@ const InvoiceTemplatePreview = ({ templateConfig = {}, templateMeta = null, cont
             Amount Due
           </Typography>
           <Typography variant="h5" sx={{ fontWeight: 600, color: text }}>
-            {formatCurrency(total)}
+            {currencyFormatter(total)}
           </Typography>
           <Typography variant="caption" sx={{ color: textSecondary }}>
             Due upon receipt
@@ -488,13 +562,34 @@ const InvoiceTemplatePreview = ({ templateConfig = {}, templateMeta = null, cont
         </Box>
       )}
 
-      {sections.showNotes !== false && sampleInvoiceData.notes && (
+      {sections.showNotes !== false && displayData.notes && (
         <Box sx={{ mb: 4 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1, color: primary }}>
             Notes:
           </Typography>
           <Typography variant="body2" sx={{ color: textSecondary }}>
-            {sampleInvoiceData.notes}
+            {displayData.notes}
+          </Typography>
+        </Box>
+      )}
+
+      {(templateConfig.type === 'quote' || templateConfig.type === 'proforma') && (
+        <Box 
+          sx={{ 
+            mb: 4, 
+            p: 3, 
+            backgroundColor: '#fef3c7',
+            border: '1px solid #fbbf24',
+            borderRadius,
+          }}
+        >
+          <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1, color: '#92400e' }}>
+            ⚠️ Disclaimer:
+          </Typography>
+          <Typography variant="body2" sx={{ color: '#78350f', fontSize: '0.875rem', lineHeight: 1.6 }}>
+            {templateConfig.disclaimer || (templateConfig.type === 'quote' 
+              ? 'This quotation is valid for 30 days from the date of issue. Prices and availability are subject to change. This is not an invoice and does not constitute a binding agreement until accepted and confirmed by both parties.'
+              : 'This is a Proforma Invoice and is provided for informational purposes only. It is not a tax invoice and should not be used for accounting or tax purposes. A final invoice will be issued upon completion of the transaction.')}
           </Typography>
         </Box>
       )}

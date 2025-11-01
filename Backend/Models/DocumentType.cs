@@ -22,6 +22,13 @@ namespace InvoicingBackend.Models
         [MaxLength(100)]
         public string DisplayName { get; set; } = string.Empty; // "Tax Invoice", "Proforma Invoice", etc.
         
+        // Two-level categorization
+        [Required]
+        [MaxLength(20)]
+        public string Category { get; set; } = "Invoice"; // "Invoice" or "Proforma"
+        
+        public bool CountsForLogistics { get; set; } = true; // If true, affects inventory and revenue
+        
         public bool RequiresTaxInfo { get; set; } = false;
         public bool IsQuotation { get; set; } = false;
         public bool IsProforma { get; set; } = false;

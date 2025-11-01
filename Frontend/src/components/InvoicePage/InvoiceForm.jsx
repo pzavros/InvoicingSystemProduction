@@ -16,8 +16,9 @@ import {
   Typography,
   Divider,
   Autocomplete,
+  IconButton,
 } from "@mui/material";
-import { BiArrowBack } from "react-icons/bi";
+import { ArrowBack as ArrowBackIcon } from "@mui/icons-material";
 import { useDispatch } from "react-redux";
 import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import InvoiceItem from "./InvoiceItem";
@@ -156,8 +157,11 @@ const InvoiceForm = () => {
   const [loading, setLoading] = useState(false);
   const [currencies, setCurrencies] = useState([]);
   const [statuses, setStatuses] = useState([]);
+  const [filteredStatuses, setFilteredStatuses] = useState([]); // Statuses filtered by document category
   const [clients, setClients] = useState([]);
   const [documentTypes, setDocumentTypes] = useState([]);
+  const [documentCategory, setDocumentCategory] = useState("Invoice"); // "Invoice" or "Proforma"
+  const [filteredDocumentTypes, setFilteredDocumentTypes] = useState([]);
   const [clientSelectionMode, setClientSelectionMode] = useState("manual"); // "manual" or "select"
   const [selectedClientId, setSelectedClientId] = useState("");
   const [notification, setNotification] = useState({
@@ -213,6 +217,12 @@ const InvoiceForm = () => {
 
         const documentTypesData = await getAllDocumentTypes();
         setDocumentTypes(documentTypesData);
+        
+        // Set initial category based on the default document type (ID=1 is Invoice)
+        const defaultDocType = documentTypesData.find(dt => dt.id === 1);
+        if (defaultDocType) {
+          setDocumentCategory(defaultDocType.category || "Invoice");
+        }
 
         // Load template after setting up initial form data
         await loadTemplateForDocumentType(1); // Default to Invoice (type 1)
@@ -403,6 +413,62 @@ const InvoiceForm = () => {
     handleCalculateTotal();
   }, [formData.items, formData.discountRate]);
 
+  // Filter document types based on selected category
+  useEffect(() => {
+    if (documentTypes.length > 0) {
+      const filtered = documentTypes.filter(dt => dt.category === documentCategory);
+      setFilteredDocumentTypes(filtered);
+      
+      // If current documentTypeId is not in filtered list, select preferred type
+      const currentTypeStillValid = filtered.find(dt => dt.id === formData.documentTypeId);
+      if (!currentTypeStillValid && filtered.length > 0) {
+        // For Invoice category, prefer the basic "Invoice" type (ID=1)
+        // For Proforma category, prefer "Proforma Invoice" type (ID=3)
+        let preferredType;
+        if (documentCategory === "Invoice") {
+          preferredType = filtered.find(dt => dt.id === 1) || filtered[0];
+        } else if (documentCategory === "Proforma") {
+          preferredType = filtered.find(dt => dt.id === 3) || filtered[0];
+        } else {
+          preferredType = filtered[0];
+        }
+        setFormData(prev => ({
+          ...prev,
+          documentTypeId: preferredType.id
+        }));
+      }
+    }
+  }, [documentTypes, documentCategory]);
+
+  // Filter statuses based on document category
+  // Proforma/Quotation documents don't have payment statuses
+  useEffect(() => {
+    if (statuses.length > 0) {
+      if (documentCategory === "Proforma") {
+        // For proforma/quotations, only allow Draft and Deleted statuses
+        const allowedStatusIds = [1, 4]; // 1=Draft, 4=Deleted
+        const filtered = statuses.filter(s => allowedStatusIds.includes(s.statusId));
+        
+        // If editing a Proforma with Unpaid/Paid status, include it in the dropdown
+        // so the user can see the current status, but they can only change it to Draft or Deleted
+        if (formData.statusId && !allowedStatusIds.includes(formData.statusId)) {
+          const currentStatus = statuses.find(s => s.statusId === formData.statusId);
+          if (currentStatus) {
+            // Add the current status to the filtered list so it shows in the dropdown
+            setFilteredStatuses([...filtered, currentStatus]);
+          } else {
+            setFilteredStatuses(filtered);
+          }
+        } else {
+          setFilteredStatuses(filtered);
+        }
+      } else {
+        // For invoices, show all statuses
+        setFilteredStatuses(statuses);
+      }
+    }
+  }, [statuses, documentCategory, formData.statusId]);
+
   useEffect(() => {
     const loadTemplateForForm = async () => {
       const templateId = formData.templateId;
@@ -502,6 +568,14 @@ const InvoiceForm = () => {
       templateId: null,
       documentTypeId: invoiceData.documentTypeId || 1,
     });
+    
+    // Set document category based on the loaded invoice's document type
+    if (invoiceData.documentTypeId && documentTypes.length > 0) {
+      const docType = documentTypes.find(dt => dt.id === invoiceData.documentTypeId);
+      if (docType && docType.category) {
+        setDocumentCategory(docType.category);
+      }
+    }
   };
 
   const handleRowDel = (itemToDelete) => {
@@ -972,38 +1046,26 @@ const InvoiceForm = () => {
       backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3), transparent 50.2%), radial-gradient(circle at 80% 20%, rgba(120, 119, 198, 0.15), transparent 50.2%), radial-gradient(circle at 40% 80%, rgba(120, 119, 198, 0.1), transparent 50.2%)',
       py: 2
     }}>
-      <form onSubmit={openModal} style={{ maxWidth: '100%' }}><Box sx={{ 
-          display: "flex", 
-          alignItems: "center",
+      <form onSubmit={openModal} style={{ maxWidth: '100%' }}>
+        {/* Header with Back Button */}
+        <Box sx={{ 
           width: '100%',
           maxWidth: '1200px',
           margin: '0 auto',
-          px: { xs: 2, sm: 3, md: 4 }
+          px: { xs: 2, sm: 3, md: 4 },
+          mb: 3
         }}>
-          <Box sx={{
-            display: 'flex',
-            alignItems: 'center',
-            padding: '8px 16px',
-            borderRadius: '8px',
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            transition: 'all 0.3s ease',
-            cursor: 'pointer',
-            '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.15)',
-              transform: 'translateY(-2px)',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
-            }
-          }}>
-            <BiArrowBack size={18} color="white" />
-            <Link to="/" style={{ textDecoration: "none", color: "white", marginLeft: '8px' }}>
-              <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                Go Back
-              </Typography>
-            </Link>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <IconButton onClick={() => navigate("/")} sx={{ mr: 2 }}>
+              <ArrowBackIcon />
+            </IconButton>
+            <Typography variant="h4" component="h1" sx={{ fontWeight: 600 }}>
+              {isEdit ? "Edit Invoice" : isCopy ? "Copy Invoice" : "Create Invoice"}
+            </Typography>
           </Box>
-        </Box>        <Box sx={{ 
+        </Box>
+
+        <Box sx={{ 
           width: '100%', 
           maxWidth: '1200px', 
           margin: '0 auto',
@@ -1208,7 +1270,7 @@ const InvoiceForm = () => {
                       }
                     }}
                   >
-                    {statuses.map(status => (
+                    {filteredStatuses.map(status => (
                       <MenuItem key={status.statusId} value={status.statusId}>
                         {status.name}
                       </MenuItem>
@@ -1251,7 +1313,68 @@ const InvoiceForm = () => {
                 }}
               >
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                  {/* Document Type Selection */}
+                  {/* Document Category Selection */}
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                    <Typography sx={{ 
+                      fontWeight: 700, 
+                      minWidth: "120px",
+                      color: '#2d3748',
+                      fontSize: '0.95rem'
+                    }}>
+                      📂 Category:
+                    </Typography>
+                    <FormControl size="small" sx={{ minWidth: 200 }}>
+                      <Select
+                        value={documentCategory}
+                        onChange={(e) => {
+                          const newCategory = e.target.value;
+                          setDocumentCategory(newCategory);
+                          // Auto-select appropriate document type from new category
+                          const typesInCategory = documentTypes.filter(dt => dt.category === newCategory);
+                          if (typesInCategory.length > 0) {
+                            // For Invoice category, prefer the basic "Invoice" type (ID=1)
+                            // For Proforma category, prefer "Proforma Invoice" type (ID=3)
+                            let preferredType;
+                            if (newCategory === "Invoice") {
+                              preferredType = typesInCategory.find(dt => dt.id === 1) || typesInCategory[0];
+                            } else if (newCategory === "Proforma") {
+                              preferredType = typesInCategory.find(dt => dt.id === 3) || typesInCategory[0];
+                            } else {
+                              preferredType = typesInCategory[0];
+                            }
+                            editField('documentTypeId', preferredType.id);
+                          }
+                        }}
+                        sx={{
+                          '& .MuiOutlinedInput-root': {
+                            background: 'rgba(255, 255, 255, 0.2)',
+                            backdropFilter: 'blur(10px)',
+                            borderRadius: '12px'
+                          },
+                          '.MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgba(255, 255, 255, 0.3)',
+                            borderWidth: '2px'
+                          },
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgba(102, 126, 234, 0.5)'
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#667eea',
+                            borderWidth: '2px'
+                          },
+                          '& .MuiInputBase-input': {
+                            color: '#2d3748',
+                            fontWeight: 500
+                          }
+                        }}
+                      >
+                        <MenuItem value="Invoice">Invoice (Counts for Logistics)</MenuItem>
+                        <MenuItem value="Proforma">Proforma (Does Not Count)</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Box>
+
+                  {/* Document Type Selection - Now filtered by category */}
                   <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                     <Typography sx={{ 
                       fontWeight: 700, 
@@ -1288,7 +1411,7 @@ const InvoiceForm = () => {
                           }
                         }}
                       >
-                        {documentTypes.map((type) => (
+                        {filteredDocumentTypes.map((type) => (
                           <MenuItem key={type.id} value={type.id}>
                             {type.displayName}
                           </MenuItem>

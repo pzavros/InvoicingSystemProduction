@@ -22,9 +22,10 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  IconButton,
 } from "@mui/material";
-import { BiArrowBack } from "react-icons/bi";
 import {
+  ArrowBack as ArrowBackIcon,
   CloudDownload as DownloadIcon,
   Email as EmailIcon,
   AttachFile as AttachIcon,
@@ -56,7 +57,10 @@ const InvoiceViewForm = ({ invoice, isEditMode, invoiceId }) => {
   const [editMode, setEditMode] = useState(isEditMode);
   const [currencies, setCurrencies] = useState([]);
   const [statuses, setStatuses] = useState([]);
+  const [filteredStatuses, setFilteredStatuses] = useState([]); // Statuses filtered by document category
   const [documentTypes, setDocumentTypes] = useState([]);
+  const [documentCategory, setDocumentCategory] = useState("Invoice"); // "Invoice" or "Proforma"
+  const [filteredDocumentTypes, setFilteredDocumentTypes] = useState([]); // Document types filtered by category
   const [loading, setLoading] = useState(false);
   const [statusUpdateLoading, setStatusUpdateLoading] = useState(false);
   const [notification, setNotification] = useState({
@@ -221,6 +225,15 @@ const InvoiceViewForm = ({ invoice, isEditMode, invoiceId }) => {
         setCurrencies(currenciesData);
         setStatuses(statusesData);
         setDocumentTypes(documentTypesData);
+        
+        // Set initial category - if viewing an invoice, it will be updated in the invoice useEffect
+        // Otherwise default to Invoice category
+        if (invoice?.documentTypeId) {
+          const docType = documentTypesData.find(dt => dt.id === invoice.documentTypeId);
+          if (docType && docType.category) {
+            setDocumentCategory(docType.category);
+          }
+        }
       } catch (error) {
         console.error("Error fetching initial data:", error);
         setNotification({
@@ -300,8 +313,62 @@ const InvoiceViewForm = ({ invoice, isEditMode, invoiceId }) => {
         })) || [],
       };
       setFormData(newFormData);
+      
+      // Update document category based on the invoice's document type
+      if (invoice?.documentTypeId && documentTypes.length > 0) {
+        const docType = documentTypes.find(dt => dt.id === invoice.documentTypeId);
+        if (docType && docType.category) {
+          setDocumentCategory(docType.category);
+        }
+      }
     }
-  }, [invoice, currencies, statuses]);
+  }, [invoice, currencies, statuses, documentTypes]);
+
+  // Filter document types based on selected category
+  useEffect(() => {
+    if (documentTypes.length > 0) {
+      const filtered = documentTypes.filter(dt => dt.category === documentCategory);
+      setFilteredDocumentTypes(filtered);
+      
+      // If current documentTypeId is not in filtered list, don't change it when viewing
+      // Only auto-select when in edit mode
+      if (editMode) {
+        const currentTypeStillValid = filtered.find(dt => dt.id === formData.documentTypeId);
+        if (!currentTypeStillValid && filtered.length > 0) {
+          setFormData(prev => ({
+            ...prev,
+            documentTypeId: filtered[0].id
+          }));
+        }
+      }
+    }
+  }, [documentTypes, documentCategory, editMode]);
+
+  // Filter statuses based on document category
+  // Proforma/Quotation documents don't have payment statuses
+  useEffect(() => {
+    if (statuses.length > 0) {
+      if (documentCategory === "Proforma") {
+        // For proforma/quotations, only allow Draft and Deleted statuses
+        const allowedStatusIds = [1, 4]; // 1=Draft, 4=Deleted
+        const filtered = statuses.filter(s => allowedStatusIds.includes(s.statusId));
+        setFilteredStatuses(filtered);
+        
+        // If viewing a Proforma with Unpaid/Paid status, we need to include it in the dropdown
+        // so the user can see the current status, but they can only change it to Draft or Deleted
+        if (formData.statusId && !allowedStatusIds.includes(formData.statusId)) {
+          const currentStatus = statuses.find(s => s.statusId === formData.statusId);
+          if (currentStatus) {
+            // Add the current status to the filtered list so it shows in the dropdown
+            setFilteredStatuses([...filtered, currentStatus]);
+          }
+        }
+      } else {
+        // For invoices, show all statuses
+        setFilteredStatuses(statuses);
+      }
+    }
+  }, [statuses, documentCategory, formData.statusId]);
 
   useEffect(() => {
     const docTypeId = formData.documentTypeId || invoice?.documentTypeId || null;
@@ -881,31 +948,21 @@ ${formData.billFrom}`);
       py: 2
     }}>
       <form onSubmit={openModal} style={{ maxWidth: '100%' }}>
+        {/* Header with Back Button */}
         <Box sx={{ 
-          display: "flex", 
-          alignItems: "center",
           width: '100%',
           maxWidth: '1200px',
           margin: '0 auto',
           px: { xs: 2, sm: 3, md: 4 },
-          mb: 2
+          mb: 3
         }}>
-          <Box sx={{
-            display: 'flex',
-            alignItems: 'center',
-            background: 'rgba(255, 255, 255, 0.25)',
-            backdropFilter: 'blur(20px)',
-            borderRadius: '12px',
-            padding: '8px 16px',
-            border: '1px solid rgba(255, 255, 255, 0.18)',
-            cursor: 'pointer'
-          }}>
-            <BiArrowBack size={18} color="#4a5568" />
-            <Box sx={{ fontWeight: "600", ml: 2, color: "#2d3748" }}>
-              <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
-                ← Back to Dashboard
-              </Link>
-            </Box>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <IconButton onClick={() => navigate("/")} sx={{ mr: 2 }}>
+              <ArrowBackIcon />
+            </IconButton>
+            <Typography variant="h4" component="h1" sx={{ fontWeight: 600 }}>
+              Invoice Details
+            </Typography>
           </Box>
         </Box>
 
@@ -1017,7 +1074,7 @@ ${formData.billFrom}`);
                     ) : null
                   }
                 >
-                  {statuses.map(status => (
+                  {filteredStatuses.map(status => (
                     <MenuItem key={status.statusId} value={status.statusId}>
                       {status.name}
                     </MenuItem>

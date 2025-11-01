@@ -54,14 +54,18 @@ import UsageIndicator from '../SubscriptionPage/UsageIndicator';
 import { useSubscription } from '../../utils/SubscriptionContext';
 
 // Create status badges with different colors and modern styling
-const StatusBadge = ({ status }) => {
+const StatusBadge = ({ status, documentCategory }) => {
   let color = 'default';
   let label = status || 'Unknown';
   let customStyles = {};
   
+  // For Proforma/Quotation documents, use different labels
+  const isProforma = documentCategory === 'Proforma';
+  
   switch(status?.toLowerCase()) {
     case 'paid':
       color = 'success';
+      label = isProforma ? 'Completed' : 'Paid'; // Proforma shows "Completed" instead of "Paid"
       customStyles = {
         backgroundColor: 'rgba(16, 185, 129, 0.1)',
         color: '#059669',
@@ -71,6 +75,7 @@ const StatusBadge = ({ status }) => {
       break;
     case 'unpaid':
       color = 'warning';
+      label = isProforma ? 'Pending' : 'Unpaid'; // Proforma shows "Pending" instead of "Unpaid"
       customStyles = {
         backgroundColor: 'rgba(245, 158, 11, 0.1)',
         color: '#d97706',
@@ -80,6 +85,7 @@ const StatusBadge = ({ status }) => {
       break;
     case 'overdue':
       color = 'error';
+      label = isProforma ? 'Expired' : 'Overdue'; // Proforma shows "Expired" instead of "Overdue"
       customStyles = {
         backgroundColor: 'rgba(239, 68, 68, 0.1)',
         color: '#dc2626',
@@ -89,6 +95,7 @@ const StatusBadge = ({ status }) => {
       break;
     case 'draft':
       color = 'default';
+      label = isProforma ? 'Draft' : 'Draft'; // Both show "Draft"
       customStyles = {
         backgroundColor: 'rgba(107, 114, 128, 0.1)',
         color: '#4b5563',
@@ -98,6 +105,7 @@ const StatusBadge = ({ status }) => {
       break;
     case 'deleted':
       color = 'error';
+      label = 'Deleted'; // Both show "Deleted"
       customStyles = {
         backgroundColor: 'rgba(239, 68, 68, 0.1)',
         color: '#dc2626',
@@ -139,31 +147,43 @@ const DOCUMENT_TYPE_BASE_STYLES = {
     label: 'Invoice',
     color: '#2563eb',
     backgroundColor: 'rgba(37, 99, 235, 0.12)',
-    border: '1px solid rgba(37, 99, 235, 0.25)'
+    border: '1px solid rgba(37, 99, 235, 0.25)',
+    category: 'Invoice' // Default category
   },
   1: {
     label: 'Invoice',
     color: '#2563eb',
     backgroundColor: 'rgba(37, 99, 235, 0.12)',
-    border: '1px solid rgba(37, 99, 235, 0.25)'
+    border: '1px solid rgba(37, 99, 235, 0.25)',
+    category: 'Invoice'
   },
   2: {
     label: 'Tax Invoice',
     color: '#047857',
     backgroundColor: 'rgba(4, 120, 87, 0.12)',
-    border: '1px solid rgba(4, 120, 87, 0.25)'
+    border: '1px solid rgba(4, 120, 87, 0.25)',
+    category: 'Invoice'
   },
   3: {
     label: 'Proforma Invoice',
     color: '#7c3aed',
     backgroundColor: 'rgba(124, 58, 237, 0.12)',
-    border: '1px solid rgba(124, 58, 237, 0.25)'
+    border: '1px solid rgba(124, 58, 237, 0.25)',
+    category: 'Proforma'
   },
   4: {
     label: 'Quotation',
     color: '#d97706',
     backgroundColor: 'rgba(217, 119, 6, 0.12)',
-    border: '1px solid rgba(217, 119, 6, 0.25)'
+    border: '1px solid rgba(217, 119, 6, 0.25)',
+    category: 'Proforma'
+  },
+  5: {
+    label: 'Cash Invoice',
+    color: '#059669',
+    backgroundColor: 'rgba(5, 150, 105, 0.12)',
+    border: '1px solid rgba(5, 150, 105, 0.25)',
+    category: 'Invoice'
   }
 };
 
@@ -256,7 +276,8 @@ export default function InvoiceList() {
       const label = type.displayName || type.name || type.description || type.code || `Type ${typeId}`;
       map[typeId] = {
         ...(map[typeId] || DOCUMENT_TYPE_BASE_STYLES.default),
-        label
+        label,
+        category: type.category || 'Invoice' // Add category field
       };
     });
     return map;
@@ -1189,7 +1210,10 @@ export default function InvoiceList() {
                                 {formatDate(invoice.dateOfIssue)}
                               </Typography>
                             </Box>
-                            <StatusBadge status={invoice.statusName || 'Unknown'} />
+                            <StatusBadge 
+                              status={invoice.statusName || 'Unknown'} 
+                              documentCategory={docTypeMeta.category}
+                            />
                           </Box>
 
                           {/* Client */}
@@ -1609,7 +1633,10 @@ export default function InvoiceList() {
                             {(invoice.currency?.symbol || '$')}{totalValue.toFixed(2)}
                           </TableCell>
                           <TableCell>
-                            <StatusBadge status={invoice.statusName || 'Unknown'} />
+                            <StatusBadge 
+                              status={invoice.statusName || 'Unknown'} 
+                              documentCategory={docTypeMeta.category}
+                            />
                           </TableCell>
                           <TableCell>
                             <Box sx={{ display: 'flex', gap: { xs: 0.25, sm: 0.5 } }}>
