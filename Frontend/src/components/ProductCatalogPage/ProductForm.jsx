@@ -421,7 +421,7 @@ const ProductForm = ({
             <Grid item xs={12} md={6}>
               <TextField
                 name="unitPrice"
-                label="Price"
+                label="Price (incl. VAT)"
                 value={formData.unitPrice}
                 onChange={handleInputChange}
                 fullWidth
@@ -432,7 +432,7 @@ const ProductForm = ({
                   startAdornment: <InputAdornment position="start">€</InputAdornment>,
                 }}
                 error={!!errors.unitPrice}
-                helperText={errors.unitPrice}
+                helperText={errors.unitPrice || "Enter price including VAT (gross price)"}
                 sx={{ 
                   height: '80px',
                   '& .MuiOutlinedInput-root': {

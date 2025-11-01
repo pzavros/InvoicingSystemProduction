@@ -110,7 +110,7 @@ const InvoiceItem = (props) => {
                 <TableCell sx={{ 
                   color: '#2d3748', 
                   fontWeight: 700, 
-                  minWidth: '100px',
+                  minWidth: '80px',
                   fontSize: '0.95rem',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
@@ -120,12 +120,32 @@ const InvoiceItem = (props) => {
                 <TableCell sx={{ 
                   color: '#2d3748', 
                   fontWeight: 700, 
-                  minWidth: '150px',
+                  minWidth: '180px',
                   fontSize: '0.95rem',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
-                  💰 PRICE/RATE
+                  💰 PRICE (INCL. VAT)
+                </TableCell>
+                <TableCell sx={{ 
+                  color: '#2d3748', 
+                  fontWeight: 700, 
+                  minWidth: '100px',
+                  fontSize: '0.95rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  🧾 VAT %
+                </TableCell>
+                <TableCell sx={{ 
+                  color: '#2d3748', 
+                  fontWeight: 700, 
+                  minWidth: '120px',
+                  fontSize: '0.95rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  💵 TOTAL
                 </TableCell>
                 {!readOnly && (
                   <TableCell align="center" sx={{ 
@@ -232,7 +252,23 @@ const ItemCard = (props) => {
     ? item.itemPrice.toString() 
     : "0.00";
 
-  const itemTotal = (parseFloat(itemQuantity) * parseFloat(itemPrice)).toFixed(2);
+  const itemTaxRate = item.itemTaxRate !== undefined && !isNaN(item.itemTaxRate)
+    ? item.itemTaxRate.toString()
+    : "0";
+
+  // Calculate line total with VAT
+  // Price is GROSS (includes VAT)
+  const grossPrice = parseFloat(itemPrice);
+  const quantity = parseFloat(itemQuantity);
+  const taxRate = parseFloat(itemTaxRate);
+  
+  // Line total (gross) = quantity × gross price
+  const itemTotal = (quantity * grossPrice).toFixed(2);
+  
+  // Calculate VAT amount from gross price
+  // VAT = gross × (taxRate / (100 + taxRate))
+  const vatAmount = taxRate > 0 ? (quantity * grossPrice * (taxRate / (100 + taxRate))) : 0;
+  const netAmount = (quantity * grossPrice) - vatAmount;
 
   return (
     <Card 
@@ -301,8 +337,8 @@ const ItemCard = (props) => {
 
         <Divider sx={{ my: 2, borderColor: "rgba(102, 126, 234, 0.2)" }} />
 
-        {/* Quantity & Price in Grid */}
-        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mb: 2 }}>
+        {/* Quantity, Price & VAT in Grid */}
+        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2, mb: 2 }}>
           <Box>
             <Typography 
               variant="caption" 
@@ -345,7 +381,7 @@ const ItemCard = (props) => {
                 display: 'block'
               }}
             >
-              💰 Price/Rate
+              💰 Price (incl. VAT)
             </Typography>
             <EditableField
               onItemizedItemEdit={(evt) => onItemizedItemEdit(evt, item.itemId)}
@@ -353,12 +389,44 @@ const ItemCard = (props) => {
                 leading: currency,
                 type: "number",
                 name: "itemPrice",
-                min: 1,
+                min: 0,
                 step: "0.01",
                 presicion: 2,
                 textAlign: "text-end",
                 value: itemPrice,
                 id: item.itemId,
+              }}
+              readOnly={readOnly}
+            />
+          </Box>
+
+          <Box>
+            <Typography 
+              variant="caption" 
+              sx={{ 
+                color: '#667eea', 
+                fontWeight: 700, 
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                fontSize: '0.7rem',
+                mb: 0.5,
+                display: 'block'
+              }}
+            >
+              🧾 VAT %
+            </Typography>
+            <EditableField
+              onItemizedItemEdit={(evt) => onItemizedItemEdit(evt, item.itemId)}
+              cellData={{
+                type: "number",
+                name: "itemTaxRate",
+                min: 0,
+                max: 100,
+                step: "0.01",
+                placeholder: "0",
+                value: itemTaxRate,
+                id: item.itemId,
+                trailing: "%"
               }}
               readOnly={readOnly}
             />
@@ -433,6 +501,24 @@ const ItemRow = (props) => {
     ? props.item.itemPrice.toString() 
     : "0.00";
 
+  const itemTaxRate = props.item.itemTaxRate !== undefined && !isNaN(props.item.itemTaxRate)
+    ? props.item.itemTaxRate.toString()
+    : "0";
+
+  // Calculate line total with VAT
+  // Price is GROSS (includes VAT)
+  const grossPrice = parseFloat(itemPrice);
+  const quantity = parseFloat(itemQuantity);
+  const taxRate = parseFloat(itemTaxRate);
+  
+  // Line total (gross) = quantity × gross price
+  const lineTotal = (quantity * grossPrice).toFixed(2);
+  
+  // Calculate VAT amount from gross price
+  // VAT = gross × (taxRate / (100 + taxRate))
+  const vatAmount = taxRate > 0 ? (quantity * grossPrice * (taxRate / (100 + taxRate))) : 0;
+  const netAmount = (quantity * grossPrice) - vatAmount;
+
   return (
     <TableRow sx={{ 
       '&:hover': { 
@@ -468,7 +554,7 @@ const ItemRow = (props) => {
           readOnly={props.readOnly}
         />
       </TableCell>
-      <TableCell sx={{ minWidth: "100px" }}>
+      <TableCell sx={{ minWidth: "80px" }}>
         <EditableField
           onItemizedItemEdit={(evt) =>
             props.onItemizedItemEdit(evt, props.item.itemId)
@@ -484,7 +570,7 @@ const ItemRow = (props) => {
           readOnly={props.readOnly}
         />
       </TableCell>
-      <TableCell sx={{ minWidth: "150px" }}>
+      <TableCell sx={{ minWidth: "180px" }}>
         <EditableField
           onItemizedItemEdit={(evt) =>
             props.onItemizedItemEdit(evt, props.item.itemId)
@@ -493,7 +579,7 @@ const ItemRow = (props) => {
             leading: props.currency,
             type: "number",
             name: "itemPrice",
-            min: 1,
+            min: 0,
             step: "0.01",
             presicion: 2,
             textAlign: "text-end",
@@ -502,6 +588,28 @@ const ItemRow = (props) => {
           }}
           readOnly={props.readOnly}
         />
+      </TableCell>
+      <TableCell sx={{ minWidth: "100px" }}>
+        <EditableField
+          onItemizedItemEdit={(evt) =>
+            props.onItemizedItemEdit(evt, props.item.itemId)
+          }
+          cellData={{
+            type: "number",
+            name: "itemTaxRate",
+            min: 0,
+            max: 100,
+            step: "0.01",
+            placeholder: "0",
+            value: itemTaxRate,
+            id: props.item.itemId,
+            trailing: "%"
+          }}
+          readOnly={props.readOnly}
+        />
+      </TableCell>
+      <TableCell sx={{ minWidth: "120px", fontWeight: 600, color: '#2d3748' }}>
+        {props.currency}{lineTotal}
       </TableCell>
       {!props.readOnly && (
         <TableCell align="center" sx={{ minWidth: "50px" }}>

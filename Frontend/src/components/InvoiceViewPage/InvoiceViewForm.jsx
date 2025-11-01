@@ -169,6 +169,9 @@ const InvoiceViewForm = ({ invoice, isEditMode, invoiceId }) => {
         ? parseFloat(item.unitPrice).toFixed(2) 
         : "0.00",
       itemQuantity: item.quantity || 1,
+      itemTaxRate: (item.taxRate !== null && item.taxRate !== undefined) ? parseFloat(item.taxRate) : 0,
+      productId: item.productId || null,
+      isCustomItem: item.isCustomItem || false
     })) || [
       {
         itemId: `temp-default-${Date.now()}`,
@@ -176,6 +179,7 @@ const InvoiceViewForm = ({ invoice, isEditMode, invoiceId }) => {
         itemDescription: "",
         itemPrice: "1.00",
         itemQuantity: 1,
+        itemTaxRate: 0,
       },
     ],
   });
@@ -290,6 +294,7 @@ const InvoiceViewForm = ({ invoice, isEditMode, invoiceId }) => {
           itemDescription: item.description || "",
           itemPrice: item.unitPrice !== undefined ? parseFloat(item.unitPrice).toFixed(2) : "0.00",
           itemQuantity: item.quantity || 1,
+          itemTaxRate: (item.taxRate !== null && item.taxRate !== undefined) ? parseFloat(item.taxRate) : 0,
           productId: item.productId || null, // Preserve productId for stock management
           isCustomItem: item.isCustomItem || false
         })) || [],
@@ -345,6 +350,7 @@ const InvoiceViewForm = ({ invoice, isEditMode, invoiceId }) => {
       itemDescription: "",
       itemPrice: "1.00",
       itemQuantity: 1,
+      itemTaxRate: 0,
     };
 
     setFormData(prevFormData => {
@@ -578,7 +584,8 @@ const InvoiceViewForm = ({ invoice, isEditMode, invoiceId }) => {
         Title: item.itemName || "",
         Description: item.itemDescription || "",
         Quantity: parseInt(item.itemQuantity) || 1,
-        UnitPrice: parseFloat(item.itemPrice) || 0
+        UnitPrice: parseFloat(item.itemPrice) || 0,
+        TaxRate: item.itemTaxRate !== undefined && item.itemTaxRate !== null && item.itemTaxRate !== "" ? parseFloat(item.itemTaxRate) : 0
       }))
     };
   };
@@ -830,6 +837,33 @@ ${formData.billFrom}`);
       swift: formData.swift,
       iban: formData.iban,
     };
+  };
+
+  // Calculate VAT breakdown by rate from items (per-item VAT system)
+  const calculateVATBreakdown = () => {
+    const vatByRate = {};
+    let totalNet = 0;
+    
+    formData.items.forEach(item => {
+      const quantity = parseFloat(item.itemQuantity) || 0;
+      const grossPrice = parseFloat(item.itemPrice) || 0;
+      const taxRate = parseFloat(item.itemTaxRate) || 0;
+      
+      const lineGross = quantity * grossPrice;
+      totalNet += lineGross;
+      
+      // Calculate VAT from gross price: VAT = gross × (rate / (100 + rate))
+      if (taxRate > 0) {
+        const itemVatAmount = lineGross * (taxRate / (100 + taxRate));
+        
+        if (!vatByRate[taxRate]) {
+          vatByRate[taxRate] = 0;
+        }
+        vatByRate[taxRate] += itemVatAmount;
+      }
+    });
+    
+    return { vatByRate, totalNet };
   };
 
   if (loading && currencies.length === 0) {
@@ -1620,30 +1654,43 @@ ${formData.billFrom}`);
                       alignItems: "center",
                     }}
                   >
-                    <span style={{ fontWeight: "bold" }}>Subtotal:</span>
+                    <span style={{ fontWeight: "bold" }}>Subtotal (excl. VAT):</span>
                     <span>
                       {formData.currency}
-                      {formData.subTotal}
+                      {(() => {
+                        const { totalNet } = calculateVATBreakdown();
+                        const { vatByRate } = calculateVATBreakdown();
+                        const totalVAT = Object.values(vatByRate).reduce((sum, vat) => sum + vat, 0);
+                        const netAmount = totalNet - totalVAT;
+                        return netAmount.toFixed(2);
+                      })()}
                     </span>
                   </Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      mt: 2,
-                    }}
-                  >
-                    <span style={{ fontWeight: "bold" }}>Discount:</span>
-                    <span>
-                      <span style={{ fontSize: "small" }}>
-                        ({formData.discountRate || 0}%)
-                      </span>
-                      {formData.currency}
-                      {formData.discountAmount || 0}
-                    </span>
-                  </Box>
-                  {parseFloat(formData.taxRate) > 0 && (
+                  
+                  {/* Display VAT breakdown by rate */}
+                  {(() => {
+                    const { vatByRate } = calculateVATBreakdown();
+                    return Object.keys(vatByRate).length > 0 && Object.keys(vatByRate).map(rate => (
+                      <Box
+                        key={rate}
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          mt: 2,
+                        }}
+                      >
+                        <span style={{ fontWeight: "bold" }}>VAT ({rate}%):</span>
+                        <span>
+                          {formData.currency}
+                          {vatByRate[rate].toFixed(2)}
+                        </span>
+                      </Box>
+                    ));
+                  })()}
+                  
+                  {/* Only show discount if it's greater than 0 */}
+                  {parseFloat(formData.discountRate) > 0 && (
                     <Box
                       sx={{
                         display: "flex",
@@ -1652,16 +1699,17 @@ ${formData.billFrom}`);
                         mt: 2,
                       }}
                     >
-                      <span style={{ fontWeight: "bold" }}>Tax:</span>
+                      <span style={{ fontWeight: "bold" }}>Discount:</span>
                       <span>
                         <span style={{ fontSize: "small" }}>
-                          ({formData.taxRate || 0}%)
+                          ({formData.discountRate || 0}%)
                         </span>
                         {formData.currency}
-                        {formData.taxAmount || 0}
+                        {formData.discountAmount || 0}
                       </span>
                     </Box>
                   )}
+                  
                   <Box sx={{ my: 2 }}>
                     <hr />
                   </Box>
@@ -1674,7 +1722,7 @@ ${formData.billFrom}`);
                       fontWeight: "bold",
                     }}
                   >
-                    <span>Total:</span>
+                    <span>Total (incl. VAT):</span>
                     <span>
                       {formData.currency}
                       {formData.total || 0}

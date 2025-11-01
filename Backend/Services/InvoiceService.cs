@@ -282,7 +282,8 @@ namespace InvoicingBackend.Services
                 invoice.TemplateId = resolvedTemplateId.Value;
             }
 
-            invoice.InvoiceNumber = dto.InvoiceNumber;
+            // Don't update InvoiceNumber - it should remain unchanged after creation
+            // invoice.InvoiceNumber = dto.InvoiceNumber;
             invoice.DateOfIssue = dto.DateOfIssue.Kind == DateTimeKind.Utc ? dto.DateOfIssue : DateTime.SpecifyKind(dto.DateOfIssue, DateTimeKind.Utc);
             invoice.DueDate = dto.DueDate.Kind == DateTimeKind.Utc ? dto.DueDate : DateTime.SpecifyKind(dto.DueDate, DateTimeKind.Utc);
             invoice.BillTo = dto.BillTo;

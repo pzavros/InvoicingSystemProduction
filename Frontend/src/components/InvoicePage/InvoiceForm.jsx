@@ -144,6 +144,7 @@ const InvoiceForm = () => {
         itemName: "",
         itemPrice: "1.00",
         itemQuantity: 1,
+        itemTaxRate: 0,
       },
     ],
     statusId: 1,
@@ -400,7 +401,7 @@ const InvoiceForm = () => {
 
   useEffect(() => {
     handleCalculateTotal();
-  }, [formData.items, formData.taxRate, formData.discountRate]);
+  }, [formData.items, formData.discountRate]);
 
   useEffect(() => {
     const loadTemplateForForm = async () => {
@@ -484,6 +485,7 @@ const InvoiceForm = () => {
         itemDescription: item.description,
         itemPrice: (item.unitPrice !== undefined ? parseFloat(item.unitPrice).toFixed(2) : "0.00"),
         itemQuantity: item.quantity || 1,
+        itemTaxRate: (item.taxRate !== null && item.taxRate !== undefined) ? parseFloat(item.taxRate) : 0, // Per-item VAT rate
         productId: item.productId || null, // Preserve productId for stock management
         isCustomItem: item.isCustomItem || false
       })) || [
@@ -492,6 +494,7 @@ const InvoiceForm = () => {
           itemName: "",
           itemPrice: "1.00",
           itemQuantity: 1,
+          itemTaxRate: 0,
         },
       ],
       statusId: currentStatus.statusId,
@@ -515,6 +518,7 @@ const InvoiceForm = () => {
       itemName: "",
       itemPrice: "1.00",
       itemQuantity: 1,
+      itemTaxRate: 0,
     };
     setFormData({
       ...formData,
@@ -550,29 +554,52 @@ const InvoiceForm = () => {
 
   const handleCalculateTotal = () => {
     setFormData((prevFormData) => {
-      let subTotal = 0;
+      let totalGross = 0;
+      let totalNet = 0;
+      const vatByRate = {}; // Object to group VAT by rate
+      
       prevFormData.items.forEach((item) => {
-        const itemPrice = parseFloat(String(item.itemPrice).replace(/[^\d.-]/g, '')) || 0;
+        const grossPrice = parseFloat(String(item.itemPrice).replace(/[^\d.-]/g, '')) || 0;
         const itemQuantity = parseInt(String(item.itemQuantity).replace(/[^\d.-]/g, '')) || 0;
-        subTotal += itemPrice * itemQuantity;
+        const itemTaxRate = parseFloat(String(item.itemTaxRate).replace(/[^\d.-]/g, '')) || 0;
+        
+        // Line total (gross) - price already includes VAT
+        const lineGross = grossPrice * itemQuantity;
+        totalGross += lineGross;
+        
+        // Calculate VAT amount from gross price
+        // VAT = gross × (taxRate / (100 + taxRate))
+        const itemVatAmount = itemTaxRate > 0 
+          ? lineGross * (itemTaxRate / (100 + itemTaxRate))
+          : 0;
+        
+        // Net amount = Gross - VAT
+        const lineNet = lineGross - itemVatAmount;
+        totalNet += lineNet;
+        
+        // Group VAT by rate
+        if (itemTaxRate > 0) {
+          if (!vatByRate[itemTaxRate]) {
+            vatByRate[itemTaxRate] = 0;
+          }
+          vatByRate[itemTaxRate] += itemVatAmount;
+        }
       });
       
-      const taxRate = parseFloat(prevFormData.taxRate) || 0;
+      // Calculate total VAT amount
+      const totalVatAmount = Object.values(vatByRate).reduce((sum, amount) => sum + amount, 0);
+      
       const discountRate = parseFloat(prevFormData.discountRate) || 0;
+      const discountAmount = (totalNet * (discountRate / 100)).toFixed(2);
       
-      const taxAmount = (subTotal * (taxRate / 100)).toFixed(2);
-      const discountAmount = (subTotal * (discountRate / 100)).toFixed(2);
-      
-      const total = (
-        subTotal -
-        parseFloat(discountAmount) +
-        parseFloat(taxAmount)
-      ).toFixed(2);
+      // Total = Net - Discount + VAT = (totalNet - discount) + totalVat = totalGross - discount
+      const total = (totalGross - parseFloat(discountAmount)).toFixed(2);
 
       return {
         ...prevFormData,
-        subTotal: subTotal.toFixed(2),
-        taxAmount,
+        subTotal: totalNet.toFixed(2), // Net amount (excluding VAT)
+        taxAmount: totalVatAmount.toFixed(2),
+        vatBreakdown: vatByRate, // Store VAT breakdown for display
         discountAmount,
         total,
       };
@@ -757,7 +784,7 @@ const InvoiceForm = () => {
       return new Date().toISOString(); 
     };
 
-    return {
+    const payload = {
       dateOfIssue: ensureValidDate(formData.dateOfIssue),
       dueDate: ensureValidDate(formData.dueDate || formData.dateOfIssue),
       billTo: formData.billTo,
@@ -795,9 +822,12 @@ const InvoiceForm = () => {
         Title: item.itemName || "",
         Description: item.itemDescription,
         Quantity: parseInt(item.itemQuantity) || 1,
-        UnitPrice: parseFloat(item.itemPrice) || 0
+        UnitPrice: parseFloat(item.itemPrice) || 0,
+        TaxRate: item.itemTaxRate !== undefined && item.itemTaxRate !== null && item.itemTaxRate !== "" ? parseFloat(item.itemTaxRate) : 0
       }))
     };
+    
+    return payload;
   };
   
 
@@ -1081,62 +1111,7 @@ const InvoiceForm = () => {
                 </Select>
               </FormControl>
 
-              {/* 2. VAT Rate Dropdown */}
-              <FormControl sx={{ 
-                minWidth: '180px', 
-                flexGrow: 1, 
-                maxWidth: { xs: '100%', sm: '220px' },
-                '& .MuiOutlinedInput-root': {
-                  background: 'rgba(255, 255, 255, 0.15)',
-                  backdropFilter: 'blur(10px)',
-                  borderRadius: '12px',
-                  '&:hover': {
-                    background: 'rgba(255, 255, 255, 0.25)'
-                  }
-                }
-              }}>
-                <InputLabel 
-                  id="tax-rate-select-label" 
-                  sx={{ 
-                    fontSize: "0.9rem",
-                    fontWeight: 600,
-                    color: '#4a5568',
-                    '&.Mui-focused': { color: '#667eea' }
-                  }}
-                >
-                  🧾 VAT Rate
-                </InputLabel>
-                <Select
-                  labelId="tax-rate-select-label"
-                  label="🧾 VAT Rate"
-                  name="taxRate"
-                  value={formData.taxRate}
-                  onChange={(e) => editField(e.target.name, e.target.value)}
-                  size="medium"
-                  sx={{
-                    '.MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'rgba(255, 255, 255, 0.3)',
-                      borderWidth: '2px'
-                    },
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'rgba(102, 126, 234, 0.5)'
-                    },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#667eea',
-                      borderWidth: '2px'
-                    },
-                    '& .MuiSelect-select': {
-                      color: '#2d3748',
-                      fontWeight: 600
-                    }
-                  }}
-                >
-                  <MenuItem value={0}>0%</MenuItem>
-                  <MenuItem value={19}>19%</MenuItem>
-                </Select>
-              </FormControl>
-
-              {/* 3. Discount Rate Field */}
+              {/* 2. Discount Rate Field */}
               <TextField
                 name="discountRate"
                 type="number"
@@ -1185,7 +1160,7 @@ const InvoiceForm = () => {
                 }}
               />
 
-              {/* 4. Status Dropdown - Only in Edit Mode */}
+              {/* 3. Status Dropdown - Only in Edit Mode */}
               {isEdit && statuses.length > 0 && (
                 <FormControl sx={{ 
                   minWidth: '180px', 
@@ -1853,28 +1828,14 @@ const InvoiceForm = () => {
                           mb: 2
                         }}
                       >
-                        <Typography sx={{ fontWeight: 600, color: '#4a5568' }}>Subtotal:</Typography>
+                        <Typography sx={{ fontWeight: 600, color: '#4a5568' }}>Subtotal (excl. VAT):</Typography>
                         <Typography sx={{ fontWeight: 600, color: '#2d3748' }}>
                           {formData.currency}{formData.subTotal}
                         </Typography>
                       </Box>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          mb: 2,
-                        }}
-                      >
-                        <Typography sx={{ fontWeight: 600, color: '#4a5568' }}>Discount:</Typography>
-                        <Typography sx={{ fontWeight: 600, color: '#2d3748' }}>
-                          <Typography component="span" sx={{ fontSize: "0.85rem", color: '#718096', mr: 1 }}>
-                            ({formData.discountRate || 0}%)
-                          </Typography>
-                          {formData.currency}{formData.discountAmount || 0}
-                        </Typography>
-                      </Box>
-                      {parseFloat(formData.taxRate) > 0 && (
+                      
+                      {/* Only show discount if it's greater than 0 */}
+                      {parseFloat(formData.discountRate) > 0 && (
                         <Box
                           sx={{
                             display: "flex",
@@ -1883,14 +1844,38 @@ const InvoiceForm = () => {
                             mb: 2,
                           }}
                         >
-                          <Typography sx={{ fontWeight: 600, color: '#4a5568' }}>Tax:</Typography>
+                          <Typography sx={{ fontWeight: 600, color: '#4a5568' }}>Discount:</Typography>
                           <Typography sx={{ fontWeight: 600, color: '#2d3748' }}>
                             <Typography component="span" sx={{ fontSize: "0.85rem", color: '#718096', mr: 1 }}>
-                              ({formData.taxRate || 0}%)
+                              ({formData.discountRate || 0}%)
                             </Typography>
-                            {formData.currency}{formData.taxAmount || 0}
+                            {formData.currency}{formData.discountAmount || 0}
                           </Typography>
                         </Box>
+                      )}
+                      
+                      {/* VAT Breakdown - Show each VAT rate separately */}
+                      {formData.vatBreakdown && Object.keys(formData.vatBreakdown).length > 0 && (
+                        <>
+                          {Object.entries(formData.vatBreakdown).map(([rate, amount]) => (
+                            <Box
+                              key={rate}
+                              sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                mb: 2,
+                              }}
+                            >
+                              <Typography sx={{ fontWeight: 600, color: '#4a5568' }}>
+                                VAT ({rate}%):
+                              </Typography>
+                              <Typography sx={{ fontWeight: 600, color: '#2d3748' }}>
+                                {formData.currency}{amount.toFixed(2)}
+                              </Typography>
+                            </Box>
+                          ))}
+                        </>
                       )}
                       <Divider sx={{ my: 2, borderColor: "rgba(102, 126, 234, 0.2)" }} />
                       <Box
@@ -1902,7 +1887,7 @@ const InvoiceForm = () => {
                           fontWeight: "bold",
                         }}
                       >
-                        <Typography sx={{ fontSize: "1.2rem", fontWeight: 700, color: '#2d3748' }}>Total:</Typography>
+                        <Typography sx={{ fontSize: "1.2rem", fontWeight: 700, color: '#2d3748' }}>Total (incl. VAT):</Typography>
                         <Typography sx={{ fontSize: "1.2rem", fontWeight: 700, color: '#667eea' }}>
                           {formData.currency}{formData.total || 0}
                         </Typography>

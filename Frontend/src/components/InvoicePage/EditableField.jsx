@@ -38,8 +38,10 @@ const StyledFormControl = styled(Form.Control)({
   // Add styling for number inputs specifically
   '&[type="number"]': {
     appearance: 'textfield',
+    MozAppearance: 'textfield',
     '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button': {
-      appearance: 'auto'
+      WebkitAppearance: 'none',
+      margin: 0,
     }
   },
   // Style for required fields with empty values - only show after user interaction

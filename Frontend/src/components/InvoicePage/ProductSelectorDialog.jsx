@@ -103,6 +103,7 @@ const ProductSelectorDialog = ({
         itemDescription: product.description || '',
         itemPrice: (product.unitPrice || 0).toFixed(2),
         itemQuantity: 1,
+        itemTaxRate: product.taxRate || 0,
         productId: product.id,
         isCustomItem: false
       };
@@ -118,6 +119,7 @@ const ProductSelectorDialog = ({
       itemDescription: product.description || '',
       itemPrice: (product.unitPrice || 0).toFixed(2),
       itemQuantity: 1,
+      itemTaxRate: product.taxRate || 0,
       productId: product.id,
       isCustomItem: false
     }));
