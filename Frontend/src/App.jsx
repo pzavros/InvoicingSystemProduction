@@ -52,6 +52,7 @@ function MainContent() {
       sx={{
         flexGrow: 1,
         p: 0,
+        pl: shouldOffsetContent ? 2 : 0, // Add left padding to match right side
         ml: shouldOffsetContent ? `${drawerWidth}px` : 0,
         mt: isMobile ? '64px' : 0, // Top margin for mobile AppBar
         width: shouldOffsetContent ? `calc(100vw - ${drawerWidth}px)` : '100vw',
