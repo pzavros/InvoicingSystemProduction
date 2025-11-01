@@ -30,7 +30,7 @@ api.interceptors.response.use(
       localStorage.removeItem('authToken');
       localStorage.removeItem('user');
       localStorage.removeItem('hadSubscriptionAccess'); // Clear subscription access flag
-      window.location.href = '/login';
+      window.location.href = '/app/login';
     }
     return Promise.reject(error);
   }

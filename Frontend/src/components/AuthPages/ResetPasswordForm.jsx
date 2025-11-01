@@ -150,7 +150,7 @@ const ResetPasswordForm = () => {
                     fullWidth
                     variant="contained"
                     size="large"
-                    onClick={() => navigate('/login')}
+                    onClick={() => navigate('/app/login')}
                     sx={{
                       py: 1.5,
                       borderRadius: 2,

@@ -403,7 +403,7 @@ namespace InvoicingBackend.Services
             await _context.SaveChangesAsync();
 
             // Send welcome email after verification
-            var loginUrl = $"{GetBaseUrl()}/login";
+            var loginUrl = $"{GetBaseUrl()}/app/login";
             await _emailService.SendWelcomeEmailAsync(
                 user.Email,
                 $"{user.FirstName} {user.LastName}",

@@ -138,7 +138,7 @@ const ForgotPasswordForm = () => {
                   <Button
                     fullWidth
                     variant="text"
-                    onClick={() => navigate('/login')}
+                    onClick={() => navigate('/app/login')}
                     startIcon={<ArrowBackIcon />}
                     sx={{ color: '#667eea' }}
                   >
@@ -240,7 +240,7 @@ const ForgotPasswordForm = () => {
                     <Button
                       fullWidth
                       variant="text"
-                      onClick={() => navigate('/login')}
+                      onClick={() => navigate('/app/login')}
                       startIcon={<ArrowBackIcon />}
                       sx={{
                         color: '#667eea',
