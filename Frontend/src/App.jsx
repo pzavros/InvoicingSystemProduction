@@ -78,7 +78,7 @@ function MainContent() {
         <Route path="/invoice" element={<ProtectedRoute><SubscriptionGuard><InvoicePage /></SubscriptionGuard></ProtectedRoute>} />
         <Route path="/invoices" element={<ProtectedRoute><SubscriptionGuard><Homepage /></SubscriptionGuard></ProtectedRoute>} />
         <Route path="/invoices/create" element={<ProtectedRoute><SubscriptionGuard><InvoicePage /></SubscriptionGuard></ProtectedRoute>} />
-        <Route path="/invoices/edit/:id" element={<ProtectedRoute><SubscriptionGuard><InvoiceViewPage /></SubscriptionGuard></ProtectedRoute>} />
+        <Route path="/invoices/edit/:id" element={<ProtectedRoute><SubscriptionGuard><InvoicePage /></SubscriptionGuard></ProtectedRoute>} />
         <Route path="/invoices/view/:id" element={<ProtectedRoute><SubscriptionGuard><InvoiceViewPage /></SubscriptionGuard></ProtectedRoute>} />
         <Route path="/dashboard" element={<ProtectedRoute><SubscriptionGuard><DashboardPage /></SubscriptionGuard></ProtectedRoute>} />
         <Route path="/products" element={<ProtectedRoute><SubscriptionGuard><ProductCatalogPage /></SubscriptionGuard></ProtectedRoute>} />

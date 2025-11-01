@@ -524,11 +524,27 @@ const InvoiceForm = () => {
   };
 
   const handleProductAdd = (product) => {
-    // Add product from catalog to invoice items
-    setFormData(prevFormData => ({
-      ...prevFormData,
-      items: [...prevFormData.items, product],
-    }));
+    // Check if there's an empty item first
+    setFormData(prevFormData => {
+      const emptyItemIndex = prevFormData.items.findIndex(
+        item => !item.itemName || item.itemName.trim() === ''
+      );
+
+      let updatedItems;
+      if (emptyItemIndex !== -1) {
+        // Replace the first empty item with the selected product
+        updatedItems = [...prevFormData.items];
+        updatedItems[emptyItemIndex] = product;
+      } else {
+        // No empty items, add as new item
+        updatedItems = [...prevFormData.items, product];
+      }
+
+      return {
+        ...prevFormData,
+        items: updatedItems,
+      };
+    });
     handleCalculateTotal();
   };
 
@@ -613,11 +629,47 @@ const InvoiceForm = () => {
     }
   };
 
+  const validateInvoiceItems = () => {
+    // Check if invoice has at least one item with a valid name
+    const hasValidItems = formData.items && formData.items.length > 0 && 
+      formData.items.some(item => item.itemName && item.itemName.trim() !== '');
+    
+    return hasValidItems;
+  };
+
   const handleStatusChange = async (newStatusId) => {
     if (!isEdit || !params.id) return;
 
     const selectedStatus = statuses.find(s => s.statusId === newStatusId);
     if (!selectedStatus) return;
+
+    // Check if trying to change from Draft (statusId: 1) to another status
+    const isDraftStatus = formData.statusId === 1;
+    const isChangingFromDraft = isDraftStatus && newStatusId !== 1;
+
+    // Validate items when changing from Draft to another status
+    if (isChangingFromDraft) {
+      const hasValidItems = validateInvoiceItems();
+      
+      if (!hasValidItems) {
+        setNotification({
+          open: true,
+          message: "Cannot change status from Draft. Please add at least one item with a valid name before changing the invoice status.",
+          severity: "error",
+        });
+        return;
+      }
+
+      // Check if all required fields are filled
+      if (!formData.billTo || !formData.billToEmail || !formData.dateOfIssue) {
+        setNotification({
+          open: true,
+          message: "Cannot change status from Draft. Please fill in all required fields (Bill To, Email, and Due Date) before changing the invoice status.",
+          severity: "error",
+        });
+        return;
+      }
+    }
 
     setLoading(true);
     try {
@@ -690,8 +742,16 @@ const InvoiceForm = () => {
 
   const prepareInvoiceDataForAPI = () => {
     const ensureValidDate = (dateString) => {
-      const date = new Date(dateString);
-      if (dateString && !isNaN(date.getTime())) {
+      if (!dateString) {
+        return new Date().toISOString();
+      }
+      
+      // Create date from the input string (which is in YYYY-MM-DD format from date input)
+      // Add 'T12:00:00Z' to make it noon UTC to avoid timezone issues
+      const dateWithTime = dateString.includes('T') ? dateString : `${dateString}T12:00:00Z`;
+      const date = new Date(dateWithTime);
+      
+      if (!isNaN(date.getTime())) {
         return date.toISOString();
       } 
       return new Date().toISOString(); 
@@ -747,6 +807,31 @@ const InvoiceForm = () => {
       const canCreate = checkLimit('invoice');
       if (!canCreate) {
         // Limit modal will be shown automatically by useLimit hook
+        return;
+      }
+    }
+
+    // Validate items if status is not Draft
+    const isDraftStatus = formData.statusId === 1;
+    if (!isDraftStatus) {
+      const hasValidItems = validateInvoiceItems();
+      
+      if (!hasValidItems) {
+        setNotification({
+          open: true,
+          message: "Cannot save invoice with a non-Draft status. Please add at least one item with a valid name or change the status to Draft.",
+          severity: "error",
+        });
+        return;
+      }
+
+      // Check if all required fields are filled
+      if (!formData.billTo || !formData.billToEmail || !formData.dateOfIssue) {
+        setNotification({
+          open: true,
+          message: "Cannot save invoice with a non-Draft status. Please fill in all required fields (Bill To, Email, and Due Date) or change the status to Draft.",
+          severity: "error",
+        });
         return;
       }
     }
@@ -939,8 +1024,9 @@ const InvoiceForm = () => {
               background: 'rgba(255, 255, 255, 0.1)',
               borderRadius: '0 0 20px 20px'
             }}>
+              {/* 1. Currency Dropdown */}
               <FormControl sx={{ 
-                minWidth: '200px', 
+                minWidth: '180px', 
                 flexGrow: 1, 
                 maxWidth: { xs: '100%', sm: '220px' },
                 '& .MuiOutlinedInput-root': {
@@ -993,10 +1079,118 @@ const InvoiceForm = () => {
                     </MenuItem>
                   ))}
                 </Select>
-              </FormControl>              {isEdit && statuses.length > 0 && (
+              </FormControl>
+
+              {/* 2. VAT Rate Dropdown */}
+              <FormControl sx={{ 
+                minWidth: '180px', 
+                flexGrow: 1, 
+                maxWidth: { xs: '100%', sm: '220px' },
+                '& .MuiOutlinedInput-root': {
+                  background: 'rgba(255, 255, 255, 0.15)',
+                  backdropFilter: 'blur(10px)',
+                  borderRadius: '12px',
+                  '&:hover': {
+                    background: 'rgba(255, 255, 255, 0.25)'
+                  }
+                }
+              }}>
+                <InputLabel 
+                  id="tax-rate-select-label" 
+                  sx={{ 
+                    fontSize: "0.9rem",
+                    fontWeight: 600,
+                    color: '#4a5568',
+                    '&.Mui-focused': { color: '#667eea' }
+                  }}
+                >
+                  🧾 VAT Rate
+                </InputLabel>
+                <Select
+                  labelId="tax-rate-select-label"
+                  label="🧾 VAT Rate"
+                  name="taxRate"
+                  value={formData.taxRate}
+                  onChange={(e) => editField(e.target.name, e.target.value)}
+                  size="medium"
+                  sx={{
+                    '.MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(255, 255, 255, 0.3)',
+                      borderWidth: '2px'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(102, 126, 234, 0.5)'
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#667eea',
+                      borderWidth: '2px'
+                    },
+                    '& .MuiSelect-select': {
+                      color: '#2d3748',
+                      fontWeight: 600
+                    }
+                  }}
+                >
+                  <MenuItem value={0}>0%</MenuItem>
+                  <MenuItem value={19}>19%</MenuItem>
+                </Select>
+              </FormControl>
+
+              {/* 3. Discount Rate Field */}
+              <TextField
+                name="discountRate"
+                type="number"
+                value={formData.discountRate}
+                onChange={(e) => editField(e.target.name, e.target.value)}
+                placeholder="0.0"
+                label="💸 Discount Rate"
+                variant="outlined"
+                size="medium"
+                sx={{
+                  minWidth: '180px',
+                  flexGrow: 1,
+                  maxWidth: { xs: '100%', sm: '220px' },
+                  '& .MuiOutlinedInput-root': {
+                    background: 'rgba(255, 255, 255, 0.15)',
+                    backdropFilter: 'blur(10px)',
+                    borderRadius: '12px',
+                    '&:hover': {
+                      background: 'rgba(255, 255, 255, 0.25)'
+                    }
+                  },
+                  '.MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                    borderWidth: '2px'
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(102, 126, 234, 0.5)'
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#667eea',
+                    borderWidth: '2px'
+                  },
+                  '& .MuiInputLabel-root': {
+                    fontSize: "0.9rem",
+                    color: '#4a5568',
+                    fontWeight: 600,
+                    '&.Mui-focused': { color: '#667eea' }
+                  },
+                  '& .MuiInputBase-input': {
+                    color: '#2d3748',
+                    fontWeight: 500
+                  }
+                }}
+                InputProps={{
+                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                }}
+              />
+
+              {/* 4. Status Dropdown - Only in Edit Mode */}
+              {isEdit && statuses.length > 0 && (
                 <FormControl sx={{ 
-                  minWidth: 150, 
-                  maxWidth: { xs: '100%', sm: 200 },
+                  minWidth: '180px', 
+                  flexGrow: 1, 
+                  maxWidth: { xs: '100%', sm: '220px' },
                   '& .MuiOutlinedInput-root': {
                     background: 'rgba(255, 255, 255, 0.15)',
                     backdropFilter: 'blur(10px)',
@@ -1005,8 +1199,9 @@ const InvoiceForm = () => {
                       background: 'rgba(255, 255, 255, 0.25)'
                     }
                   }
-                }} size="small">
+                }}>
                   <InputLabel id="status-select-label" sx={{ 
+                    fontSize: "0.9rem",
                     color: '#4a5568',
                     fontWeight: 600,
                     '&.Mui-focused': { color: '#667eea' }
@@ -1019,6 +1214,7 @@ const InvoiceForm = () => {
                     value={formData.statusId || ''}
                     onChange={(event) => handleStatusChange(event.target.value)}
                     disabled={loading}
+                    size="medium"
                     sx={{
                       '.MuiOutlinedInput-notchedOutline': { 
                         borderColor: 'rgba(255, 255, 255, 0.3)',
@@ -1044,98 +1240,7 @@ const InvoiceForm = () => {
                     ))}
                   </Select>
                 </FormControl>
-              )}              <FormControl sx={{ 
-                minWidth: '180px', 
-                flexGrow: 1, 
-                maxWidth: { xs: '100%', sm: '220px' },
-                '& .MuiOutlinedInput-root': {
-                  background: 'rgba(255, 255, 255, 0.2)',
-                  backdropFilter: 'blur(10px)',
-                  borderRadius: '12px'
-                },
-                '.MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(255, 255, 255, 0.3)',
-                  borderWidth: '2px'
-                },
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(102, 126, 234, 0.5)'
-                },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#667eea',
-                  borderWidth: '2px'
-                }
-              }}>
-                <InputLabel 
-                  id="tax-rate-select-label" 
-                  sx={{ 
-                    fontSize: "0.9rem",
-                    fontWeight: 600,
-                    color: '#4a5568',
-                    '&.Mui-focused': { color: '#667eea' }
-                  }}
-                >
-                  🧾 VAT Rate
-                </InputLabel>
-                <Select
-                  labelId="tax-rate-select-label"
-                  label="🧾 VAT Rate"
-                  name="taxRate"
-                  value={formData.taxRate}
-                  onChange={(e) => editField(e.target.name, e.target.value)}
-                  size="medium"
-                  sx={{
-                    '& .MuiSelect-select': {
-                      color: '#2d3748',
-                      fontWeight: 600
-                    }
-                  }}
-                >
-                  <MenuItem value={0}>0%</MenuItem>
-                  <MenuItem value={19}>19%</MenuItem>
-                </Select>
-              </FormControl><TextField
-                name="discountRate"
-                type="number"
-                value={formData.discountRate}
-                onChange={(e) => editField(e.target.name, e.target.value)}
-                placeholder="0.0"
-                label="💸 Discount Rate"
-                variant="outlined"
-                size="small"
-                sx={{
-                  minWidth: '180px',
-                  flexGrow: 1,
-                  maxWidth: { xs: '100%', sm: '220px' },
-                  '& .MuiOutlinedInput-root': {
-                    background: 'rgba(255, 255, 255, 0.15)',
-                    backdropFilter: 'blur(10px)',
-                    borderRadius: '12px'
-                  },
-                  '.MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'rgba(255, 255, 255, 0.3)',
-                    borderWidth: '2px'
-                  },
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'rgba(102, 126, 234, 0.5)'
-                  },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#667eea',
-                    borderWidth: '2px'
-                  },
-                  '& .MuiInputLabel-root': {
-                    color: '#4a5568',
-                    fontWeight: 600,
-                    '&.Mui-focused': { color: '#667eea' }
-                  },
-                  '& .MuiInputBase-input': {
-                    color: '#2d3748',
-                    fontWeight: 500
-                  }
-                }}
-                InputProps={{
-                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                }}
-              />
+              )}
             </Box>
           </Card>
         </Box>        <Box sx={{ 

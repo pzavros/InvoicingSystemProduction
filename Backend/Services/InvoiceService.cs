@@ -195,8 +195,8 @@ namespace InvoicingBackend.Services
             var invoice = new Invoice
             {
                 InvoiceNumber = nextInvoiceNumber,
-                DateOfIssue = dto.DateOfIssue,
-                DueDate = dto.DueDate,
+                DateOfIssue = dto.DateOfIssue.Kind == DateTimeKind.Utc ? dto.DateOfIssue : DateTime.SpecifyKind(dto.DateOfIssue, DateTimeKind.Utc),
+                DueDate = dto.DueDate.Kind == DateTimeKind.Utc ? dto.DueDate : DateTime.SpecifyKind(dto.DueDate, DateTimeKind.Utc),
                 BillTo = dto.BillTo,
                 BillToEmail = dto.BillToEmail,
                 BillToAddress = dto.BillToAddress,
@@ -249,7 +249,14 @@ namespace InvoicingBackend.Services
                     Quantity = itemDto.Quantity,
                     UnitPrice = itemDto.UnitPrice,
                     TaxRate = itemDto.TaxRate,
-                    IsTaxable = itemDto.IsTaxable
+                    IsTaxable = itemDto.IsTaxable,
+                    DateEntered = DateTime.UtcNow,
+                    EnteredBy = "System",
+                    UserId = userId,
+                    DateModified = null,
+                    DateDeleted = null,
+                    ModifiedBy = null,
+                    DeletedBy = null
                 });
             }
 
@@ -276,8 +283,8 @@ namespace InvoicingBackend.Services
             }
 
             invoice.InvoiceNumber = dto.InvoiceNumber;
-            invoice.DateOfIssue = dto.DateOfIssue;
-            invoice.DueDate = dto.DueDate;
+            invoice.DateOfIssue = dto.DateOfIssue.Kind == DateTimeKind.Utc ? dto.DateOfIssue : DateTime.SpecifyKind(dto.DateOfIssue, DateTimeKind.Utc);
+            invoice.DueDate = dto.DueDate.Kind == DateTimeKind.Utc ? dto.DueDate : DateTime.SpecifyKind(dto.DueDate, DateTimeKind.Utc);
             invoice.BillTo = dto.BillTo;
             invoice.BillToEmail = dto.BillToEmail;
             invoice.BillToAddress = dto.BillToAddress;
@@ -315,7 +322,7 @@ namespace InvoicingBackend.Services
             invoice.Items.Clear();
             foreach (var itemDto in dto.Items ?? Enumerable.Empty<InvoiceItemDto>())
             {
-                invoice.Items.Add(new InvoiceItem
+                var newItem = new InvoiceItem
                 {
                     ProductId = itemDto.ProductId,
                     Title = itemDto.Title,
@@ -323,8 +330,16 @@ namespace InvoicingBackend.Services
                     Quantity = itemDto.Quantity,
                     UnitPrice = itemDto.UnitPrice,
                     TaxRate = itemDto.TaxRate,
-                    IsTaxable = itemDto.IsTaxable
-                });
+                    IsTaxable = itemDto.IsTaxable,
+                    DateEntered = DateTime.UtcNow,
+                    EnteredBy = "System",
+                    UserId = userId,
+                    DateModified = null,
+                    DateDeleted = null,
+                    ModifiedBy = null,
+                    DeletedBy = null
+                };
+                invoice.Items.Add(newItem);
             }
 
             // Process stock deduction for new items

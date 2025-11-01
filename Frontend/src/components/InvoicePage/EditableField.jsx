@@ -42,11 +42,11 @@ const StyledFormControl = styled(Form.Control)({
       appearance: 'auto'
     }
   },
-  // Style for required fields with empty values
-  '&:required:invalid': {
+  // Style for required fields with empty values - only show after user interaction
+  '&.touched:required:invalid': {
     borderColor: 'var(--color-error)', // Use error color for border
   },
-  '&:required:focus:invalid': {
+  '&.touched:required:focus:invalid': {
     borderColor: 'var(--color-error)', // Keep error color on focus if still invalid
     boxShadow: '0 0 0 0.2rem rgba(255, 0, 0, 0.25)', // Optional: add a red shadow for invalid focused required fields
   }
@@ -72,6 +72,8 @@ const ReadOnlyField = styled(Typography)(({ theme }) => ({
 }));
 
 const EditableField = (props) => {
+  const [touched, setTouched] = React.useState(false);
+  
   // Convert any potential NaN values to empty strings or default values
   // Ensure text fields retain their string values and only handle NaN conversion for numeric fields
   const value = props.cellData.type === 'number' 
@@ -110,7 +112,7 @@ const EditableField = (props) => {
         </InputGroup.Text>
       )}
       <StyledFormControl
-        className={props.cellData.textAlign}
+        className={`${props.cellData.textAlign || ''} ${touched ? 'touched' : ''}`}
         type={props.cellData.name === 'itemQuantity' || props.cellData.name === 'itemPrice' ? 'number' : props.cellData.type}
         placeholder={props.cellData.placeholder}
         min={props.cellData.min}
@@ -121,6 +123,8 @@ const EditableField = (props) => {
         precision={props.cellData.precision}
         aria-label={props.cellData.name}
         onChange={props.onItemizedItemEdit}
+        onBlur={() => setTouched(true)}
+        onFocus={() => setTouched(true)}
         disabled={props.readOnly}
         required={props.cellData.required}
       />
