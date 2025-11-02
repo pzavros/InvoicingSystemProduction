@@ -164,14 +164,38 @@ const InvoiceModal = (props) => {
       case 2: return "TAX INVOICE";
       case 3: return "PROFORMA INVOICE";
       case 4: return "QUOTATION";
+      case 5: return "CASH INVOICE";
       default: return "INVOICE";
+    }
+  };
+
+  // Function to map documentTypeId to template type
+  const getTemplateType = (documentTypeId) => {
+    switch (documentTypeId) {
+      case 1: return "standard";
+      case 2: return "tax";
+      case 3: return "proforma";
+      case 4: return "quote";
+      case 5: return "cash";
+      default: return "standard";
     }
   };
   
   const invoiceTitle = isInvoiceCanceled ? "CANCELED INVOICE" : getDocumentTypeTitle(props.info.documentTypeId);
 
-  const templateTheme = React.useMemo(() => {
+  // Ensure templateConfig has the correct type based on documentTypeId
+  const enhancedTemplateConfig = React.useMemo(() => {
     const config = props.templateConfig || {};
+    const derivedType = getTemplateType(props.info.documentTypeId);
+    
+    return {
+      ...config,
+      type: config.type || derivedType
+    };
+  }, [props.templateConfig, props.info.documentTypeId]);
+
+  const templateTheme = React.useMemo(() => {
+    const config = enhancedTemplateConfig;
     const rawTheme = (config.theme || config.colorTheme?.id || config.colorTheme || '').toString().toLowerCase();
 
     let palette = null;
@@ -253,7 +277,7 @@ const InvoiceModal = (props) => {
       borderRadius,
       sections,
     };
-  }, [props.templateConfig]);
+  }, [enhancedTemplateConfig]);
 
   const {
     colors: templateColors,
@@ -452,7 +476,7 @@ const InvoiceModal = (props) => {
             }}
           >
             <InvoiceTemplatePreview
-              templateConfig={props.templateConfig}
+              templateConfig={enhancedTemplateConfig}
               templateMeta={{
                 ...props.templateMeta,
                 documentTypeName: invoiceTitle

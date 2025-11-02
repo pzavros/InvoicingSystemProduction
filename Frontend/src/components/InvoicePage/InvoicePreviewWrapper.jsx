@@ -26,15 +26,16 @@ const InvoicePreviewWrapper = ({
   };
 
   // Helper function to get document type name
-  function getDocumentTypeName(documentTypeId) {
+  const getDocumentTypeTitle = (documentTypeId) => {
     switch (documentTypeId) {
       case 1: return "Invoice";
       case 2: return "Tax Invoice";
       case 3: return "Proforma Invoice";
       case 4: return "Quotation";
+      case 5: return "Cash Invoice";
       default: return "Invoice";
     }
-  }
+  };
 
   return (
     <InvoiceTemplatePreview

@@ -105,7 +105,7 @@ const InvoiceItem = (props) => {
                   letterSpacing: '0.5px',
                   py: 2.5
                 }}>
-                  📦 ITEM
+                  ITEM
                 </TableCell>
                 <TableCell sx={{ 
                   color: '#2d3748', 
@@ -115,7 +115,7 @@ const InvoiceItem = (props) => {
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
-                  📊 QTY
+                  QTY
                 </TableCell>
                 <TableCell sx={{ 
                   color: '#2d3748', 
@@ -125,7 +125,7 @@ const InvoiceItem = (props) => {
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
-                  💰 PRICE (INCL. VAT)
+                  PRICE (INCL. VAT)
                 </TableCell>
                 <TableCell sx={{ 
                   color: '#2d3748', 
@@ -135,7 +135,7 @@ const InvoiceItem = (props) => {
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
-                  🧾 VAT %
+                  VAT %
                 </TableCell>
                 <TableCell sx={{ 
                   color: '#2d3748', 
@@ -145,7 +145,7 @@ const InvoiceItem = (props) => {
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px'
                 }}>
-                  💵 TOTAL
+                  TOTAL
                 </TableCell>
                 {!readOnly && (
                   <TableCell align="center" sx={{ 
@@ -155,7 +155,7 @@ const InvoiceItem = (props) => {
                     textTransform: 'uppercase',
                     letterSpacing: '0.5px'
                   }}>
-                    ⚡ ACTION
+                    ACTION
                   </TableCell>
                 )}
               </TableRow>
@@ -193,7 +193,7 @@ const InvoiceItem = (props) => {
               }
             }}
           >
-            ➕ Add Custom Item
+            Add Custom Item
           </Button>
           
           <Button 
@@ -220,7 +220,7 @@ const InvoiceItem = (props) => {
               }
             }}
           >
-            📚 Add from Catalog
+            Add from Catalog
           </Button>
         </Box>
       )}
@@ -262,13 +262,15 @@ const ItemCard = (props) => {
   const quantity = parseFloat(itemQuantity);
   const taxRate = parseFloat(itemTaxRate);
   
-  // Line total (gross) = quantity × gross price
-  const itemTotal = (quantity * grossPrice).toFixed(2);
+  // Calculate gross amount first
+  const grossAmount = quantity * grossPrice;
   
-  // Calculate VAT amount from gross price
+  // Extract VAT amount from gross price
   // VAT = gross × (taxRate / (100 + taxRate))
-  const vatAmount = taxRate > 0 ? (quantity * grossPrice * (taxRate / (100 + taxRate))) : 0;
-  const netAmount = (quantity * grossPrice) - vatAmount;
+  const vatAmount = taxRate > 0 ? (grossAmount * (taxRate / (100 + taxRate))) : 0;
+  
+  // Line total = gross amount (which user entered)
+  const itemTotal = grossAmount.toFixed(2);
 
   return (
     <Card 
@@ -306,7 +308,7 @@ const ItemCard = (props) => {
               display: 'block'
             }}
           >
-            📦 Item
+            Item
           </Typography>
           <EditableField
             onItemizedItemEdit={(evt) => onItemizedItemEdit(evt, item.itemId)}
@@ -352,7 +354,7 @@ const ItemCard = (props) => {
                 display: 'block'
               }}
             >
-              📊 Quantity
+              Quantity
             </Typography>
             <EditableField
               onItemizedItemEdit={(evt) => onItemizedItemEdit(evt, item.itemId)}
@@ -381,7 +383,7 @@ const ItemCard = (props) => {
                 display: 'block'
               }}
             >
-              💰 Price (incl. VAT)
+              Price (incl. VAT)
             </Typography>
             <EditableField
               onItemizedItemEdit={(evt) => onItemizedItemEdit(evt, item.itemId)}
@@ -413,7 +415,7 @@ const ItemCard = (props) => {
                 display: 'block'
               }}
             >
-              🧾 VAT %
+              VAT %
             </Typography>
             <EditableField
               onItemizedItemEdit={(evt) => onItemizedItemEdit(evt, item.itemId)}
@@ -511,13 +513,15 @@ const ItemRow = (props) => {
   const quantity = parseFloat(itemQuantity);
   const taxRate = parseFloat(itemTaxRate);
   
-  // Line total (gross) = quantity × gross price
-  const lineTotal = (quantity * grossPrice).toFixed(2);
+  // Calculate gross amount first
+  const grossAmount = quantity * grossPrice;
   
-  // Calculate VAT amount from gross price
+  // Extract VAT amount from gross price
   // VAT = gross × (taxRate / (100 + taxRate))
-  const vatAmount = taxRate > 0 ? (quantity * grossPrice * (taxRate / (100 + taxRate))) : 0;
-  const netAmount = (quantity * grossPrice) - vatAmount;
+  const vatAmount = taxRate > 0 ? (grossAmount * (taxRate / (100 + taxRate))) : 0;
+  
+  // Line total = gross amount (which user entered)
+  const lineTotal = grossAmount.toFixed(2);
 
   return (
     <TableRow sx={{ 

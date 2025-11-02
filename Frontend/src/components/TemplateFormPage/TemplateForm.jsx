@@ -133,7 +133,8 @@ const TemplateForm = () => {
           'Invoice': 'standard',
           'Tax Invoice': 'tax', 
           'Proforma': 'proforma',
-          'Quotation': 'quote'
+          'Quotation': 'quote',
+          'Cash Invoice': 'cash'
         };
         const mappedType = typeMapping[defaultDocType.displayName] || 'standard';
         
@@ -182,7 +183,8 @@ const TemplateForm = () => {
             'Invoice': 'standard',
             'Tax Invoice': 'tax', 
             'Proforma': 'proforma',
-            'Quotation': 'quote'
+            'Quotation': 'quote',
+            'Cash Invoice': 'cash'
           };
           mappedType = typeMapping[docType.displayName] || mappedType;
         }
@@ -606,7 +608,8 @@ const TemplateForm = () => {
                         'Invoice': 'standard',
                         'Tax Invoice': 'tax', 
                         'Proforma': 'proforma',
-                        'Quotation': 'quote'
+                        'Quotation': 'quote',
+                        'Cash Invoice': 'cash'
                       };
                       const mappedType = typeMapping[selectedDocType.displayName] || 'standard';
                       handleInputChange('type', mappedType);

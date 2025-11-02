@@ -208,50 +208,58 @@ const InvoiceTemplatePreview = ({
   };
 
   const calculateTotals = () => {
-    const subtotal = displayItems.reduce((sum, item) => {
-      const price = parseAmount(item.itemPrice);
-      const quantity = parseAmount(item.itemQuantity ?? 1);
-      return sum + price * quantity;
-    }, 0);
-
-    const discountRate = parseAmount(displayData.discountRate);
-    const rateDiscount = discountRate > 0 ? subtotal * (discountRate / 100) : 0;
-    const providedDiscount = parseAmount(displayData.discountAmount);
-    const discountAmount = Math.min(
-      subtotal,
-      providedDiscount > 0 ? providedDiscount : rateDiscount
-    );
-
-    // Calculate VAT breakdown by rate
+    // Calculate totals treating prices as GROSS (including VAT)
+    let totalGross = 0;
+    let totalNet = 0;
     const vatBreakdown = {};
-    let totalTaxAmount = 0;
 
     displayItems.forEach((item) => {
-      const itemPrice = parseAmount(item.itemPrice);
+      const grossPrice = parseAmount(item.itemPrice);
       const itemQuantity = parseAmount(item.itemQuantity ?? 1);
-      const itemTotal = itemPrice * itemQuantity;
       const itemTaxRate = item.itemTaxRate !== undefined && item.itemTaxRate !== null 
         ? parseAmount(item.itemTaxRate) 
         : 0;
 
-      if (itemTaxRate > 0) {
-        // Apply discount proportionally to this item
-        const itemDiscountAmount = discountAmount > 0 ? (itemTotal / subtotal) * discountAmount : 0;
-        const itemNetAmount = itemTotal - itemDiscountAmount;
-        const itemVatAmount = itemNetAmount * (itemTaxRate / 100);
+      // Line total (gross) - price already includes VAT
+      const lineGross = grossPrice * itemQuantity;
+      totalGross += lineGross;
 
+      // Extract VAT amount from gross price
+      // VAT = gross × (taxRate / (100 + taxRate))
+      const itemVatAmount = itemTaxRate > 0 
+        ? lineGross * (itemTaxRate / (100 + itemTaxRate))
+        : 0;
+
+      // Net amount = Gross - VAT
+      const lineNet = lineGross - itemVatAmount;
+      totalNet += lineNet;
+
+      // Group VAT by rate
+      if (itemTaxRate > 0) {
         if (!vatBreakdown[itemTaxRate]) {
           vatBreakdown[itemTaxRate] = 0;
         }
         vatBreakdown[itemTaxRate] += itemVatAmount;
-        totalTaxAmount += itemVatAmount;
       }
     });
 
-    const total = Math.max(subtotal - discountAmount + totalTaxAmount, 0);
+    // Calculate discount on net amount
+    const discountRate = parseAmount(displayData.discountRate);
+    const rateDiscount = discountRate > 0 ? totalNet * (discountRate / 100) : 0;
+    const providedDiscount = parseAmount(displayData.discountAmount);
+    const discountAmount = Math.min(
+      totalNet,
+      providedDiscount > 0 ? providedDiscount : rateDiscount
+    );
+
+    // Calculate total VAT amount
+    const totalTaxAmount = Object.values(vatBreakdown).reduce((sum, amount) => sum + amount, 0);
+
+    // Total = Gross - Discount
+    const total = Math.max(totalGross - discountAmount, 0);
 
     return {
-      subtotal,
+      subtotal: totalNet, // Net amount (excluding VAT)
       discountAmount,
       taxAmount: totalTaxAmount,
       vatBreakdown,
@@ -316,7 +324,9 @@ const InvoiceTemplatePreview = ({
                   ? 'PROFORMA INVOICE'
                   : templateConfig.type === 'quote'
                     ? 'QUOTATION'
-                    : 'INVOICE'}
+                    : templateConfig.type === 'cash'
+                      ? 'CASH INVOICE'
+                      : 'INVOICE'}
             </Typography>
             <Typography variant="h6" sx={{ color: textSecondary, mt: 1 }}>
               #{displayData.invoiceNumber}

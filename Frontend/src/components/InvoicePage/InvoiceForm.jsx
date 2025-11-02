@@ -666,7 +666,7 @@ const InvoiceForm = () => {
       const discountRate = parseFloat(prevFormData.discountRate) || 0;
       const discountAmount = (totalNet * (discountRate / 100)).toFixed(2);
       
-      // Total = Net - Discount + VAT = (totalNet - discount) + totalVat = totalGross - discount
+      // Total = Gross - Discount (discount is applied to net, then add back VAT)
       const total = (totalGross - parseFloat(discountAmount)).toFixed(2);
 
       return {
@@ -950,7 +950,7 @@ const InvoiceForm = () => {
         dispatch(updateReduxInvoice({ id: params.id, updatedInvoice: formData }));
         setNotification({
           open: true,
-          message: "Invoice updated successfully 🥳",
+          message: "Invoice updated successfully",
           severity: "success",
         });
       } else {
@@ -958,7 +958,7 @@ const InvoiceForm = () => {
         dispatch(addInvoice(formData));
         setNotification({
           open: true,
-          message: "Invoice added successfully 🥳",
+          message: "Invoice added successfully",
           severity: "success",
         });
       }
@@ -1108,7 +1108,7 @@ const InvoiceForm = () => {
                   color: 'white',
                   fontSize: '14px'
                 }}>
-                  ⚙️
+                  ⚙
                 </Box>
                 Invoice Settings
               </Typography>
@@ -1139,11 +1139,11 @@ const InvoiceForm = () => {
                     '&.Mui-focused': { color: '#667eea' }
                   }}
                 >
-                  💰 Currency
+                  Currency
                 </InputLabel>
                 <Select
                   labelId="currency-select-label"
-                  label="💰 Currency"
+                  label="Currency"
                   onChange={(event) => onCurrencyChange(event.target.value)}
                   value={formData.currencyId}
                   size="medium"
@@ -1180,7 +1180,7 @@ const InvoiceForm = () => {
                 value={formData.discountRate}
                 onChange={(e) => editField(e.target.name, e.target.value)}
                 placeholder="0.0"
-                label="💸 Discount Rate"
+                label="Discount Rate"
                 variant="outlined"
                 size="medium"
                 sx={{
@@ -1243,11 +1243,11 @@ const InvoiceForm = () => {
                     fontWeight: 600,
                     '&.Mui-focused': { color: '#667eea' }
                   }}>
-                    📊 Status
+                    Status
                   </InputLabel>
                   <Select
                     labelId="status-select-label"
-                    label="📊 Status"
+                    label="Status"
                     value={formData.statusId || ''}
                     onChange={(event) => handleStatusChange(event.target.value)}
                     disabled={loading}
@@ -1321,7 +1321,7 @@ const InvoiceForm = () => {
                       color: '#2d3748',
                       fontSize: '0.95rem'
                     }}>
-                      📂 Category:
+                      Category:
                     </Typography>
                     <FormControl size="small" sx={{ minWidth: 200 }}>
                       <Select
@@ -1382,7 +1382,7 @@ const InvoiceForm = () => {
                       color: '#2d3748',
                       fontSize: '0.95rem'
                     }}>
-                      📋 Document Type:
+                      Document Type:
                     </Typography>
                     <FormControl size="small" sx={{ minWidth: 200 }}>
                       <Select
@@ -1427,7 +1427,7 @@ const InvoiceForm = () => {
                       color: '#2d3748',
                       fontSize: '0.95rem'
                     }}>
-                      📅 Issue Date:
+                      Issue Date:
                     </Typography>
                     <TextField
                       type="date"
@@ -1467,7 +1467,7 @@ const InvoiceForm = () => {
                       color: '#2d3748',
                       fontSize: '0.95rem'
                     }}>
-                      ⏰ Due Date:
+                      Due Date:
                     </Typography>
                     <TextField
                       type="date"
@@ -1537,7 +1537,7 @@ const InvoiceForm = () => {
                         color: 'white',
                         fontSize: '12px'
                       }}>
-                        📧
+                        ✉
                       </Box>
                       Bill To:
                     </Typography>
@@ -1560,7 +1560,7 @@ const InvoiceForm = () => {
                           }
                         }}
                       >
-                        👥 Select Client
+                        Select Client
                       </Button>
                       <Button
                         variant={clientSelectionMode === "manual" ? "contained" : "outlined"}
@@ -1578,7 +1578,7 @@ const InvoiceForm = () => {
                           }
                         }}
                       >
-                        ✏️ Manual Entry
+                        Manual Entry
                       </Button>
                     </Box>
 
@@ -1594,7 +1594,7 @@ const InvoiceForm = () => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            label="🔍 Search & Select Client"
+                            label="Search & Select Client"
                             placeholder="Type to search clients..."
                             size="small"
                             sx={{
@@ -1635,11 +1635,11 @@ const InvoiceForm = () => {
                                 {option.name}
                               </Typography>
                               <Typography variant="caption" sx={{ color: '#6b7280' }}>
-                                📧 {option.email} {option.company && `• 🏢 ${option.company}`}
+                                {option.email} {option.company && `• ${option.company}`}
                               </Typography>
                               {option.phone && (
                                 <Typography variant="caption" sx={{ color: '#6b7280' }}>
-                                  📞 {option.phone}
+                                  {option.phone}
                                 </Typography>
                               )}
                             </Box>
@@ -1783,7 +1783,7 @@ const InvoiceForm = () => {
                         border: '1px solid rgba(102, 126, 234, 0.2)'
                       }}>
                         <Typography variant="caption" sx={{ color: '#667eea', fontWeight: 600, mb: 1, display: 'block' }}>
-                          📋 Selected Client Details:
+                          Selected Client Details:
                         </Typography>
                         <Typography variant="body2" sx={{ mb: 0.5 }}>
                           <strong>Name:</strong> {formData.billTo}
@@ -1824,7 +1824,7 @@ const InvoiceForm = () => {
                         color: 'white',
                         fontSize: '12px'
                       }}>
-                        🏢
+                        ⌂
                       </Box>
                       Bill From:
                     </Typography><TextField
@@ -2162,7 +2162,7 @@ const InvoiceForm = () => {
             }}
             disabled={loading}
           >
-            📄 Preview Invoice
+            Preview Invoice
           </Button>
           <Button
             variant="contained"
@@ -2186,7 +2186,7 @@ const InvoiceForm = () => {
             }}
             disabled={loading}
           >
-            {loading ? <CircularProgress size={24} color="inherit" /> : (isEdit ? "💾 Update Invoice" : "💾 Save Invoice")}
+            {loading ? <CircularProgress size={24} color="inherit" /> : (isEdit ? "Update Invoice" : "Save Invoice")}
           </Button>
         </Box>
       </Box>
