@@ -1847,6 +1847,7 @@ ${formData.billFrom}`);
                 currentDate: formData.currentDate,
                 invoiceNumber: formData.invoiceNumber,
                 dateOfIssue: formData.dateOfIssue,
+                dueDate: formData.dueDate,
                 billTo: formData.billTo,
                 billToEmail: formData.billToEmail,
                 billToAddress: formData.billToAddress,

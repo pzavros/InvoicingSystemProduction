@@ -17,6 +17,7 @@ import {
   Divider,
   Autocomplete,
   IconButton,
+  Backdrop,
 } from "@mui/material";
 import { ArrowBack as ArrowBackIcon } from "@mui/icons-material";
 import { useDispatch } from "react-redux";
@@ -41,6 +42,7 @@ import {
 } from "./api";
 import { getAllClients } from "../ClientsPage/api";
 import { getAllDocumentTypes } from "../DocumentTypePage/api";
+import { getAllProducts } from "../ProductCatalogPage/api";
 import { getUserProfile } from "../AuthPages/api";
 
 const LANGUAGE_LOCALE_MAP = {
@@ -104,12 +106,20 @@ const InvoiceForm = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [copyId, setCopyId] = useState("");
   const { getOneInvoice, listSize } = useInvoiceListData();
+  
+  // Calculate default due date (14 days from today)
+  const getDefaultDueDate = () => {
+    const today = new Date();
+    const dueDate = new Date(today);
+    dueDate.setDate(today.getDate() + 14);
+    return dueDate.toISOString().split('T')[0];
+  };
+  
   const [formData, setFormData] = useState({
     id: generateRandomId(),
-    currentDate: new Date().toISOString().split('T')[0],
     invoiceNumber: listSize + 1,
-    dateOfIssue: "",
-    dueDate: "",
+    dateOfIssue: new Date().toISOString().split('T')[0],
+    dueDate: getDefaultDueDate(),
     billTo: "",
     billToEmail: "",
     billToAddress: "",
@@ -155,6 +165,7 @@ const InvoiceForm = () => {
   });
 
   const [loading, setLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("");
   const [currencies, setCurrencies] = useState([]);
   const [statuses, setStatuses] = useState([]);
   const [filteredStatuses, setFilteredStatuses] = useState([]); // Statuses filtered by document category
@@ -738,6 +749,78 @@ const InvoiceForm = () => {
     return hasValidItems;
   };
 
+  const validateStock = async () => {
+    // Get all items that are linked to products (not custom items)
+    const productItems = formData.items.filter(item => item.productId && !item.isCustomItem);
+    
+    if (productItems.length === 0) {
+      return { isValid: true }; // No stock items to validate
+    }
+
+    try {
+      // Fetch current product stock levels
+      const productsResponse = await getAllProducts();
+      const products = productsResponse.data || productsResponse;
+
+      // If editing, fetch the original invoice to compare quantities
+      let originalItems = [];
+      if (isEdit && params.id) {
+        try {
+          const originalInvoice = await getInvoiceById(params.id);
+          originalItems = originalInvoice.items || [];
+        } catch (error) {
+          console.error("Error fetching original invoice for stock validation:", error);
+          // If we can't fetch original, proceed with current validation
+        }
+      }
+
+      // Check each product item against stock
+      const stockIssues = [];
+      
+      for (const item of productItems) {
+        const product = products.find(p => p.id === item.productId);
+        
+        if (product) {
+          const requestedQty = parseInt(item.itemQuantity) || 0;
+          const availableStock = product.stockQuantity || 0;
+          
+          // If editing, account for the quantity already allocated in the original invoice
+          let effectiveAvailableStock = availableStock;
+          if (isEdit && originalItems.length > 0) {
+            const originalItem = originalItems.find(orig => orig.productId === item.productId);
+            if (originalItem) {
+              const originalQty = parseInt(originalItem.quantity) || 0;
+              // Add back the original quantity to available stock
+              effectiveAvailableStock = availableStock + originalQty;
+            }
+          }
+          
+          if (requestedQty > effectiveAvailableStock) {
+            stockIssues.push({
+              itemName: item.itemName,
+              requested: requestedQty,
+              available: effectiveAvailableStock
+            });
+          }
+        }
+      }
+
+      if (stockIssues.length > 0) {
+        return {
+          isValid: false,
+          issues: stockIssues
+        };
+      }
+
+      return { isValid: true };
+    } catch (error) {
+      console.error("Error validating stock:", error);
+      // If we can't validate stock, we'll allow the invoice to proceed
+      // but log the error for debugging
+      return { isValid: true };
+    }
+  };
+
   const handleStatusChange = async (newStatusId) => {
     if (!isEdit || !params.id) return;
 
@@ -939,15 +1022,36 @@ const InvoiceForm = () => {
         return;
       }
     }
+
+    // Validate stock for all product items
+    setLoading(true);
+    setLoadingMessage("Validating stock availability...");
+    
+    const stockValidation = await validateStock();
+    if (!stockValidation.isValid) {
+      const issueMessages = stockValidation.issues.map(issue => 
+        `${issue.itemName}: Requested ${issue.requested}, Available ${issue.available}`
+      ).join('\n');
+      
+      setLoading(false);
+      setLoadingMessage("");
+      setNotification({
+        open: true,
+        message: `Insufficient stock for the following items:\n${issueMessages}`,
+        severity: "error",
+      });
+      return;
+    }
     
     try {
-      setLoading(true);
+      setLoadingMessage(isEdit ? "Updating invoice..." : "Creating invoice...");
       const invoiceData = prepareInvoiceDataForAPI();
       
       let result;
       if (isEdit) {
         result = await updateInvoice(params.id, invoiceData);
         dispatch(updateReduxInvoice({ id: params.id, updatedInvoice: formData }));
+        setLoadingMessage("Invoice updated successfully! Redirecting...");
         setNotification({
           open: true,
           message: "Invoice updated successfully",
@@ -956,6 +1060,7 @@ const InvoiceForm = () => {
       } else {
         result = await createInvoice(invoiceData);
         dispatch(addInvoice(formData));
+        setLoadingMessage("Invoice created successfully! Redirecting...");
         setNotification({
           open: true,
           message: "Invoice added successfully",
@@ -969,6 +1074,9 @@ const InvoiceForm = () => {
       
     } catch (error) {
       console.error("Error saving invoice:", error);
+      
+      setLoading(false);
+      setLoadingMessage("");
       
       // Check if it's a limit error from the backend
       if (error.response?.status === 403 && error.response?.data?.limitReached) {
@@ -1431,9 +1539,10 @@ const InvoiceForm = () => {
                     </Typography>
                     <TextField
                       type="date"
-                      name="currentDate"
-                      value={formData.currentDate}
+                      name="dateOfIssue"
+                      value={formData.dateOfIssue}
                       onChange={(e) => editField(e.target.name, e.target.value)}
+                      required
                       size="small"
                       sx={{ 
                         width: "160px",
@@ -1471,10 +1580,9 @@ const InvoiceForm = () => {
                     </Typography>
                     <TextField
                       type="date"
-                      name="dateOfIssue"
-                      value={formData.dateOfIssue}
+                      name="dueDate"
+                      value={formData.dueDate}
                       onChange={(e) => editField(e.target.name, e.target.value)}
-                      required
                       size="small"
                       sx={{ 
                         width: "160px",
@@ -2077,9 +2185,9 @@ const InvoiceForm = () => {
                 isOpen,
                 id: formData.id,
                 currency: formData.currency,
-                currentDate: formData.currentDate,
                 invoiceNumber: formData.invoiceNumber,
                 dateOfIssue: formData.dateOfIssue,
+                dueDate: formData.dueDate,
                 billTo: formData.billTo,
                 billToEmail: formData.billToEmail,
                 billToAddress: formData.billToAddress,
@@ -2228,6 +2336,52 @@ const InvoiceForm = () => {
         resource={limitModalResource}
         limitInfo={limitModalInfo}
       />
+
+      {/* Loading Overlay */}
+      <Backdrop
+        sx={{
+          color: '#fff',
+          zIndex: (theme) => theme.zIndex.modal + 1,
+          backdropFilter: 'blur(8px)',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        }}
+        open={loading}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 3,
+            padding: 4,
+            borderRadius: '20px',
+            background: 'rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+          }}
+        >
+          <CircularProgress
+            size={60}
+            thickness={4}
+            sx={{
+              color: '#667eea',
+            }}
+          />
+          {loadingMessage && (
+            <Typography
+              variant="h6"
+              sx={{
+                color: '#fff',
+                fontWeight: 600,
+                textAlign: 'center',
+                textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+              }}
+            >
+              {loadingMessage}
+            </Typography>
+          )}
+        </Box>
+      </Backdrop>
       </form>
     </Box>
   );
