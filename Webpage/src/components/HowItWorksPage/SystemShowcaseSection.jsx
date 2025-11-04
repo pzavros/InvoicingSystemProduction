@@ -684,7 +684,7 @@ const SystemShowcaseSection = () => {
             Ready to experience it yourself?
           </Text>
           <Text sx={{ color: 'text.secondary' }}>
-            Join our waitlist to get early access and start managing your invoices professionally
+            Start managing your invoices professionally - get started free today with 3 invoices per month
           </Text>
         </Box>
       </Column>

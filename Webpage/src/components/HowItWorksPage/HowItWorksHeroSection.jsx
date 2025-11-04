@@ -7,12 +7,11 @@ import Row from '../ReusableComponents/Row.jsx';
 import Text from '../ReusableComponents/Text.jsx';
 import IconBox from '../ReusableComponents/IconBox.jsx';
 import Button from '../ReusableComponents/Button.jsx';
-import WaitlistModal from '../ReusableComponents/WaitlistModal.jsx';
+import { navigateToApp } from '../../utils/navigation.js';
 
 const HowItWorksHeroSection = () => {
   const [showVideo, setShowVideo] = useState(false);
   const [videoLoading, setVideoLoading] = useState(true);
-  const [waitlistOpen, setWaitlistOpen] = useState(false);
   const videoId = 'dA3Dq24BzgY'; // YouTube video ID
   const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
 
@@ -58,10 +57,10 @@ const HowItWorksHeroSection = () => {
           <Button 
             variant="glass" 
             size="large"
-            onClick={() => setWaitlistOpen(true)}
+            onClick={() => navigateToApp('register')}
             startIcon={<Rocket />}
           >
-            Join Waitlist
+            Get Started Free
           </Button>
           {/* View Demo Button - Commented out for now */}
           {/* <Button 
@@ -214,11 +213,6 @@ const HowItWorksHeroSection = () => {
           </Box>
         </Fade>
       </Column>
-
-      <WaitlistModal 
-        open={waitlistOpen} 
-        onClose={() => setWaitlistOpen(false)} 
-      />
     </Section>
   );
 };

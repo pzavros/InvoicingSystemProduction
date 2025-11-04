@@ -25,10 +25,12 @@ import {
   AccountCircleRounded,
   LaunchRounded,
   AutoAwesome,
-  RocketLaunchRounded
+  RocketLaunchRounded,
+  AttachMoney
 } from '@mui/icons-material';
 import Text from './Text.jsx';
 import Button from './Button.jsx';
+import { navigateToApp } from '../../utils/navigation.js';
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -45,6 +47,7 @@ const Navbar = () => {
     if (path === '/about') return 'about';
     if (path === '/features') return 'features';
     if (path === '/how-it-works') return 'how-it-works';
+    if (path === '/pricing') return 'pricing';
     if (path === '/contact') return 'contact';
     return 'home';
   };
@@ -56,6 +59,7 @@ const Navbar = () => {
     { id: 'about', path: '/about', label: 'About Us', icon: <PeopleRounded /> },
     { id: 'features', path: '/features', label: 'Features', icon: <AutoAwesome /> },
     { id: 'how-it-works', path: '/how-it-works', label: 'How It Works', icon: <AnalyticsRounded /> },
+    { id: 'pricing', path: '/pricing', label: 'Pricing', icon: <AttachMoney /> },
     { id: 'contact', path: '/contact', label: 'Contact', icon: <ReceiptLongRounded /> },
   ];
 
@@ -363,7 +367,7 @@ const Navbar = () => {
                 boxShadow: '0 8px 32px rgba(102, 126, 234, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.8), inset 0 -1px 2px rgba(102, 126, 234, 0.1)',
               }}
             >
-              {navigationItems.slice(0, 5).map((item, index) => (
+              {navigationItems.slice(0, 6).map((item, index) => (
                 <FloatingNavItem 
                   key={item.id} 
                   item={item} 
@@ -396,9 +400,7 @@ const Navbar = () => {
                 variant="primary" 
                 size="small"
                 startIcon={<LaunchRounded />}
-                onClick={() => {
-                  navigate('/coming-soon');
-                }}
+                onClick={() => navigateToApp()}
                 sx={{
                   background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                   boxShadow: '0 4px 20px rgba(102, 126, 234, 0.3)',
@@ -408,7 +410,7 @@ const Navbar = () => {
                   }
                 }}
               >
-                Launch System
+                Launch App
               </Button>
             )}
             
@@ -502,7 +504,7 @@ const Navbar = () => {
               fullWidth
               startIcon={<RocketLaunchRounded />}
               onClick={() => {
-                navigate('/coming-soon');
+                navigateToApp();
                 setMobileOpen(false);
               }}
               sx={{
@@ -510,7 +512,7 @@ const Navbar = () => {
                 boxShadow: '0 4px 20px rgba(102, 126, 234, 0.3)'
               }}
             >
-              Launch System
+              Launch App
             </Button>
           </Box>
         </Box>
@@ -519,7 +521,7 @@ const Navbar = () => {
       {/* Floating Action Button for Quick Actions */}
       <Zoom in={scrolled && !isMobile}>
         <Fab
-          onClick={() => navigate('/coming-soon')}
+          onClick={() => navigateToApp()}
           sx={{
             position: 'fixed',
             bottom: 32,

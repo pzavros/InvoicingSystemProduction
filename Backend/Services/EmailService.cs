@@ -419,7 +419,7 @@ catch (Exception ex)
                     cancellationDate.ToString("MMMM dd, yyyy"),
                     accessEndDate.ToString("MMMM dd, yyyy"),
                     planName,
-                    "10", // Free invoice limit - could be configurable
+                    "3", // Free invoice limit
                     feedbackUrl
                 );
                 return await SendEmailAsync(to, "Subscription Cancelled", body, true);

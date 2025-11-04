@@ -7,22 +7,14 @@ import Column from '../ReusableComponents/Column.jsx';
 import Row from '../ReusableComponents/Row.jsx';
 import Text from '../ReusableComponents/Text.jsx';
 import Button from '../ReusableComponents/Button.jsx';
-import WaitlistModal from '../ReusableComponents/WaitlistModal.jsx';
+import { navigateToApp } from '../../utils/navigation.js';
 
 const HeroSection = () => {
-  const [waitlistOpen, setWaitlistOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
-    setWaitlistOpen(true);
+    navigateToApp('register');
   };
-
-  // Listen for global waitlist events from navbar
-  useEffect(() => {
-    const handleOpenWaitlist = () => setWaitlistOpen(true);
-    window.addEventListener('openWaitlist', handleOpenWaitlist);
-    return () => window.removeEventListener('openWaitlist', handleOpenWaitlist);
-  }, []);
 
   const handleLearnMore = () => {
     navigate('/how-it-works');
@@ -59,7 +51,7 @@ const HeroSection = () => {
         </Text>
         
         <Text variant="h5" gutterBottom color="rgba(255, 255, 255, 0.9)" align="center" sx={{ maxWidth: 600, mx: 'auto', mb: 4, textAlign: 'center' }}>
-          Full-featured invoicing platform with client management, dashboard analytics, and customizable templates
+          Full-featured invoicing platform with client management, dashboard analytics, and customizable templates - Now Live!
         </Text>
         
         <Row gap={3} sx={{ justifyContent: 'center', flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
@@ -69,7 +61,7 @@ const HeroSection = () => {
             onClick={handleGetStarted}
             startIcon={<Rocket />}
           >
-            Join Waitlist
+            Get Started Free
           </Button>
           <Button 
             variant="outline" 
@@ -81,11 +73,6 @@ const HeroSection = () => {
           </Button>
         </Row>
       </Column>
-      
-      <WaitlistModal 
-        open={waitlistOpen} 
-        onClose={() => setWaitlistOpen(false)} 
-      />
     </Section>
   );
 };

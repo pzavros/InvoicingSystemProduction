@@ -8,14 +8,13 @@ import Row from '../ReusableComponents/Row.jsx';
 import Text from '../ReusableComponents/Text.jsx';
 import Button from '../ReusableComponents/Button.jsx';
 import IconBox from '../ReusableComponents/IconBox.jsx';
-import WaitlistModal from '../ReusableComponents/WaitlistModal.jsx';
+import { navigateToApp } from '../../utils/navigation.js';
 
 const CTASection = () => {
-  const [waitlistOpen, setWaitlistOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
-    setWaitlistOpen(true);
+    navigateToApp('register');
   };
 
   const handleViewFeatures = () => {
@@ -30,7 +29,7 @@ const CTASection = () => {
         </IconBox>
         
         <Text variant="h2" weight="bold" align="center" sx={{ color: 'white', mb: 2 }}>
-          Be First to Access Our System
+          Start Your Invoicing Journey Today
         </Text>
         
         <Text variant="h6" align="center" sx={{ 
@@ -39,14 +38,14 @@ const CTASection = () => {
           mx: 'auto',
           mb: 2
         }}>
-          Join our exclusive waitlist and get early access to the complete invoicing platform
+          Join thousands of businesses using our complete invoicing platform
         </Text>
         
         <Text align="center" sx={{ 
           color: 'rgba(255,255,255,0.8)',
           fontSize: '1.1rem'
         }}>
-          Be among the first to experience the future of invoicing management
+          Get started with our free tier - 3 invoices per month, no credit card required
         </Text>
 
         <Row gap={3} sx={{ justifyContent: 'center', flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
@@ -56,7 +55,7 @@ const CTASection = () => {
             onClick={handleGetStarted}
             startIcon={<Rocket />}
           >
-            Join Waitlist
+            Get Started Free
           </Button>
           <Button 
             variant="outline" 
@@ -79,7 +78,7 @@ const CTASection = () => {
             borderTop: '1px solid rgba(255,255,255,0.2)'
           }}
         >
-          {['Full-Stack Solution', 'Production Ready', 'Enterprise Grade'].map((item, index) => (
+          {['Full-Stack Solution', 'Production Ready', 'Now Live'].map((item, index) => (
             <Box key={index} sx={{ textAlign: 'center' }}>
               <Text variant="h6" sx={{ color: 'white', fontWeight: 'bold' }}>
                 {item.split(' ')[0]}
@@ -91,11 +90,6 @@ const CTASection = () => {
           ))}
         </Box>
       </Column>
-      
-      <WaitlistModal 
-        open={waitlistOpen} 
-        onClose={() => setWaitlistOpen(false)} 
-      />
     </Section>
   );
 };

@@ -14,17 +14,20 @@ namespace InvoicingBackend.Controllers
         private readonly ApplicationDbContext _context;
         private readonly ILogger<StripeWebhookController> _logger;
         private readonly IEmailService _emailService;
+        private readonly IConfiguration _configuration;
 
         public StripeWebhookController(
             IStripeService stripeService,
             ApplicationDbContext context,
             ILogger<StripeWebhookController> logger,
-            IEmailService emailService)
+            IEmailService emailService,
+            IConfiguration configuration)
         {
             _stripeService = stripeService;
             _context = context;
             _logger = logger;
             _emailService = emailService;
+            _configuration = configuration;
         }
 
         [HttpPost]
@@ -136,7 +139,7 @@ namespace InvoicingBackend.Controllers
                     StripeSubscriptionId = session.SubscriptionId,
                     Status = Models.SubscriptionStatus.Active,
                     StartDate = DateTime.UtcNow,
-                    MonthlyPrice = isTrial ? 0 : 13.99m,
+                    MonthlyPrice = isTrial ? 0 : GetMonthlyPrice(),
                     DateEntered = DateTime.UtcNow,
                     EnteredBy = "Stripe"
                 };
@@ -176,7 +179,7 @@ namespace InvoicingBackend.Controllers
                 {
                     dbSubscription.EndDate = DateTime.UtcNow.AddMonths(1);
                     dbSubscription.NextPaymentDate = DateTime.UtcNow.AddMonths(1);
-                    dbSubscription.MonthlyPrice = 13.99m;
+                    dbSubscription.MonthlyPrice = GetMonthlyPrice();
                 }
 
                 dbSubscription.MarkAsModified("Stripe");
@@ -439,6 +442,12 @@ namespace InvoicingBackend.Controllers
 
             // This is triggered when a trial user adds their payment method
             // The subscription will be created separately
+        }
+
+        private decimal GetMonthlyPrice()
+        {
+            var priceString = _configuration["SUBSCRIPTION_MONTHLY_PRICE"] ?? "13.99";
+            return decimal.Parse(priceString);
         }
     }
 }
