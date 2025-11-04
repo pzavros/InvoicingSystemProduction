@@ -18,6 +18,10 @@ using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add environment variables to configuration FIRST
+// This allows env vars to override appsettings.json
+builder.Configuration.AddEnvironmentVariables();
+
 // Load environment variables from .env files
 // In Docker, env vars are already loaded via docker-compose env_file
 // Only manually load .env files when running locally (not in Docker)
@@ -27,6 +31,8 @@ var isRunningInDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CO
 if (!isRunningInDocker)
 {
     EnvironmentLoader.LoadEnvironmentFiles(builder.Environment);
+    // Reload configuration after loading .env files
+    builder.Configuration.AddEnvironmentVariables();
 }
 
 // Conditionally force Kestrel to listen on all interfaces at port 5000 for Docker compatibility only
@@ -50,10 +56,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Configure JWT settings
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
-
-// Configure Email settings
-// Make sure env vars are visible (you already load .env via EnvironmentLoader)
-builder.Configuration.AddEnvironmentVariables();
 
 // Configure Email settings (Graph first, SMTP fallback)
 builder.Services.Configure<EmailSettings>(options =>
