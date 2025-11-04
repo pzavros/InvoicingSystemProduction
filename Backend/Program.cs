@@ -19,7 +19,15 @@ using System.Net;
 var builder = WebApplication.CreateBuilder(args);
 
 // Load environment variables from .env files
-EnvironmentLoader.LoadEnvironmentFiles(builder.Environment);
+// In Docker, env vars are already loaded via docker-compose env_file
+// Only manually load .env files when running locally (not in Docker)
+var isRunningInDocker = Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true" 
+                        || File.Exists("/.dockerenv");
+
+if (!isRunningInDocker)
+{
+    EnvironmentLoader.LoadEnvironmentFiles(builder.Environment);
+}
 
 // Conditionally force Kestrel to listen on all interfaces at port 5000 for Docker compatibility only
 // For development, let it use default ports
