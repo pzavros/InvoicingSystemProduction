@@ -12,11 +12,14 @@ import {
   Card,
   CardContent,
   Divider,
+  Stack,
 } from '@mui/material';
 import {
   Payment,
-  CreditCard,
   Lock,
+  CheckCircle,
+  Star,
+  CreditCard,
 } from '@mui/icons-material';
 import { subscriptionAPI } from './subscriptionAPI';
 
@@ -26,47 +29,40 @@ const PaymentDialog = ({ open, onClose, amount, isTrial = false, onSuccess, onEr
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState(null);
 
-  const handlePayment = async () => {
+  const handleProceed = async () => {
+    setProcessing(true);
+    setError(null);
+
     try {
-      setProcessing(true);
-      setError(null);
-
-      if (isTrial) {
-        // For trial, call the trial endpoint directly
-        await subscriptionAPI.startTrial();
-      } else {
-        // Regular payment processing
-        const paymentData = {
-          amount: amount,
-          currency: 'EUR',
-          description: `Monthly subscription payment - €${amount.toFixed(2)}`,
-        };
-
-        await subscriptionAPI.processPayment(paymentData);
-      }
+      // Create checkout session for both trial and regular payment
+      const successUrl = `${window.location.origin}/app/subscription?payment_success=true`;
+      const cancelUrl = `${window.location.origin}/app/subscription`;
       
-      onSuccess();
-    } catch (error) {
-      console.error('Payment error:', error);
-      const errorMessage = error.response?.data?.message || 'Payment failed. Please try again.';
+      const { data } = await subscriptionAPI.createCheckoutSession({
+        successUrl,
+        cancelUrl,
+        isTrial, // Pass trial flag to backend
+      });
+
+      // Redirect to Stripe Checkout
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('Failed to create checkout session');
+      }
+    } catch (err) {
+      console.error('Payment error:', err);
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to start checkout. Please try again.';
       setError(errorMessage);
       onError(errorMessage);
-    } finally {
       setProcessing(false);
-    }
-  };
-
-  const handleClose = () => {
-    if (!processing) {
-      setError(null);
-      onClose();
     }
   };
 
   return (
     <Dialog 
       open={open} 
-      onClose={handleClose} 
+      onClose={onClose} 
       maxWidth="sm" 
       fullWidth
       PaperProps={{
@@ -80,26 +76,28 @@ const PaymentDialog = ({ open, onClose, amount, isTrial = false, onSuccess, onEr
       <DialogTitle sx={{ 
         background: isTrial 
           ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-          : 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+          : 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
         color: 'white',
         borderRadius: '12px 12px 0 0',
-        m: 0
+        m: 0,
+        p: 3
       }}>
-        <Box display="flex" alignItems="center" gap={1}>
-          <Payment />
-          <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-            {isTrial ? 'Start Your 7-Day Free Trial' : 'Complete Payment'}
+        <Box display="flex" alignItems="center" gap={1.5}>
+          {isTrial ? <Star sx={{ fontSize: 28 }} /> : <Payment sx={{ fontSize: 28 }} />}
+          <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+            {isTrial ? 'Start Your 7-Day Free Trial' : 'Upgrade to Premium'}
           </Typography>
         </Box>
       </DialogTitle>
-      
-      <DialogContent sx={{ p: 3 }}>
+
+      <DialogContent sx={{ p: 4, mt: 2 }}>
         {error && (
-          <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
+          <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
             {error}
           </Alert>
         )}
 
+        {/* Payment Summary */}
         <Card 
           elevation={3}
           sx={{ 
@@ -107,10 +105,10 @@ const PaymentDialog = ({ open, onClose, amount, isTrial = false, onSuccess, onEr
             borderRadius: 2,
             background: isTrial 
               ? 'linear-gradient(145deg, #ecfdf5 0%, #d1fae5 100%)'
-              : 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
+              : 'linear-gradient(145deg, #f3e8ff 0%, #e9d5ff 100%)',
             border: isTrial 
               ? '2px solid rgba(16, 185, 129, 0.3)'
-              : '1px solid rgba(59, 130, 246, 0.2)',
+              : '2px solid rgba(139, 92, 246, 0.3)',
           }}
         >
           <CardContent sx={{ p: 3 }}>
@@ -118,53 +116,58 @@ const PaymentDialog = ({ open, onClose, amount, isTrial = false, onSuccess, onEr
               Payment Summary
             </Typography>
             <Box display="flex" justifyContent="space-between" mb={1}>
-              <Typography variant="body1">
-                {isTrial ? '7-Day Free Trial (Card Authorization)' : 'Monthly Subscription'}
-              </Typography>
               <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                {isTrial ? '7-Day Free Trial' : 'Monthly Subscription'}
+              </Typography>
+              <Typography variant="body1" sx={{ fontWeight: 700, fontSize: '1.1rem' }}>
                 €{amount.toFixed(2)}
               </Typography>
             </Box>
             {isTrial && (
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-                Your card will be authorized but not charged. After 7 days, you'll be automatically charged €{MONTHLY_PRICE.toFixed(2)}/month unless you cancel.
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+                You'll enter your card details to verify your account. After 7 days, you'll be charged €{MONTHLY_PRICE.toFixed(2)}/month unless you cancel.
               </Typography>
             )}
-            <Divider sx={{ my: 1 }} />
-            <Box display="flex" justifyContent="space-between">
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Total Due Today</Typography>
+            <Divider sx={{ my: 2 }} />
+            <Box display="flex" justifyContent="space-between" alignItems="center">
+              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                {isTrial ? 'Due Today' : 'Total Due Today'}
+              </Typography>
               <Typography 
-                variant="h6" 
+                variant="h5" 
                 sx={{ 
                   fontWeight: 'bold', 
-                  color: isTrial ? '#059669' : 'var(--color-primary)' 
+                  color: isTrial ? '#059669' : '#8b5cf6' 
                 }}
               >
                 €{amount.toFixed(2)}
               </Typography>
             </Box>
-            {isTrial && (
-              <Alert 
-                severity="success" 
-                sx={{ 
-                  mt: 2, 
-                  borderRadius: 2,
-                  backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                  border: '1px solid rgba(16, 185, 129, 0.3)',
-                }}
-              >
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                  🎉 You won't be charged today! Enjoy 7 days of Premium access completely free.
-                </Typography>
-              </Alert>
-            )}
           </CardContent>
         </Card>
 
+        {isTrial && (
+          <Alert 
+            severity="success" 
+            sx={{ 
+              mb: 3, 
+              borderRadius: 2,
+              backgroundColor: 'rgba(16, 185, 129, 0.1)',
+              border: '1px solid rgba(16, 185, 129, 0.3)',
+            }}
+            icon={<Star />}
+          >
+            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+              🎉 You won't be charged today! Enjoy 7 days of Premium access completely free.
+            </Typography>
+          </Alert>
+        )}
+
+        {/* Security Info */}
         <Alert 
           severity="info" 
           sx={{ 
-            mb: 2, 
+            mb: 3, 
             borderRadius: 2,
             backgroundColor: 'rgba(59, 130, 246, 0.1)',
             border: '1px solid rgba(59, 130, 246, 0.2)',
@@ -172,89 +175,115 @@ const PaymentDialog = ({ open, onClose, amount, isTrial = false, onSuccess, onEr
               color: '#3b82f6'
             }
           }}
+          icon={<Lock />}
         >
-          <Box display="flex" alignItems="center" gap={1}>
-            <Lock fontSize="small" />
-            <Typography variant="body2">
-              This is a simulation. In production, this would integrate with Stripe for secure payment processing.
-            </Typography>
-          </Box>
+          <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
+            Secure Checkout by Stripe
+          </Typography>
+          <Typography variant="body2">
+            You'll be redirected to Stripe's secure checkout page to complete your payment. Your card details are never stored on our servers.
+          </Typography>
         </Alert>
 
-        <Card 
-          elevation={3}
-          sx={{ 
-            borderRadius: 2,
-            background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-            border: '1px solid rgba(34, 197, 94, 0.2)',
-          }}
-        >
-          <CardContent sx={{ p: 3 }}>
-            <Box display="flex" alignItems="center" gap={1} mb={2}>
-              <CreditCard sx={{ color: 'var(--color-primary)' }} />
-              <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'var(--color-text-primary)' }}>
-                Payment Method
-              </Typography>
-            </Box>
-            <Typography variant="body2" color="text.secondary" mb={2}>
-              In the production version, you would enter your credit card details here.
-              For now, clicking "Complete Payment" will simulate a successful transaction.
-            </Typography>
-            <Box sx={{ 
-              p: 2, 
-              bgcolor: 'rgba(59, 130, 246, 0.05)', 
-              borderRadius: 2,
-              border: '1px solid rgba(59, 130, 246, 0.1)'
-            }}>
-              <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
-                **** **** **** 4242 (Demo Card)
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Expires: 12/25 | CVV: 123
-              </Typography>
-            </Box>
-          </CardContent>
-        </Card>
+        {/* Features List */}
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 700, color: '#6d28d9', mb: 2 }}>
+            What you'll get:
+          </Typography>
+          <Stack spacing={1.5}>
+            {[
+              '∞ Unlimited clients, categories & products',
+              '📄 Unlimited invoices every month',
+              '🎨 Custom invoice templates',
+              '✨ Professional PDFs with no watermarks',
+              '📊 Advanced dashboard analytics',
+              '⚡ Priority email support'
+            ].map((feature, index) => (
+              <Box 
+                key={index}
+                sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 1.5,
+                  p: 1.5,
+                  borderRadius: 2,
+                  background: 'rgba(139, 92, 246, 0.05)',
+                  border: '1px solid rgba(139, 92, 246, 0.1)',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    background: 'rgba(139, 92, 246, 0.1)',
+                    borderColor: 'rgba(139, 92, 246, 0.2)',
+                  }
+                }}
+              >
+                <CheckCircle sx={{ color: '#059669', fontSize: 20 }} />
+                <Typography variant="body2" sx={{ fontWeight: 500, flex: 1 }}>
+                  {feature}
+                </Typography>
+              </Box>
+            ))}
+          </Stack>
+        </Box>
+
+        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'center', mt: 2 }}>
+          By continuing, you agree to our terms of service. Cancel anytime from your account settings.
+        </Typography>
       </DialogContent>
 
-      <DialogActions sx={{ p: 3, gap: 2 }}>
+      <DialogActions sx={{ p: 3, gap: 2, borderTop: '1px solid rgba(0, 0, 0, 0.1)' }}>
         <Button 
-          onClick={handleClose} 
+          onClick={onClose} 
           disabled={processing}
+          variant="outlined"
+          size="large"
           sx={{ 
             textTransform: 'none', 
             borderRadius: 2,
             fontWeight: 600,
-            px: 3
+            px: 3,
+            borderWidth: '2px',
+            '&:hover': {
+              borderWidth: '2px',
+            }
           }}
         >
           Cancel
         </Button>
         <Button
+          onClick={handleProceed}
           variant="contained"
-          onClick={handlePayment}
           disabled={processing}
-          startIcon={processing ? <CircularProgress size={16} /> : <Payment />}
+          startIcon={processing ? <CircularProgress size={16} sx={{ color: 'white' }} /> : <CreditCard />}
+          size="large"
           sx={{ 
-            minWidth: 160,
+            minWidth: 200,
             background: isTrial
               ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-              : 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+              : 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
             borderRadius: 2,
             textTransform: 'none',
-            fontWeight: 600,
-            px: 3,
+            fontWeight: 700,
+            px: 4,
+            py: 1.5,
+            fontSize: '1rem',
+            boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)',
             '&:hover': {
               background: isTrial
                 ? 'linear-gradient(135deg, #059669 0%, #047857 100%)'
-                : 'linear-gradient(135deg, #047857 0%, #065f46 100%)',
-            }
+                : 'linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)',
+              boxShadow: '0 6px 16px rgba(139, 92, 246, 0.4)',
+              transform: 'translateY(-1px)',
+            },
+            '&:disabled': {
+              background: 'rgba(0, 0, 0, 0.12)',
+            },
+            transition: 'all 0.2s ease'
           }}
         >
           {processing 
-            ? 'Processing...' 
+            ? 'Redirecting to Stripe...' 
             : isTrial 
-              ? 'Authorize & Start Trial' 
+              ? 'Start Free Trial' 
               : `Pay €${amount.toFixed(2)}`
           }
         </Button>

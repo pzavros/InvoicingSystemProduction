@@ -14,18 +14,21 @@ namespace InvoicingBackend.Services
         private readonly IEmailService _emailService;
         private readonly ILogger<SubscriptionService> _logger;
         private readonly IConfiguration _configuration;
+        private readonly IStripeService _stripeService;
         private const int TRIAL_DAYS = 7;
 
         public SubscriptionService(
             ApplicationDbContext context, 
             IEmailService emailService, 
             ILogger<SubscriptionService> logger,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IStripeService stripeService)
         {
             _context = context;
             _emailService = emailService;
             _logger = logger;
             _configuration = configuration;
+            _stripeService = stripeService;
         }
 
         private decimal GetMonthlyPrice()
@@ -775,6 +778,104 @@ namespace InvoicingBackend.Services
             
             await _context.SaveChangesAsync();
             return true;
+        }
+        
+        // ============= STRIPE INTEGRATION =============
+        
+        public async Task<string> GetOrCreateStripeCustomerAsync(int userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                throw new InvalidOperationException("User not found");
+            }
+
+            // Check if user already has a subscription with Stripe customer ID
+            var subscription = await _context.Subscriptions
+                .FirstOrDefaultAsync(s => s.UserId == userId && !s.IsDeleted);
+
+            if (subscription != null && !string.IsNullOrEmpty(subscription.StripeCustomerId))
+            {
+                return subscription.StripeCustomerId;
+            }
+
+            // Create new Stripe customer
+            var customer = await _stripeService.CreateCustomerAsync(
+                user.Email,
+                $"{user.FirstName} {user.LastName}",
+                new Dictionary<string, string>
+                {
+                    { "user_id", userId.ToString() },
+                    { "email", user.Email }
+                }
+            );
+
+            // Update or create subscription with Stripe customer ID
+            if (subscription != null)
+            {
+                subscription.StripeCustomerId = customer.Id;
+                subscription.MarkAsModified(userId.ToString());
+            }
+            else
+            {
+                var now = DateTime.UtcNow;
+                subscription = new Subscription
+                {
+                    UserId = userId,
+                    StripeCustomerId = customer.Id,
+                    Status = SubscriptionStatus.Trial,
+                    StartDate = now,
+                    EndDate = now,
+                    MonthlyPrice = GetMonthlyPrice(),
+                    DateEntered = now,
+                    EnteredBy = userId.ToString()
+                };
+                _context.Subscriptions.Add(subscription);
+            }
+
+            await _context.SaveChangesAsync();
+            return customer.Id;
+        }
+
+        public async Task<string> CreateSetupIntentAsync(int userId)
+        {
+            var customerId = await GetOrCreateStripeCustomerAsync(userId);
+            
+            var setupIntent = await _stripeService.CreateSetupIntentAsync(
+                customerId,
+                new Dictionary<string, string>
+                {
+                    { "user_id", userId.ToString() }
+                }
+            );
+
+            return setupIntent.ClientSecret;
+        }
+
+        public async Task<string> CreateCheckoutSessionAsync(int userId, string successUrl, string cancelUrl, bool isTrial = false)
+        {
+            var customerId = await GetOrCreateStripeCustomerAsync(userId);
+            var priceId = _configuration["Stripe:PriceId"];
+
+            if (string.IsNullOrEmpty(priceId))
+            {
+                throw new InvalidOperationException("Stripe price ID is not configured. Please add 'Stripe:PriceId' to appsettings.json");
+            }
+
+            var session = await _stripeService.CreateCheckoutSessionAsync(
+                customerId,
+                priceId,
+                successUrl,
+                cancelUrl,
+                new Dictionary<string, string>
+                {
+                    { "user_id", userId.ToString() },
+                    { "is_trial", isTrial.ToString() }
+                },
+                isTrial ? 7 : null // 7 days trial if isTrial is true
+            );
+
+            return session.Url;
         }
         
         // ============= MAPPING HELPERS =============

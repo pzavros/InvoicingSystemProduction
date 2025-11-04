@@ -54,6 +54,21 @@ const SubscriptionPage = () => {
 
   useEffect(() => {
     fetchSubscriptionData();
+    
+    // Check if returning from Stripe payment
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentSuccess = urlParams.get('payment_success');
+    
+    if (paymentSuccess === 'true') {
+      setSuccess('Payment successful! Your subscription has been activated. Welcome to Premium! 🎉');
+      // Clean up URL
+      window.history.replaceState({}, '', window.location.pathname);
+      // Refresh subscription status
+      setTimeout(() => {
+        refreshStatus();
+        fetchSubscriptionData();
+      }, 2000);
+    }
   }, []);
 
     const fetchSubscriptionData = async () => {
@@ -77,9 +92,13 @@ const SubscriptionPage = () => {
     }
   };
 
-  const handleStartTrial = async () => {
-    // Open payment dialog in trial mode (€0.00 charge)
+  const handleStartTrial = () => {
     setIsTrialMode(true);
+    setPaymentDialogOpen(true);
+  };
+
+  const handleUpgradeToPremium = () => {
+    setIsTrialMode(false);
     setPaymentDialogOpen(true);
   };
 
@@ -592,10 +611,7 @@ const SubscriptionPage = () => {
                       {!isPremium && subscriptionDetails && (
                         <Button
                           variant="contained"
-                          onClick={() => {
-                            setIsTrialMode(false);
-                            setPaymentDialogOpen(true);
-                          }}
+                          onClick={handleUpgradeToPremium}
                           disabled={actionLoading}
                           startIcon={<Star />}
                           size="large"

@@ -19,6 +19,11 @@ namespace InvoicingBackend.Interfaces
         Task<IEnumerable<PaymentDto>> GetUserPaymentsAsync(int userId);
         Task<PaymentDto> ProcessPaymentAsync(int userId, decimal amount, string? paymentMethodId = null);
         
+        // Stripe Integration
+        Task<string> CreateSetupIntentAsync(int userId);
+        Task<string> CreateCheckoutSessionAsync(int userId, string successUrl, string cancelUrl, bool isTrial = false);
+        Task<string> GetOrCreateStripeCustomerAsync(int userId);
+        
         // Subscription Maintenance
         Task ProcessExpiredSubscriptionsAsync(); // Background service
         Task SendPaymentRemindersAsync(); // Background service

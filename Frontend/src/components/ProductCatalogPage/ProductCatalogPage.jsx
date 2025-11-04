@@ -405,6 +405,8 @@ const ProductCatalogPage = () => {
           categories={categories}
           onEditProduct={handleEditProduct}
           onReloadProducts={loadData}
+          onInventoryUpdated={loadData}
+          showNotification={showNotification}
         />
       </TabPanel>
 

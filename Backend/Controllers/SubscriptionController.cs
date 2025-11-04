@@ -261,5 +261,51 @@ namespace InvoicingBackend.Controllers
                 return StatusCode(500, new { message = "An error occurred while checking limits.", error = ex.Message });
             }
         }
+
+        // ============= STRIPE ENDPOINTS =============
+
+        // POST: api/subscription/create-setup-intent
+        [HttpPost("create-setup-intent")]
+        public async Task<IActionResult> CreateSetupIntent()
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                var clientSecret = await _subscriptionService.CreateSetupIntentAsync(userId);
+                return Ok(new { clientSecret });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while creating setup intent.", error = ex.Message });
+            }
+        }
+
+        // POST: api/subscription/create-checkout-session
+        [HttpPost("create-checkout-session")]
+        public async Task<IActionResult> CreateCheckoutSession([FromBody] CheckoutSessionRequest request)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                var sessionUrl = await _subscriptionService.CreateCheckoutSessionAsync(
+                    userId,
+                    request.SuccessUrl,
+                    request.CancelUrl,
+                    request.IsTrial
+                );
+                return Ok(new { url = sessionUrl });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while creating checkout session.", error = ex.Message });
+            }
+        }
+    }
+
+    public class CheckoutSessionRequest
+    {
+        public string SuccessUrl { get; set; } = string.Empty;
+        public string CancelUrl { get; set; } = string.Empty;
+        public bool IsTrial { get; set; } = false;
     }
 }

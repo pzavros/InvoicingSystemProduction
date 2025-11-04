@@ -61,6 +61,14 @@ export const subscriptionAPI = {
   // Check access
   checkAccess: () => api.get('/api/subscription/check-access'),
   
+  // ============= STRIPE ENDPOINTS =============
+  
+  // Create setup intent for trial (saves card without charging)
+  createSetupIntent: () => api.post('/api/subscription/create-setup-intent'),
+  
+  // Create checkout session for paid subscription
+  createCheckoutSession: (data) => api.post('/api/subscription/create-checkout-session', data),
+  
   // ============= FREEMIUM ENDPOINTS =============
   
   // Get user's subscription tier (free or premium)

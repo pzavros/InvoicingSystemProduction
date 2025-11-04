@@ -780,7 +780,7 @@ const InvoiceForm = () => {
       for (const item of productItems) {
         const product = products.find(p => p.id === item.productId);
         
-        if (product) {
+        if (product && product.trackInventory) {
           const requestedQty = parseInt(item.itemQuantity) || 0;
           const availableStock = product.stockQuantity || 0;
           
