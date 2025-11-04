@@ -149,6 +149,9 @@ builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IStripeService, StripeService>();
 
+// Register background services
+builder.Services.AddHostedService<SubscriptionReminderService>();
+
 // Webpage services
 builder.Services.AddScoped<IWaitlistService, WaitlistService>();
 builder.Services.AddScoped<IContactMessageService, ContactMessageService>();

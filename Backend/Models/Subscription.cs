@@ -49,6 +49,9 @@ namespace InvoicingBackend.Models
         
         public DateTime? CancellationDate { get; set; } // When user requested cancellation
         
+        // Track if trial ending reminder has been sent (3 days before trial ends)
+        public bool ReminderSent { get; set; } = false;
+        
         // Navigation properties
         public new User User { get; set; } = null!;
         public ICollection<Payment> Payments { get; set; } = new List<Payment>();

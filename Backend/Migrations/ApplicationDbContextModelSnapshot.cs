@@ -1169,6 +1169,9 @@ namespace Backend.Migrations
                     b.Property<string>("PaymentMethodId")
                         .HasColumnType("text");
 
+                    b.Property<bool>("ReminderSent")
+                        .HasColumnType("boolean");
+
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()

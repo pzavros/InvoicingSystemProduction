@@ -340,9 +340,20 @@ namespace InvoicingBackend.Controllers
                 {
                     try
                     {
-                        _logger.LogInformation("Payment succeeded for user {Email}, amount €{Amount}", 
+                        _logger.LogInformation("Sending payment success email to {Email}, amount €{Amount}", 
                             dbSubscription.User.Email, invoice.AmountPaid / 100m);
-                        // TODO: Add email notification method for payment confirmation
+                        
+                        var invoiceUrl = "https://e-nvoicing.com/app/subscription"; // Link to subscription page
+                        await _emailService.SendPaymentSuccessEmailAsync(
+                            dbSubscription.User.Email,
+                            $"{dbSubscription.User.FirstName} {dbSubscription.User.LastName}",
+                            invoice.AmountPaid / 100m,
+                            invoice.Currency,
+                            DateTime.UtcNow,
+                            dbSubscription.NextPaymentDate ?? DateTime.UtcNow.AddMonths(1),
+                            invoiceUrl
+                        );
+                        _logger.LogInformation("Payment success email sent successfully");
                     }
                     catch (Exception ex)
                     {
@@ -396,9 +407,19 @@ namespace InvoicingBackend.Controllers
                 {
                     try
                     {
-                        _logger.LogWarning("Payment failed for user {Email}, amount €{Amount}", 
+                        _logger.LogWarning("Sending payment failure email to {Email}, amount €{Amount}", 
                             dbSubscription.User.Email, invoice.AmountDue / 100m);
-                        // TODO: Add email notification method for payment failure
+                        
+                        var updatePaymentUrl = "https://e-nvoicing.com/app/subscription"; // Link to update payment method
+                        await _emailService.SendPaymentFailedEmailAsync(
+                            dbSubscription.User.Email,
+                            $"{dbSubscription.User.FirstName} {dbSubscription.User.LastName}",
+                            invoice.AmountDue / 100m,
+                            invoice.Currency,
+                            invoice.PaymentIntent?.LastPaymentError?.Message ?? "Payment declined by your bank",
+                            updatePaymentUrl
+                        );
+                        _logger.LogInformation("Payment failure email sent successfully");
                     }
                     catch (Exception ex)
                     {

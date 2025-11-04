@@ -27,5 +27,8 @@ namespace InvoicingBackend.Interfaces
         Task<EmailResponseDto> SendTrialStartedEmailAsync(string to, string userName, DateTime trialStartDate, DateTime trialEndDate, string dashboardUrl);
         Task<EmailResponseDto> SendSubscriptionCancelledEmailAsync(string to, string userName, DateTime cancellationDate, DateTime accessEndDate, string planName, string feedbackUrl);
         Task<EmailResponseDto> SendPremiumUpgradeEmailAsync(string to, string userName, DateTime startDate, DateTime nextBillingDate, decimal monthlyPrice, string dashboardUrl);
+        Task<EmailResponseDto> SendPaymentSuccessEmailAsync(string to, string userName, decimal amount, string currency, DateTime paymentDate, DateTime nextBillingDate, string invoiceUrl);
+        Task<EmailResponseDto> SendPaymentFailedEmailAsync(string to, string userName, decimal amount, string currency, string failureReason, string updatePaymentUrl);
+        Task<EmailResponseDto> SendTrialEndingReminderEmailAsync(string to, string userName, DateTime trialEndDate, decimal monthlyPrice, string updatePaymentUrl);
     }
 }
