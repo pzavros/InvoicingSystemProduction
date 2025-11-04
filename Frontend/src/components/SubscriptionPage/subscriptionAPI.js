@@ -26,11 +26,9 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('user');
-      localStorage.removeItem('hadSubscriptionAccess'); // Clear subscription access flag
-      window.location.href = '/app/login';
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }

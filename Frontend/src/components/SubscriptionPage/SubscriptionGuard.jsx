@@ -21,7 +21,7 @@ const SubscriptionGuard = ({ children, requiredAccess = true }) => {
 
   // If user is not authenticated, redirect to login
   if (!authenticated) {
-    navigate('/app/login');
+    navigate('/login');
     return null;
   }
 

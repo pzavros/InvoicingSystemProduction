@@ -61,17 +61,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
-    localStorage.removeItem('hadSubscriptionAccess');
-    
+    localStorage.removeItem('token');
     setAuthenticated(false);
     setUser(null);
-    
-    // Dispatch custom event to notify other components
-    window.dispatchEvent(new CustomEvent('authStateChange'));
-    
-    window.location.href = '/app/login';
+    window.location.href = '/login';
   };
 
   const value = {

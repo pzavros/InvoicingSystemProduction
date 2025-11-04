@@ -112,7 +112,7 @@ const RegisterForm = () => {
   };
   
   const handleGoToLogin = () => {
-    navigate('/app/login', { state: { email: registeredEmail } });
+    navigate('/login', { state: { email: registeredEmail } });
   };
 
   return (
@@ -389,7 +389,7 @@ const RegisterForm = () => {
                     component="button"
                     type="button"
                     variant="body2"
-                    onClick={() => navigate('/app/login')}
+                    onClick={() => navigate('/login')}
                     sx={{
                       background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                       backgroundClip: 'text',

@@ -23,10 +23,9 @@ clientApi.interceptors.request.use((config) => {
 clientApi.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('user');
-      window.location.href = '/app/login';
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }
