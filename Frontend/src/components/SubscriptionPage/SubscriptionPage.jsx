@@ -402,11 +402,13 @@ const SubscriptionPage = () => {
                   icon={<Warning />}
                 >
                   <Typography variant="body1" sx={{ fontWeight: 600, color: '#b45309', mb: 1 }}>
-                    ⚠️ Subscription Cancelled - Access Until {new Date(subscriptionDetails.endDate).toLocaleDateString('en-US', { 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    })}
+                    ⚠️ Subscription Cancelled - Access Until {subscriptionDetails.endDate && new Date(subscriptionDetails.endDate).getFullYear() > 1970 
+                      ? new Date(subscriptionDetails.endDate).toLocaleDateString('en-US', { 
+                          year: 'numeric', 
+                          month: 'long', 
+                          day: 'numeric' 
+                        })
+                      : 'End of Period'}
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                     You've cancelled your subscription. You'll continue to have Premium access for {subscriptionDetails.daysRemainingAfterCancellation} more day{subscriptionDetails.daysRemainingAfterCancellation !== 1 ? 's' : ''}, until the end of your current billing period. After that, you'll be downgraded to the Free plan.
@@ -557,22 +559,44 @@ const SubscriptionPage = () => {
                           <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 600 }}>
                             {subscriptionDetails.monthlyPrice === 0 ? 'Premium Until' : 'Renews On'}
                           </Typography>
-                          <Typography variant="h5" sx={{ fontWeight: 800, color: '#7c3aed' }}>
-                            {new Date(subscriptionDetails.endDate).toLocaleDateString('en-US', { 
-                              year: 'numeric', 
-                              month: 'long', 
-                              day: 'numeric' 
-                            })}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                            {(() => {
-                              const daysLeft = Math.ceil((new Date(subscriptionDetails.endDate) - new Date()) / (1000 * 60 * 60 * 24));
-                              if (daysLeft < 0) return 'Expired';
-                              if (daysLeft === 0) return 'Expires today';
-                              if (daysLeft === 1) return '1 day remaining';
-                              return `${daysLeft} days remaining`;
-                            })()}
-                          </Typography>
+                          {(() => {
+                            const endDate = new Date(subscriptionDetails.endDate);
+                            const year = endDate.getFullYear();
+                            
+                            // If date is invalid or before year 2000, show a fallback message
+                            if (isNaN(endDate.getTime()) || year < 2000) {
+                              return (
+                                <>
+                                  <Typography variant="h5" sx={{ fontWeight: 800, color: '#7c3aed' }}>
+                                    Active
+                                  </Typography>
+                                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                                    Subscription is active
+                                  </Typography>
+                                </>
+                              );
+                            }
+                            
+                            const daysLeft = Math.ceil((endDate - new Date()) / (1000 * 60 * 60 * 24));
+                            
+                            return (
+                              <>
+                                <Typography variant="h5" sx={{ fontWeight: 800, color: '#7c3aed' }}>
+                                  {endDate.toLocaleDateString('en-US', { 
+                                    year: 'numeric', 
+                                    month: 'long', 
+                                    day: 'numeric' 
+                                  })}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                                  {daysLeft < 0 ? 'Expired' : 
+                                   daysLeft === 0 ? 'Expires today' : 
+                                   daysLeft === 1 ? '1 day remaining' : 
+                                   `${daysLeft} days remaining`}
+                                </Typography>
+                              </>
+                            );
+                          })()}
                         </Box>
                       )}
                     </Box>
@@ -665,7 +689,7 @@ const SubscriptionPage = () => {
                         </Button>
                       )}
 
-                      {isPremium && subscriptionDetails?.cancelAtPeriodEnd && (
+                      {isPremium && subscriptionDetails?.cancelAtPeriodEnd && subscriptionDetails.endDate && new Date(subscriptionDetails.endDate).getFullYear() > 1970 && (
                         <Chip
                           label={`Cancels on ${new Date(subscriptionDetails.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
                           icon={<Schedule />}

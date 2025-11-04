@@ -104,13 +104,18 @@ const InvoiceTemplatePreview = ({
   invoiceData = null,
   items = null,
   formatCurrency = null,
-  companyLogo = null,
-  logoMimeType = null
+  companyLogo = undefined, // undefined = template preview mode, null or string = actual invoice mode
+  logoMimeType = null,
+  companyInfo = null,
+  bankInfo = null
 }) => {
   const sections = useMemo(
     () => buildSectionsConfig(templateConfig.sections),
     [templateConfig.sections]
   );
+  
+  // Determine if we're in template preview mode (showing sample data)
+  const isTemplatePreview = companyLogo === undefined;
 
   const {
     themeKey,
@@ -393,12 +398,12 @@ const InvoiceTemplatePreview = ({
           </Box>
 
           <Box sx={{ textAlign: 'right' }}>
-            {logoSettings.showLogo && sections.showCompanyLogo !== false && (
+            {logoSettings.showLogo && sections.showCompanyLogo !== false && (isTemplatePreview || companyLogo) && (
               <Box
                 sx={{
                   width: logoDimension,
                   height: logoDimension,
-                  backgroundColor: companyLogo ? 'transparent' : '#f0f0f0',
+                  backgroundColor: (isTemplatePreview && !companyLogo) ? '#f0f0f0' : 'transparent',
                   borderRadius: logoSettings.style === 'circle' ? '50%' : borderRadius,
                   display: 'flex',
                   alignItems: 'center',
@@ -449,26 +454,66 @@ const InvoiceTemplatePreview = ({
             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1, color: primary }}>
               From:
             </Typography>
-            <Typography variant="body2">{displayData.billFrom}</Typography>
-            <Typography variant="body2" sx={{ color: textSecondary }}>
-              {displayData.billFromEmail}
-            </Typography>
-            <Typography variant="body2" sx={{ color: textSecondary }}>
-              {displayData.address}
-            </Typography>
+            {displayData.billFrom && (
+              <Typography variant="body2">{displayData.billFrom}</Typography>
+            )}
+            {companyInfo?.name && !displayData.billFrom && (
+              <Typography variant="body2">{companyInfo.name}</Typography>
+            )}
+            {companyInfo?.companyNo && (
+              <Typography variant="body2" sx={{ color: textSecondary }}>
+                Company No: {companyInfo.companyNo}
+              </Typography>
+            )}
+            {companyInfo?.vatNo && (
+              <Typography variant="body2" sx={{ color: textSecondary }}>
+                VAT No: {companyInfo.vatNo}
+              </Typography>
+            )}
+            {companyInfo?.ticNo && (
+              <Typography variant="body2" sx={{ color: textSecondary }}>
+                TIC No: {companyInfo.ticNo}
+              </Typography>
+            )}
+            {displayData.billFromEmail && (
+              <Typography variant="body2" sx={{ color: textSecondary }}>
+                {displayData.billFromEmail}
+              </Typography>
+            )}
+            {companyInfo?.email && !displayData.billFromEmail && (
+              <Typography variant="body2" sx={{ color: textSecondary }}>
+                {companyInfo.email}
+              </Typography>
+            )}
+            {companyInfo?.website && (
+              <Typography variant="body2" sx={{ color: textSecondary }}>
+                {companyInfo.website}
+              </Typography>
+            )}
+            {displayData.address && (
+              <Typography variant="body2" sx={{ color: textSecondary }}>
+                {displayData.address}
+              </Typography>
+            )}
           </Grid>
           {sections.showClientDetails !== false && (
             <Grid item xs={12} md={6}>
               <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1, color: primary }}>
                 To:
               </Typography>
-              <Typography variant="body2">{displayData.billTo}</Typography>
-              <Typography variant="body2" sx={{ color: textSecondary }}>
-                {displayData.billToEmail}
-              </Typography>
-              <Typography variant="body2" sx={{ color: textSecondary }}>
-                {displayData.billToAddress}
-              </Typography>
+              {displayData.billTo && (
+                <Typography variant="body2">{displayData.billTo}</Typography>
+              )}
+              {displayData.billToEmail && (
+                <Typography variant="body2" sx={{ color: textSecondary }}>
+                  {displayData.billToEmail}
+                </Typography>
+              )}
+              {displayData.billToAddress && (
+                <Typography variant="body2" sx={{ color: textSecondary }}>
+                  {displayData.billToAddress}
+                </Typography>
+              )}
             </Grid>
           )}
         </Grid>
@@ -631,7 +676,7 @@ const InvoiceTemplatePreview = ({
         </Box>
       )}
 
-      {sections.showNotes !== false && displayData.notes && (
+      {sections.showNotes !== false && displayData.notes && displayData.notes.trim() && (
         <Box sx={{ mb: 4 }}>
           <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1, color: primary }}>
             Notes:
@@ -664,6 +709,8 @@ const InvoiceTemplatePreview = ({
       )}
 
       {(sections.showBankInfo || sections.showBankDetails) && (
+        isTemplatePreview || (bankInfo && (bankInfo.bankName || bankInfo.accountName || bankInfo.accountNo || bankInfo.swift || bankInfo.iban))
+      ) && (
         <Box
           sx={{
             backgroundColor: sections.bankInfoBackground !== false ? '#f9f9f9' : 'transparent',
@@ -675,21 +722,31 @@ const InvoiceTemplatePreview = ({
           <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 2, color: primary }}>
             Banking Details:
           </Typography>
-          <Typography variant="body2" sx={{ color: text }}>
-            Bank Name: Sample Bank
-          </Typography>
-          <Typography variant="body2" sx={{ color: text }}>
-            Account Name: Your Company Name
-          </Typography>
-          <Typography variant="body2" sx={{ color: text }}>
-            Account Number: 123456789
-          </Typography>
-          <Typography variant="body2" sx={{ color: text }}>
-            Swift: SAMPUS33
-          </Typography>
-          <Typography variant="body2" sx={{ color: text }}>
-            IBAN: US12 3456 7890 1234 5678 90
-          </Typography>
+          {(isTemplatePreview || bankInfo?.bankName) && (
+            <Typography variant="body2" sx={{ color: text }}>
+              Bank Name: {bankInfo?.bankName || 'Sample Bank'}
+            </Typography>
+          )}
+          {(isTemplatePreview || bankInfo?.accountName) && (
+            <Typography variant="body2" sx={{ color: text }}>
+              Account Name: {bankInfo?.accountName || 'Your Company Name'}
+            </Typography>
+          )}
+          {(isTemplatePreview || bankInfo?.accountNo) && (
+            <Typography variant="body2" sx={{ color: text }}>
+              Account Number: {bankInfo?.accountNo || '123456789'}
+            </Typography>
+          )}
+          {(isTemplatePreview || bankInfo?.swift) && (
+            <Typography variant="body2" sx={{ color: text }}>
+              Swift: {bankInfo?.swift || 'SAMPUS33'}
+            </Typography>
+          )}
+          {(isTemplatePreview || bankInfo?.iban) && (
+            <Typography variant="body2" sx={{ color: text }}>
+              IBAN: {bankInfo?.iban || 'US12 3456 7890 1234 5678 90'}
+            </Typography>
+          )}
         </Box>
       )}
     </Box>

@@ -2212,7 +2212,7 @@ const InvoiceForm = () => {
               taxAmount={formData.taxAmount}
               discountAmount={formData.discountAmount}
               total={formData.total}
-              logo={formData.companyLogo || "https://via.placeholder.com/120x120?text=Your+Logo"}
+              logo={formData.companyLogo || ""}
               logoMimeType={formData.companyLogoMimeType}
               companyInfo={getCompanyInfo()}
               bankInfo={getBankInfo()}

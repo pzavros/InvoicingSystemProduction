@@ -825,7 +825,7 @@ namespace InvoicingBackend.Services
                     StripeCustomerId = customer.Id,
                     Status = SubscriptionStatus.Trial,
                     StartDate = now,
-                    EndDate = now,
+                    EndDate = now.AddDays(TRIAL_DAYS), // Set proper trial end date
                     MonthlyPrice = GetMonthlyPrice(),
                     DateEntered = now,
                     EnteredBy = userId.ToString()

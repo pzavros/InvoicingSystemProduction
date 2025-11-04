@@ -116,6 +116,22 @@ namespace InvoicingBackend.Controllers
             _logger.LogInformation("Processing checkout for user {UserId}, isTrial: {IsTrial}, customerId: {CustomerId}, subscriptionId: {SubscriptionId}", 
                 userId, isTrial, session.CustomerId, session.SubscriptionId);
 
+            // Get the actual Stripe subscription to get correct dates
+            Stripe.Subscription? stripeSubscription = null;
+            if (!string.IsNullOrEmpty(session.SubscriptionId))
+            {
+                try
+                {
+                    stripeSubscription = await _stripeService.GetSubscriptionAsync(session.SubscriptionId);
+                    _logger.LogInformation("Retrieved Stripe subscription: CurrentPeriodEnd={End}, TrialEnd={TrialEnd}, Status={Status}", 
+                        stripeSubscription.CurrentPeriodEnd, stripeSubscription.TrialEnd, stripeSubscription.Status);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to retrieve Stripe subscription {SubscriptionId}", session.SubscriptionId);
+                }
+            }
+
             // Get or create subscription record
             var dbSubscription = await _context.Subscriptions
                 .Include(s => s.User)
@@ -144,18 +160,33 @@ namespace InvoicingBackend.Controllers
                     EnteredBy = "Stripe"
                 };
 
-                if (isTrial)
+                // Use Stripe subscription dates if available
+                if (stripeSubscription != null)
                 {
-                    // 7-day trial
-                    dbSubscription.TrialEndDate = DateTime.UtcNow.AddDays(7);
-                    dbSubscription.EndDate = DateTime.UtcNow.AddDays(7);
-                    dbSubscription.HasUsedTrial = true;
+                    dbSubscription.EndDate = stripeSubscription.CurrentPeriodEnd;
+                    dbSubscription.NextPaymentDate = stripeSubscription.CurrentPeriodEnd;
+                    
+                    if (stripeSubscription.TrialEnd.HasValue && stripeSubscription.TrialEnd.Value > DateTime.UtcNow)
+                    {
+                        dbSubscription.TrialEndDate = stripeSubscription.TrialEnd;
+                        dbSubscription.HasUsedTrial = true;
+                        dbSubscription.MonthlyPrice = 0;
+                    }
                 }
                 else
                 {
-                    // Regular subscription - 30 days
-                    dbSubscription.EndDate = DateTime.UtcNow.AddMonths(1);
-                    dbSubscription.NextPaymentDate = DateTime.UtcNow.AddMonths(1);
+                    // Fallback to manual calculation if Stripe subscription not available
+                    if (isTrial)
+                    {
+                        dbSubscription.TrialEndDate = DateTime.UtcNow.AddDays(7);
+                        dbSubscription.EndDate = DateTime.UtcNow.AddDays(7);
+                        dbSubscription.HasUsedTrial = true;
+                    }
+                    else
+                    {
+                        dbSubscription.EndDate = DateTime.UtcNow.AddMonths(1);
+                        dbSubscription.NextPaymentDate = DateTime.UtcNow.AddMonths(1);
+                    }
                 }
 
                 _context.Subscriptions.Add(dbSubscription);
@@ -168,18 +199,39 @@ namespace InvoicingBackend.Controllers
                 dbSubscription.Status = Models.SubscriptionStatus.Active;
                 dbSubscription.StartDate = DateTime.UtcNow;
 
-                if (isTrial)
+                // Use Stripe subscription dates if available
+                if (stripeSubscription != null)
                 {
-                    dbSubscription.TrialEndDate = DateTime.UtcNow.AddDays(7);
-                    dbSubscription.EndDate = DateTime.UtcNow.AddDays(7);
-                    dbSubscription.MonthlyPrice = 0;
-                    dbSubscription.HasUsedTrial = true;
+                    dbSubscription.EndDate = stripeSubscription.CurrentPeriodEnd;
+                    dbSubscription.NextPaymentDate = stripeSubscription.CurrentPeriodEnd;
+                    
+                    if (stripeSubscription.TrialEnd.HasValue && stripeSubscription.TrialEnd.Value > DateTime.UtcNow)
+                    {
+                        dbSubscription.TrialEndDate = stripeSubscription.TrialEnd;
+                        dbSubscription.HasUsedTrial = true;
+                        dbSubscription.MonthlyPrice = 0;
+                    }
+                    else
+                    {
+                        dbSubscription.MonthlyPrice = GetMonthlyPrice();
+                    }
                 }
                 else
                 {
-                    dbSubscription.EndDate = DateTime.UtcNow.AddMonths(1);
-                    dbSubscription.NextPaymentDate = DateTime.UtcNow.AddMonths(1);
-                    dbSubscription.MonthlyPrice = GetMonthlyPrice();
+                    // Fallback to manual calculation
+                    if (isTrial)
+                    {
+                        dbSubscription.TrialEndDate = DateTime.UtcNow.AddDays(7);
+                        dbSubscription.EndDate = DateTime.UtcNow.AddDays(7);
+                        dbSubscription.MonthlyPrice = 0;
+                        dbSubscription.HasUsedTrial = true;
+                    }
+                    else
+                    {
+                        dbSubscription.EndDate = DateTime.UtcNow.AddMonths(1);
+                        dbSubscription.NextPaymentDate = DateTime.UtcNow.AddMonths(1);
+                        dbSubscription.MonthlyPrice = GetMonthlyPrice();
+                    }
                 }
 
                 dbSubscription.MarkAsModified("Stripe");
@@ -203,6 +255,44 @@ namespace InvoicingBackend.Controllers
 
             _logger.LogInformation("Subscription successfully created/updated for user {UserId}, tier={Tier}", 
                 userId, userToUpdate?.SubscriptionTier ?? "unknown");
+
+            // Send welcome email
+            if (userToUpdate != null)
+            {
+                try
+                {
+                    if (isTrial)
+                    {
+                        // Send trial started email
+                        var trialEndDate = dbSubscription.TrialEndDate ?? DateTime.UtcNow.AddDays(7);
+                        await _emailService.SendTrialStartedEmailAsync(
+                            userToUpdate.Email,
+                            $"{userToUpdate.FirstName} {userToUpdate.LastName}",
+                            DateTime.UtcNow,
+                            trialEndDate,
+                            "https://e-nvoicing.com/app/dashboard"
+                        );
+                        _logger.LogInformation("Trial started email sent to {Email}", userToUpdate.Email);
+                    }
+                    else
+                    {
+                        // Send premium upgrade email
+                        await _emailService.SendPremiumUpgradeEmailAsync(
+                            userToUpdate.Email,
+                            $"{userToUpdate.FirstName} {userToUpdate.LastName}",
+                            DateTime.UtcNow,
+                            dbSubscription.NextPaymentDate ?? DateTime.UtcNow.AddMonths(1),
+                            GetMonthlyPrice(),
+                            "https://e-nvoicing.com/app/dashboard"
+                        );
+                        _logger.LogInformation("Premium upgrade email sent to {Email}", userToUpdate.Email);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to send welcome email for user {UserId}", userId);
+                }
+            }
         }
 
         private async Task HandleSubscriptionCreated(Event stripeEvent)
@@ -346,12 +436,14 @@ namespace InvoicingBackend.Controllers
                         _logger.LogInformation("Sending payment success email to {Email}, amount €{Amount}", 
                             dbSubscription.User.Email, invoice.AmountPaid / 100m);
                         
-                        var invoiceUrl = "https://e-nvoicing.com/app/subscription"; // Link to subscription page
+                        // Use Stripe's hosted invoice URL if available, otherwise subscription page
+                        var invoiceUrl = invoice.HostedInvoiceUrl ?? "https://e-nvoicing.com/app/subscription";
+                        
                         await _emailService.SendPaymentSuccessEmailAsync(
                             dbSubscription.User.Email,
                             $"{dbSubscription.User.FirstName} {dbSubscription.User.LastName}",
                             invoice.AmountPaid / 100m,
-                            invoice.Currency,
+                            invoice.Currency.ToUpper(),
                             DateTime.UtcNow,
                             dbSubscription.NextPaymentDate ?? DateTime.UtcNow.AddMonths(1),
                             invoiceUrl

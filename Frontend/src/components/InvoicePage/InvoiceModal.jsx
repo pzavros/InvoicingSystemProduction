@@ -105,15 +105,15 @@ const InvoiceModal = (props) => {
   const items = Array.isArray(props.items) ? props.items : [];
   const info = props.info || {};
   const companyInfo = props.companyInfo || {
-    name: info.billFrom || "Unknown",
-    companyNo: info.companyNo || "Unknown",
-    vatNo: "6789456",
-    ticNo: "1234563",
-    website: "https://www.i-spiral.com",
-    email: "info@i-spiral.com",
+    name: info.billFrom || "",
+    companyNo: info.companyNo || "",
+    vatNo: info.vatNo || "",
+    ticNo: info.ticNo || "",
+    website: info.website || "",
+    email: info.companyEmail || info.billFromEmail || "",
   };
 
-  const placeholderLogoSrc = "https://via.placeholder.com/120x120?text=Company+Logo";
+  const placeholderLogoSrc = "";
   const primaryLogoValue = typeof props.logo === 'string' && props.logo.trim().length > 0
     ? props.logo.trim()
     : typeof props.info?.logo === 'string' && props.info.logo.trim().length > 0
@@ -145,15 +145,9 @@ const InvoiceModal = (props) => {
     ? primaryLogoValue.startsWith("data:")
       ? primaryLogoValue
       : `data:${logoMimeType};base64,${primaryLogoValue}`
-    : placeholderLogoSrc;
+    : "";
 
-  const bankInfo = props.bankInfo || {
-    bankName: "Hellenic Bank",
-    accountName: "PRIMELEGACY SERVICES LTD",
-    accountNo: "350-01-H01712-01",
-    swift: "HEBACY2N",
-    iban: "CY87 0050 0350 0003 5001 H017 1201",
-  };
+  const bankInfo = props.bankInfo || null;
 
   const isInvoiceCanceled = props.info.isDeleted || props.info.statusId === 4;
   
@@ -503,6 +497,8 @@ const InvoiceModal = (props) => {
               formatCurrency={formatCurrency}
               companyLogo={logoSrc}
               logoMimeType={logoMimeType}
+              companyInfo={companyInfo}
+              bankInfo={bankInfo}
               containerSx={{
                 maxWidth: '100%',
                 mx: 0,
