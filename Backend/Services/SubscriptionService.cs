@@ -878,6 +878,78 @@ namespace InvoicingBackend.Services
             return session.Url;
         }
         
+        public async Task SyncStripeSubscriptionAsync(int userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                throw new InvalidOperationException("User not found");
+            }
+
+            // Get the user's subscription record
+            var subscription = await _context.Subscriptions
+                .FirstOrDefaultAsync(s => s.UserId == userId && !s.IsDeleted);
+
+            if (subscription == null || string.IsNullOrEmpty(subscription.StripeCustomerId))
+            {
+                _logger.LogWarning("No subscription found for user {UserId}", userId);
+                return;
+            }
+
+            try
+            {
+                // Get the latest subscription from Stripe
+                var customer = await _stripeService.GetCustomerAsync(subscription.StripeCustomerId);
+                
+                // If no active subscription in Stripe, check if there's a setup intent that succeeded
+                // This might happen if webhooks are not configured
+                if (customer != null && !string.IsNullOrEmpty(subscription.StripeSubscriptionId))
+                {
+                    var stripeSubscription = await _stripeService.GetSubscriptionAsync(subscription.StripeSubscriptionId);
+                    
+                    if (stripeSubscription != null && stripeSubscription.Status == "active")
+                    {
+                        // Update local subscription to match Stripe
+                        subscription.Status = SubscriptionStatus.Active;
+                        subscription.EndDate = stripeSubscription.CurrentPeriodEnd;
+                        subscription.NextPaymentDate = stripeSubscription.CurrentPeriodEnd;
+                        
+                        // Check if it's a trial
+                        var isTrial = stripeSubscription.TrialEnd.HasValue && 
+                                     DateTime.UtcNow < stripeSubscription.TrialEnd.Value;
+                        
+                        if (isTrial)
+                        {
+                            subscription.TrialEndDate = stripeSubscription.TrialEnd;
+                            subscription.HasUsedTrial = true;
+                            subscription.MonthlyPrice = 0;
+                        }
+                        else
+                        {
+                            subscription.MonthlyPrice = GetMonthlyPrice();
+                        }
+                        
+                        subscription.MarkAsModified("Manual Sync");
+                        
+                        // Upgrade user to premium
+                        user.SubscriptionTier = "premium";
+                        user.IsTrialUser = isTrial;
+                        _context.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                        
+                        await _context.SaveChangesAsync();
+                        
+                        _logger.LogInformation("Subscription synced successfully for user {UserId}, tier set to {Tier}", 
+                            userId, user.SubscriptionTier);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error syncing subscription for user {UserId}", userId);
+                throw;
+            }
+        }
+
         // ============= MAPPING HELPERS =============
         
         private static SubscriptionDto MapToDto(Subscription subscription)

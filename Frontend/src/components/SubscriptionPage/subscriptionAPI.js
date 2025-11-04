@@ -69,6 +69,9 @@ export const subscriptionAPI = {
   // Create checkout session for paid subscription
   createCheckoutSession: (data) => api.post('/api/subscription/create-checkout-session', data),
   
+  // Manually sync subscription from Stripe (for when webhooks aren't configured)
+  syncSubscription: () => api.post('/api/subscription/sync-subscription'),
+  
   // ============= FREEMIUM ENDPOINTS =============
   
   // Get user's subscription tier (free or premium)

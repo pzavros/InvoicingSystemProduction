@@ -12,6 +12,7 @@ import {
   Divider
 } from '@mui/material';
 import { COLOR_THEMES } from '../../utils/colorThemes';
+import { useSubscription } from '../../utils/SubscriptionContext';
 
 const DEFAULT_PRIMARY = '#667eea';
 const DEFAULT_SECONDARY = '#4338ca';
@@ -294,6 +295,12 @@ const InvoiceTemplatePreview = ({
   const tableRadius = sections.tableStyle === 'rounded' ? borderRadius : 0;
   const logoDimension = computeLogoDimensions();
 
+  // Get subscription status for watermark
+  const { isPremium, loading: subscriptionLoading } = useSubscription();
+  
+  // Show watermark if not premium and subscription data is loaded
+  const showWatermark = !subscriptionLoading && !isPremium;
+
   const containerStyles = {
     maxWidth: 800,
     mx: 'auto',
@@ -303,10 +310,62 @@ const InvoiceTemplatePreview = ({
     border: '1px solid #e2e8f0',
     p: { xs: 3, md: 4 },
     fontFamily,
+    position: 'relative', // Add position relative for watermark
   };
 
   return (
     <Box sx={{ ...containerStyles, ...containerSx }}>
+      {/* Free Tier Watermark */}
+      {showWatermark && (
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 20,
+            right: 20,
+            pointerEvents: 'none',
+            userSelect: 'none',
+            zIndex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.5,
+            opacity: 0.3,
+          }}
+        >
+          {/* E-Invoicing Brand Name */}
+          <Typography
+            sx={{
+              fontSize: '1.5rem',
+              fontWeight: 700,
+              color: '#7c3aed',
+              letterSpacing: '-0.5px',
+              fontFamily: 'Inter, Arial, sans-serif',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            E-Invoicing
+          </Typography>
+          <Box
+            sx={{
+              width: 2,
+              height: 28,
+              backgroundColor: '#c4b5fd',
+            }}
+          />
+          <Typography
+            sx={{
+              fontSize: '1.3rem',
+              fontWeight: 600,
+              color: '#1f2937',
+              letterSpacing: '0.5px',
+              textTransform: 'uppercase',
+              fontFamily: 'Arial, sans-serif',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Free Tier
+          </Typography>
+        </Box>
+      )}
       {sections.showInvoiceHeader !== false && (
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
           <Box>

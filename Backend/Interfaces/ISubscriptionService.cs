@@ -23,6 +23,7 @@ namespace InvoicingBackend.Interfaces
         Task<string> CreateSetupIntentAsync(int userId);
         Task<string> CreateCheckoutSessionAsync(int userId, string successUrl, string cancelUrl, bool isTrial = false);
         Task<string> GetOrCreateStripeCustomerAsync(int userId);
+        Task SyncStripeSubscriptionAsync(int userId);
         
         // Subscription Maintenance
         Task ProcessExpiredSubscriptionsAsync(); // Background service

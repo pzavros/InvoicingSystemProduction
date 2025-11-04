@@ -300,6 +300,23 @@ namespace InvoicingBackend.Controllers
                 return StatusCode(500, new { message = "An error occurred while creating checkout session.", error = ex.Message });
             }
         }
+
+        // POST: api/subscription/sync-subscription
+        // Manual sync endpoint for when webhooks are not configured (development)
+        [HttpPost("sync-subscription")]
+        public async Task<IActionResult> SyncSubscription()
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                await _subscriptionService.SyncStripeSubscriptionAsync(userId);
+                return Ok(new { message = "Subscription synced successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred while syncing subscription.", error = ex.Message });
+            }
+        }
     }
 
     public class CheckoutSessionRequest

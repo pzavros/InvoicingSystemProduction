@@ -15,6 +15,7 @@ import {
   ArrowForward,
 } from '@mui/icons-material';
 import { useSubscription } from '../../utils/SubscriptionContext';
+import { subscriptionAPI } from './subscriptionAPI';
 
 const SubscriptionSuccess = () => {
   const navigate = useNavigate();
@@ -30,6 +31,13 @@ const SubscriptionSuccess = () => {
       try {
         // Wait a moment for webhook to process
         await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Manually sync subscription from Stripe (in case webhooks aren't configured)
+        try {
+          await subscriptionAPI.syncSubscription();
+        } catch (syncError) {
+          console.warn('Manual sync failed, might already be synced via webhook:', syncError);
+        }
         
         // Refresh subscription status from backend
         await refreshStatus();
