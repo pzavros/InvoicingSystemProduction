@@ -287,11 +287,16 @@ const InvoiceForm = () => {
               const storedUserRaw = localStorage.getItem("user");
               if (storedUserRaw) {
                 const storedUser = JSON.parse(storedUserRaw);
+                // Only update safe, non-sensitive fields
                 const updatedUser = {
-                  ...storedUser,
+                  firstName: storedUser.firstName,
+                  lastName: storedUser.lastName,
+                  subscriptionTier: storedUser.subscriptionTier,
+                  isAdmin: storedUser.isAdmin,
                   currency: normalizedPreferences.currency || storedUser?.currency,
                   dateFormat: normalizedPreferences.dateFormat || storedUser?.dateFormat,
                   language: normalizedPreferences.language || storedUser?.language,
+                  darkMode: storedUser.darkMode
                 };
                 localStorage.setItem("user", JSON.stringify(updatedUser));
               }
@@ -1537,16 +1542,16 @@ const InvoiceForm = () => {
               >
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                   {/* Document Category Selection */}
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
                     <Typography sx={{ 
                       fontWeight: 700, 
-                      minWidth: "120px",
+                      minWidth: { xs: '100%', sm: '120px' },
                       color: '#2d3748',
                       fontSize: '0.95rem'
                     }}>
                       Category:
                     </Typography>
-                    <FormControl size="small" sx={{ minWidth: 200 }}>
+                    <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 200 }, flex: 1 }}>
                       <Select
                         value={documentCategory}
                         onChange={(e) => {
@@ -1598,16 +1603,16 @@ const InvoiceForm = () => {
                   </Box>
 
                   {/* Document Type Selection - Now filtered by category */}
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
                     <Typography sx={{ 
                       fontWeight: 700, 
-                      minWidth: "120px",
+                      minWidth: { xs: '100%', sm: '120px' },
                       color: '#2d3748',
                       fontSize: '0.95rem'
                     }}>
                       Document Type:
                     </Typography>
-                    <FormControl size="small" sx={{ minWidth: 200 }}>
+                    <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 200 }, flex: 1 }}>
                       <Select
                         value={formData.documentTypeId || 1}
                         onChange={(e) => editField('documentTypeId', e.target.value)}

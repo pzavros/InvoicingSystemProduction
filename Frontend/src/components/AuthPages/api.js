@@ -150,6 +150,22 @@ export const isAuthenticated = () => {
   return !!token && !!user;
 };
 
+// Sanitize user data before storing in localStorage
+// Only store non-sensitive information needed for the app
+const sanitizeUserData = (user) => {
+  if (!user) return null;
+  return {
+    firstName: user.firstName,
+    lastName: user.lastName,
+    subscriptionTier: user.subscriptionTier,
+    isAdmin: user.isAdmin,
+    currency: user.currency,
+    dateFormat: user.dateFormat,
+    language: user.language,
+    darkMode: user.darkMode
+  };
+};
+
 // Get current user from localStorage
 export const getCurrentUser = () => {
   const userStr = localStorage.getItem('user');
@@ -159,7 +175,7 @@ export const getCurrentUser = () => {
 // Store auth data
 export const storeAuthData = (authResponse) => {
   localStorage.setItem('authToken', authResponse.token);
-  localStorage.setItem('user', JSON.stringify(authResponse.user));
+  localStorage.setItem('user', JSON.stringify(sanitizeUserData(authResponse.user)));
 };
 
 export default authApi;

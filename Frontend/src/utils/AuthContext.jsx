@@ -11,6 +11,22 @@ export const useAuth = () => {
   return context;
 };
 
+// Sanitize user data before storing in localStorage
+// Only store non-sensitive information needed for the app
+const sanitizeUserData = (user) => {
+  if (!user) return null;
+  return {
+    firstName: user.firstName,
+    lastName: user.lastName,
+    subscriptionTier: user.subscriptionTier,
+    isAdmin: user.isAdmin,
+    currency: user.currency,
+    dateFormat: user.dateFormat,
+    language: user.language,
+    darkMode: user.darkMode
+  };
+};
+
 export const AuthProvider = ({ children }) => {
   const [authenticated, setAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
@@ -51,7 +67,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = (authResponse) => {
     localStorage.setItem('authToken', authResponse.token);
-    localStorage.setItem('user', JSON.stringify(authResponse.user));
+    localStorage.setItem('user', JSON.stringify(sanitizeUserData(authResponse.user)));
     
     setAuthenticated(true);
     setUser(authResponse.user);

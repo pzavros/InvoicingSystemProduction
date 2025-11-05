@@ -80,21 +80,52 @@ if (typeof document !== 'undefined' && !document.head.querySelector('#invoice-mo
 }
 
 const GenerateInvoice = (invoiceNumber) => {
-  html2canvas(document.querySelector("#invoiceCapture")).then((canvas) => {
-    const imgData = canvas.toDataURL("image/png", 1.0);
-    const pdf = new jsPDF({
-      orientation: "portrait",
-      unit: "pt",
-      format: [612, 792],
+  const invoiceElement = document.querySelector("#invoiceCapture");
+  
+  // Store original styles
+  const originalMinWidth = invoiceElement.style.minWidth;
+  const originalOverflow = invoiceElement.style.overflow;
+  const originalWidth = invoiceElement.style.width;
+  
+  // Temporarily force desktop width for PDF capture
+  invoiceElement.style.minWidth = '800px';
+  invoiceElement.style.width = '800px';
+  invoiceElement.style.overflow = 'visible';
+  
+  // Small delay to ensure styles are applied
+  setTimeout(() => {
+    html2canvas(invoiceElement, {
+      scale: 2, // Higher quality
+      useCORS: true,
+      logging: false,
+      windowWidth: 800,
+    }).then((canvas) => {
+      // Restore original styles immediately after capture
+      invoiceElement.style.minWidth = originalMinWidth;
+      invoiceElement.style.overflow = originalOverflow;
+      invoiceElement.style.width = originalWidth;
+      
+      const imgData = canvas.toDataURL("image/png", 1.0);
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "pt",
+        format: [612, 792],
+      });
+      pdf.internal.scaleFactor = 1;
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      const safeInvoiceNumber = String(invoiceNumber).replace(/[^a-z0-9]/gi, '_').toLowerCase();
+      pdf.save(`invoice_${safeInvoiceNumber || 'download'}.pdf`);
+    }).catch((error) => {
+      // Restore styles even if capture fails
+      invoiceElement.style.minWidth = originalMinWidth;
+      invoiceElement.style.overflow = originalOverflow;
+      invoiceElement.style.width = originalWidth;
+      console.error('PDF generation failed:', error);
     });
-    pdf.internal.scaleFactor = 1;
-    const imgProps = pdf.getImageProperties(imgData);
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-    const safeInvoiceNumber = String(invoiceNumber).replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    pdf.save(`invoice_${safeInvoiceNumber || 'download'}.pdf`);
-  });
+  }, 100);
 };
 
 const InvoiceModal = (props) => {
@@ -458,14 +489,16 @@ const InvoiceModal = (props) => {
           <Box
             id="invoiceCapture"
             sx={{ 
-              p: { xs: 2, sm: 3, md: 4 },
+              p: { xs: 2, sm: 3, md: 4 }, // Responsive padding for better mobile preview
               '@media print': {
                 background: '#ffffff !important',
                 color: '#000000 !important',
                 margin: 0,
                 padding: '32px',
                 width: '100%',
-                minHeight: 'auto'
+                minHeight: 'auto',
+                minWidth: 'auto',
+                overflow: 'visible'
               }
             }}
           >

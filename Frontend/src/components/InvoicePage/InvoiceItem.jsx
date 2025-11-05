@@ -339,8 +339,16 @@ const ItemCard = (props) => {
 
         <Divider sx={{ my: 2, borderColor: "rgba(102, 126, 234, 0.2)" }} />
 
-        {/* Quantity, Price & VAT in Grid */}
-        <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 2, mb: 2 }}>
+        {/* Quantity, Price & VAT in Grid - Responsive for mobile */}
+        <Box sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: { 
+            xs: '80px 1fr 80px',  // Mobile: Small Qty, Large Price, Small VAT
+            sm: '1fr 1fr 1fr'     // Desktop: Equal columns
+          }, 
+          gap: 2, 
+          mb: 2 
+        }}>
           <Box>
             <Typography 
               variant="caption" 

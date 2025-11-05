@@ -80,6 +80,7 @@ const SubscriptionPage = () => {
       ]);
       setPayments(paymentsResponse.data);
       // Handle null subscription for new users who haven't started trial yet
+      console.log('Subscription data received:', subscriptionResponse.data);
       setSubscriptionDetails(subscriptionResponse.data || null);
     } catch (error) {
       console.error('Error fetching payment data:', error);
@@ -560,11 +561,40 @@ const SubscriptionPage = () => {
                             {subscriptionDetails.monthlyPrice === 0 ? 'Premium Until' : 'Renews On'}
                           </Typography>
                           {(() => {
-                            const endDate = new Date(subscriptionDetails.endDate);
+                            // Use trialEndDate for trials, endDate for paid subscriptions
+                            const dateString = subscriptionDetails.isTrialActive 
+                              ? subscriptionDetails.trialEndDate 
+                              : subscriptionDetails.endDate;
+                            
+                            console.log('Date display logic:', {
+                              isTrialActive: subscriptionDetails.isTrialActive,
+                              trialEndDate: subscriptionDetails.trialEndDate,
+                              endDate: subscriptionDetails.endDate,
+                              dateString: dateString
+                            });
+                            
+                            if (!dateString) {
+                              console.log('No date string found, showing Active fallback');
+                              return (
+                                <>
+                                  <Typography variant="h5" sx={{ fontWeight: 800, color: '#7c3aed' }}>
+                                    Active
+                                  </Typography>
+                                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+                                    Subscription is active
+                                  </Typography>
+                                </>
+                              );
+                            }
+                            
+                            const endDate = new Date(dateString);
                             const year = endDate.getFullYear();
+                            
+                            console.log('Parsed date:', endDate, 'Year:', year);
                             
                             // If date is invalid or before year 2000, show a fallback message
                             if (isNaN(endDate.getTime()) || year < 2000) {
+                              console.log('Invalid date or year < 2000, showing Active fallback');
                               return (
                                 <>
                                   <Typography variant="h5" sx={{ fontWeight: 800, color: '#7c3aed' }}>

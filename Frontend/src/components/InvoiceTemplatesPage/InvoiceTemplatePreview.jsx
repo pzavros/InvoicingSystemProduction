@@ -313,7 +313,7 @@ const InvoiceTemplatePreview = ({
     borderRadius,
     boxShadow: '0 10px 30px rgba(15, 23, 42, 0.08)',
     border: '1px solid #e2e8f0',
-    p: { xs: 3, md: 4 },
+    p: { xs: 2, sm: 3, md: 4 }, // Responsive padding for mobile-friendly preview
     fontFamily,
     position: 'relative', // Add position relative for watermark
   };
@@ -372,7 +372,7 @@ const InvoiceTemplatePreview = ({
         </Box>
       )}
       {sections.showInvoiceHeader !== false && (
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 4 }}>
           <Box>
             <Typography
               variant="h4"
@@ -410,6 +410,7 @@ const InvoiceTemplatePreview = ({
                   justifyContent: 'center',
                   mx: 'auto',
                   overflow: 'hidden',
+                  mb: 2,
                 }}
               >
                 {companyLogo ? (
@@ -429,11 +430,38 @@ const InvoiceTemplatePreview = ({
                 )}
               </Box>
             )}
+            
+            {/* Company details below logo */}
+            {sections.showCompanyInfo !== false && (
+              <Box sx={{ textAlign: 'right' }}>
+                {companyInfo?.companyNo && (
+                  <Typography variant="body2" sx={{ color: textSecondary, fontSize: '0.875rem' }}>
+                    Company No: {companyInfo.companyNo}
+                  </Typography>
+                )}
+                {companyInfo?.vatNo && (
+                  <Typography variant="body2" sx={{ color: textSecondary, fontSize: '0.875rem' }}>
+                    VAT No: {companyInfo.vatNo}
+                  </Typography>
+                )}
+                {companyInfo?.ticNo && (
+                  <Typography variant="body2" sx={{ color: textSecondary, fontSize: '0.875rem' }}>
+                    TIC No: {companyInfo.ticNo}
+                  </Typography>
+                )}
+                {companyInfo?.website && (
+                  <Typography variant="body2" sx={{ color: textSecondary, fontSize: '0.875rem' }}>
+                    {companyInfo.website}
+                  </Typography>
+                )}
+              </Box>
+            )}
           </Box>
         </Box>
       )}
 
-      {((templateMeta && templateMeta.name) || templateConfig?.customization?.name) && (
+      {/* Only show template name in template preview mode, not in actual invoices */}
+      {isTemplatePreview && ((templateMeta && templateMeta.name) || templateConfig?.customization?.name) && (
         <Box sx={{ mb: 3 }}>
           <Typography
             variant="body2"
@@ -448,8 +476,10 @@ const InvoiceTemplatePreview = ({
         </Box>
       )}
 
-      {sections.showCompanyInfo !== false && (
-        <Grid container spacing={4} sx={{ mb: 4 }}>
+      {/* Company and Client Details Section */}
+      <Grid container spacing={4} sx={{ mb: 4 }}>
+        {/* Bill From Section - Billing information only */}
+        {sections.showCompanyInfo !== false && (
           <Grid item xs={12} md={6}>
             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1, color: primary }}>
               From:
@@ -459,21 +489,6 @@ const InvoiceTemplatePreview = ({
             )}
             {companyInfo?.name && !displayData.billFrom && (
               <Typography variant="body2">{companyInfo.name}</Typography>
-            )}
-            {companyInfo?.companyNo && (
-              <Typography variant="body2" sx={{ color: textSecondary }}>
-                Company No: {companyInfo.companyNo}
-              </Typography>
-            )}
-            {companyInfo?.vatNo && (
-              <Typography variant="body2" sx={{ color: textSecondary }}>
-                VAT No: {companyInfo.vatNo}
-              </Typography>
-            )}
-            {companyInfo?.ticNo && (
-              <Typography variant="body2" sx={{ color: textSecondary }}>
-                TIC No: {companyInfo.ticNo}
-              </Typography>
             )}
             {displayData.billFromEmail && (
               <Typography variant="body2" sx={{ color: textSecondary }}>
@@ -485,40 +500,37 @@ const InvoiceTemplatePreview = ({
                 {companyInfo.email}
               </Typography>
             )}
-            {companyInfo?.website && (
-              <Typography variant="body2" sx={{ color: textSecondary }}>
-                {companyInfo.website}
-              </Typography>
-            )}
             {displayData.address && (
               <Typography variant="body2" sx={{ color: textSecondary }}>
                 {displayData.address}
               </Typography>
             )}
           </Grid>
-          {sections.showClientDetails !== false && (
-            <Grid item xs={12} md={6}>
-              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1, color: primary }}>
-                To:
+        )}
+        
+        {/* Bill To Section */}
+        {sections.showClientDetails !== false && (
+          <Grid item xs={12} md={6}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1, color: primary }}>
+              To:
+            </Typography>
+            {displayData.billTo && (
+              <Typography variant="body2">{displayData.billTo}</Typography>
+            )}
+            {displayData.billToEmail && (
+              <Typography variant="body2" sx={{ color: textSecondary }}>
+                {displayData.billToEmail}
               </Typography>
-              {displayData.billTo && (
-                <Typography variant="body2">{displayData.billTo}</Typography>
-              )}
-              {displayData.billToEmail && (
-                <Typography variant="body2" sx={{ color: textSecondary }}>
-                  {displayData.billToEmail}
-                </Typography>
-              )}
-              {displayData.billToAddress && (
-                <Typography variant="body2" sx={{ color: textSecondary }}>
-                  {displayData.billToAddress}
-                </Typography>
-              )}
-            </Grid>
-          )}
-        </Grid>
-      )}
-
+            )}
+            {displayData.billToAddress && (
+              <Typography variant="body2" sx={{ color: textSecondary }}>
+                {displayData.billToAddress}
+              </Typography>
+            )}
+          </Grid>
+        )}
+      </Grid>
+      
       {sections.showDates !== false && (
         <Grid container spacing={4} sx={{ mb: 4 }}>
           <Grid item xs={12} md={6}>

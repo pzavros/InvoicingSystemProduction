@@ -249,7 +249,7 @@ const ProductSelectorDialog = ({
             gap: 1,
             fontSize: { xs: '0.875rem', sm: '1rem' }
           }}>
-            🔍 Search & Filter Products
+            Search & Filter Products
           </Typography>
           <Box sx={{ 
             display: 'flex', 
@@ -320,13 +320,13 @@ const ProductSelectorDialog = ({
               onChange={(e) => setSelectedCategory(e.target.value)}
             >              <MenuItem value="">
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  📂 All Categories
+                  All Categories
                 </Box>
               </MenuItem>
               {categories.map((category) => (
                 <MenuItem key={category.id} value={category.id}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    🏷️ {category.name}
+                    {category.name}
                   </Box>
                 </MenuItem>
               ))}</Select>
@@ -418,7 +418,7 @@ const ProductSelectorDialog = ({
                               fontSize: '1rem'
                             }}
                           >
-                            📦 {product.name}
+                            {product.name}
                           </Typography>
                           {product.description && (
                             <Typography 
@@ -456,7 +456,7 @@ const ProductSelectorDialog = ({
                               mb: 0.5
                             }}
                           >
-                            🏷️ Category
+                            Category
                           </Typography>
                           <Typography 
                             variant="body2"
@@ -483,7 +483,7 @@ const ProductSelectorDialog = ({
                               mb: 0.5
                             }}
                           >
-                            💰 Price
+                            Price
                           </Typography>
                           <Typography 
                             variant="h6"
@@ -512,7 +512,7 @@ const ProductSelectorDialog = ({
                             mb: 0.5
                           }}
                         >
-                          📊 Stock Status
+                          Stock Status
                         </Typography>
                         {product.trackInventory ? (
                           <Chip
@@ -585,27 +585,28 @@ const ProductSelectorDialog = ({
                   {multipleSelection && (
                     <TableCell padding="checkbox" sx={{ width: '60px' }}>
                       <Typography variant="body2" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        ✅ Select
+                        Select
                       </Typography>
                     </TableCell>
                   )}
                   <TableCell sx={{ width: '40%' }}>
                     <Typography variant="body2" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      📦 Product
+                      Product
                     </Typography>
                   </TableCell>
                   <TableCell sx={{ width: '20%' }}>
                     <Typography variant="body2" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      🏷️ Category
+                      Category
                     </Typography>
                   </TableCell>
                   <TableCell align="right" sx={{ width: '15%' }}>
                     <Typography variant="body2" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'flex-end' }}>
-                      💰 Price
+                      Price
                     </Typography>
                   </TableCell>
                   <TableCell sx={{ width: '25%' }}>
-                    <Typography variant="body2" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>                      📊 Stock Status
+                    <Typography variant="body2" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      Stock Status
                     </Typography></TableCell>
                 </TableRow>
               </TableHead>

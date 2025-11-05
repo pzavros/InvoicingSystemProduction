@@ -167,11 +167,16 @@ const useProfileData = () => {
           const storedUserRaw = localStorage.getItem('user');
           if (storedUserRaw) {
             const storedUser = JSON.parse(storedUserRaw);
+            // Only update safe, non-sensitive fields
             const updatedUser = {
-              ...storedUser,
+              firstName: storedUser.firstName,
+              lastName: storedUser.lastName,
+              subscriptionTier: storedUser.subscriptionTier,
+              isAdmin: storedUser.isAdmin,
               currency: prefs.currency ? prefs.currency.toUpperCase() : storedUser?.currency,
               dateFormat: prefs.dateFormat ? prefs.dateFormat.toUpperCase() : storedUser?.dateFormat,
-              language: prefs.language || storedUser?.language
+              language: prefs.language || storedUser?.language,
+              darkMode: storedUser.darkMode
             };
             localStorage.setItem('user', JSON.stringify(updatedUser));
           }
