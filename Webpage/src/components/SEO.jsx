@@ -1,4 +1,4 @@
-import { Helmet } from 'react-helmet-async';
+import { useEffect } from 'react';
 
 const SEO = ({ 
   title = "Professional Invoicing System | Global E-Invoicing Solution",
@@ -8,16 +8,31 @@ const SEO = ({
   ogType = "website",
   canonicalUrl,
   structuredData,
-  geoRegion = null, // Optional: specify region like "US", "GB", "CY" for local targeting
-  geoPlacename = null // Optional: specify place like "New York", "London", "Cyprus"
+  geoRegion = null,
+  geoPlacename = null
 }) => {
-  const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://yourdomain.com';
-  const url = canonicalUrl || (typeof window !== 'undefined' ? window.location.href : siteUrl);
+  const siteUrl = typeof window !== 'undefined' ? window.location.origin : '';
+  const url = canonicalUrl || (typeof window !== 'undefined' ? window.location.href : '');
+
+  useEffect(() => {
+    // Set document title
+    document.title = title;
+
+    // Handle structured data
+    if (structuredData) {
+      let script = document.querySelector('script[type="application/ld+json"]');
+      if (!script) {
+        script = document.createElement('script');
+        script.setAttribute('type', 'application/ld+json');
+        document.head.appendChild(script);
+      }
+      script.textContent = JSON.stringify(structuredData);
+    }
+  }, [title, structuredData]);
 
   return (
-    <Helmet>
+    <>
       {/* Primary Meta Tags */}
-      <title>{title}</title>
       <meta name="title" content={title} />
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
@@ -33,11 +48,11 @@ const SEO = ({
       <meta property="og:locale" content="en_US" />
 
       {/* Twitter */}
-      <meta property="twitter:card" content="summary_large_image" />
-      <meta property="twitter:url" content={url} />
-      <meta property="twitter:title" content={title} />
-      <meta property="twitter:description" content={description} />
-      <meta property="twitter:image" content={`${siteUrl}${ogImage}`} />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:url" content={url} />
+      <meta name="twitter:title" content={title} />
+      <meta name="twitter:description" content={description} />
+      <meta name="twitter:image" content={`${siteUrl}${ogImage}`} />
 
       {/* Additional SEO */}
       <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
@@ -45,18 +60,11 @@ const SEO = ({
       <meta name="language" content="English" />
       <meta name="revisit-after" content="7 days" />
       <meta name="author" content="Professional Invoicing System" />
-      
-      {/* Geo Tags - Only include if specified for local targeting */}
+
+      {/* Geo Tags - Only if specified */}
       {geoRegion && <meta name="geo.region" content={geoRegion} />}
       {geoPlacename && <meta name="geo.placename" content={geoPlacename} />}
-
-      {/* Structured Data */}
-      {structuredData && (
-        <script type="application/ld+json">
-          {JSON.stringify(structuredData)}
-        </script>
-      )}
-    </Helmet>
+    </>
   );
 };
 
