@@ -9,6 +9,8 @@ import NotificationSnackbar from "./NotificationSnackbar";
 import useClientsData from "./useClientsData";
 import useNotification from "./useNotification";
 import PageLoader from "../ReusableComponents/PageLoader";
+import PageHelper from "../ReusableComponents/PageHelper";
+import { pageHelpContent } from "../../config/pageHelpContent";
 
 const ClientsPage = () => {
   const navigate = useNavigate();
@@ -56,6 +58,8 @@ const ClientsPage = () => {
         notification={notification}
         onClose={hideNotification}
       />
+      
+      <PageHelper {...pageHelpContent.clients} />
     </Section>
     </Fade>
   );

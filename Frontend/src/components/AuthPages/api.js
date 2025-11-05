@@ -138,8 +138,9 @@ export const getSubscriptionStatus = async () => {
 
 // Logout user (client-side)
 export const logout = () => {
-  localStorage.removeItem('token');
-  window.location.href = '/login';
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('user');
+  window.location.href = '/app/login';
 };
 
 // Check if user is authenticated

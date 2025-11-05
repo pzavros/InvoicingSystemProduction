@@ -33,6 +33,8 @@ import LowStockAlert from "./LowStockAlert";
 import UsageIndicator from "../SubscriptionPage/UsageIndicator";
 import { getAllProducts, getAllCategories, getLowStockProducts } from "./api";
 import { useSubscription } from "../../utils/SubscriptionContext";
+import PageHelper from "../ReusableComponents/PageHelper";
+import { pageHelpContent } from "../../config/pageHelpContent";
 
 function TabPanel({ children, value, index, ...other }) {
   return (
@@ -470,6 +472,8 @@ const ProductCatalogPage = () => {
           {notification.message}
         </Alert>
       </Snackbar>
+      
+      <PageHelper {...pageHelpContent.products} />
       </Box>
     </Fade>
   );

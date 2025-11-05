@@ -24,6 +24,7 @@ import TemplateFormPage from './pages/TemplateFormPage';
 import UserManagementPage from './pages/UserManagementPage';
 import UserFormPage from './pages/UserFormPage';
 import SystemAdminPage from './pages/SystemAdminPage';
+import GettingStartedPage from './pages/GettingStartedPage';
 import SubscriptionGuard from './components/SubscriptionPage/SubscriptionGuard';
 import SubscriptionBanner from './components/SubscriptionPage/SubscriptionBanner';
 import AdminRoute from './components/ReusableComponents/AdminRoute';
@@ -96,6 +97,7 @@ function MainContent() {
         {/* Routes that don't require subscription */}
         <Route path="/about" element={<ProtectedRoute><AboutUsPage /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+        <Route path="/getting-started" element={<ProtectedRoute><GettingStartedPage /></ProtectedRoute>} />
         
         {/* Admin Routes - Protected and require admin privileges */}
         <Route path="/admin/users" element={<ProtectedRoute><AdminRoute><UserManagementPage /></AdminRoute></ProtectedRoute>} />

@@ -226,7 +226,7 @@ app.UseAdminAuditLogging();
 app.MapControllers();
 
 // ─── APPLY MIGRATIONS ON STARTUP ──────────────────────────────────────────────────
-using (var scope = app.Services.CreateScope())
+using (var scope = app.Services.CreateScope())e
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();

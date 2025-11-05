@@ -41,6 +41,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import GroupIcon from '@mui/icons-material/Group';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
+import SchoolIcon from '@mui/icons-material/School';
 import { SidebarContext } from './SidebarContext';
 import { useAuth } from '../../utils/AuthContext';
 
@@ -153,6 +154,13 @@ export default function NavBar() {
       path: '/subscription', 
       description: 'Manage subscription',
       color: '#8b5cf6' // Purple
+    },
+    { 
+      text: 'Getting Started', 
+      icon: <SchoolIcon />, 
+      path: '/getting-started', 
+      description: 'Step-by-step guide',
+      color: '#ec4899' // Pink
     },
     { 
       text: 'About', 

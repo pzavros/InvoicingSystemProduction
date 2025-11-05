@@ -61,10 +61,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
     setAuthenticated(false);
     setUser(null);
-    window.location.href = '/login';
+    window.location.href = '/app/login';
   };
 
   const value = {

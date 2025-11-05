@@ -8,6 +8,8 @@ import ReportDisplay from './ReportDisplay';
 import ReportExports from './ReportExports';
 import useInvoiceReportData from './useInvoiceReportData';
 import { exportReportToExcel } from './api';
+import PageHelper from '../ReusableComponents/PageHelper';
+import { pageHelpContent } from '../../config/pageHelpContent';
 
 const DRAWER_WIDTH = 340;
 
@@ -730,6 +732,8 @@ const ReportPage = () => {
           {notification.message}
         </Alert>
       </Snackbar>
+      
+      <PageHelper {...pageHelpContent.reports} />
     </Box>
   );
 };

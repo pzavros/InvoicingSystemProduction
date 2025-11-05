@@ -22,6 +22,8 @@ import AnnualInvoiceCountChart from '../components/DashboardPage/AnnualInvoiceCo
 // <-- Correct relative paths into your components folder:
 import CurrentMonthEarningsDisplay from '../components/DashboardPage/CurrentMonthEarningsDisplay';
 import CurrentMonthInvoiceCountDisplay from '../components/DashboardPage/CurrentMonthInvoiceCountDisplay';
+import PageHelper from '../components/ReusableComponents/PageHelper';
+import { pageHelpContent } from '../config/pageHelpContent';
 
 const monthNames = [
   'January','February','March','April','May','June',
@@ -245,6 +247,8 @@ export default function DashboardPage() {
           </Grow>
         </Box>
       </Fade>
+      
+      <PageHelper {...pageHelpContent.dashboard} />
     </Container>
   );
 }

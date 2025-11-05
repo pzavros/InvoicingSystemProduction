@@ -46,6 +46,8 @@ import {
   Refresh as RefreshIcon,
 } from "@mui/icons-material";
 import { getSystemSetup, updateSystemSetup } from "./api";
+import PageHelper from "../ReusableComponents/PageHelper";
+import { pageHelpContent } from "../../config/pageHelpContent";
 
 const CompanyProfileSettings = () => {
   const theme = useTheme();
@@ -1081,6 +1083,8 @@ const CompanyProfileSettings = () => {
           {notification.message}
         </Alert>
       </Snackbar>
+      
+      <PageHelper {...pageHelpContent.systemSetup} />
     </Box>
   );
 };

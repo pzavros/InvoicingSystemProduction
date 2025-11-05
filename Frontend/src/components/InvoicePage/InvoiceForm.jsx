@@ -45,6 +45,8 @@ import { getAllDocumentTypes } from "../DocumentTypePage/api";
 import { getAllProducts } from "../ProductCatalogPage/api";
 import { getUserProfile } from "../AuthPages/api";
 import PageLoader from "../ReusableComponents/PageLoader";
+import PageHelper from "../ReusableComponents/PageHelper";
+import { pageHelpContent } from "../../config/pageHelpContent";
 
 const LANGUAGE_LOCALE_MAP = {
   english: "en-US",
@@ -2495,6 +2497,8 @@ const InvoiceForm = () => {
           )}
         </Box>
       </Backdrop>
+      
+      <PageHelper {...pageHelpContent.invoice} />
       </form>
     </Box>
   );

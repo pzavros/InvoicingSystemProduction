@@ -56,6 +56,8 @@ import TemplateCustomizer from './TemplateCustomizer';
 import { useSubscription } from '../../utils/SubscriptionContext';
 import UsageIndicator from '../SubscriptionPage/UsageIndicator';
 import PageLoader from '../ReusableComponents/PageLoader';
+import PageHelper from '../ReusableComponents/PageHelper';
+import { pageHelpContent } from '../../config/pageHelpContent';
 
 const InvoiceTemplatesPage = () => {
   const navigate = useNavigate();
@@ -904,6 +906,8 @@ const InvoiceTemplatesPage = () => {
           {notification.message}
         </Alert>
       </Snackbar>
+      
+      <PageHelper {...pageHelpContent.templates} />
     </Box>
     </Fade>
   );
