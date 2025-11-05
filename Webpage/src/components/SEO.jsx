@@ -11,8 +11,8 @@ const SEO = ({
   geoRegion = null,
   geoPlacename = null
 }) => {
-  const siteUrl = typeof window !== 'undefined' ? window.location.origin : '';
-  const url = canonicalUrl || (typeof window !== 'undefined' ? window.location.href : '');
+  const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://e-nvoicing.com';
+  const url = canonicalUrl || (typeof window !== 'undefined' ? window.location.href : 'https://e-nvoicing.com');
 
   useEffect(() => {
     // Set document title

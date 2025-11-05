@@ -6,9 +6,9 @@ export const localBusinessSchema = {
   "@type": "SoftwareCompany",
   "name": "Professional Invoicing System",
   "description": "Advanced cloud-based invoicing and logistics reporting system for businesses worldwide",
-  "url": "https://yourdomain.com",
-  "logo": "https://yourdomain.com/media/logo.svg",
-  "image": "https://yourdomain.com/media/og-image.jpg",
+  "url": "https://e-nvoicing.com",
+  "logo": "https://e-nvoicing.com/media/logo.svg",
+  "image": "https://e-nvoicing.com/media/og-image.jpg",
   // Only include address if you have a physical location
   // "address": {
   //   "@type": "PostalAddress",

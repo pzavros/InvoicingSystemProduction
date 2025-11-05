@@ -6,7 +6,7 @@
   
   <!-- Homepage -->
   <url>
-    <loc>https://yourdomain.com/</loc>
+    <loc>https://e-nvoicing.com/</loc>
     <lastmod>2025-11-05</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -14,7 +14,7 @@
   
   <!-- About Page -->
   <url>
-    <loc>https://yourdomain.com/about</loc>
+    <loc>https://e-nvoicing.com/about</loc>
     <lastmod>2025-11-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -22,7 +22,7 @@
   
   <!-- Features Page -->
   <url>
-    <loc>https://yourdomain.com/features</loc>
+    <loc>https://e-nvoicing.com/features</loc>
     <lastmod>2025-11-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
@@ -30,7 +30,7 @@
   
   <!-- How It Works Page -->
   <url>
-    <loc>https://yourdomain.com/how-it-works</loc>
+    <loc>https://e-nvoicing.com/how-it-works</loc>
     <lastmod>2025-11-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -38,7 +38,7 @@
   
   <!-- Pricing Page -->
   <url>
-    <loc>https://yourdomain.com/pricing</loc>
+    <loc>https://e-nvoicing.com/pricing</loc>
     <lastmod>2025-11-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
@@ -46,7 +46,7 @@
   
   <!-- Contact Page -->
   <url>
-    <loc>https://yourdomain.com/contact</loc>
+    <loc>https://e-nvoicing.com/contact</loc>
     <lastmod>2025-11-05</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -54,7 +54,7 @@
   
   <!-- Coming Soon Page -->
   <url>
-    <loc>https://yourdomain.com/coming-soon</loc>
+    <loc>https://e-nvoicing.com/coming-soon</loc>
     <lastmod>2025-11-05</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
