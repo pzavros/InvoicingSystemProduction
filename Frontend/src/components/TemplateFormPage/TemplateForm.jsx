@@ -32,6 +32,7 @@ import {
 } from "../InvoiceTemplatesPage/api";
 import { COLOR_THEMES } from "../../utils/colorThemes";
 import InvoiceTemplatePreview from "../InvoiceTemplatesPage/InvoiceTemplatePreview";
+import { useSubscription } from "../../utils/SubscriptionContext";
 
 /** ---------- Form Components ---------- **/
 const FormGrid = ({ size, children }) => (
@@ -54,6 +55,8 @@ const TemplateForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditing = Boolean(id);
+  const { canCreate } = useSubscription();
+  const canCreateTemplate = canCreate?.template !== false;
 
   const [formData, setFormData] = useState({
     name: "",
@@ -114,13 +117,26 @@ const TemplateForm = () => {
 
 
   useEffect(() => {
+    // Check if user has permission to create/edit templates
+    if (!canCreateTemplate) {
+      setNotification({
+        show: true,
+        message: "Templates are a premium feature. Upgrade to premium to create and edit custom templates.",
+        severity: "warning"
+      });
+      setTimeout(() => {
+        navigate("/templates");
+      }, 2000);
+      return;
+    }
+    
     const initializeData = async () => {
       const types = await fetchDocumentTypes();
       if (isEditing) await loadTemplate(types);
     };
     initializeData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, isEditing]);
+  }, [id, isEditing, canCreateTemplate]);
 
   const fetchDocumentTypes = async () => {
     try {
@@ -420,6 +436,16 @@ const TemplateForm = () => {
   const previewConfig = generateTemplateData();
 
   const handleSave = async () => {
+    // Check if user has permission to create/edit templates
+    if (!canCreateTemplate) {
+      setNotification({
+        show: true,
+        message: "Templates are a premium feature. Upgrade to premium to create and edit custom templates.",
+        severity: "error"
+      });
+      return;
+    }
+    
     if (!validateForm()) return;
 
     try {

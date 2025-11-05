@@ -165,6 +165,19 @@ namespace InvoicingBackend.Controllers
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
+                // Check if user can update templates (premium only feature)
+                var canUpdate = await _subscriptionService.CanCreateTemplateAsync(userId.Value);
+                if (!canUpdate)
+                {
+                    return StatusCode(403, new 
+                    { 
+                        message = "Template editing is a premium feature. Upgrade to premium to edit custom templates.",
+                        limitReached = true,
+                        resource = "templates",
+                        premiumOnly = true
+                    });
+                }
+
                 var template = await _templateService.UpdateTemplateAsync(id, updateDto, userId.Value);
                 if (template == null)
                     return NotFound(new { message = "Template not found or cannot be updated." });
@@ -186,6 +199,19 @@ namespace InvoicingBackend.Controllers
                 var userId = GetUserId();
                 if (userId == null) return Unauthorized();
 
+                // Check if user can delete templates (premium only feature)
+                var canDelete = await _subscriptionService.CanCreateTemplateAsync(userId.Value);
+                if (!canDelete)
+                {
+                    return StatusCode(403, new 
+                    { 
+                        message = "Template deletion is a premium feature. Upgrade to premium to delete custom templates.",
+                        limitReached = true,
+                        resource = "templates",
+                        premiumOnly = true
+                    });
+                }
+
                 var success = await _templateService.DeleteTemplateAsync(id, userId.Value);
                 if (!success)
                     return NotFound(new { message = "Template not found or cannot be deleted." });
@@ -206,6 +232,27 @@ namespace InvoicingBackend.Controllers
             {
                 var userId = GetUserId();
                 if (userId == null) return Unauthorized();
+
+                // Check if the template is a custom template and if user has premium access
+                var template = await _templateService.GetTemplateByIdAsync(id, userId.Value);
+                if (template == null)
+                    return NotFound(new { message = "Template not found." });
+
+                // If it's a custom (non-system) template, check if user has premium access
+                if (!template.IsSystemTemplate)
+                {
+                    var canUseTemplate = await _subscriptionService.CanCreateTemplateAsync(userId.Value);
+                    if (!canUseTemplate)
+                    {
+                        return StatusCode(403, new 
+                        { 
+                            message = "You need a premium subscription to use custom templates. Upgrade to premium to activate this template.",
+                            limitReached = true,
+                            resource = "templates",
+                            premiumOnly = true
+                        });
+                    }
+                }
 
                 var success = await _templateService.SetActiveTemplateAsync(id, userId.Value);
                 if (!success)

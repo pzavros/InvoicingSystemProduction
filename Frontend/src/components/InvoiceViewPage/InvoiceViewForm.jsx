@@ -1002,7 +1002,7 @@ ${formData.billFrom}`);
               flexWrap: 'wrap'
             }}>
               <Typography component="span" sx={{ fontWeight: 700, color: "#2d3748" }}>
-                📄 Invoice #{formData.invoiceNumber}
+                Invoice #{formData.invoiceNumber}
               </Typography>
               {documentTypeLabel && (
                 <Box
@@ -1041,11 +1041,11 @@ ${formData.billFrom}`);
                   fontWeight: 600,
                   '&.Mui-focused': { color: '#667eea' }
                 }}>
-                  📊 Status
+                  Status
                 </InputLabel>
                 <Select
                   labelId="status-select-label-view"
-                  label="📊 Status"
+                  label="Status"
                   value={formData.statusId || ''}
                   onChange={(e) => handleStatusChange(e.target.value)}
                   disabled={statusUpdateLoading || !editMode}
@@ -1140,10 +1140,10 @@ ${formData.billFrom}`);
                 fontWeight: 600,
                 '&.Mui-focused': { color: '#667eea' }
               }}>
-                💰 Currency
+                Currency
               </InputLabel>              <Select
                 labelId="currency-select-label"
-                label="💰 Currency"
+                label="Currency"
                 onChange={(event) => onCurrencyChange(event.target.value)}
                 value={formData.currencyId}
                 size="small"
@@ -1217,10 +1217,10 @@ ${formData.billFrom}`);
                 fontWeight: 600,
                 '&.Mui-focused': { color: '#667eea' }
               }}>
-                📊 VAT Rate
+                VAT Rate
               </InputLabel>              <Select
                 labelId="tax-rate-select-label-view"
-                label="📊 VAT Rate"
+                label="VAT Rate"
                 name="taxRate"
                 value={formData.taxRate}
                 onChange={(e) => editField(e.target.name, e.target.value)}
@@ -1253,7 +1253,7 @@ ${formData.billFrom}`);
               value={formData.discountRate}
               onChange={(e) => editField(e.target.name, e.target.value)}
               placeholder="0.0"
-              label="🎯 Discount Rate (%)"
+              label="Discount Rate (%)"
               variant="outlined"
               size="small"
               disabled={!editMode}
@@ -1333,7 +1333,7 @@ ${formData.billFrom}`);
               <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                   <span style={{ fontWeight: "700", minWidth: "130px", color: '#4a5568' }}>
-                    📅 Current Date:
+                    Current Date:
                   </span>
                   <TextField
                     type="date"
@@ -1369,7 +1369,7 @@ ${formData.billFrom}`);
                 </Box>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                   <span style={{ fontWeight: "700", minWidth: "130px", color: '#4a5568' }}>
-                    ⏰ Due Date:
+                    Due Date:
                   </span>
                   <TextField
                     type="date"
@@ -1412,7 +1412,7 @@ ${formData.billFrom}`);
                 gap: 2
               }}>
                 <span style={{ fontWeight: "700", color: '#4a5568' }}>
-                  🧾 Invoice Number:
+                  Invoice Number:
                 </span>
                 <TextField
                   type="text"
@@ -1466,7 +1466,7 @@ ${formData.billFrom}`);
                     alignItems: 'center',
                     gap: 1
                   }}>
-                    📨 Bill to:
+                    Bill to:
                   </InputLabel>
                   <TextField
                     placeholder="Who is this invoice to?"
@@ -1587,7 +1587,7 @@ ${formData.billFrom}`);
                     alignItems: 'center',
                     gap: 1
                   }}>
-                    🏢 Bill from:
+                    Bill from:
                   </InputLabel>
                   <TextField
                     placeholder="Who is this invoice from?"
@@ -1919,7 +1919,7 @@ ${formData.billFrom}`);
             }}
             disabled={loading}
           >
-            👁️ Preview Invoice
+            Preview Invoice
           </Button>
           
           <Button
@@ -1941,7 +1941,7 @@ ${formData.billFrom}`);
             disabled={loading || !formData.billToEmail}
             title={!formData.billToEmail ? "Please add client email address first" : "Download PDF and open email client"}
           >
-            📧📎 Email + PDF
+            Email + PDF
           </Button>
           {editMode && (
             <Button

@@ -136,9 +136,9 @@ const InvoiceTemplatesPage = () => {
   };
 
   const handleOpenDialog = (template = null) => {
-    // Check if user can create templates (premium only)
-    if (!template && !canCreateTemplate) {
-      showNotification('Templates are a premium feature. Upgrade to premium to create custom templates.', 'warning');
+    // Check if user can create/edit templates (premium only)
+    if (!canCreateTemplate) {
+      showNotification('Templates are a premium feature. Upgrade to premium to create and edit custom templates.', 'warning');
       return;
     }
     
@@ -163,9 +163,9 @@ const InvoiceTemplatesPage = () => {
   };
 
   const handleOpenCustomizer = (template = null) => {
-    // Check if user can create templates (premium only)
-    if (!template && !canCreateTemplate) {
-      showNotification('Templates are a premium feature. Upgrade to premium to create custom templates.', 'warning');
+    // Check if user can create/edit templates (premium only)
+    if (!canCreateTemplate) {
+      showNotification('Templates are a premium feature. Upgrade to premium to create and edit custom templates.', 'warning');
       return;
     }
     
@@ -246,9 +246,15 @@ const InvoiceTemplatesPage = () => {
   };
 
   const handleSetActive = async (templateId) => {
+    // Prevent free users from activating custom templates
+    const template = templates.find(t => t.id === templateId);
+    if (!template.isSystemTemplate && !canCreateTemplate) {
+      showNotification('You need a premium subscription to use custom templates. Upgrade to premium to activate this template.', 'warning');
+      return;
+    }
+    
     try {
       await setActiveTemplate(templateId);
-      const template = templates.find(t => t.id === templateId);
       const docTypeName = getDocumentTypeName(template?.documentTypeId);
       showNotification(`Template set as active for ${docTypeName} successfully!`);
       fetchTemplates();
@@ -321,19 +327,31 @@ const InvoiceTemplatesPage = () => {
       headerName: 'Template',
       width: 300,
       sortable: false,
-      renderCell: (params) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, height: '100%', py: 1 }}>
-          {getTemplateTypeIcon(params.row.template)}
-          <Box>
-            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1f2937', fontSize: '1rem', mb: 0.5 }}>
-              {params.value}
-            </Typography>
-            <Typography variant="body2" sx={{ fontSize: '0.85rem', color: '#6b7280', lineHeight: 1.4 }}>
-              {params.row.description}
-            </Typography>
+      renderCell: (params) => {
+        const isCustomTemplate = !params.row.isSystemTemplate;
+        const isLocked = isCustomTemplate && !canCreateTemplate;
+        
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, height: '100%', py: 1 }}>
+            {getTemplateTypeIcon(params.row.template)}
+            <Box sx={{ flex: 1 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1f2937', fontSize: '1rem', mb: 0.5 }}>
+                  {params.value}
+                </Typography>
+                {isLocked && (
+                  <Tooltip title="This template is locked. Upgrade to premium to edit or use it.">
+                    <LockIcon sx={{ fontSize: '1rem', color: '#9ca3af' }} />
+                  </Tooltip>
+                )}
+              </Box>
+              <Typography variant="body2" sx={{ fontSize: '0.85rem', color: '#6b7280', lineHeight: 1.4 }}>
+                {params.row.description}
+              </Typography>
+            </Box>
           </Box>
-        </Box>
-      ),
+        );
+      },
     },
     {
       field: 'type',
@@ -420,95 +438,126 @@ const InvoiceTemplatesPage = () => {
       headerName: 'Actions',
       width: 200,
       sortable: false,
-      renderCell: (params) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, height: '100%' }}>
-          {!params.row.template.isActive && (
-            <Button
-              size="small"
-              variant="contained"
-              onClick={() => handleSetActive(params.row.template.id)}
-              sx={{
-                textTransform: 'none',
-                borderRadius: '8px',
-                px: 2,
-                py: 0.75,
-                fontSize: '0.75rem',
-                fontWeight: 600,
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                boxShadow: '0 2px 8px rgba(16, 185, 129, 0.25)',
-                minWidth: 'auto',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                  boxShadow: '0 4px 12px rgba(16, 185, 129, 0.35)',
-                }
-              }}
-            >
-              Use
-            </Button>
-          )}
-          
-          <Tooltip title="Preview Template">
-            <IconButton
-              size="small"
-              onClick={() => handlePreviewTemplate(params.row.template)}
-              sx={{
-                color: '#6366f1',
-                backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                borderRadius: '8px',
-                '&:hover': { 
-                  backgroundColor: 'rgba(99, 102, 241, 0.2)',
-                  transform: 'scale(1.05)'
-                },
-                transition: 'all 0.2s ease'
-              }}
-            >
-              <PreviewIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-
-          {!params.row.isSystemTemplate && (
-            <Tooltip title="Edit Template">
+      renderCell: (params) => {
+        const isCustomTemplate = !params.row.isSystemTemplate;
+        const isLocked = isCustomTemplate && !canCreateTemplate;
+        
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, height: '100%' }}>
+            {!params.row.template.isActive && (
+              <Tooltip title={isLocked ? "Upgrade to premium to use custom templates" : ""}>
+                <span>
+                  <Button
+                    size="small"
+                    variant="contained"
+                    onClick={() => handleSetActive(params.row.template.id)}
+                    disabled={isLocked}
+                    sx={{
+                      textTransform: 'none',
+                      borderRadius: '8px',
+                      px: 2,
+                      py: 0.75,
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      background: isLocked 
+                        ? 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)'
+                        : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                      boxShadow: isLocked ? 'none' : '0 2px 8px rgba(16, 185, 129, 0.25)',
+                      minWidth: 'auto',
+                      '&:hover': isLocked ? {} : {
+                        background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                        boxShadow: '0 4px 12px rgba(16, 185, 129, 0.35)',
+                      },
+                      '&.Mui-disabled': {
+                        color: 'white',
+                        opacity: 0.7
+                      }
+                    }}
+                  >
+                    {isLocked ? <LockIcon fontSize="small" sx={{ mr: 0.5 }} /> : null}
+                    Use
+                  </Button>
+                </span>
+              </Tooltip>
+            )}
+            
+            <Tooltip title="Preview Template">
               <IconButton
                 size="small"
-                onClick={() => navigate(`/templates/edit/${params.row.template.id}`)}
+                onClick={() => handlePreviewTemplate(params.row.template)}
                 sx={{
-                  color: '#f59e0b',
-                  backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                  color: '#6366f1',
+                  backgroundColor: 'rgba(99, 102, 241, 0.1)',
                   borderRadius: '8px',
                   '&:hover': { 
-                    backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                    backgroundColor: 'rgba(99, 102, 241, 0.2)',
                     transform: 'scale(1.05)'
                   },
                   transition: 'all 0.2s ease'
                 }}
               >
-                <EditIcon fontSize="small" />
+                <PreviewIcon fontSize="small" />
               </IconButton>
             </Tooltip>
-          )}
 
-          {!params.row.isSystemTemplate && (
-            <Tooltip title="Delete Template">
-              <IconButton
-                size="small"
-                onClick={() => handleDeleteTemplate(params.row.template.id)}
-                sx={{
-                  color: '#ef4444',
-                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                  borderRadius: '8px',
-                  '&:hover': { 
-                    backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                    transform: 'scale(1.05)'
-                  },
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          )}
-        </Box>
-      ),
+            {!params.row.isSystemTemplate && (
+              <Tooltip title={isLocked ? "Upgrade to premium to edit custom templates" : "Edit Template"}>
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={() => navigate(`/templates/edit/${params.row.template.id}`)}
+                    disabled={isLocked}
+                    sx={{
+                      color: isLocked ? '#9ca3af' : '#f59e0b',
+                      backgroundColor: isLocked ? 'rgba(156, 163, 175, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                      borderRadius: '8px',
+                      '&:hover': isLocked ? {} : { 
+                        backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                        transform: 'scale(1.05)'
+                      },
+                      transition: 'all 0.2s ease',
+                      '&.Mui-disabled': {
+                        color: '#9ca3af',
+                        opacity: 0.5
+                      }
+                    }}
+                  >
+                    {isLocked ? <LockIcon fontSize="small" /> : <EditIcon fontSize="small" />}
+                  </IconButton>
+                </span>
+              </Tooltip>
+            )}
+
+            {!params.row.isSystemTemplate && (
+              <Tooltip title={isLocked ? "Upgrade to premium to delete custom templates" : "Delete Template"}>
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={() => handleDeleteTemplate(params.row.template.id)}
+                    disabled={isLocked}
+                    sx={{
+                      color: isLocked ? '#9ca3af' : '#ef4444',
+                      backgroundColor: isLocked ? 'rgba(156, 163, 175, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                      borderRadius: '8px',
+                      '&:hover': isLocked ? {} : { 
+                        backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                        transform: 'scale(1.05)'
+                      },
+                      transition: 'all 0.2s ease',
+                      '&.Mui-disabled': {
+                        color: '#9ca3af',
+                        opacity: 0.5
+                      }
+                    }}
+                  >
+                    {isLocked ? <LockIcon fontSize="small" /> : <DeleteIcon fontSize="small" />}
+                  </IconButton>
+                </span>
+              </Tooltip>
+            )}
+          </Box>
+        );
+      },
     },
   ];
 

@@ -260,7 +260,11 @@ namespace InvoicingBackend.Services
                 if (user != null)
                 {
                     user.SubscriptionTier = "free";
+                    user.IsTrialUser = false;
                 }
+
+                // Deactivate all custom templates when downgrading to free tier
+                await DeactivateCustomTemplatesAsync(userId);
             }
 
             await _context.SaveChangesAsync();
@@ -539,6 +543,20 @@ namespace InvoicingBackend.Services
             {
                 subscription.Status = SubscriptionStatus.Expired;
                 subscription.MarkAsModified("System");
+
+                // Downgrade user to free tier when subscription expires
+                var user = await _context.Users.FindAsync(subscription.UserId);
+                if (user != null)
+                {
+                    user.SubscriptionTier = SubscriptionLimits.FREE_TIER;
+                    user.IsTrialUser = false;
+                }
+
+                // Deactivate all custom templates when subscription expires
+                if (subscription.UserId.HasValue)
+                {
+                    await DeactivateCustomTemplatesAsync(subscription.UserId.Value);
+                }
             }
 
             if (expiredSubscriptions.Any())
@@ -948,6 +966,31 @@ namespace InvoicingBackend.Services
                 _logger.LogError(ex, "Error syncing subscription for user {UserId}", userId);
                 throw;
             }
+        }
+
+        // ============= PRIVATE HELPER METHODS =============
+
+        /// <summary>
+        /// Deactivates all custom (non-system) templates for a user when they downgrade to free tier
+        /// </summary>
+        private async Task DeactivateCustomTemplatesAsync(int userId)
+        {
+            var customTemplates = await _context.InvoiceTemplates
+                .Where(t => t.UserId == userId && 
+                           !t.IsSystemTemplate && 
+                           t.IsActive && 
+                           !t.IsDeleted)
+                .ToListAsync();
+
+            foreach (var template in customTemplates)
+            {
+                template.IsActive = false;
+                // Note: We don't delete them, just deactivate them
+                // If the user upgrades again, they can reactivate their templates
+            }
+
+            _logger.LogInformation("Deactivated {Count} custom templates for user {UserId}", 
+                customTemplates.Count, userId);
         }
 
         // ============= MAPPING HELPERS =============
