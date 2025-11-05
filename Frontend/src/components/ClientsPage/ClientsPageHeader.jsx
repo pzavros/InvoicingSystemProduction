@@ -4,7 +4,9 @@ import {
   Box,
   Typography,
   Button,
-  Tooltip
+  Tooltip,
+  Fade,
+  Grow
 } from "@mui/material";
 import {
   Add as AddIcon,
@@ -25,6 +27,7 @@ const ClientsPageHeader = ({ clientsCount, onAddClient }) => {
   };
   return (
     <>
+      <Grow in={true} timeout={600}>
       <Box 
         sx={{ 
           display: 'flex', 
@@ -45,7 +48,7 @@ const ClientsPageHeader = ({ clientsCount, onAddClient }) => {
             left: 0,
             right: 0,
             height: '4px',
-            background: 'linear-gradient(90deg, #10b981 0%, #3b82f6 50%, #8b5cf6 100%)',
+            background: 'linear-gradient(90deg, #06b6d4 0%, #0891b2 100%)',
             borderRadius: '3px 3px 0 0'
           }
         }}
@@ -56,7 +59,7 @@ const ClientsPageHeader = ({ clientsCount, onAddClient }) => {
             width: 48,
             height: 48,
             borderRadius: '12px',
-            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+            background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -71,7 +74,7 @@ const ClientsPageHeader = ({ clientsCount, onAddClient }) => {
             component="h1" 
             sx={{ 
               fontWeight: 'bold',
-              background: 'linear-gradient(135deg, #047857 0%, #10b981 100%)',
+              background: 'linear-gradient(135deg, #0891b2 0%, #06b6d4 100%)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -131,6 +134,7 @@ const ClientsPageHeader = ({ clientsCount, onAddClient }) => {
         </span>
       </Tooltip>
     </Box>
+    </Grow>
 
     {/* Usage Indicator for Free Tier - Below Header */}
     <Box sx={{ mb: 3 }}>

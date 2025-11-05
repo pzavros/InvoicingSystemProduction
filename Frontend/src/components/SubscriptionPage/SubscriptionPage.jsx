@@ -284,11 +284,11 @@ const SubscriptionPage = () => {
                     width: 64,
                     height: 64,
                     borderRadius: '18px',
-                    background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
+                    background: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    boxShadow: '0 12px 24px rgba(139, 92, 246, 0.4)',
+                    boxShadow: '0 12px 24px rgba(20, 184, 166, 0.4)',
                     transition: 'transform 0.3s ease',
                     '&:hover': {
                       transform: 'scale(1.05) rotate(2deg)'
@@ -303,7 +303,7 @@ const SubscriptionPage = () => {
                     component="h1"
                     sx={{
                       fontWeight: 800,
-                      background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
+                      background: 'linear-gradient(135deg, #0d9488 0%, #14b8a6 100%)',
                       backgroundClip: 'text',
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
@@ -480,12 +480,12 @@ const SubscriptionPage = () => {
                         left: 0,
                         right: 0,
                         height: '4px',
-                        background: 'linear-gradient(90deg, #8b5cf6 0%, #a855f7 100%)',
+                        background: 'linear-gradient(90deg, #8b5cf6 0%, #7c3aed 100%)',
                       }
                     }}
                   >
                     <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                      <Typography variant="h5" sx={{ fontWeight: 800, color: '#6d28d9' }}>
+                      <Typography variant="h5" sx={{ fontWeight: 800, color: '#7c3aed' }}>
                         Current Plan Status
                       </Typography>
                       <Chip

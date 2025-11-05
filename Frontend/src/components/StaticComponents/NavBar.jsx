@@ -96,70 +96,70 @@ export default function NavBar() {
       icon: <HomeIcon />, 
       path: '/', 
       description: 'Invoice management',
-      color: '#3b82f6'
+      color: '#3b82f6' // Blue
     },
     { 
       text: 'Dashboard', 
       icon: <DashboardIcon />, 
       path: '/dashboard', 
       description: 'Analytics & insights',
-      color: '#8b5cf6'
+      color: '#8b5cf6' // Purple
     },
     { 
       text: 'Create Invoice', 
       icon: <AddCircleOutlineIcon />, 
       path: '/invoices/create', 
       description: 'New invoice',
-      color: '#10b981'
+      color: '#10b981' // Emerald Green
     },
     { 
       text: 'Products', 
       icon: <InventoryIcon />, 
       path: '/products', 
       description: 'Manage catalog',
-      color: '#f59e0b'
+      color: '#f59e0b' // Amber
     },
     { 
       text: 'Templates', 
       icon: <DescriptionIcon />, 
       path: '/templates', 
       description: 'Invoice templates',
-      color: '#8b5cf6'
+      color: '#14b8a6' // Teal
     },
     { 
       text: 'Clients', 
       icon: <GroupIcon />, 
       path: '/clients', 
       description: 'Manage clients',
-      color: '#06b6d4'
+      color: '#06b6d4' // Cyan
     },
     { 
       text: 'Reports', 
       icon: <ReceiptIcon />, 
       path: '/report', 
       description: 'Generate reports',
-      color: '#ef4444'
+      color: '#ef4444' // Red
     },
     { 
       text: 'Settings', 
       icon: <SettingsIcon />, 
       path: '/settings', 
       description: 'System configuration',
-      color: '#6b7280'
+      color: '#6366f1' // Indigo
     },
     { 
       text: 'Subscription', 
       icon: <CreditCardIcon />, 
       path: '/subscription', 
       description: 'Manage subscription',
-      color: '#22c55e'
+      color: '#8b5cf6' // Purple
     },
     { 
       text: 'About', 
       icon: <InfoIcon />, 
       path: '/about', 
       description: 'System information',
-      color: '#06b6d4'
+      color: '#a855f7' // Violet
     },
   ];
 

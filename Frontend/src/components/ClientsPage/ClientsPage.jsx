@@ -1,12 +1,14 @@
 // src/components/ClientsPage/ClientsPage.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { Fade } from "@mui/material";
 import Section from "../ReusableComponents/Section";
 import ClientsPageHeader from "./ClientsPageHeader";
 import ClientsDataGrid from "./ClientsDataGrid";
 import NotificationSnackbar from "./NotificationSnackbar";
 import useClientsData from "./useClientsData";
 import useNotification from "./useNotification";
+import PageLoader from "../ReusableComponents/PageLoader";
 
 const ClientsPage = () => {
   const navigate = useNavigate();
@@ -30,7 +32,12 @@ const ClientsPage = () => {
     }
   };
 
+  if (loading) {
+    return <PageLoader color="#06b6d4" />;
+  }
+
   return (
+    <Fade in={true} timeout={800}>
     <Section>
       <ClientsPageHeader 
         clientsCount={clients.length}
@@ -50,6 +57,7 @@ const ClientsPage = () => {
         onClose={hideNotification}
       />
     </Section>
+    </Fade>
   );
 };
 

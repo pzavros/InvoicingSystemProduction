@@ -41,7 +41,9 @@ import {
   CardActions,
   Divider,
   useMediaQuery,
-  useTheme
+  useTheme,
+  Fade,
+  Grow
 } from '@mui/material';
 import { visuallyHidden } from '@mui/utils'; // Corrected import for TableSortLabel accessibility
 import { useNavigate } from 'react-router-dom';
@@ -52,6 +54,7 @@ import { useDispatch } from 'react-redux';
 import { formatDate } from '../ReusableComponents/dateUtils';
 import UsageIndicator from '../SubscriptionPage/UsageIndicator';
 import { useSubscription } from '../../utils/SubscriptionContext';
+import PageLoader from '../ReusableComponents/PageLoader';
 
 // Create status badges with different colors and modern styling
 const StatusBadge = ({ status, documentCategory }) => {
@@ -653,9 +656,12 @@ export default function InvoiceList() {
   const numItemsOnPage = filteredInvoices
     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
     .length;
+    
   return (
+    <Fade in={true} timeout={800}>
     <Box sx={{ width: '100%' }}>
       {/* Enhanced Header Section */}
+      <Grow in={true} timeout={600}>
       <Box 
         sx={{ 
           display: 'flex', 
@@ -678,7 +684,7 @@ export default function InvoiceList() {
             left: 0,
             right: 0,
             height: '4px',
-            background: 'linear-gradient(90deg, #3b82f6 0%, #8b5cf6 50%, #10b981 100%)',
+            background: 'linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)',
             borderRadius: '3px 3px 0 0'
           }
         }}
@@ -689,7 +695,7 @@ export default function InvoiceList() {
               width: { xs: 40, sm: 48 },
               height: { xs: 40, sm: 48 },
               borderRadius: '12px',
-              background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -705,7 +711,7 @@ export default function InvoiceList() {
               sx={{ 
                 fontWeight: 'bold',
                 fontSize: { xs: '1.25rem', sm: '1.5rem' },
-                background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
+                background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
@@ -769,6 +775,7 @@ export default function InvoiceList() {
           </span>
         </Tooltip>
       </Box>
+      </Grow>
 
       {/* Usage Indicator for Free Tier - Below Header */}
       <Box sx={{ mb: 3 }}>
@@ -1050,37 +1057,9 @@ export default function InvoiceList() {
           border: '1px solid rgba(255, 255, 255, 0.2)',
           backdropFilter: 'blur(10px)'
         }}
-      >        {loading ? (
-          <Box 
-            sx={{ 
-              display: 'flex', 
-              flexDirection: 'column',
-              justifyContent: 'center', 
-              alignItems: 'center',
-              p: { xs: 4, sm: 6 },
-              gap: 2
-            }}
-          >
-            <CircularProgress 
-              size={{ xs: 40, sm: 48 }}
-              sx={{ 
-                color: '#3b82f6',
-                '& .MuiCircularProgress-circle': {
-                  strokeLinecap: 'round',
-                }
-              }}
-            />
-            <Typography 
-              variant="body1" 
-              sx={{ 
-                color: 'text.secondary',
-                fontWeight: 'medium',
-                fontSize: { xs: '0.875rem', sm: '1rem' }
-              }}
-            >
-              Loading invoices...
-            </Typography>
-          </Box>
+      >
+        {loading ? (
+          <PageLoader color="#3b82f6" minHeight="300px" />
         ) : error ? (
           <Alert 
             severity="error" 
@@ -1956,5 +1935,6 @@ export default function InvoiceList() {
         </Alert>
       </Snackbar>
     </Box>
+    </Fade>
   );
 }

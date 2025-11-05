@@ -59,9 +59,7 @@ const ClientFormPage = () => {
     website: "",
     taxNumber: "",
     notes: "",
-    isActive: true,
-    defaultPaymentTerms: 30,
-    preferredCurrencyId: null
+    isActive: true
   });
 
   const [errors, setErrors] = useState({});
@@ -95,9 +93,7 @@ const ClientFormPage = () => {
         website: client.website || "",
         taxNumber: client.taxNumber || "",
         notes: client.notes || "",
-        isActive: client.isActive ?? true,
-        defaultPaymentTerms: client.defaultPaymentTerms || 30,
-        preferredCurrencyId: client.preferredCurrencyId || null
+        isActive: client.isActive ?? true
       });
     } catch (error) {
       setNotification({
@@ -560,61 +556,6 @@ const ClientFormPage = () => {
               />
             }
             label="Active Client"
-          />
-        </FormGrid>
-
-        <FormGrid size={{ xs: 12, md: 4 }}>
-          <FormLabel htmlFor="defaultPaymentTerms">Default Payment Terms (days)</FormLabel>
-          <OutlinedInput
-            id="defaultPaymentTerms"
-            name="defaultPaymentTerms"
-            type="number"
-            value={formData.defaultPaymentTerms}
-            onChange={handleChange("defaultPaymentTerms")}
-            inputProps={{ min: 0 }}
-            size="small"
-            fullWidth
-            sx={{
-              backgroundColor: '#ffffff',
-              '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#d1d5db',
-                borderWidth: '1.5px'
-              },
-              '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#9ca3af'
-              },
-              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#3b82f6',
-                borderWidth: '2px'
-              }
-            }}
-          />
-        </FormGrid>
-
-        <FormGrid size={{ xs: 12, md: 4 }}>
-          <FormLabel htmlFor="preferredCurrencyId">Preferred Currency (ID)</FormLabel>
-          <OutlinedInput
-            id="preferredCurrencyId"
-            name="preferredCurrencyId"
-            value={formData.preferredCurrencyId ?? ""}
-            onChange={handleChange("preferredCurrencyId")}
-            placeholder="e.g., 978 (EUR)"
-            size="small"
-            fullWidth
-            sx={{
-              backgroundColor: '#ffffff',
-              '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#d1d5db',
-                borderWidth: '1.5px'
-              },
-              '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#9ca3af'
-              },
-              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#3b82f6',
-                borderWidth: '2px'
-              }
-            }}
           />
         </FormGrid>
 

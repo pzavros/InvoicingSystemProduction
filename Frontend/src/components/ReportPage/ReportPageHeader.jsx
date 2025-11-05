@@ -37,8 +37,8 @@ const ReportPageHeader = ({ reportType, dateRange }) => {
         p: 3,
         borderRadius: 3,
         background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-        border: '1px solid rgba(168, 85, 247, 0.1)',
-        boxShadow: '0 4px 12px rgba(168, 85, 247, 0.08)',
+        border: '1px solid rgba(239, 68, 68, 0.1)',
+        boxShadow: '0 4px 12px rgba(239, 68, 68, 0.08)',
         position: 'relative',
         overflow: 'hidden',
         '&::before': {
@@ -48,7 +48,7 @@ const ReportPageHeader = ({ reportType, dateRange }) => {
           left: 0,
           right: 0,
           height: '4px',
-          background: 'linear-gradient(90deg, #a855f7 0%, #3b82f6 50%, #10b981 100%)',
+          background: 'linear-gradient(90deg, #ef4444 0%, #dc2626 100%)',
           borderRadius: '3px 3px 0 0'
         }
       }}
@@ -62,11 +62,11 @@ const ReportPageHeader = ({ reportType, dateRange }) => {
                 width: 48,
                 height: 48,
                 borderRadius: '12px',
-                background: 'linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%)',
+                background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 8px 16px rgba(168, 85, 247, 0.3)'
+                boxShadow: '0 8px 16px rgba(239, 68, 68, 0.3)'
               }}
             >
               <AssessmentIcon sx={{ color: 'white', fontSize: 24 }} />
@@ -78,7 +78,7 @@ const ReportPageHeader = ({ reportType, dateRange }) => {
               component="h1" 
               sx={{ 
                 fontWeight: 'bold',
-                background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
+                background: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',

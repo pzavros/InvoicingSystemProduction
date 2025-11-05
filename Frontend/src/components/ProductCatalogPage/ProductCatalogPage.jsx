@@ -15,7 +15,9 @@ import {
   IconButton,
   Tooltip,
   Paper,
-  Badge
+  Badge,
+  Fade,
+  Grow
 } from "@mui/material";
 import {
   Add as AddIcon,
@@ -25,7 +27,7 @@ import {
   Lock as LockIcon
 } from "@mui/icons-material";
 import ProductList from "./ProductList";
-
+import PageLoader from "../ReusableComponents/PageLoader";
 import CategoryManager from "./CategoryManager";
 import LowStockAlert from "./LowStockAlert";
 import UsageIndicator from "../SubscriptionPage/UsageIndicator";
@@ -122,9 +124,16 @@ const ProductCatalogPage = () => {
   const handleCloseNotification = () => {
     setNotification({ ...notification, open: false });
   };
+
+  if (loading) {
+    return <PageLoader color="#f59e0b" />;
+  }
+
   return (
-    <Box sx={{ width: '100%' }}>
+    <Fade in={true} timeout={800}>
+      <Box sx={{ width: '100%' }}>
       {/* Enhanced Header Section */}
+      <Grow in={true} timeout={600}>
       <Box 
         sx={{ 
           display: 'flex', 
@@ -147,7 +156,7 @@ const ProductCatalogPage = () => {
             left: 0,
             right: 0,
             height: '4px',
-            background: 'linear-gradient(90deg, #10b981 0%, #3b82f6 50%, #8b5cf6 100%)',
+            background: 'linear-gradient(90deg, #f59e0b 0%, #d97706 100%)',
             borderRadius: '3px 3px 0 0'
           }
         }}
@@ -158,7 +167,7 @@ const ProductCatalogPage = () => {
               width: { xs: 40, sm: 48 },
               height: { xs: 40, sm: 48 },
               borderRadius: '12px',
-              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -174,7 +183,7 @@ const ProductCatalogPage = () => {
               sx={{ 
                 fontWeight: 'bold',
                 fontSize: { xs: '1.25rem', sm: '1.5rem' },
-                background: 'linear-gradient(135deg, #047857 0%, #10b981 100%)',
+                background: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
@@ -281,6 +290,7 @@ const ProductCatalogPage = () => {
           </Tooltip>
         </Box>
       </Box>
+      </Grow>
 
       {/* Usage Indicators for Free Tier - Below Header */}
       <Box sx={{ mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
@@ -460,7 +470,8 @@ const ProductCatalogPage = () => {
           {notification.message}
         </Alert>
       </Snackbar>
-    </Box>
+      </Box>
+    </Fade>
   );
 };
 

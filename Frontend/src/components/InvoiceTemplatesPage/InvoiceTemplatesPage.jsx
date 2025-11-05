@@ -21,7 +21,9 @@ import {
   Select,
   MenuItem,
   FormControl,
-  InputLabel
+  InputLabel,
+  Fade,
+  Grow
 } from '@mui/material';
 import {
   DataGrid,
@@ -53,6 +55,7 @@ import TemplatePreviewModal from './TemplatePreviewModal';
 import TemplateCustomizer from './TemplateCustomizer';
 import { useSubscription } from '../../utils/SubscriptionContext';
 import UsageIndicator from '../SubscriptionPage/UsageIndicator';
+import PageLoader from '../ReusableComponents/PageLoader';
 
 const InvoiceTemplatesPage = () => {
   const navigate = useNavigate();
@@ -508,16 +511,14 @@ const InvoiceTemplatesPage = () => {
   ];
 
   if (loading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
-        <CircularProgress />
-      </Box>
-    );
+    return <PageLoader color="#14b8a6" />;
   }
 
   return (
+    <Fade in={true} timeout={800}>
     <Box sx={{ p: 3 }}>
       {/* Header */}
+      <Grow in={true} timeout={600}>
       <Box
         sx={{
           display: 'flex',
@@ -540,7 +541,7 @@ const InvoiceTemplatesPage = () => {
             left: 0,
             right: 0,
             height: '4px',
-            background: 'linear-gradient(90deg, #1d4ed8 0%, #3b82f6 50%, #8b5cf6 100%)',
+            background: 'linear-gradient(90deg, #14b8a6 0%, #0d9488 100%)',
             borderRadius: '3px 3px 0 0'
           }
         }}
@@ -551,11 +552,11 @@ const InvoiceTemplatesPage = () => {
               width: 48,
               height: 48,
               borderRadius: '12px',
-              background: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%)',
+              background: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 8px 16px rgba(59, 130, 246, 0.35)'
+              boxShadow: '0 8px 16px rgba(20, 184, 166, 0.35)'
             }}
           >
             <DocumentIcon sx={{ color: 'white', fontSize: 24 }} />
@@ -566,7 +567,7 @@ const InvoiceTemplatesPage = () => {
               component="h1"
               sx={{
                 fontWeight: 'bold',
-                background: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)',
+                background: 'linear-gradient(135deg, #0d9488 0%, #14b8a6 100%)',
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
@@ -631,11 +632,11 @@ const InvoiceTemplatesPage = () => {
                 onClick={handleNavigateToAdd}
                 disabled={!canCreateTemplate}
                 sx={{
-                  backgroundColor: canCreateTemplate ? '#1d4ed8' : '#9ca3af',
+                  backgroundColor: canCreateTemplate ? '#10b981' : '#9ca3af',
                   backgroundImage: canCreateTemplate 
-                    ? 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%)'
+                    ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
                     : 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
-                  boxShadow: canCreateTemplate ? '0 8px 16px rgba(59, 130, 246, 0.35)' : 'none',
+                  boxShadow: canCreateTemplate ? '0 8px 16px rgba(16, 185, 129, 0.35)' : 'none',
                   borderRadius: 2,
                   px: 3,
                   py: 1.5,
@@ -643,9 +644,9 @@ const InvoiceTemplatesPage = () => {
                   textTransform: 'none',
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   '&:hover': canCreateTemplate ? {
-                    backgroundImage: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 50%, #2563eb 100%)',
+                    backgroundImage: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
                     transform: 'translateY(-2px)',
-                    boxShadow: '0 12px 24px rgba(37, 99, 235, 0.45)'
+                    boxShadow: '0 12px 24px rgba(16, 185, 129, 0.45)'
                   } : {},
                   '&.Mui-disabled': {
                     color: 'white',
@@ -657,44 +658,9 @@ const InvoiceTemplatesPage = () => {
               </Button>
             </span>
           </Tooltip>
-
-          <Tooltip
-            title={!canCreateTemplate ? "Templates are a premium feature. Upgrade to premium to create custom templates." : ""}
-            arrow
-          >
-            <span>
-              <Button
-                variant="outlined"
-                startIcon={canCreateTemplate ? <AddIcon /> : <LockIcon />}
-                onClick={() => handleOpenDialog()}
-                disabled={!canCreateTemplate}
-                sx={{
-                  borderColor: canCreateTemplate ? 'rgba(148, 163, 184, 0.6)' : '#9ca3af',
-                  color: canCreateTemplate ? '#334155' : '#6b7280',
-                  fontWeight: 600,
-                  borderRadius: 2,
-                  px: 3,
-                  py: 1.5,
-                  textTransform: 'none',
-                  backgroundColor: canCreateTemplate ? 'rgba(255, 255, 255, 0.6)' : 'transparent',
-                  transition: 'all 0.3s ease',
-                  '&:hover': canCreateTemplate ? {
-                    borderColor: 'rgba(59, 130, 246, 0.6)',
-                    backgroundColor: 'rgba(59, 130, 246, 0.08)',
-                    boxShadow: '0 8px 16px rgba(59, 130, 246, 0.15)'
-                  } : {},
-                  '&.Mui-disabled': {
-                    borderColor: '#d1d5db',
-                    opacity: 0.6
-                  }
-                }}
-              >
-                {canCreateTemplate ? 'Advanced Mode' : 'Premium Only'}
-              </Button>
-            </span>
-          </Tooltip>
         </Stack>
       </Box>
+      </Grow>
 
       {/* Usage Indicator for Free Tier - Below Header */}
       <Box sx={{ mb: 3 }}>
@@ -758,47 +724,26 @@ const InvoiceTemplatesPage = () => {
             <Typography variant="body2" sx={{ color: '#9ca3af', mb: 4, maxWidth: 400, mx: 'auto' }}>
               Create your first custom invoice template to get started. Templates help you maintain consistent branding across all your documents.
             </Typography>
-            <Stack direction="row" spacing={2} justifyContent="center">
-              <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={() => navigate('/templates/add')}
-                sx={{
-                  background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-                  boxShadow: '0 4px 12px rgba(99, 102, 241, 0.25)',
-                  borderRadius: 2,
-                  px: 3,
-                  py: 1.5,
-                  fontWeight: 600,
-                  textTransform: 'none',
-                  '&:hover': {
-                    background: 'linear-gradient(135deg, #4f46e5 0%, #4338ca 100%)',
-                    boxShadow: '0 6px 16px rgba(99, 102, 241, 0.35)',
-                  }
-                }}
-              >
-                Create Template
-              </Button>
-              <Button
-                variant="outlined"
-                onClick={() => handleOpenDialog()}
-                sx={{ 
-                  color: '#6b7280', 
-                  borderColor: '#d1d5db',
-                  borderRadius: 2,
-                  px: 3,
-                  py: 1.5,
-                  fontWeight: 600,
-                  textTransform: 'none',
-                  '&:hover': {
-                    borderColor: '#9ca3af',
-                    backgroundColor: '#f9fafb'
-                  }
-                }}
-              >
-                Advanced Mode
-              </Button>
-            </Stack>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => navigate('/templates/add')}
+              sx={{
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
+                borderRadius: 2,
+                px: 3,
+                py: 1.5,
+                fontWeight: 600,
+                textTransform: 'none',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                  boxShadow: '0 6px 16px rgba(16, 185, 129, 0.35)',
+                }
+              }}
+            >
+              Create Template
+            </Button>
           </Box>
         ) : (
           <Box sx={{ height: 600, width: '100%' }}>
@@ -960,6 +905,7 @@ const InvoiceTemplatesPage = () => {
         </Alert>
       </Snackbar>
     </Box>
+    </Fade>
   );
 };
 

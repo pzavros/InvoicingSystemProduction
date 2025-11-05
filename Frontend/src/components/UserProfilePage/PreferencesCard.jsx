@@ -6,8 +6,6 @@ import {
   Typography,
   Grid,
   MenuItem,
-  Switch,
-  FormControlLabel,
   CircularProgress
 } from '@mui/material';
 import { 
@@ -110,48 +108,6 @@ const PreferencesCard = ({
             </MenuItem>
           ))}
         </TextField>
-      </Grid>
-
-      {/* Second Row - Language Field */}
-      <Grid size={{ xs: 12, md: 6 }}>
-        <TextField
-          fullWidth
-          name="language"
-          label="Language"
-          value={preferences?.language || 'English'}
-          onChange={handlePreferenceChange}
-          disabled={updating}
-          size="small"
-        />
-      </Grid>
-
-      {/* Third Row - Switches Side by Side */}
-      <Grid size={{ xs: 12, md: 6 }}>
-        <FormControlLabel
-          control={
-            <Switch
-              name="emailNotifications"
-              checked={preferences?.emailNotifications || false}
-              onChange={handlePreferenceChange}
-              disabled={updating}
-            />
-          }
-          label="Email Notifications"
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, md: 6 }}>
-        <FormControlLabel
-          control={
-            <Switch
-              name="darkMode"
-              checked={preferences?.darkMode || false}
-              onChange={handlePreferenceChange}
-              disabled={updating}
-            />
-          }
-          label="Dark Mode"
-        />
       </Grid>
 
       {/* Button Row - Full Width */}

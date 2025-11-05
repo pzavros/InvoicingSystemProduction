@@ -356,7 +356,7 @@ const CompanyProfileSettings = () => {
             left: 0,
             right: 0,
             height: '4px',
-            background: 'linear-gradient(90deg, #059669 0%, #10b981 50%, #22c55e 100%)',
+            background: 'linear-gradient(90deg, #6366f1 0%, #4f46e5 100%)',
             borderRadius: '3px 3px 0 0'
           }
         }}
@@ -367,7 +367,7 @@ const CompanyProfileSettings = () => {
               width: { xs: 48, md: 56 },
               height: { xs: 48, md: 56 },
               borderRadius: { xs: '14px', md: '16px' },
-              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -383,7 +383,7 @@ const CompanyProfileSettings = () => {
               component="h1"
               sx={{
                 fontWeight: 'bold',
-                background: 'linear-gradient(135deg, #047857 0%, #10b981 100%)',
+                background: 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)',
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',

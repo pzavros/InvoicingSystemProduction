@@ -16,9 +16,7 @@ import {
   Fade,
   CircularProgress,
   InputAdornment,
-  IconButton,
-  Switch,
-  FormControlLabel
+  IconButton
 } from '@mui/material';
 import {
   Person as PersonIcon,
@@ -29,8 +27,6 @@ import {
   Save as SaveIcon,
   Edit as EditIcon,
   Security as SecurityIcon,
-  Settings as SettingsIcon,
-  Notifications as NotificationsIcon,
   Lock as LockIcon,
   Visibility,
   VisibilityOff
@@ -62,12 +58,6 @@ const UserProfile = () => {
     current: false,
     new: false,
     confirm: false
-  });
-
-  const [preferences, setPreferences] = useState({
-    emailNotifications: true,
-    marketingEmails: false,
-    securityAlerts: true
   });
 
   const [activeTab, setActiveTab] = useState('profile');
@@ -106,13 +96,6 @@ const UserProfile = () => {
     setPasswordData({
       ...passwordData,
       [e.target.name]: e.target.value
-    });
-  };
-
-  const handlePreferenceChange = (e) => {
-    setPreferences({
-      ...preferences,
-      [e.target.name]: e.target.checked
     });
   };
 
@@ -197,7 +180,7 @@ const UserProfile = () => {
                   User Profile
                 </Typography>
                 <Typography variant="body1" sx={{ color: '#6b7280' }}>
-                  Manage your account settings and preferences
+                  Manage your personal information and security
                 </Typography>
               </Box>
             </Box>
@@ -295,12 +278,11 @@ const UserProfile = () => {
             <Grid container spacing={2} sx={{ mb: 3 }}>
               {[
                 { key: 'profile', label: 'Profile', icon: PersonIcon },
-                { key: 'security', label: 'Security', icon: SecurityIcon },
-                { key: 'preferences', label: 'Preferences', icon: SettingsIcon }
+                { key: 'security', label: 'Security', icon: SecurityIcon }
               ].map((tab) => {
                 const IconComponent = tab.icon;
                 return (
-                  <Grid item xs={4} key={tab.key}>
+                  <Grid item xs={6} key={tab.key}>
                     <Button
                       fullWidth
                       variant={activeTab === tab.key ? 'contained' : 'outlined'}
@@ -636,139 +618,6 @@ const UserProfile = () => {
                         }}
                       >
                         Update Password
-                      </Button>
-                    </Grid>
-                  </Grid>
-                </CardContent>
-              </Card>
-            )}
-
-            {activeTab === 'preferences' && (
-              <Card 
-                elevation={0}
-                sx={{ 
-                  borderRadius: 2,
-                  border: '1px solid rgba(148, 163, 184, 0.2)',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
-                }}
-              >
-                <CardContent sx={{ p: 3 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-                    <Box 
-                      sx={{
-                        width: 32,
-                        height: 32,
-                        borderRadius: 2,
-                        background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}
-                    >
-                      <SettingsIcon sx={{ color: 'white', fontSize: 18 }} />
-                    </Box>
-                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                      Notification Preferences
-                    </Typography>
-                  </Box>
-
-                  <Grid container spacing={2}>
-                    {[
-                      { 
-                        key: 'emailNotifications', 
-                        label: 'Email Notifications', 
-                        description: 'Receive important updates via email',
-                        icon: EmailIcon
-                      },
-                      { 
-                        key: 'securityAlerts', 
-                        label: 'Security Alerts', 
-                        description: 'Get notified about security events',
-                        icon: SecurityIcon
-                      },
-                      { 
-                        key: 'marketingEmails', 
-                        label: 'Marketing Emails', 
-                        description: 'Receive promotional content and updates',
-                        icon: NotificationsIcon
-                      }
-                    ].map((pref) => {
-                      const IconComponent = pref.icon;
-                      return (
-                        <Grid item xs={12} key={pref.key}>
-                          <Box 
-                            sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'space-between',
-                              p: 2,
-                              borderRadius: 2,
-                              backgroundColor: '#f8fafc',
-                              border: '1px solid rgba(148, 163, 184, 0.2)'
-                            }}
-                          >
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                              <Box 
-                                sx={{
-                                  width: 28,
-                                  height: 28,
-                                  borderRadius: 1.5,
-                                  background: preferences[pref.key] 
-                                    ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
-                                    : 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center'
-                                }}
-                              >
-                                <IconComponent sx={{ color: 'white', fontSize: 16 }} />
-                              </Box>
-                              <Box>
-                                <Typography sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>
-                                  {pref.label}
-                                </Typography>
-                                <Typography variant="caption" sx={{ color: '#6b7280' }}>
-                                  {pref.description}
-                                </Typography>
-                              </Box>
-                            </Box>
-                            <Switch
-                              name={pref.key}
-                              checked={preferences[pref.key]}
-                              onChange={handlePreferenceChange}
-                              size="small"
-                              sx={{
-                                '& .MuiSwitch-switchBase.Mui-checked': {
-                                  color: '#3b82f6'
-                                },
-                                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                                  backgroundColor: '#3b82f6'
-                                }
-                              }}
-                            />
-                          </Box>
-                        </Grid>
-                      );
-                    })}
-                    
-                    <Grid item xs={12}>
-                      <Button
-                        variant="contained"
-                        startIcon={<SaveIcon />}
-                        sx={{
-                          backgroundColor: '#3b82f6',
-                          backgroundImage: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-                          boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
-                          borderRadius: 2,
-                          px: 3,
-                          py: 1,
-                          fontWeight: 600,
-                          '&:hover': {
-                            backgroundColor: '#2563eb'
-                          }
-                        }}
-                      >
-                        Save Preferences
                       </Button>
                     </Grid>
                   </Grid>

@@ -44,6 +44,7 @@ import { getAllClients } from "../ClientsPage/api";
 import { getAllDocumentTypes } from "../DocumentTypePage/api";
 import { getAllProducts } from "../ProductCatalogPage/api";
 import { getUserProfile } from "../AuthPages/api";
+import PageLoader from "../ReusableComponents/PageLoader";
 
 const LANGUAGE_LOCALE_MAP = {
   english: "en-US",
@@ -182,6 +183,12 @@ const InvoiceForm = () => {
   });
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [userPreferences, setUserPreferences] = useState(() => readStoredUserPreferences());
+  const [setupStatus, setSetupStatus] = useState({
+    hasCompanyInfo: false,
+    hasClients: false,
+    hasProducts: false,
+    isCheckComplete: false
+  });
 
   const resolvedLocale = resolveLocaleFromPreference(userPreferences?.language);
   const resolvedDateFormat = (userPreferences?.dateFormat || "MM/DD/YYYY").toUpperCase().trim();
@@ -224,7 +231,9 @@ const InvoiceForm = () => {
         setStatuses(statusesData);
 
         const clientsData = await getAllClients();
-        setClients(clientsData);
+        // Filter to only show active clients in the dropdown
+        const activeClients = clientsData.filter(client => client.isActive !== false);
+        setClients(activeClients);
 
         const documentTypesData = await getAllDocumentTypes();
         setDocumentTypes(documentTypesData);
@@ -239,6 +248,26 @@ const InvoiceForm = () => {
         await loadTemplateForDocumentType(1); // Default to Invoice (type 1)
 
         const setupData = await getSystemSetup(); // Assuming this returns { ..., logo, logoMimeType }
+        
+        // Check setup completion status - fetch products to complete the check
+        let hasProducts = false;
+        try {
+          const productsResponse = await getAllProducts();
+          const products = productsResponse.data || productsResponse;
+          hasProducts = products && products.length > 0;
+        } catch (error) {
+          console.error("Error checking products for setup status:", error);
+        }
+        
+        const hasCompanyInfo = !!(setupData?.name && setupData?.email);
+        const hasClients = activeClients && activeClients.length > 0;
+        
+        setSetupStatus({
+          hasCompanyInfo,
+          hasClients,
+          hasProducts,
+          isCheckComplete: true // Setup check is now complete
+        });
         
         let profileData = null;
         try {
@@ -1142,12 +1171,10 @@ const InvoiceForm = () => {
   };
 
   if (loading && currencies.length === 0) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <CircularProgress />
-      </Box>
-    );
-  }  return (
+    return <PageLoader color="#10b981" minHeight="100vh" />;
+  }
+
+  return (
     <Box sx={{ 
       minHeight: '100vh', 
       backgroundColor: '#f8fafc',
@@ -1172,6 +1199,92 @@ const InvoiceForm = () => {
             </Typography>
           </Box>
         </Box>
+
+        {/* Setup Completion Alert - Show only if setup is incomplete and not editing */}
+        {!isEdit && setupStatus.isCheckComplete && (!setupStatus.hasCompanyInfo || !setupStatus.hasClients || !setupStatus.hasProducts) && (
+          <Box sx={{ 
+            width: '100%', 
+            maxWidth: '1200px', 
+            margin: '0 auto',
+            px: { xs: 2, sm: 3, md: 4 },
+            mb: 2
+          }}>
+            <Alert 
+              severity="info" 
+              sx={{ 
+                borderRadius: '16px',
+                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%)',
+                border: '1px solid rgba(59, 130, 246, 0.3)',
+                '& .MuiAlert-icon': {
+                  color: '#3b82f6'
+                }
+              }}
+            >
+              <Typography variant="body1" sx={{ fontWeight: 600, mb: 1, color: '#1e40af' }}>
+                👋 Welcome! Complete your setup for a better invoice experience
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 1.5, color: '#1e3a8a' }}>
+                Before creating invoices, we recommend setting up:
+              </Typography>
+              <Box component="ul" sx={{ m: 0, pl: 2.5, color: '#1e3a8a' }}>
+                {!setupStatus.hasCompanyInfo && (
+                  <li>
+                    <Typography variant="body2" component="span">
+                      <strong>Company Details</strong> - Add your business information in{' '}
+                      <Link 
+                        to="/settings" 
+                        style={{ 
+                          color: '#2563eb', 
+                          fontWeight: 600,
+                          textDecoration: 'underline'
+                        }}
+                      >
+                        System Settings
+                      </Link>
+                    </Typography>
+                  </li>
+                )}
+                {!setupStatus.hasClients && (
+                  <li>
+                    <Typography variant="body2" component="span">
+                      <strong>Clients</strong> - Create client profiles in{' '}
+                      <Link 
+                        to="/clients" 
+                        style={{ 
+                          color: '#2563eb', 
+                          fontWeight: 600,
+                          textDecoration: 'underline'
+                        }}
+                      >
+                        Client Management
+                      </Link>
+                    </Typography>
+                  </li>
+                )}
+                {!setupStatus.hasProducts && (
+                  <li>
+                    <Typography variant="body2" component="span">
+                      <strong>Products/Services</strong> - Add items to your catalog in{' '}
+                      <Link 
+                        to="/products" 
+                        style={{ 
+                          color: '#2563eb', 
+                          fontWeight: 600,
+                          textDecoration: 'underline'
+                        }}
+                      >
+                        Product Catalog
+                      </Link>
+                    </Typography>
+                  </li>
+                )}
+              </Box>
+              <Typography variant="body2" sx={{ mt: 1.5, fontStyle: 'italic', color: '#475569' }}>
+                💡 You can still create invoices now, but completing these steps will make the process much faster!
+              </Typography>
+            </Alert>
+          </Box>
+        )}
 
         <Box sx={{ 
           width: '100%', 

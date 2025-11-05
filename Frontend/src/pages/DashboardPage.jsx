@@ -66,7 +66,7 @@ export default function DashboardPage() {
                 left: 0,
                 right: 0,
                 height: '4px',
-                background: 'linear-gradient(90deg, #4f46e5 0%, #7c3aed 50%, #3b82f6 100%)',
+                background: 'linear-gradient(90deg, #8b5cf6 0%, #a855f7 100%)',
                 borderRadius: '3px 3px 0 0'
               }
             }}
@@ -77,7 +77,7 @@ export default function DashboardPage() {
                   width: { xs: 48, sm: 56 },
                   height: { xs: 48, sm: 56 },
                   borderRadius: '16px',
-                  background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+                  background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -93,7 +93,7 @@ export default function DashboardPage() {
                   sx={{
                     fontWeight: 'bold',
                     fontSize: { xs: '1.25rem', sm: '1.5rem' },
-                    background: 'linear-gradient(135deg, #4338ca 0%, #7c3aed 100%)',
+                    background: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)',
                     backgroundClip: 'text',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
