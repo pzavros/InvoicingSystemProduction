@@ -45,7 +45,7 @@ function TabPanel({ children, value, index, ...other }) {
       aria-labelledby={`product-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
     </div>
   );
 }
@@ -132,339 +132,382 @@ const ProductCatalogPage = () => {
   }
 
   return (
-    <Fade in={true} timeout={800}>
-      <Box sx={{ width: '100%' }}>
-      {/* Enhanced Header Section */}
-      <Grow in={true} timeout={600}>
+    <Box sx={{ width: '100%' }}>
+      {/* Apple-Style Header Section */}
       <Box 
         sx={{ 
           display: 'flex', 
           flexDirection: { xs: 'column', sm: 'row' },
           justifyContent: 'space-between', 
-          alignItems: { xs: 'stretch', sm: 'center' },
-          gap: { xs: 2, sm: 0 },
-          mb: { xs: 3, md: 4 },
-          p: { xs: 2, sm: 3 },
-          borderRadius: 3,
-          background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-          border: '1px solid rgba(16, 185, 129, 0.1)',
-          boxShadow: '0 4px 12px rgba(16, 185, 129, 0.08)',
-          position: 'relative',
-          overflow: 'hidden',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '4px',
-            background: 'linear-gradient(90deg, #f59e0b 0%, #d97706 100%)',
-            borderRadius: '3px 3px 0 0'
-          }
+          alignItems: { xs: 'flex-start', sm: 'center' },
+          gap: { xs: 2, sm: 3 },
+          mb: 3,
+          pb: 3,
+          borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2 } }}>
-          <Box
-            sx={{
-              width: { xs: 40, sm: 48 },
-              height: { xs: 40, sm: 48 },
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 8px 16px rgba(16, 185, 129, 0.3)'
+        <Box>
+          <Typography 
+            variant="h4" 
+            component="h1" 
+            sx={{ 
+              fontWeight: 700,
+              fontSize: { xs: '1.75rem', sm: '2rem' },
+              color: 'rgba(15, 23, 42, 0.95)',
+              letterSpacing: '-0.02em',
+              lineHeight: 1.1,
+              mb: 0.5
             }}
           >
-            <InventoryIcon sx={{ color: 'white', fontSize: { xs: 20, sm: 24 } }} />
-          </Box>
-          <Box>
-            <Typography 
-              variant="h5" 
-              component="h1" 
-              sx={{ 
-                fontWeight: 'bold',
-                fontSize: { xs: '1.25rem', sm: '1.5rem' },
-                background: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                mb: 0.5
-              }}
-            >
-              Product & Service Catalog
-            </Typography>
-            <Typography 
-              variant="subtitle2" 
-              sx={{ 
-                color: 'text.secondary',
-                fontWeight: 'medium',
-                fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                display: { xs: 'none', sm: 'block' }
-              }}
-            >
-              Manage your products, services, and inventory
-            </Typography>
-          </Box>
+            Products
+          </Typography>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: 'rgba(15, 23, 42, 0.5)',
+              fontSize: '0.9375rem',
+              fontWeight: 400,
+              letterSpacing: '-0.01em'
+            }}
+          >
+            Manage your product catalog and categories
+          </Typography>
         </Box>
         
-        <Box sx={{ display: 'flex', gap: { xs: 1, sm: 2 }, alignItems: 'center', flexWrap: 'wrap', justifyContent: { xs: 'space-between', sm: 'flex-end' } }}>
-          {/* Low Stock Alert */}
-          {lowStockProducts.length > 0 && (
-            <Tooltip title={`${lowStockProducts.length} products low in stock`}>
-              <IconButton 
-                onClick={() => setActiveTab(2)}
-                sx={{ 
-                  position: 'relative',
-                  backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                  borderRadius: 2,
-                  border: '1px solid rgba(245, 158, 11, 0.2)',
-                  color: '#d97706',
-                  width: { xs: 40, sm: 44 },
-                  height: { xs: 40, sm: 44 },
-                  '&:hover': {
-                    backgroundColor: 'rgba(245, 158, 11, 0.2)',
-                    transform: 'translateY(-1px)',
-                    boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
-                  },
-                  transition: 'all 0.3s ease-in-out'
-                }}
-              >
-                <WarningIcon sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }} />
-                <Chip 
-                  label={lowStockProducts.length} 
-                  size="small" 
-                  sx={{ 
-                    position: 'absolute', 
-                    top: -8, 
-                    right: -8, 
-                    minWidth: 20, 
-                    height: 20,
-                    backgroundColor: '#dc2626',
-                    color: 'white',
-                    fontWeight: 'bold',
-                    fontSize: '0.7rem'
-                  }}
-                />
-              </IconButton>
-            </Tooltip>
-          )}
-          
-          <Tooltip 
-            title={!canAddProduct ? "You've reached the maximum number of products on the free plan. Upgrade to premium for unlimited products." : ""}
-            arrow
-          >
-            <span>
-              <Button
-                variant="contained"
-                startIcon={canAddProduct ? <AddIcon /> : <LockIcon />}
-                onClick={handleAddProduct}
-                disabled={!canAddProduct}
-                fullWidth={{ xs: true, sm: false }}
-                sx={{ 
-                  backgroundColor: canAddProduct ? '#10b981' : '#9ca3af',
-                  backgroundImage: canAddProduct 
-                    ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-                    : 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
-                  boxShadow: canAddProduct ? '0 8px 16px rgba(16, 185, 129, 0.3)' : 'none',
-                  border: 'none',
-                  borderRadius: 2,
-                  px: { xs: 2, sm: 3 },
-                  py: 1.5,
-                  fontSize: { xs: '0.875rem', sm: '1rem' },
-                  fontWeight: 600,
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  '&:hover': canAddProduct ? { 
-                    backgroundColor: '#059669',
-                    backgroundImage: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 12px 24px rgba(16, 185, 129, 0.4)'
-                  } : {},
-                  '&.Mui-disabled': {
-                    color: 'white',
-                    opacity: 0.7
-                  }
-                }}
-              >
-                {canAddProduct ? 'Add Product' : 'Limit Reached'}
-              </Button>
-            </span>
-          </Tooltip>
+        <Tooltip 
+          title={!canAddProduct ? "You've reached the maximum number of products on the free plan. Upgrade to premium for unlimited products." : ""}
+          arrow
+        >
+          <span>
+            <Button
+              variant="contained"
+              startIcon={canAddProduct ? <AddIcon /> : <LockIcon />}
+              onClick={handleAddProduct}
+              disabled={!canAddProduct}
+              fullWidth={{ xs: true, sm: false }}
+              sx={{ 
+                background: canAddProduct 
+                  ? 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' 
+                  : 'rgba(15, 23, 42, 0.3)',
+                color: 'white',
+                boxShadow: 'none',
+                borderRadius: '8px',
+                px: 2.5,
+                py: 1,
+                fontSize: '0.9375rem',
+                fontWeight: 600,
+                textTransform: 'none',
+                letterSpacing: '-0.01em',
+                minWidth: { xs: 'auto', sm: 140 },
+                transition: 'all 0.15s ease',
+                '&:hover': canAddProduct ? { 
+                  background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                  boxShadow: 'none',
+                } : {},
+                '&.Mui-disabled': {
+                  color: 'rgba(255, 255, 255, 0.6)',
+                  opacity: 1
+                }
+              }}
+            >
+              {canAddProduct ? 'New Product' : 'Limit Reached'}
+            </Button>
+          </span>
+        </Tooltip>
+      </Box>
+
+      {/* Usage Indicators - Below Header */}
+      {!isPremium && (
+        <Box sx={{ mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+          <UsageIndicator resource="product" label="Products" />
+          <UsageIndicator resource="category" label="Categories" />
         </Box>
-      </Box>
-      </Grow>
+      )}
 
-      {/* Usage Indicators for Free Tier - Below Header */}
-      <Box sx={{ mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-        <UsageIndicator resource="product" label="Products" />
-        <UsageIndicator resource="category" label="Categories" />
-      </Box>
-
-      {/* Enhanced Tabs Section */}
-      <Paper 
-        elevation={2}
-        sx={{ 
-          borderRadius: 3,
-          overflow: 'hidden',
-          mb: 3,
-          background: '#ffffff',
-          border: '1px solid rgba(16, 185, 129, 0.08)',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)'
-        }}
-      >
-        <Tabs 
-          value={activeTab} 
-          onChange={handleTabChange}
-          variant="scrollable"
-          scrollButtons="auto"
-          allowScrollButtonsMobile
-          sx={{
-            borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
-            minHeight: { xs: 56, sm: 64 },
-            px: { xs: 1, sm: 2 },
-            '& .MuiTabs-flexContainer': {
-              gap: { xs: 0.5, sm: 1 }
-            },
-            '& .MuiTabs-scrollButtons': {
-              width: { xs: 32, sm: 40 },
-              '&.Mui-disabled': {
-                opacity: 0.3
-              }
-            },
-            '& .MuiTab-root': {
-              minHeight: { xs: 56, sm: 64 },
-              fontSize: { xs: '0.8125rem', sm: '0.9375rem' },
-              fontWeight: 600,
-              textTransform: 'none',
-              color: 'text.secondary',
-              px: { xs: 2, sm: 3 },
-              py: { xs: 1.5, sm: 2 },
-              minWidth: { xs: 'auto', sm: 140 },
-              transition: 'all 0.3s ease-in-out',
-              '&:hover': {
-                color: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.04)'
-              },
-              '&.Mui-selected': {
-                color: '#10b981',
-                fontWeight: 700,
-                backgroundColor: 'rgba(16, 185, 129, 0.06)'
-              }
-            },
-            '& .MuiTabs-indicator': {
-              height: 3,
-              borderRadius: '3px 3px 0 0',
-              background: 'linear-gradient(90deg, #10b981 0%, #059669 100%)',
-              boxShadow: '0 -2px 8px rgba(16, 185, 129, 0.3)'
+      {/* Low Stock Alert Banner */}
+      {lowStockProducts.length > 0 && (
+        <Alert 
+          severity="warning" 
+          sx={{ 
+            mb: 3,
+            borderRadius: '8px',
+            '& .MuiAlert-icon': {
+              fontSize: '1.25rem'
             }
           }}
         >
-          <Tab 
-            icon={<InventoryIcon sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }} />} 
-            iconPosition="start"
-            label="Products & Services" 
+          {lowStockProducts.length} product{lowStockProducts.length > 1 ? 's' : ''} low in stock. Click the "Low Stock" tab to view.
+        </Alert>
+      )}
+
+      {/* Tabs Section - Apple-Style Segmented Control */}
+      <Box 
+        sx={{ 
+          mb: 3,
+          display: 'flex',
+          justifyContent: 'center',
+        }}
+      >
+        <Box
+          sx={{
+            display: 'inline-flex',
+            backgroundColor: 'rgba(15, 23, 42, 0.04)',
+            borderRadius: '12px',
+            padding: '4px',
+            gap: '4px',
+            border: '1px solid rgba(15, 23, 42, 0.06)',
+          }}
+        >
+          <Box
+            onClick={() => handleTabChange(null, 0)}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              px: 3,
+              py: 1.25,
+              borderRadius: '9px',
+              cursor: 'pointer',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              background: activeTab === 0 
+                ? 'white'
+                : 'transparent',
+              color: activeTab === 0
+                ? '#8b5cf6'
+                : 'rgba(15, 23, 42, 0.6)',
+              boxShadow: activeTab === 0
+                ? '0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)'
+                : 'none',
+              fontWeight: activeTab === 0 ? 600 : 500,
+              fontSize: '0.875rem',
+              letterSpacing: '-0.01em',
+              userSelect: 'none',
+              '&:hover': {
+                background: activeTab === 0
+                  ? 'white'
+                  : 'rgba(139, 92, 246, 0.08)',
+                color: activeTab === 0
+                  ? '#8b5cf6'
+                  : 'rgba(15, 23, 42, 0.8)',
+              }
+            }}
+          >
+            <InventoryIcon sx={{ fontSize: '1.125rem' }} />
+            <Typography 
+              sx={{ 
+                fontSize: '0.875rem', 
+                fontWeight: 'inherit',
+                letterSpacing: 'inherit',
+                lineHeight: 1
+              }}
+            >
+              Products
+            </Typography>
+          </Box>
+
+          <Box
+            onClick={() => handleTabChange(null, 1)}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              px: 3,
+              py: 1.25,
+              borderRadius: '9px',
+              cursor: 'pointer',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              background: activeTab === 1 
+                ? 'white'
+                : 'transparent',
+              color: activeTab === 1
+                ? '#8b5cf6'
+                : 'rgba(15, 23, 42, 0.6)',
+              boxShadow: activeTab === 1
+                ? '0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)'
+                : 'none',
+              fontWeight: activeTab === 1 ? 600 : 500,
+              fontSize: '0.875rem',
+              letterSpacing: '-0.01em',
+              userSelect: 'none',
+              '&:hover': {
+                background: activeTab === 1
+                  ? 'white'
+                  : 'rgba(139, 92, 246, 0.08)',
+                color: activeTab === 1
+                  ? '#8b5cf6'
+                  : 'rgba(15, 23, 42, 0.8)',
+              }
+            }}
+          >
+            <CategoryIcon sx={{ fontSize: '1.125rem' }} />
+            <Typography 
+              sx={{ 
+                fontSize: '0.875rem', 
+                fontWeight: 'inherit',
+                letterSpacing: 'inherit',
+                lineHeight: 1
+              }}
+            >
+              Categories
+            </Typography>
+          </Box>
+
+          <Box
+            onClick={() => handleTabChange(null, 2)}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              px: 3,
+              py: 1.25,
+              borderRadius: '9px',
+              cursor: 'pointer',
+              position: 'relative',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              background: activeTab === 2 
+                ? 'white'
+                : 'transparent',
+              color: activeTab === 2
+                ? '#f59e0b'
+                : 'rgba(15, 23, 42, 0.6)',
+              boxShadow: activeTab === 2
+                ? '0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)'
+                : 'none',
+              fontWeight: activeTab === 2 ? 600 : 500,
+              fontSize: '0.875rem',
+              letterSpacing: '-0.01em',
+              userSelect: 'none',
+              '&:hover': {
+                background: activeTab === 2
+                  ? 'white'
+                  : 'rgba(245, 158, 11, 0.08)',
+                color: activeTab === 2
+                  ? '#f59e0b'
+                  : 'rgba(15, 23, 42, 0.8)',
+              }
+            }}
+          >
+            <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+              <WarningIcon sx={{ fontSize: '1.125rem' }} />
+              {lowStockProducts.length > 0 && (
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: -6,
+                    right: -8,
+                    minWidth: 18,
+                    height: 18,
+                    borderRadius: '9px',
+                    backgroundColor: '#dc2626',
+                    color: 'white',
+                    fontSize: '0.625rem',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '0 5px',
+                    border: '2px solid rgba(15, 23, 42, 0.04)',
+                    boxShadow: '0 2px 4px rgba(220, 38, 38, 0.3)',
+                  }}
+                >
+                  {lowStockProducts.length}
+                </Box>
+              )}
+            </Box>
+            <Typography 
+              sx={{ 
+                fontSize: '0.875rem', 
+                fontWeight: 'inherit',
+                letterSpacing: 'inherit',
+                lineHeight: 1
+              }}
+            >
+              Low Stock
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Content Container */}
+      <Paper 
+        elevation={0}
+        sx={{ 
+          borderRadius: '12px',
+          overflow: 'hidden',
+          backgroundColor: 'white',
+          border: '1px solid rgba(15, 23, 42, 0.08)',
+        }}
+      >
+        {/* Tab Panels */}
+        <TabPanel value={activeTab} index={0}>
+          <ProductList
+            products={products}
+            categories={categories}
+            loading={loading}
+            onEditProduct={handleEditProduct}
+            onDeleteProduct={handleProductDeleted}
+            onReloadProducts={loadData}
           />
-          <Tab 
-            icon={<CategoryIcon sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }} />} 
-            iconPosition="start"
-            label="Categories" 
+        </TabPanel>
+
+        <TabPanel value={activeTab} index={1}>
+          <CategoryManager
+            categories={categories}
+            onCategoryUpdated={loadData}
+            showNotification={showNotification}
           />
-          <Tab 
-            icon={
-              <Badge 
-                badgeContent={lowStockProducts.length} 
-                color="error"
-                sx={{
-                  '& .MuiBadge-badge': {
-                    fontSize: { xs: '0.625rem', sm: '0.75rem' },
-                    minWidth: { xs: 16, sm: 20 },
-                    height: { xs: 16, sm: 20 }
-                  }
-                }}
-              >
-                <WarningIcon sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }} />
-              </Badge>
-            }
-            iconPosition="start"
-            label="Low Stock" 
+        </TabPanel>
+
+        <TabPanel value={activeTab} index={2}>
+          <LowStockAlert
+            lowStockProducts={lowStockProducts}
+            categories={categories}
+            onEditProduct={handleEditProduct}
+            onReloadProducts={loadData}
+            onInventoryUpdated={loadData}
+            showNotification={showNotification}
           />
-        </Tabs>
+        </TabPanel>
       </Paper>
 
-      {/* Tab Panels */}
-      <TabPanel value={activeTab} index={0}>
-        <ProductList
-          products={products}
-          categories={categories}
-          loading={loading}
-          onEditProduct={handleEditProduct}
-          onDeleteProduct={handleProductDeleted}
-          onReloadProducts={loadData}
-        />
-      </TabPanel>
-
-      <TabPanel value={activeTab} index={1}>
-        <CategoryManager
-          categories={categories}
-          onCategoryUpdated={loadData}
-          showNotification={showNotification}
-        />
-      </TabPanel>
-
-      <TabPanel value={activeTab} index={2}>
-        <LowStockAlert
-          lowStockProducts={lowStockProducts}
-          categories={categories}
-          onEditProduct={handleEditProduct}
-          onReloadProducts={loadData}
-          onInventoryUpdated={loadData}
-          showNotification={showNotification}
-        />
-      </TabPanel>
-
-      {/* Enhanced Notification Snackbar */}
+      {/* Refined Notification Snackbar */}
       <Snackbar
         open={notification.open}
         autoHideDuration={6000}
         onClose={handleCloseNotification}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        sx={{
-          '& .MuiSnackbarContent-root': {
-            borderRadius: 2,
-            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)'
-          }
-        }}
       >
         <Alert
           onClose={handleCloseNotification}
           severity={notification.severity}
           sx={{ 
             width: "100%",
-            borderRadius: 2,
+            borderRadius: '10px',
             fontWeight: 500,
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+            backdropFilter: 'blur(20px)',
             ...(notification.severity === 'success' && {
-              backgroundColor: 'rgba(16, 185, 129, 0.1)',
-              color: '#059669',
-              border: '1px solid rgba(16, 185, 129, 0.2)',
+              backgroundColor: 'rgba(139, 92, 246, 0.95)',
+              color: 'white',
+              border: 'none',
               '& .MuiAlert-icon': {
-                color: '#059669'
+                color: 'white'
               }
             }),
             ...(notification.severity === 'error' && {
-              backgroundColor: 'rgba(239, 68, 68, 0.1)',
-              color: '#dc2626',
-              border: '1px solid rgba(239, 68, 68, 0.2)',
+              backgroundColor: 'rgba(220, 38, 38, 0.95)',
+              color: 'white',
+              border: 'none',
               '& .MuiAlert-icon': {
-                color: '#dc2626'
+                color: 'white'
               }
             }),
             ...(notification.severity === 'warning' && {
-              backgroundColor: 'rgba(245, 158, 11, 0.1)',
-              color: '#d97706',
-              border: '1px solid rgba(245, 158, 11, 0.2)',
+              backgroundColor: 'rgba(217, 119, 6, 0.95)',
+              color: 'white',
+              border: 'none',
               '& .MuiAlert-icon': {
-                color: '#d97706'
+                color: 'white'
               }
             })
           }}
@@ -474,8 +517,7 @@ const ProductCatalogPage = () => {
       </Snackbar>
       
       <PageHelper {...pageHelpContent.products} />
-      </Box>
-    </Fade>
+    </Box>
   );
 };
 

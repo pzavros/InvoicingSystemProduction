@@ -208,13 +208,16 @@ const ClientList = ({ clients, loading, onEditClient, onDeleteClient, onReloadCl
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
           <Chip
             label={params.value ? "Active" : "Inactive"}
-            size="medium"
+            size="small"
             sx={{
-              backgroundColor: params.value ? 'rgba(16, 185, 129, 0.1)' : 'rgba(156, 163, 175, 0.1)',
+              backgroundColor: params.value ? 'rgba(16, 185, 129, 0.08)' : 'rgba(156, 163, 175, 0.08)',
               color: params.value ? '#059669' : '#6b7280',
-              fontWeight: 500,
-              fontSize: '0.875rem',
-              border: `1px solid ${params.value ? 'rgba(16, 185, 129, 0.2)' : 'rgba(156, 163, 175, 0.2)'}`,
+              fontWeight: 600,
+              fontSize: '0.75rem',
+              height: '24px',
+              borderRadius: '6px',
+              border: 'none',
+              letterSpacing: '-0.01em',
             }}
           />
         </Box>
@@ -232,14 +235,17 @@ const ClientList = ({ clients, loading, onEditClient, onDeleteClient, onReloadCl
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, height: '100%' }}>
           <Tooltip title="Edit Client">
             <IconButton
-              size="medium"
+              size="small"
               onClick={() => onEditClient(params.row.client)}
               sx={{
-                color: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                borderRadius: 1.5,
+                width: 32,
+                height: 32,
+                color: '#06b6d4',
+                backgroundColor: 'rgba(6, 182, 212, 0.08)',
+                borderRadius: '8px',
+                transition: 'all 0.2s',
                 '&:hover': {
-                  backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                  backgroundColor: 'rgba(6, 182, 212, 0.16)',
                   transform: 'translateY(-1px)',
                 },
               }}
@@ -249,14 +255,17 @@ const ClientList = ({ clients, loading, onEditClient, onDeleteClient, onReloadCl
           </Tooltip>
           <Tooltip title="Delete Client">
             <IconButton
-              size="medium"
+              size="small"
               onClick={() => handleDeleteClick(params.row.client)}
               sx={{
+                width: 32,
+                height: 32,
                 color: '#dc2626',
-                backgroundColor: 'rgba(220, 38, 38, 0.1)',
-                borderRadius: 1.5,
+                backgroundColor: 'rgba(220, 38, 38, 0.08)',
+                borderRadius: '8px',
+                transition: 'all 0.2s',
                 '&:hover': {
-                  backgroundColor: 'rgba(220, 38, 38, 0.2)',
+                  backgroundColor: 'rgba(220, 38, 38, 0.16)',
                   transform: 'translateY(-1px)',
                 },
               }}
@@ -640,56 +649,66 @@ const ClientList = ({ clients, loading, onEditClient, onDeleteClient, onReloadCl
           height: rows.length <= 10 ? 'auto' : calculateGridHeight(),
           minHeight: 400,
           maxHeight: 800,
-          boxShadow: '0 20px 35px -8px rgba(0, 0, 0, 0.12), 0 15px 20px -6px rgba(0, 0, 0, 0.08), 0 6px 12px -2px rgba(0, 0, 0, 0.06)',
-          borderRadius: '16px',
+          borderRadius: '12px',
           border: 'none',
           backgroundColor: '#ffffff',
+          boxShadow: 'none',
           overflow: 'hidden',
-          position: 'relative',
           '& .MuiDataGrid-main': {
-            borderRadius: '16px',
+            borderRadius: '12px',
           },
           '& .MuiDataGrid-columnHeaders': {
             backgroundColor: '#ffffff',
-            borderBottom: 'none',
-            borderTopLeftRadius: '16px',
-            borderTopRightRadius: '16px',
+            borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
+            minHeight: '56px !important',
+            maxHeight: '56px !important',
+            '& .MuiDataGrid-columnHeader': {
+              '&:focus, &:focus-within': {
+                outline: 'none',
+              },
+            },
             '& .MuiDataGrid-columnHeaderTitle': {
-              fontSize: '1rem',
+              fontSize: '0.8125rem',
               fontWeight: 600,
-              color: '#111827',
+              color: 'rgba(15, 23, 42, 0.7)',
+              letterSpacing: '-0.01em'
             },
           },
+          '& .MuiDataGrid-columnSeparator': {
+            display: 'none',
+          },
           '& .MuiDataGrid-toolbarContainer': {
-            padding: '24px 28px',
+            padding: '20px 24px',
             backgroundColor: '#ffffff',
-            borderBottom: 'none',
-            borderTopLeftRadius: '16px',
-            borderTopRightRadius: '16px',
+            borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
             display: 'flex',
             alignItems: 'center',
-            gap: '12px',
+            gap: 2,
             '& .MuiInputBase-root': {
-              fontSize: '0.95rem',
-              backgroundColor: '#ffffff',
+              fontSize: '0.875rem',
+              backgroundColor: 'rgba(15, 23, 42, 0.04)',
+              border: '1px solid rgba(15, 23, 42, 0.08)',
               borderRadius: '8px',
-              border: '1px solid rgba(209, 213, 219, 0.6)',
-              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-              minWidth: '280px',
+              boxShadow: 'none',
+              minWidth: '300px',
               height: '40px',
-              transition: 'all 0.2s ease-in-out',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              '& fieldset': {
+                border: 'none'
+              },
               '&:hover': {
-                borderColor: 'rgba(16, 185, 129, 0.5)',
-                boxShadow: '0 2px 6px 0 rgba(16, 185, 129, 0.15)',
+                backgroundColor: 'rgba(15, 23, 42, 0.06)',
+                borderColor: 'rgba(15, 23, 42, 0.12)',
               },
               '&.Mui-focused': {
-                borderColor: '#10b981',
-                boxShadow: '0 0 0 3px rgba(16, 185, 129, 0.12), 0 2px 6px 0 rgba(0, 0, 0, 0.1)',
+                backgroundColor: 'white',
+                borderColor: '#8b5cf6',
+                boxShadow: '0 0 0 3px rgba(139, 92, 246, 0.1)',
               },
               '& .MuiInputBase-input': {
-                padding: '8px 12px',
+                padding: '10px 14px',
                 '&::placeholder': {
-                  color: '#9ca3af',
+                  color: 'rgba(15, 23, 42, 0.4)',
                   fontWeight: 400,
                 },
               },
@@ -697,80 +716,69 @@ const ClientList = ({ clients, loading, onEditClient, onDeleteClient, onReloadCl
             '& .MuiButton-root': {
               fontSize: '0.875rem',
               fontWeight: 500,
-              backgroundColor: '#ffffff',
-              border: '1px solid rgba(209, 213, 219, 0.6)',
+              backgroundColor: 'transparent',
+              border: 'none',
               borderRadius: '8px',
-              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-              padding: '8px 16px',
+              boxShadow: 'none',
+              padding: '8px 12px',
               minWidth: 'auto',
               height: '40px',
-              color: '#374151',
+              color: 'rgba(15, 23, 42, 0.6)',
               textTransform: 'none',
-              transition: 'all 0.2s ease-in-out',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
               '&:hover': {
-                backgroundColor: '#ffffff',
-                borderColor: '#10b981',
-                color: '#10b981',
-                boxShadow: '0 2px 6px 0 rgba(16, 185, 129, 0.2)',
-                transform: 'translateY(-1px)',
+                backgroundColor: 'rgba(15, 23, 42, 0.06)',
+                color: 'rgba(15, 23, 42, 0.8)',
               },
               '&.Mui-disabled': {
-                backgroundColor: '#f3f4f6',
-                borderColor: 'rgba(209, 213, 219, 0.4)',
-                color: '#9ca3af',
-                boxShadow: 'none',
-              },
-              '& .MuiButton-startIcon': {
-                marginRight: '6px',
-                '& svg': {
-                  fontSize: '18px',
-                },
+                backgroundColor: 'transparent',
+                color: 'rgba(15, 23, 42, 0.25)',
               },
             },
-            '& .MuiButtonBase-root[title*="Density"]': {
-              '& svg': {
-                color: '#6b7280',
-              },
-              '&:hover svg': {
-                color: '#10b981',
-              },
-            },
-            '& .MuiButtonBase-root[title*="Export"]': {
-              '& svg': {
-                color: '#6b7280',
-              },
-              '&:hover svg': {
-                color: '#10b981',
-              },
-            },
-            '& .MuiButtonBase-root[title*="Filter"]': {
-              '& svg': {
-                color: '#6b7280',
-              },
-              '&:hover svg': {
-                color: '#10b981',
-              },
-            },
-          },
-          '& .MuiDataGrid-footerContainer': {
-            borderTop: 'none',
-            backgroundColor: '#ffffff',
-            borderBottomLeftRadius: '16px',
-            borderBottomRightRadius: '16px',
           },
           '& .MuiDataGrid-row': {
-            backgroundColor: '#ffffff',
+            borderBottom: '1px solid rgba(15, 23, 42, 0.06)',
+            transition: 'all 0.15s ease',
             '&:hover': {
-              backgroundColor: 'rgba(16, 185, 129, 0.03)',
-              transform: 'translateY(-1px)',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+              backgroundColor: 'rgba(139, 92, 246, 0.02)',
+              cursor: 'pointer',
             },
-            '& .MuiDataGrid-cell': {
-              borderBottom: '1px solid rgba(243, 244, 246, 0.8)',
+            '&:last-child': {
+              borderBottom: 'none',
             },
           },
           '& .MuiDataGrid-cell': {
-            borderRight: 'none',
+            borderBottom: 'none',
+            '&:focus, &:focus-within': {
+              outline: 'none',
+            },
+          },
+          '& .MuiDataGrid-footerContainer': {
+            borderTop: '1px solid rgba(15, 23, 42, 0.08)',
+            backgroundColor: '#ffffff',
+            minHeight: '56px',
+            '& .MuiTablePagination-root': {
+              color: 'rgba(15, 23, 42, 0.7)',
+              fontSize: '0.875rem',
+            },
+            '& .MuiTablePagination-select': {
+              borderRadius: '6px',
+              backgroundColor: 'rgba(15, 23, 42, 0.04)',
+              padding: '4px 8px',
+              '&:hover': {
+                backgroundColor: 'rgba(15, 23, 42, 0.08)',
+              },
+            },
+            '& .MuiTablePagination-actions button': {
+              color: 'rgba(15, 23, 42, 0.6)',
+              '&:hover': {
+                backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                color: '#8b5cf6',
+              },
+              '&.Mui-disabled': {
+                color: 'rgba(15, 23, 42, 0.25)',
+              },
+            },
           },
         }}
       />

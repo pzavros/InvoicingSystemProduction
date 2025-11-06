@@ -1,10 +1,10 @@
-import Page from '../components/ReusableComponents/Page';
+import PageContainer from '../components/ReusableComponents/PageContainer';
 import InvoiceTemplatesPage from '../components/InvoiceTemplatesPage/InvoiceTemplatesPage';
 
 export default function TemplatesPage() {
   return (
-    <Page>
+    <PageContainer maxWidth="xl">
       <InvoiceTemplatesPage />
-    </Page>
+    </PageContainer>
   );
 }

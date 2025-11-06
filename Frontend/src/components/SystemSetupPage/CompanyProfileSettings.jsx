@@ -303,122 +303,66 @@ const CompanyProfileSettings = () => {
     );
   }
   return (
-    <Box
-      sx={{
-        position: 'relative',
-        overflow: 'hidden',
-        '@keyframes fadeInUp': {
-          '0%': { opacity: 0, transform: 'translateY(30px)' },
-          '100%': { opacity: 1, transform: 'translateY(0)' }
-        },
-        '@keyframes slideInLeft': {
-          '0%': { opacity: 0, transform: 'translateX(-30px)' },
-          '100%': { opacity: 1, transform: 'translateX(0)' }
-        },
-        '@keyframes slideInRight': {
-          '0%': { opacity: 0, transform: 'translateX(30px)' },
-          '100%': { opacity: 1, transform: 'translateX(0)' }
-        },
-        '@keyframes scaleIn': {
-          '0%': { opacity: 0, transform: 'scale(0.9)' },
-          '100%': { opacity: 1, transform: 'scale(1)' }
-        },
-        '@keyframes shimmer': {
-          '0%': { backgroundPosition: '-200px 0' },
-          '100%': { backgroundPosition: 'calc(200px + 100%) 0' }
-        },
-        '@keyframes pulse': {
-          '0%': { boxShadow: '0 0 0 0 rgba(103, 126, 234, 0.7)' },
-          '70%': { boxShadow: '0 0 0 10px rgba(103, 126, 234, 0)' },
-          '100%': { boxShadow: '0 0 0 0 rgba(103, 126, 234, 0)' }
-        }
-      }}
-    >
-      {/* Hero Header */}
+    <>
+      <Box
+        sx={{
+          position: 'relative'
+        }}
+      >
+      {/* Clean Header */}
       <Box
         sx={{
           display: 'flex',
-          flexDirection: { xs: 'column', md: 'row' },
+          flexDirection: { xs: 'column', sm: 'row' },
           justifyContent: 'space-between',
-          alignItems: { xs: 'flex-start', md: 'center' },
-          gap: { xs: 2, md: 3 },
-          mb: { xs: 3, md: 4 },
-          p: { xs: 2, md: 3 },
-          borderRadius: { xs: 2, md: 3 },
-          background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-          border: '1px solid rgba(34, 197, 94, 0.18)',
-          boxShadow: '0 4px 12px rgba(34, 197, 94, 0.12)',
-          position: 'relative',
-          overflow: 'hidden',
-          animation: 'fadeInUp 0.6s ease-out',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '4px',
-            background: 'linear-gradient(90deg, #6366f1 0%, #4f46e5 100%)',
-            borderRadius: '3px 3px 0 0'
-          }
+          alignItems: { xs: 'flex-start', sm: 'center' },
+          gap: { xs: 2, sm: 3 },
+          mb: 3,
+          pb: 3,
+          borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: { xs: '100%', md: 'auto' } }}>
-          <Box
+        {/* Left Side - Title and Description */}
+        <Box>
+          <Typography
+            variant="h4"
+            component="h1"
             sx={{
-              width: { xs: 48, md: 56 },
-              height: { xs: 48, md: 56 },
-              borderRadius: { xs: '14px', md: '16px' },
-              background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 10px 18px rgba(16, 185, 129, 0.35)',
-              animation: 'scaleIn 0.5s ease-out 0.2s both'
+              fontWeight: 700,
+              fontSize: { xs: '1.75rem', sm: '2rem' },
+              color: 'rgba(15, 23, 42, 0.95)',
+              letterSpacing: '-0.02em',
+              lineHeight: 1.1,
+              mb: 0.5
             }}
           >
-            <BusinessIcon sx={{ color: 'white', fontSize: { xs: 22, md: 26 } }} />
-          </Box>
-          <Box sx={{ animation: 'slideInLeft 0.6s ease-out 0.1s both', flex: 1 }}>
-            <Typography
-              variant={isMobile ? "h6" : "h5"}
-              component="h1"
-              sx={{
-                fontWeight: 'bold',
-                background: 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                mb: 0.5
-              }}
-            >
-              Company Settings
-            </Typography>
-            <Typography
-              variant={isMobile ? "caption" : "subtitle2"}
-              sx={{
-                color: 'text.secondary',
-                fontWeight: 'medium',
-                display: { xs: 'none', sm: 'block' }
-              }}
-            >
-              Configure your business profile and banking details to keep your invoices accurate.
-            </Typography>
-          </Box>
+            Company Settings
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'rgba(15, 23, 42, 0.5)',
+              fontSize: '0.9375rem',
+              fontWeight: 400,
+              letterSpacing: '-0.01em'
+            }}
+          >
+            Configure your business profile and banking details
+          </Typography>
         </Box>
 
+        {/* Right Side - Progress Indicator */}
         <Box
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            alignItems: { xs: 'flex-start', md: 'flex-end' },
-            gap: 1.5,
-            width: { xs: '100%', md: 320 },
-            animation: 'slideInRight 0.6s ease-out 0.2s both'
+            alignItems: { xs: 'flex-start', sm: 'flex-end' },
+            gap: 1,
+            minWidth: { sm: 200 }
           }}
         >
-          <Stack direction="row" alignItems="center" spacing={1.5}>
-            <Typography variant={isMobile ? "caption" : "subtitle2"} sx={{ fontWeight: 600, color: '#047857' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="body2" sx={{ fontWeight: 600, color: 'rgba(15, 23, 42, 0.7)', fontSize: '0.8125rem' }}>
               Setup Progress
             </Typography>
             {formProgress === 100 && (
@@ -427,118 +371,191 @@ const CompanyProfileSettings = () => {
                 label="Complete"
                 size="small"
                 sx={{
-                  backgroundColor: 'rgba(34, 197, 94, 0.15)',
-                  color: '#047857',
+                  backgroundColor: 'rgba(34, 197, 94, 0.08)',
+                  color: '#059669',
                   fontWeight: 600,
-                  animation: 'pulse 2s infinite'
+                  fontSize: '0.75rem',
+                  height: '24px',
+                  borderRadius: '6px',
+                  border: 'none',
                 }}
               />
             )}
-          </Stack>
+          </Box>
           <Box sx={{ width: '100%' }}>
             <LinearProgress
               variant="determinate"
               value={formProgress}
               sx={{
-                height: { xs: 6, md: 8 },
-                borderRadius: 4,
-                backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                height: 6,
+                borderRadius: 3,
+                backgroundColor: 'rgba(15, 23, 42, 0.08)',
                 '& .MuiLinearProgress-bar': {
-                  borderRadius: 4,
-                  background: 'linear-gradient(90deg, #059669 0%, #10b981 50%, #22c55e 100%)'
+                  borderRadius: 3,
+                  background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'
                 }
               }}
             />
           </Box>
-          <Typography variant={isMobile ? "caption" : "body2"} color="text.secondary">
+          <Typography variant="caption" sx={{ color: 'rgba(15, 23, 42, 0.5)', fontSize: '0.8125rem' }}>
             {Math.round(formProgress)}% complete{hasUnsavedChanges ? ' • Unsaved changes' : ''}
           </Typography>
         </Box>
       </Box>
-      {/* Main Content */}
-      <Box sx={{ maxWidth: 1400, mx: 'auto', p: { xs: 1, sm: 2, md: 3 } }}>
-        {/* Tab Navigation */}        <Paper
-          elevation={0}
+      
+      {/* Segmented Control - Apple Style */}
+      <Box 
+        sx={{ 
+          mb: 3,
+          display: 'flex',
+          justifyContent: 'center',
+        }}
+      >
+        <Box
           sx={{
-            mb: { xs: 2, md: 4 },
-            borderRadius: { xs: 2, md: 3 },
-            background: 'rgba(255,255,255,0.98)',
-            border: '1px solid rgba(0,0,0,0.08)',
-            animation: 'fadeInUp 0.6s ease-out 0.3s both'
+            display: 'inline-flex',
+            backgroundColor: 'rgba(15, 23, 42, 0.04)',
+            borderRadius: '12px',
+            padding: '4px',
+            gap: '4px',
+            border: '1px solid rgba(15, 23, 42, 0.06)',
           }}
         >
-          <Tabs
-            value={activeTab}
-            onChange={handleTabChange}
-            variant={isMobile ? "fullWidth" : "standard"}
+          <Box
+            onClick={() => setActiveTab(0)}
             sx={{
-              '& .MuiTabs-indicator': {
-                height: 3,
-                background: 'linear-gradient(90deg, #667eea, #764ba2)',
-                borderRadius: '3px 3px 0 0'
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              px: 3,
+              py: 1.25,
+              borderRadius: '9px',
+              cursor: 'pointer',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              background: activeTab === 0 
+                ? 'white'
+                : 'transparent',
+              color: activeTab === 0
+                ? '#8b5cf6'
+                : 'rgba(15, 23, 42, 0.6)',
+              boxShadow: activeTab === 0
+                ? '0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)'
+                : 'none',
+              fontWeight: activeTab === 0 ? 600 : 500,
+              fontSize: '0.875rem',
+              letterSpacing: '-0.01em',
+              userSelect: 'none',
+              '&:hover': {
+                background: activeTab === 0
+                  ? 'white'
+                  : 'rgba(139, 92, 246, 0.08)',
+                color: activeTab === 0
+                  ? '#8b5cf6'
+                  : 'rgba(15, 23, 42, 0.8)',
               }
             }}
           >
-            <Tab
-              icon={isMobile ? undefined : <BusinessIcon />}
-              iconPosition={isMobile ? undefined : "start"}
-              label={isMobile ? "Company" : "Company Profile"}
-              sx={{
-                minHeight: { xs: 56, md: 70 },
-                fontWeight: 600,
-                textTransform: 'none',
-                fontSize: { xs: '0.875rem', md: '1rem' },
-                '&.Mui-selected': { color: '#667eea' }
+            <BusinessIcon sx={{ fontSize: '1.125rem' }} />
+            <Typography 
+              sx={{ 
+                fontSize: '0.875rem', 
+                fontWeight: 'inherit',
+                letterSpacing: 'inherit',
+                lineHeight: 1
               }}
-            />
-            <Tab
-              icon={isMobile ? undefined : <BankIcon />}
-              iconPosition={isMobile ? undefined : "start"}
-              label={isMobile ? "Banking" : "Banking Details"}
-              sx={{
-                minHeight: { xs: 56, md: 70 },
-                fontWeight: 600,
-                textTransform: 'none',
-                fontSize: { xs: '0.875rem', md: '1rem' },
-                '&.Mui-selected': { color: '#667eea' }
-              }}
-            />
-          </Tabs>
-        </Paper>
+            >
+              Company Profile
+            </Typography>
+          </Box>
 
-        {/* Tab Content */}
-        <Fade in={true} timeout={500}>
-          <Box>
-            {activeTab === 0 && (              <Paper
-                elevation={0}
-                sx={{
-                  p: { xs: 2, sm: 3, md: 4 },
-                  borderRadius: { xs: 2, md: 3 },
-                  background: 'rgba(255,255,255,0.98)',
-                  border: '1px solid rgba(0,0,0,0.08)',
-                  animation: 'slideInLeft 0.6s ease-out'
+          <Box
+            onClick={() => setActiveTab(1)}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1,
+              px: 3,
+              py: 1.25,
+              borderRadius: '9px',
+              cursor: 'pointer',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              background: activeTab === 1 
+                ? 'white'
+                : 'transparent',
+              color: activeTab === 1
+                ? '#8b5cf6'
+                : 'rgba(15, 23, 42, 0.6)',
+              boxShadow: activeTab === 1
+                ? '0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)'
+                : 'none',
+              fontWeight: activeTab === 1 ? 600 : 500,
+              fontSize: '0.875rem',
+              letterSpacing: '-0.01em',
+              userSelect: 'none',
+              '&:hover': {
+                background: activeTab === 1
+                  ? 'white'
+                  : 'rgba(139, 92, 246, 0.08)',
+                color: activeTab === 1
+                  ? '#8b5cf6'
+                  : 'rgba(15, 23, 42, 0.8)',
+              }
+            }}
+          >
+            <BankIcon sx={{ fontSize: '1.125rem' }} />
+            <Typography 
+              sx={{ 
+                fontSize: '0.875rem', 
+                fontWeight: 'inherit',
+                letterSpacing: 'inherit',
+                lineHeight: 1
+              }}
+            >
+              Banking Details
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Tab Content */}
+      <Box>
+        {activeTab === 0 && (
+          <Box
+            sx={{
+              p: { xs: 2, sm: 3, md: 4 },
+              borderRadius: '12px',
+              backgroundColor: 'white',
+              border: '1px solid rgba(15, 23, 42, 0.06)',
+            }}
+          >
+            {/* Company Profile Tab */}
+            <Box sx={{ mb: { xs: 3, md: 4 } }}>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  fontWeight: 600, 
+                  color: 'rgba(15, 23, 42, 0.9)',
+                  fontSize: '1.125rem',
+                  letterSpacing: '-0.01em'
                 }}
               >
-                {/* Company Profile Tab */}                <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: { xs: 3, md: 4 } }}>
-                  <BusinessIcon sx={{ color: '#667eea', fontSize: { xs: 24, md: 28 } }} />
-                  <Typography variant={isMobile ? "h6" : "h5"} sx={{ fontWeight: 700, color: '#2c3e50' }}>
-                    Company Information
-                  </Typography>
-                </Stack>
+                Company Information
+              </Typography>
+            </Box>
 
                 {/* Logo Upload Section */}
                 <Box
                   sx={{
-                    mb: { xs: 3, md: 4 },
-                    p: { xs: 2, md: 3 },
-                    border: '2px dashed #e0e0e0',
-                    borderRadius: 2,
+                    mb: 4,
+                    p: 3,
+                    border: '2px dashed rgba(15, 23, 42, 0.15)',
+                    borderRadius: '12px',
                     textAlign: 'center',
-                    background: 'linear-gradient(135deg, #f8f9fa 0%, #fff 100%)',
-                    transition: 'all 0.3s ease',
+                    backgroundColor: 'rgba(15, 23, 42, 0.02)',
+                    transition: 'all 0.2s ease',
                     '&:hover': {
-                      borderColor: '#667eea',
-                      background: 'linear-gradient(135deg, #f0f2ff 0%, #fff 100%)'
+                      borderColor: '#8b5cf6',
+                      backgroundColor: 'rgba(139, 92, 246, 0.02)',
                     }
                   }}
                 >
@@ -549,40 +566,39 @@ const CompanyProfileSettings = () => {
                         src={logoPreview}
                         alt="Company Logo"
                         sx={{
-                          maxWidth: { xs: 150, md: 200 },
-                          maxHeight: { xs: 90, md: 120 },
-                          borderRadius: 2,
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                          animation: 'scaleIn 0.5s ease-out'
+                          maxWidth: 200,
+                          maxHeight: 120,
+                          borderRadius: '8px',
+                          objectFit: 'contain',
                         }}
                       />
                     ) : (
                       <Avatar
                         sx={{
-                          width: { xs: 64, md: 80 },
-                          height: { xs: 64, md: 80 },
-                          backgroundColor: '#f5f5f5',
-                          border: '2px solid #e0e0e0'
+                          width: 80,
+                          height: 80,
+                          backgroundColor: 'rgba(15, 23, 42, 0.04)',
+                          border: 'none'
                         }}
                       >
-                        <CameraIcon sx={{ fontSize: { xs: 32, md: 40 }, color: '#999' }} />
+                        <CameraIcon sx={{ fontSize: 40, color: 'rgba(15, 23, 42, 0.4)' }} />
                       </Avatar>
                     )}
-                      <Stack direction={isMobile ? "column" : "row"} spacing={2} alignItems="center" sx={{ width: isMobile ? '100%' : 'auto' }}>
+                    <Stack direction="row" spacing={2} alignItems="center">
                       <Button
                         variant="outlined"
                         component="label"
                         startIcon={<UploadIcon />}
-                        fullWidth={isMobile}
                         sx={{
-                          borderRadius: 2,
+                          borderRadius: '8px',
                           fontWeight: 600,
                           textTransform: 'none',
-                          borderColor: '#667eea',
-                          color: '#667eea',
+                          fontSize: '0.875rem',
+                          borderColor: '#8b5cf6',
+                          color: '#8b5cf6',
                           '&:hover': {
-                            backgroundColor: 'rgba(102, 126, 234, 0.05)',
-                            borderColor: '#667eea'
+                            backgroundColor: 'rgba(139, 92, 246, 0.04)',
+                            borderColor: '#7c3aed'
                           }
                         }}
                       >
@@ -599,15 +615,15 @@ const CompanyProfileSettings = () => {
                         <Button
                           variant="text"
                           startIcon={<RefreshIcon />}
-                          fullWidth={isMobile}
                           onClick={refreshLogoPreview}
                           sx={{
-                            borderRadius: 2,
-                            fontWeight: 600,
+                            borderRadius: '8px',
+                            fontWeight: 500,
                             textTransform: 'none',
-                            color: '#666',
+                            fontSize: '0.875rem',
+                            color: 'rgba(15, 23, 42, 0.6)',
                             '&:hover': {
-                              backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                              backgroundColor: 'rgba(15, 23, 42, 0.04)'
                             }
                           }}
                         >
@@ -616,13 +632,17 @@ const CompanyProfileSettings = () => {
                       )}
                     </Stack>
                     
-                    <Typography variant="caption" sx={{ color: '#666', maxWidth: 300, px: 1 }}>
+                    <Typography 
+                      variant="caption" 
+                      sx={{ 
+                        color: 'rgba(15, 23, 42, 0.6)', 
+                        maxWidth: 300 
+                      }}
+                    >
                       Upload your company logo. Recommended size: 400x200px. Max file size: 2MB.
                     </Typography>
                   </Stack>
-                </Box>
-
-                {/* Company Details Form */}
+                </Box>                {/* Company Details Form */}
                 <Grid container spacing={3}>
                   <Grid item xs={12} md={6}>
                     <TextField
@@ -633,17 +653,16 @@ const CompanyProfileSettings = () => {
                       fullWidth
                       variant="outlined"
                       InputProps={{
-                        startAdornment: <BusinessIcon sx={{ mr: 1, color: '#667eea' }} />
+                        startAdornment: <BusinessIcon sx={{ mr: 1, color: '#8b5cf6' }} />
                       }}
                       sx={{
                         '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                          transition: 'all 0.3s ease',
-                          '&:hover': {
-                            '& > fieldset': { borderColor: '#667eea' }
+                          borderRadius: '8px',
+                          '&:hover fieldset': { 
+                            borderColor: '#8b5cf6' 
                           },
-                          '&.Mui-focused': {
-                            '& > fieldset': { borderColor: '#667eea', borderWidth: 2 }
+                          '&.Mui-focused fieldset': { 
+                            borderColor: '#8b5cf6' 
                           }
                         }
                       }}
@@ -807,24 +826,23 @@ const CompanyProfileSettings = () => {
                     />
                   </Grid>
                 </Grid>
-              </Paper>
+              </Box>
             )}
 
-            {activeTab === 1 && (              <Paper
-                elevation={0}
-                sx={{
-                  p: { xs: 2, sm: 3, md: 4 },
-                  borderRadius: { xs: 2, md: 3 },
-                  background: 'rgba(255,255,255,0.98)',
-                  border: '1px solid rgba(0,0,0,0.08)',
-                  animation: 'slideInRight 0.6s ease-out'
-                }}
-              >
-                {/* Banking Details Tab */}                <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: { xs: 3, md: 4 } }}>
-                  <BankIcon sx={{ color: '#667eea', fontSize: { xs: 24, md: 28 } }} />
-                  <Typography variant={isMobile ? "h6" : "h5"} sx={{ fontWeight: 700, color: '#2c3e50' }}>
-                    Banking Information
-                  </Typography>                </Stack>
+            {activeTab === 1 && (
+              <Box sx={{ py: 3 }}>
+                {/* Banking Details Tab */}
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    fontWeight: 600, 
+                    mb: 3,
+                    fontSize: '1.125rem',
+                    color: 'rgba(15, 23, 42, 0.9)'
+                  }}
+                >
+                  Banking Information
+                </Typography>
 
                 {/* Banking Form */}
                 <Grid container spacing={3}>
@@ -959,24 +977,21 @@ const CompanyProfileSettings = () => {
                     />
                   </Grid>
                 </Grid>
-              </Paper>
+              </Box>
             )}
           </Box>
-        </Fade>
 
         {/* Action Buttons */}
         <Box
           sx={{
-            mt: { xs: 3, md: 4 },
+            mt: 4,
             display: 'flex',
-            flexDirection: { xs: 'column', sm: 'row' },
             justifyContent: 'space-between',
-            alignItems: { xs: 'stretch', sm: 'center' },
-            gap: 2,
-            animation: 'fadeInUp 0.6s ease-out 0.5s both'
+            alignItems: 'center',
+            gap: 2
           }}
         >
-          <Stack direction="row" alignItems="center" spacing={2} sx={{ justifyContent: { xs: 'center', sm: 'flex-start' } }}>
+          <Stack direction="row" alignItems="center" spacing={2}>
             {hasUnsavedChanges && (
               <Chip
                 icon={<ErrorIcon />}
@@ -985,29 +1000,27 @@ const CompanyProfileSettings = () => {
                 sx={{
                   backgroundColor: 'rgba(255, 152, 0, 0.1)',
                   color: '#ff9800',
-                  fontWeight: 600,
-                  animation: 'pulse 2s infinite'
+                  fontWeight: 600
                 }}
               />
             )}
           </Stack>
 
-          <Stack direction={isMobile ? "column-reverse" : "row"} spacing={2} sx={{ width: { xs: '100%', sm: 'auto' } }}>
+          <Stack direction="row" spacing={2}>
             <Button
               variant="outlined"
               onClick={() => window.location.reload()}
-              startIcon={!isMobile && <RefreshIcon />}
-              fullWidth={isMobile}
+              startIcon={<RefreshIcon />}
               sx={{
-                borderRadius: 2,
+                borderRadius: '8px',
                 fontWeight: 600,
                 textTransform: 'none',
-                borderColor: '#667eea',
-                color: '#667eea',
-                height: { xs: 44, md: 48 },
+                fontSize: '0.875rem',
+                borderColor: '#8b5cf6',
+                color: '#8b5cf6',
                 '&:hover': {
-                  backgroundColor: 'rgba(102, 126, 234, 0.05)',
-                  borderColor: '#667eea'
+                  backgroundColor: 'rgba(139, 92, 246, 0.04)',
+                  borderColor: '#7c3aed'
                 }
               }}
             >
@@ -1018,33 +1031,29 @@ const CompanyProfileSettings = () => {
               variant="contained"
               onClick={handleSave}
               disabled={saving}
-              startIcon={saving ? <CircularProgress size={20} color="inherit" /> : !isMobile && <SaveIcon />}
-              fullWidth={isMobile}
+              startIcon={saving ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
               sx={{
-                minWidth: { xs: '100%', sm: 160 },
-                height: { xs: 44, md: 48 },
-                borderRadius: 2,
+                minWidth: 160,
+                borderRadius: '8px',
                 fontWeight: 600,
                 textTransform: 'none',
-                background: 'linear-gradient(45deg, #667eea 30%, #764ba2 90%)',
-                boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+                fontSize: '0.875rem',
+                background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                boxShadow: 'none',
                 '&:hover': {
-                  background: 'linear-gradient(45deg, #5a6fd8 30%, #694a98 90%)',
-                  boxShadow: '0 6px 16px rgba(102, 126, 234, 0.4)',
-                  transform: 'translateY(-1px)'
+                  background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                  boxShadow: 'none'
                 },
                 '&:disabled': {
                   background: 'rgba(0,0,0,0.12)',
                   boxShadow: 'none'
-                },
-                transition: 'all 0.3s ease'
+                }
               }}
             >
               {saving ? 'Saving...' : 'Save Settings'}
             </Button>
           </Stack>
         </Box>
-      </Box>
 
       {/* Loading Backdrop */}
       <Backdrop
@@ -1055,10 +1064,11 @@ const CompanyProfileSettings = () => {
           <CircularProgress color="inherit" size={60} />
           <Typography variant="h6" sx={{ fontWeight: 600 }}>
             Saving your settings...
-          </Typography>        </Stack>
+          </Typography>
+        </Stack>
       </Backdrop>
 
-      {/* Enhanced Notification */}
+      {/* Notification */}
       <Snackbar
         open={notification.open}
         autoHideDuration={6000}
@@ -1071,9 +1081,9 @@ const CompanyProfileSettings = () => {
           variant="filled"
           sx={{
             width: "100%",
-            borderRadius: 2,
+            borderRadius: '8px',
             fontWeight: 600,
-            boxShadow: '0 8px 25px rgba(0,0,0,0.15)'
+            boxShadow: 'none'
           }}
           icon={
             notification.severity === 'success' ? <CheckIcon /> :
@@ -1086,6 +1096,7 @@ const CompanyProfileSettings = () => {
       
       <PageHelper {...pageHelpContent.systemSetup} />
     </Box>
+    </>
   );
 };
 

@@ -332,20 +332,20 @@ const InvoiceTemplatesPage = () => {
         const isLocked = isCustomTemplate && !canCreateTemplate;
         
         return (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, height: '100%', py: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, height: '100%', py: 1 }}>
             {getTemplateTypeIcon(params.row.template)}
             <Box sx={{ flex: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, color: '#1f2937', fontSize: '1rem', mb: 0.5 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'rgba(15, 23, 42, 0.95)', fontSize: '0.9375rem', mb: 0.25, letterSpacing: '-0.01em' }}>
                   {params.value}
                 </Typography>
                 {isLocked && (
-                  <Tooltip title="This template is locked. Upgrade to premium to edit or use it.">
-                    <LockIcon sx={{ fontSize: '1rem', color: '#9ca3af' }} />
+                  <Tooltip title="This template is locked. Upgrade to premium to edit or use it." arrow>
+                    <LockIcon sx={{ fontSize: '1rem', color: 'rgba(15, 23, 42, 0.4)' }} />
                   </Tooltip>
                 )}
               </Box>
-              <Typography variant="body2" sx={{ fontSize: '0.85rem', color: '#6b7280', lineHeight: 1.4 }}>
+              <Typography variant="body2" sx={{ fontSize: '0.8125rem', color: 'rgba(15, 23, 42, 0.5)', lineHeight: 1.3 }}>
                 {params.row.description}
               </Typography>
             </Box>
@@ -366,12 +366,12 @@ const InvoiceTemplatesPage = () => {
             sx={{
               fontWeight: 600,
               fontSize: '0.75rem',
-              backgroundColor: params.row.isSystemTemplate ? '#f0f4ff' : '#f3e8ff',
+              height: '24px',
+              borderRadius: '6px',
+              letterSpacing: '-0.01em',
+              backgroundColor: params.row.isSystemTemplate ? 'rgba(99, 102, 241, 0.08)' : 'rgba(139, 92, 246, 0.08)',
               color: params.row.isSystemTemplate ? '#6366f1' : '#8b5cf6',
-              border: params.row.isSystemTemplate ? '1.5px solid #c7d2fe' : '1.5px solid #ddd6fe',
-              '& .MuiChip-label': {
-                px: 1.5
-              }
+              border: 'none',
             }}
           />
         </Box>
@@ -391,15 +391,15 @@ const InvoiceTemplatesPage = () => {
             sx={{
               fontWeight: 600,
               fontSize: '0.75rem',
-              backgroundColor: '#fef3c7',
+              height: '24px',
+              borderRadius: '6px',
+              letterSpacing: '-0.01em',
+              backgroundColor: 'rgba(245, 158, 11, 0.1)',
               color: '#d97706',
-              border: '1.5px solid #fde68a',
+              border: 'none',
               '& .MuiChip-icon': {
                 color: '#d97706'
               },
-              '& .MuiChip-label': {
-                px: 1.5
-              }
             }}
           />
         </Box>
@@ -419,15 +419,15 @@ const InvoiceTemplatesPage = () => {
             sx={{
               fontWeight: 600,
               fontSize: '0.75rem',
-              backgroundColor: params.value ? '#d1fae5' : '#f3f4f6',
+              height: '24px',
+              borderRadius: '6px',
+              letterSpacing: '-0.01em',
+              backgroundColor: params.value ? 'rgba(16, 185, 129, 0.1)' : 'rgba(107, 114, 128, 0.08)',
               color: params.value ? '#059669' : '#6b7280',
-              border: params.value ? '1.5px solid #a7f3d0' : '1.5px solid #e5e7eb',
+              border: 'none',
               '& .MuiChip-icon': {
                 color: '#059669'
               },
-              '& .MuiChip-label': {
-                px: 1.5
-              }
             }}
           />
         </Box>
@@ -443,9 +443,9 @@ const InvoiceTemplatesPage = () => {
         const isLocked = isCustomTemplate && !canCreateTemplate;
         
         return (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, height: '100%' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, height: '100%' }}>
             {!params.row.template.isActive && (
-              <Tooltip title={isLocked ? "Upgrade to premium to use custom templates" : ""}>
+              <Tooltip title={isLocked ? "Upgrade to premium to use custom templates" : "Set as active template"} arrow>
                 <span>
                   <Button
                     size="small"
@@ -459,98 +459,109 @@ const InvoiceTemplatesPage = () => {
                       py: 0.75,
                       fontSize: '0.75rem',
                       fontWeight: 600,
+                      minHeight: 32,
+                      boxShadow: 'none',
                       background: isLocked 
-                        ? 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)'
+                        ? 'rgba(15, 23, 42, 0.3)'
                         : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                      boxShadow: isLocked ? 'none' : '0 2px 8px rgba(16, 185, 129, 0.25)',
                       minWidth: 'auto',
+                      transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                       '&:hover': isLocked ? {} : {
                         background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                        boxShadow: '0 4px 12px rgba(16, 185, 129, 0.35)',
+                        boxShadow: 'none',
                       },
                       '&.Mui-disabled': {
-                        color: 'white',
-                        opacity: 0.7
+                        color: 'rgba(255, 255, 255, 0.6)',
+                        opacity: 1
                       }
                     }}
                   >
-                    {isLocked ? <LockIcon fontSize="small" sx={{ mr: 0.5 }} /> : null}
+                    {isLocked ? <LockIcon fontSize="small" sx={{ mr: 0.5, fontSize: '0.875rem' }} /> : null}
                     Use
                   </Button>
                 </span>
               </Tooltip>
             )}
             
-            <Tooltip title="Preview Template">
+            <Tooltip title="Preview Template" arrow>
               <IconButton
                 size="small"
                 onClick={() => handlePreviewTemplate(params.row.template)}
                 sx={{
                   color: '#6366f1',
-                  backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                  backgroundColor: 'rgba(99, 102, 241, 0.08)',
+                  width: 32,
+                  height: 32,
                   borderRadius: '8px',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                   '&:hover': { 
-                    backgroundColor: 'rgba(99, 102, 241, 0.2)',
-                    transform: 'scale(1.05)'
+                    backgroundColor: 'rgba(99, 102, 241, 0.15)',
+                    color: '#4f46e5',
+                    transform: 'translateY(-1px)',
                   },
-                  transition: 'all 0.2s ease'
                 }}
               >
-                <PreviewIcon fontSize="small" />
+                <PreviewIcon sx={{ fontSize: 16 }} />
               </IconButton>
             </Tooltip>
 
             {!params.row.isSystemTemplate && (
-              <Tooltip title={isLocked ? "Upgrade to premium to edit custom templates" : "Edit Template"}>
+              <Tooltip title={isLocked ? "Upgrade to premium to edit custom templates" : "Edit Template"} arrow>
                 <span>
                   <IconButton
                     size="small"
                     onClick={() => navigate(`/templates/edit/${params.row.template.id}`)}
                     disabled={isLocked}
                     sx={{
-                      color: isLocked ? '#9ca3af' : '#f59e0b',
-                      backgroundColor: isLocked ? 'rgba(156, 163, 175, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                      color: isLocked ? 'rgba(15, 23, 42, 0.4)' : '#f59e0b',
+                      backgroundColor: isLocked ? 'rgba(15, 23, 42, 0.06)' : 'rgba(245, 158, 11, 0.08)',
+                      width: 32,
+                      height: 32,
                       borderRadius: '8px',
+                      transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                       '&:hover': isLocked ? {} : { 
-                        backgroundColor: 'rgba(245, 158, 11, 0.2)',
-                        transform: 'scale(1.05)'
+                        backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                        color: '#d97706',
+                        transform: 'translateY(-1px)',
                       },
-                      transition: 'all 0.2s ease',
                       '&.Mui-disabled': {
-                        color: '#9ca3af',
+                        color: 'rgba(15, 23, 42, 0.25)',
                         opacity: 0.5
                       }
                     }}
                   >
-                    {isLocked ? <LockIcon fontSize="small" /> : <EditIcon fontSize="small" />}
+                    {isLocked ? <LockIcon sx={{ fontSize: 16 }} /> : <EditIcon sx={{ fontSize: 16 }} />}
                   </IconButton>
                 </span>
               </Tooltip>
             )}
 
             {!params.row.isSystemTemplate && (
-              <Tooltip title={isLocked ? "Upgrade to premium to delete custom templates" : "Delete Template"}>
+              <Tooltip title={isLocked ? "Upgrade to premium to delete custom templates" : "Delete Template"} arrow>
                 <span>
                   <IconButton
                     size="small"
                     onClick={() => handleDeleteTemplate(params.row.template.id)}
                     disabled={isLocked}
                     sx={{
-                      color: isLocked ? '#9ca3af' : '#ef4444',
-                      backgroundColor: isLocked ? 'rgba(156, 163, 175, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                      color: isLocked ? 'rgba(15, 23, 42, 0.4)' : '#dc2626',
+                      backgroundColor: isLocked ? 'rgba(15, 23, 42, 0.06)' : 'rgba(239, 68, 68, 0.08)',
+                      width: 32,
+                      height: 32,
                       borderRadius: '8px',
+                      transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                       '&:hover': isLocked ? {} : { 
-                        backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                        transform: 'scale(1.05)'
+                        backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                        color: '#b91c1c',
+                        transform: 'translateY(-1px)',
                       },
-                      transition: 'all 0.2s ease',
                       '&.Mui-disabled': {
-                        color: '#9ca3af',
+                        color: 'rgba(15, 23, 42, 0.25)',
                         opacity: 0.5
                       }
                     }}
                   >
-                    {isLocked ? <LockIcon fontSize="small" /> : <DeleteIcon fontSize="small" />}
+                    {isLocked ? <LockIcon sx={{ fontSize: 16 }} /> : <DeleteIcon sx={{ fontSize: 16 }} />}
                   </IconButton>
                 </span>
               </Tooltip>
@@ -566,92 +577,85 @@ const InvoiceTemplatesPage = () => {
   }
 
   return (
-    <Fade in={true} timeout={800}>
-    <Box sx={{ p: 3 }}>
-      {/* Header */}
-      <Grow in={true} timeout={600}>
-      <Box
-        sx={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'space-between',
-          alignItems: { xs: 'flex-start', md: 'center' },
-          gap: 3,
-          mb: 4,
-          p: 3,
-          borderRadius: 3,
-          background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-          border: '1px solid rgba(59, 130, 246, 0.15)',
-          boxShadow: '0 4px 12px rgba(59, 130, 246, 0.1)',
-          position: 'relative',
-          overflow: 'hidden',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '4px',
-            background: 'linear-gradient(90deg, #14b8a6 0%, #0d9488 100%)',
-            borderRadius: '3px 3px 0 0'
-          }
+    <Box sx={{ width: '100%' }}>
+      {/* Clean Header - Matching Home/Products Style */}
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          flexDirection: { xs: 'column', sm: 'row' },
+          justifyContent: 'space-between', 
+          alignItems: { xs: 'flex-start', sm: 'center' },
+          gap: { xs: 2, sm: 3 },
+          mb: 3,
+          pb: 3,
+          borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, minWidth: 280 }}>
-          <Box
-            sx={{
-              width: 48,
-              height: 48,
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 8px 16px rgba(20, 184, 166, 0.35)'
+        <Box>
+          <Typography 
+            variant="h4" 
+            component="h1" 
+            sx={{ 
+              fontWeight: 700,
+              fontSize: { xs: '1.75rem', sm: '2rem' },
+              color: 'rgba(15, 23, 42, 0.95)',
+              letterSpacing: '-0.02em',
+              lineHeight: 1.1,
+              mb: 0.5
             }}
           >
-            <DocumentIcon sx={{ color: 'white', fontSize: 24 }} />
-          </Box>
-          <Box>
-            <Typography
-              variant="h5"
-              component="h1"
-              sx={{
-                fontWeight: 'bold',
-                background: 'linear-gradient(135deg, #0d9488 0%, #14b8a6 100%)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                mb: 0.5
-              }}
-            >
-              Invoice Template Management
-            </Typography>
-            <Typography
-              variant="subtitle2"
-              sx={{
-                color: 'text.secondary',
-                fontWeight: 'medium'
-              }}
-            >
-              Create and manage your invoice templates. Set one active template per document type.
-            </Typography>
-          </Box>
+            Templates
+          </Typography>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: 'rgba(15, 23, 42, 0.5)',
+              fontSize: '0.9375rem',
+              fontWeight: 400,
+              letterSpacing: '-0.01em'
+            }}
+          >
+            Create and manage invoice templates
+          </Typography>
         </Box>
 
-        <Stack
-          direction={{ xs: 'column', md: 'row' }}
-          spacing={2}
-          alignItems={{ xs: 'stretch', md: 'center' }}
-          sx={{ width: { xs: '100%', md: 'auto' } }}
-        >
+        <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
           <FormControl
             size="small"
             sx={{
-              minWidth: { xs: '100%', md: 200 },
-              backgroundColor: 'white',
-              borderRadius: 2,
-              boxShadow: { xs: '0 4px 8px rgba(148, 163, 184, 0.15)', md: 'none' }
+              minWidth: 180,
+              '& .MuiOutlinedInput-root': {
+                backgroundColor: 'rgba(15, 23, 42, 0.04)',
+                borderRadius: '8px',
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                height: 40,
+                border: '1px solid rgba(15, 23, 42, 0.08)',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                '&:hover': {
+                  backgroundColor: 'rgba(15, 23, 42, 0.06)',
+                  borderColor: 'rgba(15, 23, 42, 0.12)',
+                },
+                '&.Mui-focused': {
+                  backgroundColor: 'white',
+                  borderColor: '#8b5cf6',
+                  boxShadow: '0 0 0 3px rgba(139, 92, 246, 0.1)',
+                },
+                '& fieldset': {
+                  border: 'none'
+                }
+              },
+              '& .MuiInputLabel-root': {
+                fontSize: '0.875rem',
+                fontWeight: 400,
+                color: 'rgba(15, 23, 42, 0.6)',
+                '&.Mui-focused': {
+                  color: '#8b5cf6'
+                }
+              },
+              '& .MuiSelect-icon': {
+                color: 'rgba(15, 23, 42, 0.6)'
+              }
             }}
           >
             <InputLabel>Document Type</InputLabel>
@@ -659,12 +663,8 @@ const InvoiceTemplatesPage = () => {
               value={selectedDocumentType}
               label="Document Type"
               onChange={(e) => setSelectedDocumentType(e.target.value)}
-              sx={{
-                borderRadius: 2,
-                backgroundColor: 'white'
-              }}
             >
-              <MenuItem value="all">All Document Types</MenuItem>
+              <MenuItem value="all">All Types</MenuItem>
               {documentTypes.map((docType) => (
                 <MenuItem key={docType.id} value={docType.id}>
                   {docType.displayName}
@@ -672,8 +672,9 @@ const InvoiceTemplatesPage = () => {
               ))}
             </Select>
           </FormControl>
+          
           <Tooltip
-            title={!canCreateTemplate ? "Templates are a premium feature. Upgrade to premium to create custom templates." : ""}
+            title={!canCreateTemplate ? "Upgrade to premium to create templates" : ""}
             arrow
           >
             <span>
@@ -682,77 +683,60 @@ const InvoiceTemplatesPage = () => {
                 startIcon={canCreateTemplate ? <AddIcon /> : <LockIcon />}
                 onClick={handleNavigateToAdd}
                 disabled={!canCreateTemplate}
+                fullWidth={{ xs: true, sm: false }}
                 sx={{
-                  backgroundColor: canCreateTemplate ? '#10b981' : '#9ca3af',
-                  backgroundImage: canCreateTemplate 
-                    ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-                    : 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
-                  boxShadow: canCreateTemplate ? '0 8px 16px rgba(16, 185, 129, 0.35)' : 'none',
-                  borderRadius: 2,
-                  px: 3,
-                  py: 1.5,
+                  background: canCreateTemplate 
+                    ? 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' 
+                    : 'rgba(15, 23, 42, 0.3)',
+                  color: 'white',
+                  boxShadow: 'none',
+                  borderRadius: '8px',
+                  px: 2.5,
+                  py: 1,
+                  fontSize: '0.9375rem',
                   fontWeight: 600,
                   textTransform: 'none',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  '&:hover': canCreateTemplate ? {
-                    backgroundImage: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 12px 24px rgba(16, 185, 129, 0.45)'
+                  letterSpacing: '-0.01em',
+                  minWidth: { xs: 'auto', sm: 140 },
+                  transition: 'all 0.15s ease',
+                  '&:hover': canCreateTemplate ? { 
+                    background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                    boxShadow: 'none',
                   } : {},
                   '&.Mui-disabled': {
-                    color: 'white',
-                    opacity: 0.7
+                    color: 'rgba(255, 255, 255, 0.6)',
+                    opacity: 1
                   }
                 }}
               >
-                {canCreateTemplate ? 'Create Template' : 'Premium Only'}
+                {canCreateTemplate ? 'New Template' : 'Premium Only'}
               </Button>
             </span>
           </Tooltip>
-        </Stack>
-      </Box>
-      </Grow>
-
-      {/* Usage Indicator for Free Tier - Below Header */}
-      <Box sx={{ mb: 3 }}>
-        <UsageIndicator resource="template" label="Templates" />
+        </Box>
       </Box>
 
-      {/* Templates DataGrid */}
+      {/* Usage Indicator for Free Tier */}
+      {!isPremium && (
+        <Box sx={{ mb: 3 }}>
+          <UsageIndicator resource="template" label="Templates" />
+        </Box>
+      )}
+
+      {/* Templates DataGrid - Modern Clean Style */}
       <Paper
         elevation={0}
         sx={{
-          borderRadius: 3,
+          borderRadius: '12px',
           overflow: 'hidden',
-          background: '#ffffff',
-          border: '1px solid #e5e7eb',
-          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)'
+          backgroundColor: 'white',
+          border: '1px solid rgba(15, 23, 42, 0.08)',
         }}
       >
-        <Box sx={{ 
-          p: 3, 
-          borderBottom: '2px solid #f3f4f6',
-          background: 'linear-gradient(to right, #fafafa 0%, #ffffff 100%)'
-        }}>
-          <Typography variant="h6" sx={{ fontWeight: 700, color: '#111827', mb: 1 }}>
-            {selectedDocumentType === 'all' 
-              ? `All Templates (${templates.length})`
-              : `${getDocumentTypeName(selectedDocumentType)} Templates (${templates.length})`
-            }
-          </Typography>
-          <Typography variant="body2" sx={{ color: '#6b7280', fontSize: '0.875rem' }}>
-            {selectedDocumentType === 'all' 
-              ? 'Manage your professional and custom invoice templates across all document types'
-              : `Manage templates for ${getDocumentTypeName(selectedDocumentType)} documents`
-            }
-          </Typography>
-        </Box>
-
         {templates.length === 0 && !loading ? (
           <Box sx={{ 
             p: 8, 
             textAlign: 'center',
-            background: 'linear-gradient(to bottom, #fafafa 0%, #ffffff 100%)'
           }}>
             <Box
               sx={{
@@ -760,36 +744,36 @@ const InvoiceTemplatesPage = () => {
                 height: 80,
                 margin: '0 auto 24px',
                 borderRadius: '20px',
-                background: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%)',
+                background: 'rgba(139, 92, 246, 0.08)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
               }}
             >
-              <DocumentIcon sx={{ fontSize: 40, color: '#9ca3af' }} />
+              <DocumentIcon sx={{ fontSize: 40, color: '#8b5cf6' }} />
             </Box>
-            <Typography variant="h6" sx={{ color: '#4b5563', fontWeight: 600, mb: 1 }}>
+            <Typography variant="h6" sx={{ color: 'rgba(15, 23, 42, 0.9)', fontWeight: 600, mb: 1 }}>
               No Templates Available
             </Typography>
-            <Typography variant="body2" sx={{ color: '#9ca3af', mb: 4, maxWidth: 400, mx: 'auto' }}>
+            <Typography variant="body2" sx={{ color: 'rgba(15, 23, 42, 0.5)', mb: 4, maxWidth: 400, mx: 'auto' }}>
               Create your first custom invoice template to get started. Templates help you maintain consistent branding across all your documents.
             </Typography>
             <Button
               variant="contained"
               startIcon={<AddIcon />}
               onClick={() => navigate('/templates/add')}
+              disabled={!canCreateTemplate}
               sx={{
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
-                borderRadius: 2,
+                background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                boxShadow: 'none',
+                borderRadius: '8px',
                 px: 3,
                 py: 1.5,
                 fontWeight: 600,
                 textTransform: 'none',
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                  boxShadow: '0 6px 16px rgba(16, 185, 129, 0.35)',
+                  background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                  boxShadow: 'none',
                 }
               }}
             >
@@ -806,51 +790,144 @@ const InvoiceTemplatesPage = () => {
               slotProps={{
                 toolbar: {
                   showQuickFilter: true,
-                  quickFilterProps: { debounceMs: 500 },
+                  quickFilterProps: { 
+                    debounceMs: 500,
+                    placeholder: 'Search templates...'
+                  },
                 },
               }}
               initialState={{
                 pagination: { paginationModel: { pageSize: 10 } },
-                sorting: { sortModel: [] }, // Disable default sorting
+                sorting: { sortModel: [] },
               }}
               pageSizeOptions={[5, 10, 25]}
               rowHeight={80}
               sx={{
                 border: 'none',
-                '& .MuiDataGrid-cell': {
-                  borderBottom: '1px solid #f3f4f6',
-                  display: 'flex',
-                  alignItems: 'center',
+                '& .MuiDataGrid-columnHeaders': {
+                  backgroundColor: '#ffffff',
+                  borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
+                  minHeight: '56px !important',
+                  maxHeight: '56px !important',
+                  '& .MuiDataGrid-columnHeader': {
+                    '&:focus, &:focus-within': {
+                      outline: 'none',
+                    },
+                  },
+                  '& .MuiDataGrid-columnHeaderTitle': {
+                    fontSize: '0.8125rem',
+                    fontWeight: 600,
+                    color: 'rgba(15, 23, 42, 0.7)',
+                    letterSpacing: '-0.01em'
+                  },
                 },
-                '& .MuiDataGrid-columnHeader': {
-                  backgroundColor: '#fafafa',
-                  color: '#374151',
-                  fontWeight: 700,
-                  fontSize: '0.875rem',
-                  borderBottom: '2px solid #e5e7eb',
-                },
-                '& .MuiDataGrid-row': {
-                  transition: 'all 0.2s ease',
-                  '&:hover': {
-                    backgroundColor: '#fafafa',
-                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
-                  }
-                },
-                '& .MuiDataGrid-footerContainer': {
-                  borderTop: '2px solid #e5e7eb',
-                  backgroundColor: '#fafafa'
+                '& .MuiDataGrid-columnSeparator': {
+                  display: 'none',
                 },
                 '& .MuiDataGrid-toolbarContainer': {
-                  padding: '16px',
-                  borderBottom: '1px solid #f3f4f6',
-                  backgroundColor: '#fafafa',
-                  '& .MuiButton-root': {
-                    color: '#6b7280',
+                  padding: '20px 24px',
+                  backgroundColor: '#ffffff',
+                  borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 2,
+                  '& .MuiInputBase-root': {
+                    fontSize: '0.875rem',
+                    backgroundColor: 'rgba(15, 23, 42, 0.04)',
+                    border: '1px solid rgba(15, 23, 42, 0.08)',
+                    borderRadius: '8px',
+                    boxShadow: 'none',
+                    minWidth: '300px',
+                    height: '40px',
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '& fieldset': {
+                      border: 'none'
+                    },
                     '&:hover': {
-                      backgroundColor: '#f3f4f6'
-                    }
-                  }
-                }
+                      backgroundColor: 'rgba(15, 23, 42, 0.06)',
+                      borderColor: 'rgba(15, 23, 42, 0.12)',
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: 'white',
+                      borderColor: '#8b5cf6',
+                      boxShadow: '0 0 0 3px rgba(139, 92, 246, 0.1)',
+                    },
+                    '& .MuiInputBase-input': {
+                      padding: '10px 14px',
+                      '&::placeholder': {
+                        color: 'rgba(15, 23, 42, 0.4)',
+                        fontWeight: 400,
+                      },
+                    },
+                  },
+                  '& .MuiButton-root': {
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    borderRadius: '8px',
+                    boxShadow: 'none',
+                    padding: '8px 12px',
+                    minWidth: 'auto',
+                    height: '40px',
+                    color: 'rgba(15, 23, 42, 0.6)',
+                    textTransform: 'none',
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:hover': {
+                      backgroundColor: 'rgba(15, 23, 42, 0.06)',
+                      color: 'rgba(15, 23, 42, 0.8)',
+                    },
+                    '&.Mui-disabled': {
+                      backgroundColor: 'transparent',
+                      color: 'rgba(15, 23, 42, 0.25)',
+                    },
+                  },
+                },
+                '& .MuiDataGrid-row': {
+                  borderBottom: '1px solid rgba(15, 23, 42, 0.06)',
+                  transition: 'all 0.15s ease',
+                  '&:hover': {
+                    backgroundColor: 'rgba(139, 92, 246, 0.02)',
+                    cursor: 'pointer',
+                  },
+                  '&:last-child': {
+                    borderBottom: 'none',
+                  },
+                },
+                '& .MuiDataGrid-cell': {
+                  borderBottom: 'none',
+                  '&:focus, &:focus-within': {
+                    outline: 'none',
+                  },
+                },
+                '& .MuiDataGrid-footerContainer': {
+                  borderTop: '1px solid rgba(15, 23, 42, 0.08)',
+                  backgroundColor: '#ffffff',
+                  minHeight: '56px',
+                  '& .MuiTablePagination-root': {
+                    color: 'rgba(15, 23, 42, 0.7)',
+                    fontSize: '0.875rem',
+                  },
+                  '& .MuiTablePagination-select': {
+                    borderRadius: '6px',
+                    backgroundColor: 'rgba(15, 23, 42, 0.04)',
+                    padding: '4px 8px',
+                    '&:hover': {
+                      backgroundColor: 'rgba(15, 23, 42, 0.08)',
+                    },
+                  },
+                  '& .MuiIconButton-root': {
+                    color: 'rgba(15, 23, 42, 0.6)',
+                    transition: 'all 0.15s ease',
+                    '&:hover': {
+                      backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                      color: '#8b5cf6',
+                    },
+                    '&.Mui-disabled': {
+                      color: 'rgba(15, 23, 42, 0.25)',
+                    },
+                  },
+                },
               }}
             />
           </Box>
@@ -946,11 +1023,42 @@ const InvoiceTemplatesPage = () => {
         open={notification.open}
         autoHideDuration={6000}
         onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
         <Alert
           onClose={handleCloseNotification}
           severity={notification.severity}
-          sx={{ width: '100%' }}
+          sx={{ 
+            width: "100%",
+            borderRadius: '10px',
+            fontWeight: 500,
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+            backdropFilter: 'blur(20px)',
+            ...(notification.severity === 'success' && {
+              backgroundColor: 'rgba(139, 92, 246, 0.95)',
+              color: 'white',
+              border: 'none',
+              '& .MuiAlert-icon': {
+                color: 'white'
+              }
+            }),
+            ...(notification.severity === 'error' && {
+              backgroundColor: 'rgba(220, 38, 38, 0.95)',
+              color: 'white',
+              border: 'none',
+              '& .MuiAlert-icon': {
+                color: 'white'
+              }
+            }),
+            ...(notification.severity === 'warning' && {
+              backgroundColor: 'rgba(217, 119, 6, 0.95)',
+              color: 'white',
+              border: 'none',
+              '& .MuiAlert-icon': {
+                color: 'white'
+              }
+            })
+          }}
         >
           {notification.message}
         </Alert>
@@ -958,7 +1066,6 @@ const InvoiceTemplatesPage = () => {
       
       <PageHelper {...pageHelpContent.templates} />
     </Box>
-    </Fade>
   );
 };
 

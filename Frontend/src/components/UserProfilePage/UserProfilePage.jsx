@@ -4,10 +4,10 @@ import {
   Box,
   Button,
   CircularProgress,
-  Alert
+  Alert,
+  Paper
 } from '@mui/material';
 import { useAuth } from '../../utils/AuthContext';
-import Section from '../ReusableComponents/Section';
 import UserProfilePageHeader from './UserProfilePageHeader';
 import ProfileInfoCard from './ProfileInfoCard';
 import PreferencesCard from './PreferencesCard';
@@ -71,37 +71,31 @@ const UserProfilePage = () => {
   // Check authentication first
   if (authLoading) {
     return (
-      <Section>
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress size={60} />
-        </Box>
-      </Section>
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+        <CircularProgress size={60} />
+      </Box>
     );
   }
 
   if (!authenticated || !user) {
     return (
-      <Section>
-        <Alert severity="error" sx={{ mb: 2 }}>
-          You must be logged in to view your profile. Please log in and try again.
-        </Alert>
-      </Section>
+      <Alert severity="error" sx={{ mb: 2 }}>
+        You must be logged in to view your profile. Please log in and try again.
+      </Alert>
     );
   }
 
   if (loading) {
     return (
-      <Section>
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress size={60} />
-        </Box>
-      </Section>
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+        <CircularProgress size={60} />
+      </Box>
     );
   }
 
   if (error) {
     return (
-      <Section>
+      <>
         <Alert severity="error" sx={{ mb: 2 }}>
           Failed to load profile: {error}
         </Alert>
@@ -110,12 +104,12 @@ const UserProfilePage = () => {
             You may need to log out and log back in to refresh your authentication.
           </Alert>
         )}
-      </Section>
+      </>
     );
   }
 
   return (
-    <Section>
+    <>
       <UserProfilePageHeader profile={profile} />
 
       <SubscriptionAlert />
@@ -123,75 +117,86 @@ const UserProfilePage = () => {
       {/* Combined Form */}
       <Box component="form" onSubmit={handleSaveAll}>
         {/* Profile Information Section */}
-        <Box sx={{ mb: 4 }}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 3,
+            mb: 3,
+            borderRadius: '12px',
+            backgroundColor: 'white',
+            border: '1px solid rgba(15, 23, 42, 0.08)',
+          }}
+        >
           <ProfileInfoCard
             formData={formData}
             setFormData={setFormData}
             showButton={false}
           />
-        </Box>
+        </Paper>
 
         {/* Preferences Section */}
-        <Box sx={{ mb: 4 }}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 3,
+            mb: 3,
+            borderRadius: '12px',
+            backgroundColor: 'white',
+            border: '1px solid rgba(15, 23, 42, 0.08)',
+          }}
+        >
           <PreferencesCard
             preferences={preferences}
             setPreferences={setPreferences}
             showButton={false}
           />
-        </Box>
+        </Paper>
 
         {/* Action Buttons */}
         <Box sx={{ mb: 4, display: 'flex', gap: 2, justifyContent: 'flex-start', flexWrap: 'wrap' }}>
           <Button
             type="submit"
             variant="contained"
-            size="large"
             disabled={saving}
             sx={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
               color: 'white',
-              px: 5,
-              py: 1.5,
-              fontSize: "0.95rem",
+              px: 3,
+              py: 1.25,
+              fontSize: "0.875rem",
               fontWeight: 600,
-              borderRadius: 2,
+              borderRadius: '8px',
               textTransform: "none",
+              boxShadow: 'none',
               "&:hover": {
-                background: 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)',
-                transform: "translateY(-1px)"
-              },
-              "&:active": {
-                transform: "translateY(0)"
+                background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                boxShadow: 'none'
               },
               "&:disabled": {
-                backgroundColor: "#9ca3af",
+                backgroundColor: "rgba(15, 23, 42, 0.12)",
                 background: "none",
-                transform: "none"
-              },
-              transition: "all 0.2s ease"
+                color: 'rgba(15, 23, 42, 0.4)'
+              }
             }}
           >
             {saving ? <CircularProgress size={20} color="inherit" /> : 'Save All Changes'}
           </Button>
 
           <Button
-            variant="contained"
-            color="error"
-            size="large"
+            variant="outlined"
             sx={{
-              px: 5,
-              py: 1.5,
-              fontSize: "0.95rem",
+              px: 3,
+              py: 1.25,
+              fontSize: "0.875rem",
               fontWeight: 600,
-              borderRadius: 2,
+              borderRadius: '8px',
               textTransform: "none",
+              borderColor: '#dc2626',
+              color: '#dc2626',
               "&:hover": {
-                transform: "translateY(-1px)"
-              },
-              "&:active": {
-                transform: "translateY(0)"
-              },
-              transition: "all 0.2s ease"
+                backgroundColor: 'rgba(220, 38, 38, 0.04)',
+                borderColor: '#dc2626'
+              }
             }}
             onClick={() => setPasswordDialogOpen(true)}
           >
@@ -200,22 +205,19 @@ const UserProfilePage = () => {
 
           <Button
             variant="outlined"
-            color="warning"
-            size="large"
             sx={{
-              px: 5,
-              py: 1.5,
-              fontSize: "0.95rem",
+              px: 3,
+              py: 1.25,
+              fontSize: "0.875rem",
               fontWeight: 600,
-              borderRadius: 2,
+              borderRadius: '8px',
               textTransform: "none",
+              borderColor: 'rgba(15, 23, 42, 0.2)',
+              color: 'rgba(15, 23, 42, 0.7)',
               "&:hover": {
-                transform: "translateY(-1px)"
-              },
-              "&:active": {
-                transform: "translateY(0)"
-              },
-              transition: "all 0.2s ease"
+                backgroundColor: 'rgba(15, 23, 42, 0.04)',
+                borderColor: 'rgba(15, 23, 42, 0.3)'
+              }
             }}
             onClick={() => {
               // TODO: Implement change email functionality
@@ -238,7 +240,7 @@ const UserProfilePage = () => {
         onChangePassword={changePassword}
         showNotification={showNotification}
       />
-    </Section>
+    </>
   );
 };
 

@@ -46,7 +46,15 @@ const ProfileInfoCard = ({
     <Grid container spacing={3}>
       {/* Title Row - Full Width */}
       <Grid size={{ xs: 12 }}>
-        <Typography variant="h6" sx={{ fontWeight: 600, color: "#1f2937", mb: 2 }}>
+        <Typography 
+          variant="h6" 
+          sx={{ 
+            fontWeight: 600, 
+            color: 'rgba(15, 23, 42, 0.9)', 
+            mb: 2,
+            fontSize: '1.125rem'
+          }}
+        >
           Profile Information
         </Typography>
       </Grid>
@@ -61,7 +69,17 @@ const ProfileInfoCard = ({
           onChange={handleChange}
           required
           disabled={updating}
-          size="small"
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              borderRadius: '8px',
+              '&:hover fieldset': { 
+                borderColor: '#8b5cf6' 
+              },
+              '&.Mui-focused fieldset': { 
+                borderColor: '#8b5cf6' 
+              }
+            }
+          }}
         />
       </Grid>
 
@@ -74,7 +92,17 @@ const ProfileInfoCard = ({
           onChange={handleChange}
           required
           disabled={updating}
-          size="small"
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              borderRadius: '8px',
+              '&:hover fieldset': { 
+                borderColor: '#8b5cf6' 
+              },
+              '&.Mui-focused fieldset': { 
+                borderColor: '#8b5cf6' 
+              }
+            }
+          }}
         />
       </Grid>
 
@@ -86,29 +114,25 @@ const ProfileInfoCard = ({
             variant="contained"
             disabled={updating}
             startIcon={updating ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
-            size="large"
             sx={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
               color: 'white',
-              px: 5,
-              py: 1.5,
-              fontSize: "0.95rem",
+              px: 3,
+              py: 1.25,
+              fontSize: "0.875rem",
               fontWeight: 600,
-              borderRadius: 2,
+              borderRadius: '8px',
               textTransform: "none",
+              boxShadow: 'none',
               "&:hover": {
-                background: 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)',
-                transform: "translateY(-1px)"
-              },
-              "&:active": {
-                transform: "translateY(0)"
+                background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                boxShadow: 'none'
               },
               "&:disabled": {
-                backgroundColor: "#9ca3af",
+                backgroundColor: "rgba(15, 23, 42, 0.12)",
                 background: "none",
-                transform: "none"
-              },
-              transition: "all 0.2s ease"
+                color: 'rgba(15, 23, 42, 0.4)'
+              }
             }}
           >
             {updating ? 'Updating...' : 'Update Profile'}

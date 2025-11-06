@@ -28,6 +28,7 @@
     "express": "^5.1.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.1",
+    "liquid-glass-react": "^1.1.1",
     "qrcode": "^1.5.4",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",

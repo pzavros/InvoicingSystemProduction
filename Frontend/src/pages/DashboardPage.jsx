@@ -5,16 +5,10 @@ import {
   Box,
   Stack,
   FormControl,
-  InputLabel,
   Select,
   MenuItem,
-  Paper,
-  Fade,
-  Grow
+  Paper
 } from '@mui/material';
-import {
-  Insights as InsightsIcon
-} from '@mui/icons-material';
 
 import AnnualEarningsChart from '../components/DashboardPage/AnnualEarningsChart';
 import AnnualInvoiceCountChart from '../components/DashboardPage/AnnualInvoiceCountChart';
@@ -37,181 +31,208 @@ export default function DashboardPage() {
   const currentYear = today.getFullYear();
 
   const years = Array.from({ length: 5 }, (_, i) => today.getFullYear() - i);
-  const selectedMonthLabel = monthNames[month - 1];
-  const minYear = years[years.length - 1];
-  const maxYear = years[0];
-  const chartsRendered = 4;
 
   return (
     <Container maxWidth="xl" sx={{ py: { xs: 2, sm: 3, md: 4 }, px: { xs: 2, sm: 3, md: 3 } }}>
-      <Fade in={true} timeout={800}>
         <Box>
+          {/* Apple-Style Header Section */}
           <Box
             sx={{
               display: 'flex',
-              flexWrap: 'wrap',
+              flexDirection: { xs: 'column', sm: 'row' },
               justifyContent: 'space-between',
-              alignItems: { xs: 'flex-start', md: 'center' },
+              alignItems: { xs: 'flex-start', sm: 'center' },
               gap: { xs: 2, sm: 3 },
-              mb: { xs: 3, md: 4 },
-              p: { xs: 2, sm: 3 },
-              borderRadius: 3,
-              background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-              border: '1px solid rgba(79, 70, 229, 0.18)',
-              boxShadow: '0 4px 12px rgba(79, 70, 229, 0.15)',
-              position: 'relative',
-              overflow: 'hidden',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '4px',
-                background: 'linear-gradient(90deg, #8b5cf6 0%, #a855f7 100%)',
-                borderRadius: '3px 3px 0 0'
-              }
+              mb: 3,
+              pb: 3,
+              borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
             }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2 }, minWidth: { xs: '100%', sm: 280 } }}>
-              <Box
+            <Box>
+              <Typography
+                variant="h4"
+                component="h1"
                 sx={{
-                  width: { xs: 48, sm: 56 },
-                  height: { xs: 48, sm: 56 },
-                  borderRadius: '16px',
-                  background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 10px 18px rgba(79, 70, 229, 0.35)'
+                  fontWeight: 700,
+                  fontSize: { xs: '1.75rem', sm: '2rem' },
+                  color: 'rgba(15, 23, 42, 0.95)',
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1.1,
+                  mb: 0.5
                 }}
               >
-                <InsightsIcon sx={{ color: 'white', fontSize: { xs: 22, sm: 26 } }} />
-              </Box>
-              <Box>
-                <Typography
-                  variant="h5"
-                  component="h1"
-                  sx={{
-                    fontWeight: 'bold',
-                    fontSize: { xs: '1.25rem', sm: '1.5rem' },
-                    background: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)',
-                    backgroundClip: 'text',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    mb: 0.5
-                  }}
-                >
-                  Dashboard Overview
-                </Typography>
-                <Typography
-                  variant="subtitle2"
-                  sx={{
-                    color: 'text.secondary',
-                    fontWeight: 'medium',
-                    fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                    display: { xs: 'none', sm: 'block' }
-                  }}
-                >
-                  Track revenue, invoice volume, and yearly performance at a glance.
-                </Typography>
-              </Box>
+                Dashboard
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: 'rgba(15, 23, 42, 0.5)',
+                  fontSize: '0.9375rem',
+                  fontWeight: 400,
+                  letterSpacing: '-0.01em'
+                }}
+              >
+                Track your revenue and performance metrics
+              </Typography>
             </Box>
 
+            {/* Filter Controls */}
             <Stack
-              spacing={0.5}
-              sx={{
-                minWidth: { xs: '100%', md: 320 },
-                display: { xs: 'none', md: 'flex' }
-              }}
+              direction={{ xs: 'column', sm: 'row' }}
+              spacing={1.5}
+              sx={{ width: { xs: '100%', sm: 'auto' } }}
             >
-              <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#4f46e5' }}>
-                Current Filters
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Reporting Period: {selectedMonthLabel} {year}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Year Range Loaded: {minYear} – {maxYear}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Metrics Displayed: {chartsRendered} dashboards
-              </Typography>
+              <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 140 } }}>
+                <Select
+                  value={month}
+                  onChange={e => setMonth(Number(e.target.value))}
+                  displayEmpty
+                  sx={{
+                    borderRadius: '8px',
+                    backgroundColor: 'rgba(15, 23, 42, 0.04)',
+                    border: '1px solid rgba(15, 23, 42, 0.08)',
+                    fontSize: '0.9375rem',
+                    fontWeight: 400,
+                    transition: 'all 0.15s ease',
+                    '& fieldset': {
+                      border: 'none'
+                    },
+                    '&:hover': {
+                      backgroundColor: 'rgba(15, 23, 42, 0.06)',
+                      borderColor: 'rgba(15, 23, 42, 0.12)',
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: 'white',
+                      borderColor: '#3b82f6',
+                      boxShadow: '0 0 0 3px rgba(59, 130, 246, 0.1)',
+                    },
+                    '& .MuiSelect-select': {
+                      padding: '8.5px 12px'
+                    },
+                    '& .MuiSelect-icon': {
+                      color: 'rgba(15, 23, 42, 0.4)',
+                      right: 8
+                    }
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        borderRadius: '10px',
+                        boxShadow: '0 8px 24px rgba(15, 23, 42, 0.12)',
+                        border: '1px solid rgba(15, 23, 42, 0.08)',
+                        mt: 0.5,
+                        overflow: 'hidden',
+                        '& .MuiList-root': {
+                          py: 0.5
+                        },
+                        '& .MuiMenuItem-root': {
+                          fontSize: '0.9375rem',
+                          padding: '10px 12px',
+                          margin: '0 4px',
+                          borderRadius: '6px',
+                          transition: 'all 0.15s ease',
+                          color: 'rgba(15, 23, 42, 0.9)',
+                          '&:hover': {
+                            backgroundColor: 'rgba(15, 23, 42, 0.06)'
+                          },
+                          '&.Mui-selected': {
+                            backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                            color: '#3b82f6',
+                            fontWeight: 500,
+                            '&:hover': {
+                              backgroundColor: 'rgba(59, 130, 246, 0.12)'
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }}
+                >
+                  {monthNames.map((m, idx) => (
+                    <MenuItem key={m} value={idx + 1}>
+                      {m}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 100 } }}>
+                <Select
+                  value={year}
+                  onChange={e => setYear(Number(e.target.value))}
+                  displayEmpty
+                  sx={{
+                    borderRadius: '8px',
+                    backgroundColor: 'rgba(15, 23, 42, 0.04)',
+                    border: '1px solid rgba(15, 23, 42, 0.08)',
+                    fontSize: '0.9375rem',
+                    fontWeight: 400,
+                    transition: 'all 0.15s ease',
+                    '& fieldset': {
+                      border: 'none'
+                    },
+                    '&:hover': {
+                      backgroundColor: 'rgba(15, 23, 42, 0.06)',
+                      borderColor: 'rgba(15, 23, 42, 0.12)',
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: 'white',
+                      borderColor: '#3b82f6',
+                      boxShadow: '0 0 0 3px rgba(59, 130, 246, 0.1)',
+                    },
+                    '& .MuiSelect-select': {
+                      padding: '8.5px 12px'
+                    },
+                    '& .MuiSelect-icon': {
+                      color: 'rgba(15, 23, 42, 0.4)',
+                      right: 8
+                    }
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        borderRadius: '10px',
+                        boxShadow: '0 8px 24px rgba(15, 23, 42, 0.12)',
+                        border: '1px solid rgba(15, 23, 42, 0.08)',
+                        mt: 0.5,
+                        overflow: 'hidden',
+                        '& .MuiList-root': {
+                          py: 0.5
+                        },
+                        '& .MuiMenuItem-root': {
+                          fontSize: '0.9375rem',
+                          padding: '10px 12px',
+                          margin: '0 4px',
+                          borderRadius: '6px',
+                          transition: 'all 0.15s ease',
+                          color: 'rgba(15, 23, 42, 0.9)',
+                          '&:hover': {
+                            backgroundColor: 'rgba(15, 23, 42, 0.06)'
+                          },
+                          '&.Mui-selected': {
+                            backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                            color: '#3b82f6',
+                            fontWeight: 500,
+                            '&:hover': {
+                              backgroundColor: 'rgba(59, 130, 246, 0.12)'
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }}
+                >
+                  {years.map(y => (
+                    <MenuItem key={y} value={y}>
+                      {y}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Stack>
           </Box>
 
-          <Grow in={true} timeout={600}>
-            <Paper
-              elevation={4}
-              sx={{
-                p: { xs: 2, sm: 3 },
-                mb: { xs: 3, md: 4 },
-                borderRadius: 3,
-                background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-                border: '1px solid rgba(79, 70, 229, 0.1)',
-                backdropFilter: 'blur(10px)',
-                transition: 'all 0.3s ease-in-out',
-                '&:hover': {
-                  transform: { xs: 'none', md: 'translateY(-2px)' },
-                  boxShadow: '0 12px 24px rgba(79, 70, 229, 0.12)'
-                }
-              }}
-            >
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 'medium', color: 'text.primary', fontSize: { xs: '1rem', sm: '1.25rem' } }}>
-                Filter Options
-              </Typography>
-              <Stack
-                direction={{ xs: 'column', sm: 'row' }}
-                spacing={2}
-                alignItems="center"
-              >
-                <FormControl size="small" sx={{ minWidth: 120, width: { xs: '100%', sm: 'auto' } }}>
-                  <InputLabel>Month</InputLabel>
-                  <Select
-                    value={month}
-                    label="Month"
-                    onChange={e => setMonth(Number(e.target.value))}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#4f46e5'
-                        }
-                      }
-                    }}
-                  >
-                    {monthNames.map((m, idx) => (
-                      <MenuItem key={m} value={idx + 1}>
-                        {m}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-                <FormControl size="small" sx={{ minWidth: 120, width: { xs: '100%', sm: 'auto' } }}>
-                  <InputLabel>Year</InputLabel>
-                  <Select
-                    value={year}
-                    label="Year"
-                    onChange={e => setYear(Number(e.target.value))}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#4f46e5'
-                        }
-                      }
-                    }}
-                  >
-                    {years.map(y => (
-                      <MenuItem key={y} value={y}>
-                        {y}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Stack>
-            </Paper>
-          </Grow>
-
+          {/* Stats Grid */}
           <Box
             sx={{
               display: 'grid',
@@ -220,35 +241,25 @@ export default function DashboardPage() {
               mb: { xs: 3, md: 4 }
             }}
           >
-            <Grow in={true} timeout={800}>
-              <Box sx={{ height: '100%' }}>
-                <CurrentMonthEarningsDisplay month={month} year={year} />
-              </Box>
-            </Grow>
-            <Grow in={true} timeout={1000}>
-              <Box sx={{ height: '100%' }}>
-                <CurrentMonthInvoiceCountDisplay month={month} year={year} />
-              </Box>
-            </Grow>
+            <Box sx={{ height: '100%' }}>
+              <CurrentMonthEarningsDisplay month={month} year={year} />
+            </Box>
+            <Box sx={{ height: '100%' }}>
+              <CurrentMonthInvoiceCountDisplay month={month} year={year} />
+            </Box>
           </Box>
 
+          {/* Charts Section */}
           <Box sx={{ mb: { xs: 2, sm: 3 } }}>
-            <Grow in={true} timeout={1200}>
-              <Box>
-                <AnnualEarningsChart initialYear={currentYear} />
-              </Box>
-            </Grow>
+            <AnnualEarningsChart initialYear={currentYear} />
           </Box>
           
-          <Grow in={true} timeout={1400}>
-            <Box>
-              <AnnualInvoiceCountChart initialYear={currentYear} />
-            </Box>
-          </Grow>
+          <Box>
+            <AnnualInvoiceCountChart initialYear={currentYear} />
+          </Box>
         </Box>
-      </Fade>
       
-      <PageHelper {...pageHelpContent.dashboard} />
-    </Container>
+        <PageHelper {...pageHelpContent.dashboard} />
+      </Container>
   );
 }

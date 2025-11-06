@@ -11,9 +11,6 @@ import {
   Divider,
   Tooltip,
   Avatar,
-  Chip,
-  Fade,
-  Grow,
   Menu,
   MenuItem,
   useMediaQuery,
@@ -192,123 +189,26 @@ export default function NavBar() {
   // Drawer content component (reused for both mobile and desktop)
   const drawerContent = (
     <>
-      {/* Enhanced Header Section */}
-      <Fade in timeout={800}>
-        <Box sx={{
-          display: 'flex',
-          alignItems: 'center',
-          padding: { xs: '24px 16px', md: '32px 24px' },
-          justifyContent: effectiveDrawerOpen ? 'space-between' : 'center',
-          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
-          borderBottom: '1px solid rgba(148, 163, 184, 0.1)',
-          position: 'relative',
-          overflow: 'hidden',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.02) 50%, transparent 70%)',
-            animation: 'shimmer 3s ease-in-out infinite',
-          },
-          '@keyframes shimmer': {
-            '0%': { transform: 'translateX(-100%)' },
-            '100%': { transform: 'translateX(100%)' }
-          }
-        }}>
-          {effectiveDrawerOpen && (
-            <Grow in={effectiveDrawerOpen} timeout={600}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                {/* Logo Container */}
-                <Box
-                  sx={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: '12px',
-                    background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1.5px solid rgba(102, 126, 234, 0.2)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    boxShadow: '0 4px 16px rgba(102, 126, 234, 0.15)',
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      left: '-100%',
-                      width: '100%',
-                      height: '100%',
-                      background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent)',
-                      animation: 'logoShine 4s infinite',
-                    },
-                    '@keyframes logoShine': {
-                      '0%': { left: '-100%' },
-                      '100%': { left: '100%' }
-                    }
-                  }}
-                >
-                  <Box
-                    component="img"
-                    src={`${import.meta.env.BASE_URL}media/logo.svg`}
-                    alt="E-Nvoicing Logo"
-                    sx={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      borderRadius: '10px',
-                      filter: 'drop-shadow(0 2px 4px rgba(102, 126, 234, 0.2))'
-                    }}
-                  />
-                </Box>
-                <Box>
-                  <Typography 
-                    variant="h6" 
-                    noWrap 
-                    component="div" 
-                    sx={{ 
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                      backgroundClip: 'text',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      fontWeight: 700,
-                      fontSize: '1.1rem',
-                      letterSpacing: '-0.02em'
-                    }}
-                  >
-                    E-Nvoicing
-                  </Typography>
-                  <Typography 
-                    variant="caption" 
-                    sx={{ 
-                      color: 'rgba(255, 255, 255, 0.6)',
-                      fontSize: '0.7rem',
-                      fontWeight: 500
-                    }}
-                  >
-                    Beta
-                  </Typography>
-                </Box>
-              </Box>
-            </Grow>
-          )}
-          {!effectiveDrawerOpen && (
+      {/* Classic Header Section with Glassmorphism */}
+      <Box sx={{
+        display: 'flex',
+        alignItems: 'center',
+        padding: effectiveDrawerOpen ? '20px' : '20px 12px',
+        justifyContent: effectiveDrawerOpen ? 'space-between' : 'center',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+        minHeight: 72,
+      }}>
+        {effectiveDrawerOpen ? (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            {/* Minimal Logo */}
             <Box
               sx={{
-                width: 40,
-                height: 40,
-                borderRadius: '12px',
-                background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
-                backdropFilter: 'blur(10px)',
-                border: '1.5px solid rgba(102, 126, 234, 0.2)',
+                width: 36,
+                height: 36,
+                borderRadius: '8px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 4px 16px rgba(102, 126, 234, 0.15)',
               }}
             >
               <Box
@@ -318,153 +218,166 @@ export default function NavBar() {
                 sx={{
                   width: '100%',
                   height: '100%',
-                  objectFit: 'cover',
-                  borderRadius: '10px',
-                  filter: 'drop-shadow(0 2px 4px rgba(102, 126, 234, 0.2))'
+                  objectFit: 'contain',
                 }}
               />
             </Box>
-          )}
-          <Tooltip title={effectiveDrawerOpen ? (isMobile ? "Close menu" : "Collapse sidebar") : "Expand sidebar"} placement="right">
-            <IconButton 
-              onClick={handleDrawerToggle} 
-              sx={{ 
-                color: 'white',
-                background: 'rgba(255, 255, 255, 0.05)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                '&:hover': {
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  transform: 'scale(1.05)',
-                  boxShadow: '0 8px 25px rgba(0, 0, 0, 0.2)'
-                }
+            <Box>
+              <Typography 
+                variant="h6" 
+                noWrap 
+                component="div" 
+                sx={{ 
+                  color: 'rgba(255, 255, 255, 0.95)',
+                  fontWeight: 600,
+                  fontSize: '1.05rem',
+                  letterSpacing: '-0.01em',
+                  lineHeight: 1.2
+                }}
+              >
+                E-Nvoicing
+              </Typography>
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  color: 'rgba(255, 255, 255, 0.4)',
+                  fontSize: '0.65rem',
+                  fontWeight: 500,
+                  letterSpacing: '0.5px'
+                }}
+              >
+                BETA
+              </Typography>
+            </Box>
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              width: 36,
+              height: 36,
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Box
+              component="img"
+              src={`${import.meta.env.BASE_URL}media/logo.svg`}
+              alt="E-Nvoicing Logo"
+              sx={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
               }}
-            >
-              {isMobile ? <CloseIcon /> : (sidebarOpen ? <ChevronLeftIcon /> : <MenuIcon />)}
-            </IconButton>
-          </Tooltip>
-        </Box>
-      </Fade>
+            />
+          </Box>
+        )}
+        <Tooltip title={effectiveDrawerOpen ? (isMobile ? "Close menu" : "Collapse") : "Expand"} placement="right">
+          <IconButton 
+            onClick={handleDrawerToggle} 
+            size="small"
+            sx={{ 
+              color: 'rgba(255, 255, 255, 0.7)',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                color: 'rgba(255, 255, 255, 0.95)',
+                background: 'rgba(255, 255, 255, 0.08)',
+              }
+            }}
+          >
+            {isMobile ? <CloseIcon fontSize="small" /> : (sidebarOpen ? <ChevronLeftIcon fontSize="small" /> : <MenuIcon fontSize="small" />)}
+          </IconButton>
+        </Tooltip>
+      </Box>
 
-      {/* Enhanced Navigation List */}
-      <List sx={{ pt: 2, px: 1 }}>
+      {/* Professional Navigation List */}
+      <List sx={{ pt: 3, px: 2, pb: 2 }}>
         {navItems.map((item, index) => {
           const isActive = location.pathname === item.path;
           const isHovered = hoveredItem === item.text;
           
           return (
-            <Grow in timeout={600 + index * 100} key={item.text}>
-              <Box sx={{ mb: 1 }}>
-                <Tooltip 
-                  title={!effectiveDrawerOpen ? `${item.text} - ${item.description}` : ""} 
-                  placement="right"
-                  arrow
-                >
-                  <ListItem
-                    component={Link}
-                    to={item.path}
-                    onClick={handleMobileItemClick}
-                    onMouseEnter={() => setHoveredItem(item.text)}
-                    onMouseLeave={() => setHoveredItem(null)}
-                    sx={{
-                      minHeight: 56,
-                      justifyContent: effectiveDrawerOpen ? 'initial' : 'center',
-                      px: 2,
-                      mx: 1,
-                      borderRadius: 3,
-                      cursor: 'pointer',
-                      textDecoration: 'none',
-                      position: 'relative',
-                      overflow: 'hidden',
-                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            <Box sx={{ mb: 0.5 }} key={item.text}>
+              <Tooltip 
+                title={!effectiveDrawerOpen ? item.text : ""} 
+                placement="right"
+                arrow
+              >
+                <ListItem
+                  component={Link}
+                  to={item.path}
+                  onClick={handleMobileItemClick}
+                  onMouseEnter={() => setHoveredItem(item.text)}
+                  onMouseLeave={() => setHoveredItem(null)}
+                  sx={{
+                    minHeight: 44,
+                    justifyContent: effectiveDrawerOpen ? 'initial' : 'center',
+                    px: effectiveDrawerOpen ? 1.5 : 1.25,
+                    borderRadius: '11px',
+                    cursor: 'pointer',
+                    textDecoration: 'none',
+                    position: 'relative',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    background: isActive 
+                      ? 'rgba(255, 255, 255, 0.15)'
+                      : isHovered 
+                        ? 'rgba(255, 255, 255, 0.08)'
+                        : 'transparent',
+                    backdropFilter: isActive ? 'blur(12px) saturate(180%)' : 'none',
+                    WebkitBackdropFilter: isActive ? 'blur(12px) saturate(180%)' : 'none',
+                    boxShadow: isActive 
+                      ? '0 4px 16px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                      : 'none',
+                    '&:hover': {
                       background: isActive 
-                        ? `linear-gradient(135deg, ${item.color}20 0%, ${item.color}10 100%)`
-                        : isHovered 
-                          ? 'rgba(255, 255, 255, 0.05)'
-                          : 'transparent',
-                      border: isActive 
-                        ? `1px solid ${item.color}40`
-                        : '1px solid transparent',
-                      transform: isHovered ? 'translateX(8px)' : 'translateX(0px)',
+                        ? 'rgba(255, 255, 255, 0.2)'
+                        : 'rgba(255, 255, 255, 0.1)',
+                      backdropFilter: 'blur(12px) saturate(180%)',
+                      WebkitBackdropFilter: 'blur(12px) saturate(180%)',
+                      transform: 'translateY(-1px)',
                       boxShadow: isActive 
-                        ? `0 8px 32px ${item.color}20`
-                        : isHovered
-                          ? '0 8px 25px rgba(0, 0, 0, 0.1)'
-                          : 'none',
-                      '&::before': {
-                        content: '""',
-                        position: 'absolute',
-                        left: 0,
-                        top: 0,
-                        height: '100%',
-                        width: isActive ? '4px' : '0px',
-                        background: `linear-gradient(180deg, ${item.color} 0%, ${item.color}80 100%)`,
-                        borderRadius: '0 8px 8px 0',
-                        transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        ? '0 6px 20px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.12)'
+                        : 'none',
+                    }
+                  }}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: effectiveDrawerOpen ? 1.5 : 'auto',
+                      justifyContent: 'center',
+                      color: isActive 
+                        ? item.color
+                        : 'rgba(255, 255, 255, 0.6)',
+                      transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                      fontSize: '1.25rem',
+                      '& .MuiSvgIcon-root': {
+                        fontSize: '1.25rem'
                       }
                     }}
                   >
-                    <ListItemIcon
-                      sx={{
-                        minWidth: 0,
-                        mr: effectiveDrawerOpen ? 2 : 'auto',
-                        justifyContent: 'center',
-                        color: isActive ? item.color : 'rgba(255, 255, 255, 0.8)',
-                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                        transform: isHovered ? 'scale(1.1)' : 'scale(1)',
-                        filter: isActive ? 'drop-shadow(0 0 8px currentColor)' : 'none'
+                    {item.icon}
+                  </ListItemIcon>
+                  {effectiveDrawerOpen && (
+                    <ListItemText
+                      primary={item.text}
+                      primaryTypographyProps={{
+                        sx: { 
+                          color: isActive 
+                            ? 'rgba(255, 255, 255, 1)' 
+                            : 'rgba(255, 255, 255, 0.7)', 
+                          fontWeight: isActive ? 600 : 500,
+                          fontSize: '0.875rem',
+                          letterSpacing: '-0.01em',
+                          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                        }
                       }}
-                    >
-                      {item.icon}
-                    </ListItemIcon>
-                    {effectiveDrawerOpen && (
-                      <Fade in={effectiveDrawerOpen} timeout={400}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 1 }}>
-                          <ListItemText
-                            primary={item.text}
-                            secondary={item.description}
-                            primaryTypographyProps={{
-                              sx: { 
-                                color: isActive ? item.color : 'white', 
-                                fontWeight: isActive ? 600 : 500,
-                                fontSize: '0.95rem',
-                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-                              }
-                            }}
-                            secondaryTypographyProps={{
-                              sx: { 
-                                color: 'rgba(255, 255, 255, 0.5)', 
-                                fontSize: '0.75rem',
-                                fontWeight: 400
-                              }
-                            }}
-                          />
-                          {isActive && (
-                            <Chip
-                              size="small"
-                              label="•"
-                              sx={{
-                                bgcolor: item.color,
-                                color: 'white',
-                                minWidth: 'auto',
-                                width: 24,
-                                height: 24,
-                                fontSize: '1.2rem',
-                                fontWeight: 'bold',
-                                '& .MuiChip-label': {
-                                  px: 0
-                                }
-                              }}
-                            />
-                          )}
-                        </Box>
-                      </Fade>
-                    )}
-                  </ListItem>
-                </Tooltip>
-              </Box>
-            </Grow>
+                    />
+                  )}
+                </ListItem>
+              </Tooltip>
+            </Box>
           );
         })}
       </List>
@@ -472,252 +385,220 @@ export default function NavBar() {
       {/* Admin Section */}
       {currentUser?.isAdmin && (
         <>
-          <Box sx={{ px: 2, py: 1 }}>
-            <Divider sx={{ borderColor: 'rgba(148, 163, 184, 0.2)' }} />
+          <Box sx={{ px: 2, py: 2 }}>
+            <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.08)' }} />
             {effectiveDrawerOpen && (
               <Typography 
                 variant="caption" 
                 sx={{ 
-                  color: 'rgba(255, 255, 255, 0.6)', 
-                  fontSize: '0.75rem',
+                  color: 'rgba(255, 255, 255, 0.4)', 
+                  fontSize: '0.7rem',
                   fontWeight: 600,
-                  letterSpacing: '0.5px',
-                  mt: 2,
-                  display: 'block'
+                  letterSpacing: '0.08em',
+                  mt: 2.5,
+                  mb: 1.5,
+                  display: 'block',
+                  textTransform: 'uppercase'
                 }}
               >
-                ADMIN PANEL
+                Admin
               </Typography>
             )}
           </Box>
           
-          <List sx={{ pt: 1, px: 1 }}>
+          <List sx={{ pt: 0, px: 2, pb: 2 }}>
             {adminItems.map((item, index) => {
               const isActive = location.pathname === item.path;
               const isHovered = hoveredItem === item.text;
               
               return (
-                <Grow in timeout={800 + index * 100} key={item.text}>
-                  <Box sx={{ mb: 1 }}>
-                    <Tooltip 
-                      title={!effectiveDrawerOpen ? `${item.text} - ${item.description}` : ""} 
-                      placement="right"
-                      arrow
-                    >
-                      <ListItem
-                        component={Link}
-                        to={item.path}
-                        onClick={handleMobileItemClick}
-                        onMouseEnter={() => setHoveredItem(item.text)}
-                        onMouseLeave={() => setHoveredItem(null)}
-                        sx={{
-                          minHeight: 56,
-                          justifyContent: effectiveDrawerOpen ? 'initial' : 'center',
-                          px: 2,
-                          mx: 1,
-                          borderRadius: 3,
-                          cursor: 'pointer',
-                          textDecoration: 'none',
-                          position: 'relative',
-                          overflow: 'hidden',
-                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                <Box sx={{ mb: 0.5 }} key={item.text}>
+                  <Tooltip 
+                    title={!effectiveDrawerOpen ? item.text : ""} 
+                    placement="right"
+                    arrow
+                  >
+                    <ListItem
+                      component={Link}
+                      to={item.path}
+                      onClick={handleMobileItemClick}
+                      onMouseEnter={() => setHoveredItem(item.text)}
+                      onMouseLeave={() => setHoveredItem(null)}
+                      sx={{
+                        minHeight: 44,
+                        justifyContent: effectiveDrawerOpen ? 'initial' : 'center',
+                        px: effectiveDrawerOpen ? 1.5 : 1.25,
+                        borderRadius: '11px',
+                        cursor: 'pointer',
+                        textDecoration: 'none',
+                        position: 'relative',
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        background: isActive 
+                          ? 'rgba(255, 255, 255, 0.15)'
+                          : isHovered 
+                            ? 'rgba(255, 255, 255, 0.08)'
+                            : 'transparent',
+                        backdropFilter: isActive ? 'blur(12px) saturate(180%)' : 'none',
+                        WebkitBackdropFilter: isActive ? 'blur(12px) saturate(180%)' : 'none',
+                        boxShadow: isActive 
+                          ? '0 4px 16px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                          : 'none',
+                        '&:hover': {
                           background: isActive 
-                            ? `linear-gradient(135deg, ${item.color}20 0%, ${item.color}10 100%)`
-                            : isHovered 
-                              ? 'rgba(255, 255, 255, 0.05)'
-                              : 'transparent',
-                          border: isActive 
-                            ? `1px solid ${item.color}40`
-                            : '1px solid transparent',
-                          transform: isHovered ? 'translateX(8px)' : 'translateX(0px)',
+                            ? 'rgba(255, 255, 255, 0.2)'
+                            : 'rgba(255, 255, 255, 0.1)',
+                          backdropFilter: 'blur(12px) saturate(180%)',
+                          WebkitBackdropFilter: 'blur(12px) saturate(180%)',
+                          transform: 'translateY(-1px)',
                           boxShadow: isActive 
-                            ? `0 8px 32px ${item.color}20`
-                            : isHovered
-                              ? '0 8px 25px rgba(0, 0, 0, 0.1)'
-                              : 'none',
-                          '&::before': {
-                            content: '""',
-                            position: 'absolute',
-                            left: 0,
-                            top: 0,
-                            height: '100%',
-                            width: isActive ? '4px' : '0px',
-                            background: `linear-gradient(180deg, ${item.color} 0%, ${item.color}80 100%)`,
-                            borderRadius: '0 8px 8px 0',
-                            transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            ? '0 6px 20px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.12)'
+                            : 'none',
+                        }
+                      }}
+                    >
+                      <ListItemIcon
+                        sx={{
+                          minWidth: 0,
+                          mr: effectiveDrawerOpen ? 1.5 : 'auto',
+                          justifyContent: 'center',
+                          color: isActive 
+                            ? item.color
+                            : 'rgba(255, 255, 255, 0.6)',
+                          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                          fontSize: '1.25rem',
+                          '& .MuiSvgIcon-root': {
+                            fontSize: '1.25rem'
                           }
                         }}
                       >
-                        <ListItemIcon
-                          sx={{
-                            minWidth: 0,
-                            mr: effectiveDrawerOpen ? 2 : 'auto',
-                            justifyContent: 'center',
-                            color: isActive ? item.color : 'rgba(255, 255, 255, 0.8)',
-                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            transform: isHovered ? 'scale(1.1)' : 'scale(1)',
-                            filter: isActive ? 'drop-shadow(0 0 8px currentColor)' : 'none'
+                        {item.icon}
+                      </ListItemIcon>
+                      {effectiveDrawerOpen && (
+                        <ListItemText
+                          primary={item.text}
+                          primaryTypographyProps={{
+                            sx: { 
+                              color: isActive 
+                                ? 'rgba(255, 255, 255, 1)' 
+                                : 'rgba(255, 255, 255, 0.7)', 
+                              fontWeight: isActive ? 600 : 500,
+                              fontSize: '0.875rem',
+                              letterSpacing: '-0.01em',
+                              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                            }
                           }}
-                        >
-                          {item.icon}
-                        </ListItemIcon>
-                        {effectiveDrawerOpen && (
-                          <Fade in={effectiveDrawerOpen} timeout={400}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 1 }}>
-                              <ListItemText
-                                primary={item.text}
-                                secondary={item.description}
-                                primaryTypographyProps={{
-                                  sx: { 
-                                    color: isActive ? item.color : 'white', 
-                                    fontWeight: isActive ? 600 : 500,
-                                    fontSize: '0.95rem',
-                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-                                  }
-                                }}
-                                secondaryTypographyProps={{
-                                  sx: { 
-                                    color: 'rgba(255, 255, 255, 0.5)', 
-                                    fontSize: '0.75rem',
-                                    fontWeight: 400
-                                  }
-                                }}
-                              />
-                              {isActive && (
-                                <Chip
-                                  size="small"
-                                  label="•"
-                                  sx={{
-                                    bgcolor: item.color,
-                                    color: 'white',
-                                    minWidth: 'auto',
-                                    width: 24,
-                                    height: 24,
-                                    fontSize: '1.2rem',
-                                    fontWeight: 'bold',
-                                    '& .MuiChip-label': {
-                                      px: 0
-                                    }
-                                  }}
-                                />
-                              )}
-                            </Box>
-                          </Fade>
-                        )}
-                      </ListItem>
-                    </Tooltip>
-                  </Box>
-                </Grow>
+                        />
+                      )}
+                    </ListItem>
+                  </Tooltip>
+                </Box>
               );
             })}
           </List>
         </>
       )}
 
-      {/* Enhanced Footer */}
-      <Fade in timeout={1000}>
-        <Box
-          sx={{
-            mt: 'auto',
-            background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(2, 6, 23, 0.9) 100%)',
-            borderTop: '1px solid rgba(148, 163, 184, 0.1)',
-            backdropFilter: 'blur(10px)'
-          }}
-        >
-          {/* User Profile Section */}
-          {currentUser && (
-            <Box
-              sx={{
-                p: 2,
-                borderBottom: '1px solid rgba(148, 163, 184, 0.1)',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  background: 'rgba(255, 255, 255, 0.05)'
-                }
-              }}
-              onClick={handleUserMenuClick}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Avatar
-                  sx={{
-                    width: effectiveDrawerOpen ? 40 : 32,
-                    height: effectiveDrawerOpen ? 40 : 32,
-                    background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-                    fontSize: effectiveDrawerOpen ? '1rem' : '0.8rem',
-                    transition: 'all 0.3s ease'
-                  }}
-                >
-                  {currentUser?.firstName?.[0]}{currentUser?.lastName?.[0]}
-                </Avatar>
-                {effectiveDrawerOpen && (
-                  <Box sx={{ minWidth: 0, flex: 1 }}>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: 'white',
-                        fontWeight: 600,
-                        fontSize: '0.85rem',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap'
-                      }}
-                    >
-                      {currentUser?.firstName} {currentUser?.lastName}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: 'rgba(255, 255, 255, 0.6)',
-                        fontSize: '0.7rem',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                        display: 'block'
-                      }}
-                    >
-                      {currentUser?.email}
-                    </Typography>
-                  </Box>
-                )}
-              </Box>
-            </Box>
-          )}
-
-          {/* Version Info */}
-          <Box sx={{ p: 2, textAlign: 'center' }}>
-            {effectiveDrawerOpen ? (
-              <Box>
-                <Typography 
-                  variant="caption" 
-                  sx={{ 
-                    color: 'rgba(255, 255, 255, 0.6)',
-                    fontSize: '0.75rem',
-                    fontWeight: 500,
-                    display: 'block',
-                    mb: 0.5
-                  }}
-                >
-                  Version 2.2.0
-                </Typography>
-              </Box>
-            ) : (
-              <Typography 
-                variant="caption" 
-                sx={{ 
-                  color: 'rgba(255, 255, 255, 0.6)',
-                  fontSize: '0.7rem',
-                  fontWeight: 500,
-                  writingMode: 'vertical-rl',
-                  textOrientation: 'mixed'
+      {/* Professional Footer with Glassmorphism */}
+      <Box
+        sx={{
+          mt: 'auto',
+          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+        }}
+      >
+        {/* User Profile Section */}
+        {currentUser && (
+          <Box
+            sx={{
+              p: 2,
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+              '&:hover': {
+                background: 'rgba(255, 255, 255, 0.06)',
+                backdropFilter: 'blur(20px)',
+              }
+            }}
+            onClick={handleUserMenuClick}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+              <Avatar
+                sx={{
+                  width: effectiveDrawerOpen ? 36 : 32,
+                  height: effectiveDrawerOpen ? 36 : 32,
+                  bgcolor: 'rgba(255, 255, 255, 0.12)',
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  fontSize: effectiveDrawerOpen ? '0.875rem' : '0.75rem',
+                  fontWeight: 600,
+                  border: '1.5px solid rgba(255, 255, 255, 0.15)',
+                  backdropFilter: 'blur(20px)',
+                  transition: 'all 0.2s ease'
                 }}
               >
-                v2.2.0
-              </Typography>
-            )}
+                {currentUser?.firstName?.[0]}{currentUser?.lastName?.[0]}
+              </Avatar>
+              {effectiveDrawerOpen && (
+                <Box sx={{ minWidth: 0, flex: 1 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: 'rgba(255, 255, 255, 0.9)',
+                      fontWeight: 600,
+                      fontSize: '0.8rem',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      letterSpacing: '-0.01em'
+                    }}
+                  >
+                    {currentUser?.firstName} {currentUser?.lastName}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: 'rgba(255, 255, 255, 0.5)',
+                      fontSize: '0.7rem',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      display: 'block'
+                    }}
+                  >
+                    {currentUser?.email}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
           </Box>
+        )}
+
+        {/* Version Info */}
+        <Box sx={{ p: 2, textAlign: 'center' }}>
+          {effectiveDrawerOpen ? (
+            <Typography 
+              variant="caption" 
+              sx={{ 
+                color: 'rgba(255, 255, 255, 0.35)',
+                fontSize: '0.7rem',
+                fontWeight: 500,
+                letterSpacing: '0.05em'
+              }}
+            >
+              Version 2.2.0
+            </Typography>
+          ) : (
+            <Typography 
+              variant="caption" 
+              sx={{ 
+                color: 'rgba(255, 255, 255, 0.35)',
+                fontSize: '0.65rem',
+                fontWeight: 500
+              }}
+            >
+              v2.2
+            </Typography>
+          )}
         </Box>
-      </Fade>
+      </Box>
     </>
   );
   
@@ -728,8 +609,11 @@ export default function NavBar() {
         <AppBar
           position="fixed"
           sx={{
-            background: 'linear-gradient(145deg, #1e293b 0%, #0f172a 50%, #020617 100%)',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+            background: 'rgba(15, 23, 42, 0.8)',
+            backdropFilter: 'saturate(180%) blur(20px)',
+            WebkitBackdropFilter: 'saturate(180%) blur(20px)',
+            boxShadow: '0 1px 0 rgba(255, 255, 255, 0.08)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
           }}
         >
           <Toolbar>
@@ -738,7 +622,10 @@ export default function NavBar() {
               aria-label="open drawer"
               edge="start"
               onClick={handleDrawerToggle}
-              sx={{ mr: 2 }}
+              sx={{ 
+                mr: 2,
+                color: 'rgba(255, 255, 255, 0.9)'
+              }}
             >
               <MenuIcon />
             </IconButton>
@@ -746,16 +633,12 @@ export default function NavBar() {
               {/* Logo in Mobile AppBar */}
               <Box
                 sx={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: '10px',
-                  background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
-                  backdropFilter: 'blur(10px)',
-                  border: '1.5px solid rgba(102, 126, 234, 0.2)',
+                  width: 28,
+                  height: 28,
+                  borderRadius: '6px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: '0 4px 12px rgba(102, 126, 234, 0.15)',
                 }}
               >
                 <Box
@@ -765,9 +648,7 @@ export default function NavBar() {
                   sx={{
                     width: '100%',
                     height: '100%',
-                    objectFit: 'cover',
-                    borderRadius: '8px',
-                    filter: 'drop-shadow(0 2px 4px rgba(102, 126, 234, 0.2))'
+                    objectFit: 'contain',
                   }}
                 />
               </Box>
@@ -776,13 +657,10 @@ export default function NavBar() {
                 noWrap 
                 component="div" 
                 sx={{ 
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  backgroundClip: 'text',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  fontWeight: 700,
-                  fontSize: '1.05rem',
-                  letterSpacing: '-0.02em'
+                  color: 'rgba(255, 255, 255, 0.95)',
+                  fontWeight: 600,
+                  fontSize: '1rem',
+                  letterSpacing: '-0.01em'
                 }}
               >
                 E-Nvoicing
@@ -806,11 +684,12 @@ export default function NavBar() {
             '& .MuiDrawer-paper': {
               boxSizing: 'border-box',
               width: 280,
-              background: 'linear-gradient(145deg, #1e293b 0%, #0f172a 50%, #020617 100%)',
+              background: 'rgba(15, 23, 42, 0.95)',
+              backdropFilter: 'saturate(180%) blur(20px)',
+              WebkitBackdropFilter: 'saturate(180%) blur(20px)',
               color: 'white',
-              borderRight: '1px solid rgba(148, 163, 184, 0.1)',
-              backdropFilter: 'blur(20px)',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
             },
           }}
         >
@@ -829,13 +708,14 @@ export default function NavBar() {
             '& .MuiDrawer-paper': {
               width: drawerWidth,
               boxSizing: 'border-box',
-              background: 'linear-gradient(145deg, #1e293b 0%, #0f172a 50%, #020617 100%)',
+              background: 'rgba(15, 23, 42, 0.95)',
+              backdropFilter: 'saturate(180%) blur(20px)',
+              WebkitBackdropFilter: 'saturate(180%) blur(20px)',
               color: 'white',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               overflowX: 'hidden',
-              borderRight: '1px solid rgba(148, 163, 184, 0.1)',
-              backdropFilter: 'blur(20px)',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
             },
           }}
         >
@@ -852,12 +732,15 @@ export default function NavBar() {
         anchorOrigin={{ horizontal: 'left', vertical: 'top' }}
         PaperProps={{
           sx: {
-            background: 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)',
+            background: 'rgba(30, 41, 59, 0.95)',
+            backdropFilter: 'saturate(180%) blur(20px)',
+            WebkitBackdropFilter: 'saturate(180%) blur(20px)',
             color: 'white',
-            border: '1px solid rgba(148, 163, 184, 0.2)',
-            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3)',
-            borderRadius: 2,
-            minWidth: 200
+            border: '1px solid rgba(255, 255, 255, 0.12)',
+            boxShadow: '0 12px 24px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05)',
+            borderRadius: '12px',
+            minWidth: 200,
+            mt: 1
           }
         }}
       >
@@ -865,30 +748,45 @@ export default function NavBar() {
           onClick={handleProfile}
           sx={{
             py: 1.5,
+            px: 2,
+            gap: 1.5,
             '&:hover': {
-              background: 'rgba(255, 255, 255, 0.1)'
+              background: 'rgba(255, 255, 255, 0.08)'
             }
           }}
         >
-          <ListItemIcon sx={{ color: 'white', minWidth: 40 }}>
-            <PersonIcon />
+          <ListItemIcon sx={{ color: 'rgba(255, 255, 255, 0.9)', minWidth: 36 }}>
+            <PersonIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText primary="Profile" />
+          <ListItemText 
+            primary="Profile" 
+            primaryTypographyProps={{
+              sx: { fontSize: '0.875rem', fontWeight: 500 }
+            }}
+          />
         </MenuItem>
-        <Divider sx={{ borderColor: 'rgba(148, 163, 184, 0.2)' }} />
+        <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.08)', my: 0.5 }} />
         <MenuItem
           onClick={handleLogout}
           sx={{
             py: 1.5,
+            px: 2,
+            gap: 1.5,
             '&:hover': {
-              background: 'rgba(239, 68, 68, 0.1)'
+              background: 'rgba(239, 68, 68, 0.08)'
             }
           }}
         >
-          <ListItemIcon sx={{ color: '#ef4444', minWidth: 40 }}>
-            <LogoutIcon />
+          <ListItemIcon sx={{ color: '#ef4444', minWidth: 36 }}>
+            <LogoutIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText primary="Logout" primaryTypographyProps={{ color: '#ef4444' }} />
+          <ListItemText 
+            primary="Logout" 
+            primaryTypographyProps={{ 
+              color: '#ef4444',
+              sx: { fontSize: '0.875rem', fontWeight: 500 }
+            }} 
+          />
         </MenuItem>
       </Menu>
     </>

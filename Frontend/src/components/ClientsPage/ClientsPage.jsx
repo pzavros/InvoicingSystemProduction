@@ -1,8 +1,6 @@
 // src/components/ClientsPage/ClientsPage.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Fade } from "@mui/material";
-import Section from "../ReusableComponents/Section";
 import ClientsPageHeader from "./ClientsPageHeader";
 import ClientsDataGrid from "./ClientsDataGrid";
 import NotificationSnackbar from "./NotificationSnackbar";
@@ -39,8 +37,7 @@ const ClientsPage = () => {
   }
 
   return (
-    <Fade in={true} timeout={800}>
-    <Section>
+    <>
       <ClientsPageHeader 
         clientsCount={clients.length}
         onAddClient={handleAddClient}
@@ -60,8 +57,7 @@ const ClientsPage = () => {
       />
       
       <PageHelper {...pageHelpContent.clients} />
-    </Section>
-    </Fade>
+    </>
   );
 };
 
