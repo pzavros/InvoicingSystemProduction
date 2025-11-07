@@ -41,9 +41,7 @@ import {
   CardActions,
   Divider,
   useMediaQuery,
-  useTheme,
-  Fade,
-  Grow
+  useTheme
 } from '@mui/material';
 import { visuallyHidden } from '@mui/utils'; // Corrected import for TableSortLabel accessibility
 import { useNavigate } from 'react-router-dom';
@@ -658,80 +656,46 @@ export default function InvoiceList() {
     .length;
     
   return (
-    <Fade in={true} timeout={800}>
     <Box sx={{ width: '100%' }}>
-      {/* Enhanced Header Section */}
-      <Grow in={true} timeout={600}>
+      {/* Apple-Style Header Section */}
       <Box 
         sx={{ 
           display: 'flex', 
           flexDirection: { xs: 'column', sm: 'row' },
           justifyContent: 'space-between', 
-          alignItems: { xs: 'stretch', sm: 'center' },
-          gap: { xs: 2, sm: 0 },
-          mb: { xs: 3, md: 4 },
-          p: { xs: 2, sm: 3 },
-          borderRadius: 3,
-          background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-          border: '1px solid rgba(59, 130, 246, 0.1)',
-          boxShadow: '0 4px 12px rgba(59, 130, 246, 0.08)',
-          position: 'relative',
-          overflow: 'hidden',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '4px',
-            background: 'linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)',
-            borderRadius: '3px 3px 0 0'
-          }
+          alignItems: { xs: 'flex-start', sm: 'center' },
+          gap: { xs: 2, sm: 3 },
+          mb: 3,
+          pb: 3,
+          borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2 } }}>
-          <Box
-            sx={{
-              width: { xs: 40, sm: 48 },
-              height: { xs: 40, sm: 48 },
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 8px 16px rgba(59, 130, 246, 0.3)'
+        <Box>
+          <Typography 
+            variant="h4" 
+            component="h1" 
+            sx={{ 
+              fontWeight: 700,
+              fontSize: { xs: '1.75rem', sm: '2rem' },
+              color: 'rgba(15, 23, 42, 0.95)',
+              letterSpacing: '-0.02em',
+              lineHeight: 1.1,
+              mb: 0.5
             }}
           >
-            <ReceiptIcon sx={{ color: 'white', fontSize: { xs: 20, sm: 24 } }} />
-          </Box>
-          <Box>
-            <Typography 
-              variant="h5" 
-              component="h1" 
-              sx={{ 
-                fontWeight: 'bold',
-                fontSize: { xs: '1.25rem', sm: '1.5rem' },
-                background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                mb: 0.5
-              }}
-            >
-              Invoice Management
-            </Typography>
-            <Typography 
-              variant="subtitle2" 
-              sx={{ 
-                color: 'text.secondary',
-                fontWeight: 'medium',
-                fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                display: { xs: 'none', sm: 'block' }
-              }}
-            >
-              Manage and track all your invoices
-            </Typography>
-          </Box>
+            Invoices
+          </Typography>
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: 'rgba(15, 23, 42, 0.5)',
+              fontSize: '0.9375rem',
+              fontWeight: 400,
+              letterSpacing: '-0.01em'
+            }}
+          >
+            Manage and track all your invoices
+          </Typography>
         </Box>
         
         <Tooltip 
@@ -746,84 +710,57 @@ export default function InvoiceList() {
               disabled={!canCreateInvoice}
               fullWidth={{ xs: true, sm: false }}
               sx={{ 
-                backgroundColor: canCreateInvoice ? '#10b981' : '#9ca3af',
-                backgroundImage: canCreateInvoice 
-                  ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-                  : 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
-                boxShadow: canCreateInvoice ? '0 8px 16px rgba(16, 185, 129, 0.3)' : 'none',
-                border: 'none',
-                borderRadius: 2,
-                px: { xs: 2, sm: 3 },
-                py: 1.5,
-                fontSize: { xs: '0.875rem', sm: '1rem' },
+                background: canCreateInvoice 
+                  ? 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' 
+                  : 'rgba(15, 23, 42, 0.3)',
+                color: 'white',
+                boxShadow: 'none',
+                borderRadius: '8px',
+                px: 2.5,
+                py: 1,
+                fontSize: '0.9375rem',
                 fontWeight: 600,
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                textTransform: 'none',
+                letterSpacing: '-0.01em',
+                minWidth: { xs: 'auto', sm: 140 },
+                transition: 'all 0.15s ease',
                 '&:hover': canCreateInvoice ? { 
-                  backgroundColor: '#059669',
-                  backgroundImage: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0 12px 24px rgba(16, 185, 129, 0.4)'
+                  background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                  boxShadow: 'none',
                 } : {},
                 '&.Mui-disabled': {
-                  color: 'white',
-                  opacity: 0.7
+                  color: 'rgba(255, 255, 255, 0.6)',
+                  opacity: 1
                 }
               }}
             >
-              {canCreateInvoice ? 'Create Invoice' : 'Limit Reached'}
+              {canCreateInvoice ? 'New Invoice' : 'Limit Reached'}
             </Button>
           </span>
         </Tooltip>
       </Box>
-      </Grow>
 
       {/* Usage Indicator for Free Tier - Below Header */}
       <Box sx={{ mb: 3 }}>
         <UsageIndicator resource="invoice" label="Invoices (This Month)" />
       </Box>
 
-      {/* Enhanced Search and Filter Section */}
+      {/* Apple-Style Search and Filter Section */}
       <Box 
         sx={{ 
-          p: { xs: 2, sm: 3 }, 
-          mb: { xs: 2, sm: 3 }, 
-          borderRadius: 3,
-          background: 'linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%)',
-          border: '1px solid rgba(148, 163, 184, 0.2)',
-          boxShadow: '0 4px 12px rgba(148, 163, 184, 0.1)',
-          transition: 'all 0.3s ease-in-out',
-          '&:hover': {
-            boxShadow: '0 8px 20px rgba(148, 163, 184, 0.15)',
-            transform: { xs: 'none', md: 'translateY(-1px)' }
-          }
+          mb: 3,
         }}
       >
-        <Typography 
-          variant="h6" 
-          sx={{ 
-            mb: 2, 
-            fontWeight: 'medium', 
-            color: 'text.primary',
-            fontSize: { xs: '1rem', sm: '1.25rem' },
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1
-          }}
-        >
-          <SearchIcon sx={{ color: '#6b7280', fontSize: { xs: 20, sm: 24 } }} />
-          Search & Filter
-        </Typography>
-        
         <Box
           sx={{
             display: 'flex',
             flexDirection: { xs: 'column', md: 'row' },
-            alignItems: 'center',
-            gap: 2
+            alignItems: 'stretch',
+            gap: 1.5
           }}
         >
           <TextField
-            label="Search Invoices"
+            placeholder="Search invoices..."
             variant="outlined"
             size="small"
             fullWidth
@@ -832,25 +769,42 @@ export default function InvoiceList() {
             sx={{ 
               flexGrow: 1,
               '& .MuiOutlinedInput-root': {
-                borderRadius: 2,
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#3b82f6'
+                borderRadius: '8px',
+                backgroundColor: 'rgba(15, 23, 42, 0.04)',
+                border: '1px solid rgba(15, 23, 42, 0.08)',
+                fontSize: '0.9375rem',
+                fontWeight: 400,
+                transition: 'all 0.15s ease',
+                '& fieldset': {
+                  border: 'none'
                 },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#3b82f6'
+                '&:hover': {
+                  backgroundColor: 'rgba(15, 23, 42, 0.06)',
+                  borderColor: 'rgba(15, 23, 42, 0.12)',
+                },
+                '&.Mui-focused': {
+                  backgroundColor: 'white',
+                  borderColor: '#3b82f6',
+                  boxShadow: '0 0 0 3px rgba(59, 130, 246, 0.1)',
+                }
+              },
+              '& .MuiOutlinedInput-input': {
+                padding: '8.5px 12px',
+                '&::placeholder': {
+                  color: 'rgba(15, 23, 42, 0.4)',
+                  opacity: 1
                 }
               }
             }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon sx={{ color: '#6b7280' }} />
+                  <SearchIcon sx={{ color: 'rgba(15, 23, 42, 0.3)', fontSize: 18, ml: 0.5 }} />
                 </InputAdornment>
               ),
             }}
           />        
-        <FormControl size="small" sx={{ minWidth: { xs: '100%', md: 150 } }}>
-          <InputLabel id="status-select-filter-label">Status</InputLabel>
+        <FormControl size="small" sx={{ minWidth: { xs: '100%', md: 160 } }}>
           <Select
             labelId="status-select-filter-label"
             id="status-select-filter"
@@ -858,25 +812,66 @@ export default function InvoiceList() {
             value={getStatusSelectValue()}
             onChange={handleStatusSelectChange}
             onClose={() => setPage(0)}
-            label="Status"
+            displayEmpty
             renderValue={renderSelectedStatusValue}
             sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 2,
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#8b5cf6'
-                },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#8b5cf6'
-                }
+              borderRadius: '8px',
+              backgroundColor: 'rgba(15, 23, 42, 0.04)',
+              border: '1px solid rgba(15, 23, 42, 0.08)',
+              fontSize: '0.9375rem',
+              fontWeight: 400,
+              transition: 'all 0.15s ease',
+              '& fieldset': {
+                border: 'none'
+              },
+              '&:hover': {
+                backgroundColor: 'rgba(15, 23, 42, 0.06)',
+                borderColor: 'rgba(15, 23, 42, 0.12)',
+              },
+              '&.Mui-focused': {
+                backgroundColor: 'white',
+                borderColor: '#3b82f6',
+                boxShadow: '0 0 0 3px rgba(59, 130, 246, 0.1)',
+              },
+              '& .MuiSelect-select': {
+                padding: '8.5px 12px',
+                display: 'flex',
+                alignItems: 'center'
+              },
+              '& .MuiSelect-icon': {
+                color: 'rgba(15, 23, 42, 0.4)',
+                right: 8,
+                transition: 'transform 0.15s ease'
               }
             }}
             MenuProps={{
               PaperProps: {
-                style: {
-                  maxHeight: 48 * 4.5 + 8,
-                  width: 250,
-                },
+                sx: {
+                  borderRadius: '10px',
+                  boxShadow: '0 8px 24px rgba(15, 23, 42, 0.12)',
+                  border: '1px solid rgba(15, 23, 42, 0.08)',
+                  mt: 0.5,
+                  overflow: 'hidden',
+                  '& .MuiList-root': {
+                    py: 0.5
+                  },
+                  '& .MuiMenuItem-root': {
+                    fontSize: '0.9375rem',
+                    padding: '10px 12px',
+                    margin: '0 4px',
+                    borderRadius: '6px',
+                    transition: 'all 0.15s ease',
+                    '&:hover': {
+                      backgroundColor: 'rgba(15, 23, 42, 0.06)'
+                    },
+                    '&.Mui-selected': {
+                      backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                      '&:hover': {
+                        backgroundColor: 'rgba(59, 130, 246, 0.12)'
+                      }
+                    }
+                  }
+                }
               },
             }}
           >
@@ -886,36 +881,121 @@ export default function InvoiceList() {
                 const statusValue = status.name.toLowerCase();
                 return (
                   <MenuItem key={statusValue} value={statusValue} disabled={showAllStatuses}>
-                    <Checkbox checked={showAllStatuses || (activeStatusFilters[statusValue] || false)} />
-                    <ListItemText primary={status.name} />
+                    <Checkbox 
+                      checked={showAllStatuses || (activeStatusFilters[statusValue] || false)}
+                      size="small"
+                      sx={{ 
+                        mr: 1.5,
+                        p: 0,
+                        color: 'rgba(15, 23, 42, 0.3)',
+                        '&.Mui-checked': {
+                          color: '#3b82f6'
+                        }
+                      }}
+                    />
+                    <ListItemText 
+                      primary={status.name}
+                      primaryTypographyProps={{
+                        fontSize: '0.9375rem',
+                        fontWeight: 400,
+                        color: 'rgba(15, 23, 42, 0.9)'
+                      }}
+                    />
                   </MenuItem>
                 );
             })}
             <MenuItem key="allstatuses" value="allstatuses">
-              <Checkbox checked={showAllStatuses} />
-              <ListItemText primary="All (incl. Deleted)" />
+              <Checkbox 
+                checked={showAllStatuses} 
+                size="small" 
+                sx={{ 
+                  mr: 1.5,
+                  p: 0,
+                  color: 'rgba(15, 23, 42, 0.3)',
+                  '&.Mui-checked': {
+                    color: '#3b82f6'
+                  }
+                }}
+              />
+              <ListItemText 
+                primary="All (incl. Deleted)"
+                primaryTypographyProps={{
+                  fontSize: '0.9375rem',
+                  fontWeight: 400,
+                  color: 'rgba(15, 23, 42, 0.9)'
+                }}
+              />
             </MenuItem>
           </Select>
         </FormControl>
         
-        <FormControl size="small" sx={{ minWidth: { xs: '100%', md: 150 } }}>
-          <InputLabel id="date-filter-label">Date</InputLabel>
+        <FormControl size="small" sx={{ minWidth: { xs: '100%', md: 160 } }}>
           <Select
             labelId="date-filter-label"
             id="date-filter"
             value={dateFilter}
-            label="Date"
             onChange={handleDateFilterChange}
+            displayEmpty
             sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 2,
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#f59e0b'
-                },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#f59e0b'
-                }
+              borderRadius: '8px',
+              backgroundColor: 'rgba(15, 23, 42, 0.04)',
+              border: '1px solid rgba(15, 23, 42, 0.08)',
+              fontSize: '0.9375rem',
+              fontWeight: 400,
+              transition: 'all 0.15s ease',
+              '& fieldset': {
+                border: 'none'
+              },
+              '&:hover': {
+                backgroundColor: 'rgba(15, 23, 42, 0.06)',
+                borderColor: 'rgba(15, 23, 42, 0.12)',
+              },
+              '&.Mui-focused': {
+                backgroundColor: 'white',
+                borderColor: '#3b82f6',
+                boxShadow: '0 0 0 3px rgba(59, 130, 246, 0.1)',
+              },
+              '& .MuiSelect-select': {
+                padding: '8.5px 12px'
+              },
+              '& .MuiSelect-icon': {
+                color: 'rgba(15, 23, 42, 0.4)',
+                right: 8,
+                transition: 'transform 0.15s ease'
               }
+            }}
+            MenuProps={{
+              PaperProps: {
+                sx: {
+                  borderRadius: '10px',
+                  boxShadow: '0 8px 24px rgba(15, 23, 42, 0.12)',
+                  border: '1px solid rgba(15, 23, 42, 0.08)',
+                  mt: 0.5,
+                  overflow: 'hidden',
+                  '& .MuiList-root': {
+                    py: 0.5
+                  },
+                  '& .MuiMenuItem-root': {
+                    fontSize: '0.9375rem',
+                    padding: '10px 12px',
+                    margin: '0 4px',
+                    borderRadius: '6px',
+                    transition: 'all 0.15s ease',
+                    color: 'rgba(15, 23, 42, 0.9)',
+                    '&:hover': {
+                      backgroundColor: 'rgba(15, 23, 42, 0.06)'
+                    },
+                    '&.Mui-selected': {
+                      backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                      color: '#3b82f6',
+                      fontWeight: 500,
+                      '&:hover': {
+                        backgroundColor: 'rgba(59, 130, 246, 0.12)'
+                      }
+                    }
+                  }
+                }
+              },
             }}
           >
             <MenuItem value="all">All Time</MenuItem>
@@ -929,13 +1009,15 @@ export default function InvoiceList() {
         <Box
         sx={{
           ...(selectedInvoices.length > 0 && {
-            background: 'linear-gradient(135deg, #e0f2fe 0%, #f3e5f5 100%)',
-            border: '1px solid #e3f2fd',
-            borderRadius: 3,
-            mb: 2,
+            background: 'rgba(59, 130, 246, 0.08)',
+            backdropFilter: 'saturate(180%) blur(20px)',
+            WebkitBackdropFilter: 'saturate(180%) blur(20px)',
+            border: '1px solid rgba(59, 130, 246, 0.15)',
+            borderRadius: '12px',
+            mb: 3,
             px: 3,
-            py: 2,
-            boxShadow: '0 4px 12px rgba(63, 81, 181, 0.15)',
+            py: 2.5,
+            boxShadow: '0 4px 12px rgba(59, 130, 246, 0.12)',
           }),
           display: 'flex',
           justifyContent: 'space-between',
@@ -945,7 +1027,7 @@ export default function InvoiceList() {
           visibility: selectedInvoices.length > 0 ? 'visible' : 'hidden',
           height: selectedInvoices.length > 0 ? 'auto' : 0,
           minHeight: selectedInvoices.length > 0 ? 72 : 0,
-          transition: 'all 0.3s ease-in-out',
+          transition: 'all 0.2s ease',
           overflow: 'hidden',
         }}
       >
@@ -956,15 +1038,16 @@ export default function InvoiceList() {
                 sx={{
                   width: 40,
                   height: 40,
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #3f51b5 0%, #303f9f 100%)',
+                  borderRadius: '10px',
+                  background: 'rgba(59, 130, 246, 0.12)',
+                  backdropFilter: 'blur(10px)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'white',
-                  fontWeight: 'bold',
+                  color: '#3b82f6',
+                  fontWeight: 600,
                   fontSize: '0.875rem',
-                  boxShadow: '0 2px 8px rgba(63, 81, 181, 0.3)'
+                  border: '1px solid rgba(59, 130, 246, 0.2)',
                 }}
               >
                 {selectedInvoices.length}
@@ -973,11 +1056,10 @@ export default function InvoiceList() {
                 variant="h6"
                 component="div"
                 sx={{
-                  background: 'linear-gradient(135deg, #3f51b5 0%, #303f9f 100%)',
-                  backgroundClip: 'text',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  fontWeight: 600
+                  color: '#3b82f6',
+                  fontWeight: 600,
+                  fontSize: '0.95rem',
+                  letterSpacing: '-0.01em'
                 }}
               >
                 {selectedInvoices.length === 1 ? 'Invoice Selected' : 'Invoices Selected'}
@@ -990,14 +1072,32 @@ export default function InvoiceList() {
                 sx={{ 
                   minWidth: 180,
                   '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#3f51b5'
+                    borderRadius: '8px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                    border: '1px solid rgba(15, 23, 42, 0.1)',
+                    '& fieldset': {
+                      border: 'none'
                     },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#3f51b5'
+                    '&:hover': {
+                      backgroundColor: 'white',
+                      borderColor: 'rgba(15, 23, 42, 0.15)'
+                    },
+                    '&.Mui-focused': {
+                      borderColor: '#3b82f6',
+                      boxShadow: '0 0 0 3px rgba(59, 130, 246, 0.1)',
+                      backgroundColor: 'white'
                     }
+                  },
+                  '& .MuiInputLabel-root': {
+                    fontSize: '0.875rem',
+                    color: 'rgba(15, 23, 42, 0.6)',
+                    '&.Mui-focused': {
+                      color: '#3b82f6'
+                    }
+                  },
+                  '& .MuiSelect-icon': {
+                    color: 'rgba(15, 23, 42, 0.4)',
+                    right: 8
                   }
                 }}
               >
@@ -1006,6 +1106,39 @@ export default function InvoiceList() {
                   value={bulkTargetStatus}
                   label="Change Status To"
                   onChange={(e) => setBulkTargetStatus(e.target.value)}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        borderRadius: '10px',
+                        boxShadow: '0 8px 24px rgba(15, 23, 42, 0.12)',
+                        border: '1px solid rgba(15, 23, 42, 0.08)',
+                        mt: 0.5,
+                        overflow: 'hidden',
+                        '& .MuiList-root': {
+                          py: 0.5
+                        },
+                        '& .MuiMenuItem-root': {
+                          fontSize: '0.9375rem',
+                          padding: '10px 12px',
+                          margin: '0 4px',
+                          borderRadius: '6px',
+                          transition: 'all 0.15s ease',
+                          color: 'rgba(15, 23, 42, 0.9)',
+                          '&:hover': {
+                            backgroundColor: 'rgba(15, 23, 42, 0.06)'
+                          },
+                          '&.Mui-selected': {
+                            backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                            color: '#3b82f6',
+                            fontWeight: 500,
+                            '&:hover': {
+                              backgroundColor: 'rgba(59, 130, 246, 0.12)'
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }}
                 >
                   <MenuItem value="" disabled><em>Select Status</em></MenuItem>
                   {availableStatuses.map((status) => (
@@ -1021,24 +1154,25 @@ export default function InvoiceList() {
                 onClick={handleBulkStatusChangeClick}
                 disabled={!bulkTargetStatus}
                 sx={{ 
-                  background: 'linear-gradient(135deg, #4caf50 0%, #388e3c 100%)',
-                  borderRadius: 2,
+                  background: '#10b981',
+                  borderRadius: '10px',
                   px: 3,
-                  py: 1,
+                  py: 1.25,
                   fontWeight: 600,
                   textTransform: 'none',
                   fontSize: '0.875rem',
-                  boxShadow: '0 4px 12px rgba(76, 175, 80, 0.3)',
+                  letterSpacing: '-0.01em',
+                  boxShadow: 'none',
+                  border: '1px solid rgba(255, 255, 255, 0.18)',
                   '&:hover': { 
-                    background: 'linear-gradient(135deg, #388e3c 0%, #2e7d32 100%)',
-                    boxShadow: '0 6px 16px rgba(76, 175, 80, 0.4)',
-                    transform: 'translateY(-1px)'
+                    background: '#059669',
+                    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
                   },
                   '&:disabled': {
-                    background: 'linear-gradient(135deg, #e0e0e0 0%, #bdbdbd 100%)',
+                    background: '#9ca3af',
                     boxShadow: 'none'
                   },
-                  transition: 'all 0.2s ease-in-out'
+                  transition: 'all 0.2s ease'
                 }}
               >
                 Apply Change
@@ -1050,12 +1184,13 @@ export default function InvoiceList() {
         elevation={0}
         sx={{ 
           width: '100%', 
-          background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-          borderRadius: 3,
+          background: 'rgba(255, 255, 255, 0.7)',
+          backdropFilter: 'saturate(180%) blur(20px)',
+          WebkitBackdropFilter: 'saturate(180%) blur(20px)',
+          borderRadius: '12px',
           overflow: 'hidden',
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-          backdropFilter: 'blur(10px)'
+          border: '1px solid rgba(255, 255, 255, 0.18)',
         }}
       >
         {loading ? (
@@ -1384,10 +1519,16 @@ export default function InvoiceList() {
               <Table sx={{ minWidth: { xs: 650, md: 750 } }} aria-label="invoices table">
                 <TableHead
                   sx={{
-                    background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+                    background: 'rgba(248, 250, 252, 0.6)',
+                    backdropFilter: 'blur(10px)',
                     '& .MuiTableCell-root': {
-                      borderBottom: '2px solid #e2e8f0',
-                      py: 2
+                      borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
+                      py: 1.75,
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      letterSpacing: '0.05em',
+                      textTransform: 'uppercase',
+                      color: 'rgba(15, 23, 42, 0.6)'
                     }
                   }}
                 >
@@ -1424,11 +1565,6 @@ export default function InvoiceList() {
                         padding={'normal'}
                         sortDirection={orderBy === headCell.id ? order : false}
                         sx={{
-                          fontWeight: 700,
-                          fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                          color: '#374151',
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.05em',
                           backgroundColor: 'transparent',
                           ...(headCell.id === 'total' && { paddingRight: '24px' }),
                           // Hide 'billTo' on xs, show from sm up
@@ -1443,16 +1579,16 @@ export default function InvoiceList() {
                           onClick={(event) => handleRequestSort(event, headCell.id)}
                           sx={{
                             '&.Mui-active': {
-                              color: '#3b82f6',
+                              color: 'rgba(15, 23, 42, 0.9)',
                               '& .MuiTableSortLabel-icon': {
-                                color: '#3b82f6 !important'
+                                color: 'rgba(15, 23, 42, 0.9) !important'
                               }
                             },
                             '&:hover': {
-                              color: '#3b82f6'
+                              color: 'rgba(15, 23, 42, 0.9)'
                             },
                             '& .MuiTableSortLabel-icon': {
-                              fontSize: '1rem'
+                              fontSize: '0.875rem'
                             }
                           }}
                         >
@@ -1467,11 +1603,6 @@ export default function InvoiceList() {
                     ))}
                     <TableCell 
                       sx={{ 
-                        fontWeight: 700,
-                        fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                        color: '#374151',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
                         backgroundColor: 'transparent'
                       }}
                     >
@@ -1479,11 +1610,6 @@ export default function InvoiceList() {
                     </TableCell>
                     <TableCell 
                       sx={{ 
-                        fontWeight: 700,
-                        fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                        color: '#374151',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
                         backgroundColor: 'transparent'
                       }}                    >
                       Actions</TableCell>
@@ -1509,25 +1635,23 @@ export default function InvoiceList() {
                           selected={isItemSelected}
                           sx={{ 
                             cursor: 'pointer',
-                            backgroundColor: isDeleted ? 'rgba(239, 68, 68, 0.05)' : 'inherit',
-                            transition: 'all 0.2s ease-in-out',
+                            backgroundColor: isDeleted ? 'rgba(239, 68, 68, 0.03)' : 'transparent',
+                            transition: 'all 0.15s ease',
                             '&:hover': {
                               backgroundColor: isDeleted 
-                                ? 'rgba(239, 68, 68, 0.08)' 
-                                : 'rgba(59, 130, 246, 0.04)',
-                              transform: { xs: 'none', md: 'translateY(-1px)' },
-                              boxShadow: { xs: 'none', md: '0 4px 12px rgba(0, 0, 0, 0.05)' }
+                                ? 'rgba(239, 68, 68, 0.06)' 
+                                : 'rgba(15, 23, 42, 0.02)',
                             },
                             '&.Mui-selected': {
-                              backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                              backgroundColor: 'rgba(59, 130, 246, 0.06)',
                               '&:hover': {
-                                backgroundColor: 'rgba(59, 130, 246, 0.12)'
+                                backgroundColor: 'rgba(59, 130, 246, 0.08)'
                               }
                             },
                             '& .MuiTableCell-root': {
-                              borderBottom: '1px solid #f1f5f9',
-                              py: { xs: 1.5, sm: 2 },
-                              fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                              borderBottom: '1px solid rgba(15, 23, 42, 0.06)',
+                              py: 2,
+                              fontSize: '0.875rem'
                             }
                           }}
                         >
@@ -1551,24 +1675,25 @@ export default function InvoiceList() {
                             scope="row"
                             sx={{
                               fontWeight: 600,
-                              color: '#374151',
-                              fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                              color: 'rgba(15, 23, 42, 0.9)',
+                              fontSize: '0.875rem'
                             }}
                           >
                             {invoice.invoiceNumber}
                           </TableCell>
                           <TableCell
                             sx={{
-                              color: '#6b7280',
-                              fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                              color: 'rgba(15, 23, 42, 0.6)',
+                              fontSize: '0.875rem',
+                              fontWeight: 500
                             }}
                           >
                             {formatDate(invoice.dateOfIssue)}
                           </TableCell>
                           <TableCell
                             sx={{
-                              color: '#374151',
-                              fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                              color: 'rgba(15, 23, 42, 0.8)',
+                              fontSize: '0.875rem',
                               fontWeight: 500,
                               display: { xs: 'none', sm: 'table-cell' }
                             }}
@@ -1577,8 +1702,7 @@ export default function InvoiceList() {
                           </TableCell>
                           <TableCell
                             sx={{
-                              color: docTypeMeta.color,
-                              fontSize: '0.75rem',
+                              fontSize: '0.8125rem',
                               display: { xs: 'none', md: 'table-cell' }
                             }}
                           >
@@ -1588,14 +1712,15 @@ export default function InvoiceList() {
                               sx={{
                                 backgroundColor: docTypeMeta.backgroundColor,
                                 color: docTypeMeta.color,
-                                borderRadius: '12px',
+                                borderRadius: '6px',
                                 fontWeight: 600,
-                                letterSpacing: '0.05em',
-                                textTransform: 'uppercase',
+                                fontSize: '0.6875rem',
+                                letterSpacing: '0.02em',
                                 border: docTypeMeta.border,
+                                height: '24px',
                                 '& .MuiChip-label': {
-                                  px: 1.25,
-                                  py: 0.25
+                                  px: 1,
+                                  py: 0
                                 }
                               }}
                             />
@@ -1606,7 +1731,8 @@ export default function InvoiceList() {
                               paddingRight: '24px',
                               fontWeight: 600,
                               color: '#059669',
-                              fontSize: { xs: '0.75rem', sm: '0.875rem' }
+                              fontSize: '0.875rem',
+                              fontVariantNumeric: 'tabular-nums'
                             }}
                           >
                             {(invoice.currency?.symbol || '$')}{totalValue.toFixed(2)}
@@ -1618,25 +1744,24 @@ export default function InvoiceList() {
                             />
                           </TableCell>
                           <TableCell>
-                            <Box sx={{ display: 'flex', gap: { xs: 0.25, sm: 0.5 } }}>
+                            <Box sx={{ display: 'flex', gap: 0.75 }}>
                               <Tooltip title="View Invoice" arrow>
                                 <IconButton 
                                   size="small" 
                                   onClick={(e) => { e.stopPropagation(); handleViewInvoice(invoice); }}
                                   sx={{
-                                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                    backgroundColor: 'rgba(59, 130, 246, 0.08)',
                                     color: '#3b82f6',
-                                    borderRadius: 1.5,
-                                    width: { xs: 32, sm: 36 },
-                                    height: { xs: 32, sm: 36 },
+                                    borderRadius: '6px',
+                                    width: 32,
+                                    height: 32,
                                     '&:hover': {
-                                      backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                                      transform: 'scale(1.1)'
+                                      backgroundColor: 'rgba(59, 130, 246, 0.15)',
                                     },
-                                    transition: 'all 0.2s ease-in-out'
+                                    transition: 'all 0.15s ease'
                                   }}
                                 >
-                                  <ViewIcon fontSize="small" sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }} />
+                                  <ViewIcon sx={{ fontSize: '1.125rem' }} />
                                 </IconButton>
                               </Tooltip>
                               <Tooltip title="Edit Invoice" arrow>
@@ -1645,22 +1770,21 @@ export default function InvoiceList() {
                                   onClick={(e) => { e.stopPropagation(); handleEditInvoice(invoice); }}
                                   disabled={isDeleted}
                                   sx={{
-                                    backgroundColor: isDeleted ? 'rgba(156, 163, 175, 0.1)' : 'rgba(139, 92, 246, 0.1)',
+                                    backgroundColor: isDeleted ? 'rgba(156, 163, 175, 0.08)' : 'rgba(139, 92, 246, 0.08)',
                                     color: isDeleted ? '#9ca3af' : '#8b5cf6',
-                                    borderRadius: 1.5,
-                                    width: { xs: 32, sm: 36 },
-                                    height: { xs: 32, sm: 36 },
+                                    borderRadius: '6px',
+                                    width: 32,
+                                    height: 32,
                                     '&:hover': {
-                                      backgroundColor: isDeleted ? 'rgba(156, 163, 175, 0.1)' : 'rgba(139, 92, 246, 0.2)',
-                                      transform: isDeleted ? 'none' : 'scale(1.1)'
+                                      backgroundColor: isDeleted ? 'rgba(156, 163, 175, 0.08)' : 'rgba(139, 92, 246, 0.15)',
                                     },
                                     '&:disabled': {
                                       opacity: 0.5
                                     },
-                                    transition: 'all 0.2s ease-in-out'
+                                    transition: 'all 0.15s ease'
                                   }}
                                 >
-                                  <EditIcon fontSize="small" sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }} />
+                                  <EditIcon sx={{ fontSize: '1.125rem' }} />
                                 </IconButton>
                               </Tooltip>
                               <Tooltip title="Delete Invoice" arrow sx={{ display: { xs: 'none', sm: 'block' } }}>
@@ -1669,23 +1793,22 @@ export default function InvoiceList() {
                                   onClick={(e) => { e.stopPropagation(); handleDeleteClick(invoice); }}
                                   disabled={isDeleted}
                                   sx={{
-                                    backgroundColor: isDeleted ? 'rgba(156, 163, 175, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                                    backgroundColor: isDeleted ? 'rgba(156, 163, 175, 0.08)' : 'rgba(239, 68, 68, 0.08)',
                                     color: isDeleted ? '#9ca3af' : '#ef4444',
-                                    borderRadius: 1.5,
-                                    width: { xs: 32, sm: 36 },
-                                    height: { xs: 32, sm: 36 },
+                                    borderRadius: '6px',
+                                    width: 32,
+                                    height: 32,
                                     display: { xs: 'none', sm: 'inline-flex' },
                                     '&:hover': {
-                                      backgroundColor: isDeleted ? 'rgba(156, 163, 175, 0.1)' : 'rgba(239, 68, 68, 0.2)',
-                                      transform: isDeleted ? 'none' : 'scale(1.1)'
+                                      backgroundColor: isDeleted ? 'rgba(156, 163, 175, 0.08)' : 'rgba(239, 68, 68, 0.15)',
                                     },
                                     '&:disabled': {
                                       opacity: 0.5
                                     },
-                                    transition: 'all 0.2s ease-in-out'
+                                    transition: 'all 0.15s ease'
                                   }}
                                 >
-                                  <DeleteIcon fontSize="small" sx={{ fontSize: { xs: '1rem', sm: '1.25rem' } }} />
+                                  <DeleteIcon sx={{ fontSize: '1.125rem' }} />
                                 </IconButton>
                               </Tooltip>
                             </Box>
@@ -1703,49 +1826,53 @@ export default function InvoiceList() {
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
               sx={{
-                borderTop: '1px solid #e2e8f0',
-                backgroundColor: 'rgba(248, 250, 252, 0.5)',
+                borderTop: '1px solid rgba(15, 23, 42, 0.08)',
+                backgroundColor: 'rgba(248, 250, 252, 0.4)',
                 '& .MuiTablePagination-toolbar': {
                   paddingLeft: 3,
-                  paddingRight: 2
+                  paddingRight: 2,
+                  minHeight: 56
                 },
                 '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
                   fontWeight: 500,
-                  color: '#374151',
-                  fontSize: '0.875rem'
+                  color: 'rgba(15, 23, 42, 0.7)',
+                  fontSize: '0.8125rem'
                 },
                 '& .MuiTablePagination-select': {
-                  borderRadius: 1.5,
-                  backgroundColor: 'white',
-                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                  border: '1px solid rgba(15, 23, 42, 0.1)',
+                  fontSize: '0.8125rem',
+                  fontWeight: 500,
                   '&:hover': {
-                    borderColor: '#3b82f6',
-                    backgroundColor: '#f8fafc'
+                    borderColor: 'rgba(15, 23, 42, 0.2)',
+                    backgroundColor: 'white'
                   },
                   '&:focus': {
-                    borderColor: '#3b82f6',
+                    borderColor: 'rgba(59, 130, 246, 0.4)',
                     backgroundColor: 'white'
                   }
                 },
                 '& .MuiTablePagination-actions': {
                   '& .MuiIconButton-root': {
-                    borderRadius: 1.5,
-                    backgroundColor: 'white',
-                    border: '1px solid #d1d5db',
-                    color: '#374151',
+                    borderRadius: '6px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                    border: '1px solid rgba(15, 23, 42, 0.1)',
+                    color: 'rgba(15, 23, 42, 0.7)',
+                    width: 32,
+                    height: 32,
                     margin: '0 2px',
                     '&:hover': {
-                      backgroundColor: '#3b82f6',
-                      borderColor: '#3b82f6',
-                      color: 'white',
-                      transform: 'scale(1.05)'
+                      backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                      borderColor: 'rgba(59, 130, 246, 0.2)',
+                      color: '#3b82f6',
                     },
                     '&.Mui-disabled': {
-                      backgroundColor: '#f9fafb',
-                      borderColor: '#e5e7eb',
-                      color: '#9ca3af'
+                      backgroundColor: 'rgba(248, 250, 252, 0.5)',
+                      borderColor: 'rgba(15, 23, 42, 0.05)',
+                      color: 'rgba(15, 23, 42, 0.3)'
                     },
-                    transition: 'all 0.2s ease-in-out'
+                    transition: 'all 0.15s ease'
                   }
                 }
               }}
@@ -1763,20 +1890,21 @@ export default function InvoiceList() {
         fullWidth
         PaperProps={{
           sx: {
-            borderRadius: isMobile ? 0 : 3,
-            background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            backdropFilter: 'blur(10px)'
+            borderRadius: isMobile ? 0 : '12px',
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'saturate(180%) blur(20px)',
+            WebkitBackdropFilter: 'saturate(180%) blur(20px)',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
+            border: '1px solid rgba(255, 255, 255, 0.18)',
           }
         }}
       >
         <DialogTitle
           sx={{
             fontWeight: 600,
-            fontSize: '1.25rem',
-            color: '#374151',
-            borderBottom: '1px solid #e5e7eb',
+            fontSize: '1.125rem',
+            color: 'rgba(15, 23, 42, 0.95)',
+            borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
             pb: 2
           }}
         >
@@ -1785,8 +1913,8 @@ export default function InvoiceList() {
         <DialogContent sx={{ py: 3 }}>
           <DialogContentText
             sx={{
-              color: '#6b7280',
-              fontSize: '1rem',
+              color: 'rgba(15, 23, 42, 0.7)',
+              fontSize: '0.9375rem',
               lineHeight: 1.6
             }}
           >
@@ -1799,11 +1927,15 @@ export default function InvoiceList() {
             onClick={handleDeleteCancel}
             variant="outlined"
             sx={{
-              borderColor: '#d1d5db',
-              color: '#6b7280',
+              borderRadius: '10px',
+              borderColor: 'rgba(15, 23, 42, 0.15)',
+              color: 'rgba(15, 23, 42, 0.7)',
+              textTransform: 'none',
+              fontWeight: 600,
+              px: 3,
               '&:hover': {
-                borderColor: '#9ca3af',
-                backgroundColor: '#f9fafb'
+                borderColor: 'rgba(15, 23, 42, 0.3)',
+                backgroundColor: 'rgba(15, 23, 42, 0.04)'
               }
             }}
           >
@@ -1814,9 +1946,15 @@ export default function InvoiceList() {
             variant="contained"
             autoFocus
             sx={{
+              borderRadius: '10px',
               backgroundColor: '#ef4444',
+              textTransform: 'none',
+              fontWeight: 600,
+              px: 3,
+              boxShadow: 'none',
               '&:hover': {
-                backgroundColor: '#dc2626'
+                backgroundColor: '#dc2626',
+                boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)',
               }
             }}
           >
@@ -1833,20 +1971,21 @@ export default function InvoiceList() {
         fullWidth
         PaperProps={{
           sx: {
-            borderRadius: isMobile ? 0 : 3,
-            background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            backdropFilter: 'blur(10px)'
+            borderRadius: isMobile ? 0 : '12px',
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'saturate(180%) blur(20px)',
+            WebkitBackdropFilter: 'saturate(180%) blur(20px)',
+            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
+            border: '1px solid rgba(255, 255, 255, 0.18)',
           }
         }}
       >
         <DialogTitle
           sx={{
             fontWeight: 600,
-            fontSize: '1.25rem',
-            color: '#374151',
-            borderBottom: '1px solid #e5e7eb',
+            fontSize: '1.125rem',
+            color: 'rgba(15, 23, 42, 0.95)',
+            borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
             pb: 2
           }}
         >
@@ -1855,8 +1994,8 @@ export default function InvoiceList() {
         <DialogContent sx={{ py: 3 }}>
           <DialogContentText
             sx={{
-              color: '#6b7280',
-              fontSize: '1rem',
+              color: 'rgba(15, 23, 42, 0.7)',
+              fontSize: '0.9375rem',
               lineHeight: 1.6
             }}
           >
@@ -1870,11 +2009,15 @@ export default function InvoiceList() {
             disabled={loading}
             variant="outlined"
             sx={{
-              borderColor: '#d1d5db',
-              color: '#6b7280',
+              borderRadius: '10px',
+              borderColor: 'rgba(15, 23, 42, 0.15)',
+              color: 'rgba(15, 23, 42, 0.7)',
+              textTransform: 'none',
+              fontWeight: 600,
+              px: 3,
               '&:hover': {
-                borderColor: '#9ca3af',
-                backgroundColor: '#f9fafb'
+                borderColor: 'rgba(15, 23, 42, 0.3)',
+                backgroundColor: 'rgba(15, 23, 42, 0.04)'
               }
             }}
           >
@@ -1886,9 +2029,15 @@ export default function InvoiceList() {
             autoFocus 
             disabled={loading}
             sx={{
+              borderRadius: '10px',
               backgroundColor: '#3b82f6',
+              textTransform: 'none',
+              fontWeight: 600,
+              px: 3,
+              boxShadow: 'none',
               '&:hover': {
-                backgroundColor: '#2563eb'
+                backgroundColor: '#2563eb',
+                boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
               }
             }}
           >
@@ -1935,6 +2084,5 @@ export default function InvoiceList() {
         </Alert>
       </Snackbar>
     </Box>
-    </Fade>
   );
 }

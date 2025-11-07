@@ -177,19 +177,20 @@ const InvoiceItem = (props) => {
             onClick={onRowAdd}
             fullWidth={isMobile}
             sx={{ 
-              fontWeight: 600,
-              borderRadius: '12px',
               px: 3,
-              py: 1.5,
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              py: 1.25,
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
               color: 'white',
+              fontWeight: 600,
+              fontSize: '0.875rem',
               textTransform: 'none',
-              fontSize: { xs: '0.875rem', sm: '0.95rem' },
-              transition: 'all 0.3s ease',
+              border: 'none',
+              transition: 'all 0.2s ease',
+              boxShadow: '0 1px 3px rgba(139, 92, 246, 0.15)',
               '&:hover': {
-                background: 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)',
-                transform: 'translateY(-2px)',
-                boxShadow: '0 8px 30px rgba(102, 126, 234, 0.4)'
+                background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)',
+                boxShadow: '0 2px 6px rgba(139, 92, 246, 0.25)'
               }
             }}
           >
@@ -202,21 +203,25 @@ const InvoiceItem = (props) => {
             startIcon={<InventoryIcon />}
             fullWidth={isMobile}
             sx={{ 
-              fontWeight: 600,
-              borderRadius: '12px',
               px: 3,
-              py: 1.5,
-              borderColor: "#667eea",
-              color: "#667eea",
+              py: 1.25,
+              borderRadius: '10px',
+              backgroundColor: 'rgba(139, 92, 246, 0.04)',
+              borderColor: 'rgba(15, 23, 42, 0.12)',
+              color: 'rgba(15, 23, 42, 0.85)',
+              fontWeight: 600,
+              fontSize: '0.875rem',
               textTransform: 'none',
-              fontSize: { xs: '0.875rem', sm: '0.95rem' },
-              border: '2px solid #667eea',
-              transition: 'all 0.3s ease',
+              border: '1px solid rgba(15, 23, 42, 0.12)',
+              transition: 'all 0.2s ease',
+              boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
+              '& .MuiSvgIcon-root': {
+                color: '#8b5cf6'
+              },
               '&:hover': {
-                backgroundColor: "rgba(102, 126, 234, 0.1)",
-                borderColor: "#667eea",
-                transform: 'translateY(-2px)',
-                boxShadow: '0 4px 20px rgba(102, 126, 234, 0.3)'
+                backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                borderColor: 'rgba(15, 23, 42, 0.2)',
+                boxShadow: '0 1px 3px rgba(15, 23, 42, 0.08)'
               }
             }}
           >

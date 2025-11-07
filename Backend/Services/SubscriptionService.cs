@@ -814,7 +814,33 @@ namespace InvoicingBackend.Services
 
             if (subscription != null && !string.IsNullOrEmpty(subscription.StripeCustomerId))
             {
-                return subscription.StripeCustomerId;
+                // Validate that the customer actually exists in Stripe
+                try
+                {
+                    var existingCustomer = await _stripeService.GetCustomerAsync(subscription.StripeCustomerId);
+                    if (existingCustomer != null && !existingCustomer.Deleted.GetValueOrDefault(false))
+                    {
+                        _logger.LogInformation("Using existing Stripe customer {CustomerId} for user {UserId}", 
+                            subscription.StripeCustomerId, userId);
+                        return subscription.StripeCustomerId;
+                    }
+                    
+                    // Customer was deleted, need to create a new one
+                    _logger.LogWarning("Stripe customer {CustomerId} for user {UserId} was deleted. Creating new customer.", 
+                        subscription.StripeCustomerId, userId);
+                }
+                catch (Stripe.StripeException ex)
+                {
+                    // Customer doesn't exist in Stripe (usually 404 or resource_missing), create a new one
+                    _logger.LogWarning("Stripe customer {CustomerId} for user {UserId} not found. Error: {ErrorMessage}. Creating new customer.", 
+                        subscription.StripeCustomerId, userId, ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    // Other error retrieving customer, log and create new one
+                    _logger.LogError(ex, "Error retrieving Stripe customer {CustomerId} for user {UserId}. Creating new customer.", 
+                        subscription.StripeCustomerId, userId);
+                }
             }
 
             // Create new Stripe customer

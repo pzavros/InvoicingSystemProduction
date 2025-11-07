@@ -121,11 +121,14 @@ const ProductList = ({
           label="Not Tracked"
           size="small"
           sx={{
-            backgroundColor: 'rgba(107, 114, 128, 0.1)',
-            color: '#4b5563',
-            border: '1px solid rgba(107, 114, 128, 0.2)',
-            fontWeight: 500,
+            backgroundColor: 'rgba(107, 114, 128, 0.08)',
+            color: '#6b7280',
+            border: 'none',
+            fontWeight: 600,
             fontSize: '0.75rem',
+            height: '24px',
+            borderRadius: '6px',
+            letterSpacing: '-0.01em',
           }}
         />
       );
@@ -139,9 +142,12 @@ const ProductList = ({
           sx={{
             backgroundColor: 'rgba(239, 68, 68, 0.1)',
             color: '#dc2626',
-            border: '1px solid rgba(239, 68, 68, 0.2)',
-            fontWeight: 500,
+            border: 'none',
+            fontWeight: 600,
             fontSize: '0.75rem',
+            height: '24px',
+            borderRadius: '6px',
+            letterSpacing: '-0.01em',
           }}
         />
       );
@@ -153,9 +159,12 @@ const ProductList = ({
           sx={{
             backgroundColor: 'rgba(245, 158, 11, 0.1)',
             color: '#d97706',
-            border: '1px solid rgba(245, 158, 11, 0.2)',
-            fontWeight: 500,
+            border: 'none',
+            fontWeight: 600,
             fontSize: '0.75rem',
+            height: '24px',
+            borderRadius: '6px',
+            letterSpacing: '-0.01em',
           }}
         />
       );
@@ -167,9 +176,12 @@ const ProductList = ({
           sx={{
             backgroundColor: 'rgba(16, 185, 129, 0.1)',
             color: '#059669',
-            border: '1px solid rgba(16, 185, 129, 0.2)',
-            fontWeight: 500,
+            border: 'none',
+            fontWeight: 600,
             fontSize: '0.75rem',
+            height: '24px',
+            borderRadius: '6px',
+            letterSpacing: '-0.01em',
           }}
         />
       );
@@ -184,11 +196,11 @@ const ProductList = ({
       width: 250,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', py: 1 }}>
-          <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#111827', fontSize: '0.95rem' }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'rgba(15, 23, 42, 0.95)', fontSize: '0.9375rem', letterSpacing: '-0.01em' }}>
             {params.value}
           </Typography>
           {params.row.description && (
-            <Typography variant="caption" sx={{ color: '#6b7280', fontSize: '0.8rem', lineHeight: 1.2 }}>
+            <Typography variant="caption" sx={{ color: 'rgba(15, 23, 42, 0.5)', fontSize: '0.8125rem', lineHeight: 1.3, mt: 0.25 }}>
               {params.row.description.length > 40
                 ? `${params.row.description.substring(0, 40)}...`
                 : params.row.description
@@ -209,11 +221,14 @@ const ProductList = ({
             variant="outlined"
             size="small"
             sx={{
-              backgroundColor: 'rgba(59, 130, 246, 0.05)',
+              backgroundColor: 'rgba(59, 130, 246, 0.08)',
               color: '#2563eb',
-              border: '1px solid rgba(59, 130, 246, 0.2)',
-              fontWeight: 500,
+              border: 'none',
+              fontWeight: 600,
               fontSize: '0.75rem',
+              height: '24px',
+              borderRadius: '6px',
+              letterSpacing: '-0.01em',
             }}
           />
         </Box>
@@ -225,7 +240,7 @@ const ProductList = ({
       width: 120,
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-          <Typography variant="body1" sx={{ fontWeight: 600, color: '#059669', fontSize: '0.95rem' }}>
+          <Typography variant="body1" sx={{ fontWeight: 700, color: '#059669', fontSize: '1rem', letterSpacing: '-0.02em' }}>
             €{(params.value || 0).toFixed(2)}
           </Typography>
         </Box>
@@ -265,11 +280,14 @@ const ProductList = ({
             label={params.value ? "Active" : "Inactive"}
             size="small"
             sx={{
-              backgroundColor: params.value ? 'rgba(16, 185, 129, 0.1)' : 'rgba(107, 114, 128, 0.1)',
-              color: params.value ? '#059669' : '#4b5563',
-              border: params.value ? '1px solid rgba(16, 185, 129, 0.2)' : '1px solid rgba(107, 114, 128, 0.2)',
-              fontWeight: 500,
+              backgroundColor: params.value ? 'rgba(16, 185, 129, 0.1)' : 'rgba(107, 114, 128, 0.08)',
+              color: params.value ? '#059669' : '#6b7280',
+              border: 'none',
+              fontWeight: 600,
               fontSize: '0.75rem',
+              height: '24px',
+              borderRadius: '6px',
+              letterSpacing: '-0.01em',
             }}
           />
         </Box>
@@ -283,9 +301,10 @@ const ProductList = ({
       renderCell: (params) => (
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
           <Typography variant="body2" sx={{ 
-            fontWeight: 500,
-            color: params.row.isTaxable ? '#374151' : '#9ca3af',
-            fontSize: '0.875rem'
+            fontWeight: 600,
+            color: params.row.isTaxable ? 'rgba(15, 23, 42, 0.8)' : 'rgba(15, 23, 42, 0.4)',
+            fontSize: '0.875rem',
+            letterSpacing: '-0.01em'
           }}>
             {params.row.isTaxable ? `${params.row.taxRate}%` : "No Tax"}
           </Typography>
@@ -299,17 +318,21 @@ const ProductList = ({
       sortable: false,
       filterable: false,
       renderCell: (params) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5, height: '100%' }}>
-          <Tooltip title="Edit Product">
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.75, height: '100%' }}>
+          <Tooltip title="Edit Product" arrow>
             <IconButton
               size="small"
               onClick={() => onEditProduct(params.row.product)}
               sx={{
                 color: '#2563eb',
-                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                borderRadius: 1.5,
+                backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                width: 32,
+                height: 32,
+                borderRadius: '8px',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                 '&:hover': {
-                  backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                  backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                  color: '#1d4ed8',
                   transform: 'translateY(-1px)',
                 },
               }}
@@ -318,16 +341,20 @@ const ProductList = ({
             </IconButton>
           </Tooltip>
           {params.row.trackInventory && (
-            <Tooltip title="Manage Inventory">
+            <Tooltip title="Manage Inventory" arrow>
               <IconButton
                 size="small"
                 onClick={() => handleInventoryClick(params.row.product)}
                 sx={{
                   color: '#059669',
-                  backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                  borderRadius: 1.5,
+                  backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                  width: 32,
+                  height: 32,
+                  borderRadius: '8px',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                   '&:hover': {
-                    backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                    color: '#047857',
                     transform: 'translateY(-1px)',
                   },
                 }}
@@ -336,16 +363,20 @@ const ProductList = ({
               </IconButton>
             </Tooltip>
           )}
-          <Tooltip title="Price History">
+          <Tooltip title="Price History" arrow>
             <IconButton
               size="small"
               onClick={() => handlePriceHistoryClick(params.row.product)}
               sx={{
-                color: '#7c3aed',
-                backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                borderRadius: 1.5,
+                color: '#8b5cf6',
+                backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                width: 32,
+                height: 32,
+                borderRadius: '8px',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                 '&:hover': {
-                  backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                  backgroundColor: 'rgba(139, 92, 246, 0.15)',
+                  color: '#7c3aed',
                   transform: 'translateY(-1px)',
                 },
               }}
@@ -353,16 +384,20 @@ const ProductList = ({
               <HistoryIcon sx={{ fontSize: 16 }} />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Delete Product">
+          <Tooltip title="Delete Product" arrow>
             <IconButton
               size="small"
               onClick={() => handleDeleteClick(params.row.product)}
               sx={{
                 color: '#dc2626',
-                backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                borderRadius: 1.5,
+                backgroundColor: 'rgba(239, 68, 68, 0.08)',
+                width: 32,
+                height: 32,
+                borderRadius: '8px',
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                 '&:hover': {
-                  backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                  backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                  color: '#b91c1c',
                   transform: 'translateY(-1px)',
                 },
               }}
@@ -620,24 +655,74 @@ const ProductList = ({
           fullScreen={isMobile}
           aria-labelledby="delete-dialog-title"
           aria-describedby="delete-dialog-description"
+          PaperProps={{
+            sx: {
+              borderRadius: isMobile ? 0 : '20px',
+              boxShadow: '0 20px 60px rgba(15, 23, 42, 0.15)'
+            }
+          }}
+          slotProps={{
+            backdrop: {
+              sx: {
+                backdropFilter: 'blur(12px)',
+                backgroundColor: 'rgba(15, 23, 42, 0.4)'
+              }
+            }
+          }}
         >
-          <DialogTitle id="delete-dialog-title" sx={{ color: '#dc2626', fontWeight: 600 }}>
+          <DialogTitle id="delete-dialog-title" sx={{ 
+            color: 'rgba(15, 23, 42, 0.95)', 
+            fontWeight: 700,
+            fontSize: '1.5rem',
+            letterSpacing: '-0.02em',
+            pt: 3,
+            px: 3,
+            pb: 1
+          }}>
             Delete Product
           </DialogTitle>
-          <DialogContent>
-            <DialogContentText id="delete-dialog-description">
+          <DialogContent sx={{ px: 3, py: 2 }}>
+            <DialogContentText id="delete-dialog-description" sx={{
+              color: 'rgba(15, 23, 42, 0.65)',
+              fontSize: '0.9375rem',
+              lineHeight: 1.6
+            }}>
               Are you sure you want to delete{" "}
-              <strong>"{productToDelete?.name}"</strong>? This action cannot be undone and will permanently remove this product from your catalog.
+              <Box component="strong" sx={{ 
+                color: 'rgba(15, 23, 42, 0.95)',
+                fontWeight: 600
+              }}>
+                "{productToDelete?.name}"
+              </Box>? This action cannot be undone and will permanently remove this product from your catalog.
             </DialogContentText>
           </DialogContent>
-          <DialogActions sx={{ p: 3, pt: 1 }}>
+          <DialogActions sx={{ 
+            p: 3, 
+            pt: 2,
+            gap: 1.5,
+            borderTop: '1px solid rgba(15, 23, 42, 0.08)',
+            justifyContent: 'flex-end'
+          }}>
             <Button 
               onClick={handleDeleteCancel}
               variant="outlined"
               sx={{ 
-                borderColor: '#d1d5db',
-                color: '#6b7280',
-                '&:hover': { borderColor: '#9ca3af', backgroundColor: 'rgba(156, 163, 175, 0.1)' }
+                px: 3,
+                py: 1.25,
+                borderRadius: '10px',
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                color: 'rgba(15, 23, 42, 0.65)',
+                border: '1px solid rgba(15, 23, 42, 0.12)',
+                backgroundColor: 'white',
+                letterSpacing: '-0.01em',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  backgroundColor: 'rgba(15, 23, 42, 0.02)',
+                  borderColor: 'rgba(15, 23, 42, 0.2)',
+                  color: 'rgba(15, 23, 42, 0.85)'
+                }
               }}
               disabled={deleting}
             >
@@ -647,11 +732,34 @@ const ProductList = ({
               onClick={handleDeleteConfirm}
               variant="contained"
               sx={{ 
-                backgroundColor: '#dc2626',
-                '&:hover': { backgroundColor: '#b91c1c' }
+                px: 3,
+                py: 1.25,
+                borderRadius: '10px',
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                letterSpacing: '-0.01em',
+                background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                color: 'white',
+                border: 'none',
+                boxShadow: '0 1px 3px rgba(239, 68, 68, 0.2)',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+                  boxShadow: '0 2px 6px rgba(239, 68, 68, 0.3)',
+                  transform: 'translateY(-1px)'
+                },
+                '&:active': {
+                  transform: 'translateY(0)'
+                },
+                '&:disabled': {
+                  background: 'rgba(15, 23, 42, 0.08)',
+                  color: 'rgba(15, 23, 42, 0.35)',
+                  boxShadow: 'none'
+                }
               }}
               disabled={deleting}
-              startIcon={deleting ? <CircularProgress size={16} /> : null}
+              startIcon={deleting ? <CircularProgress size={16} sx={{ color: 'white' }} /> : null}
             >
               {deleting ? "Deleting..." : "Delete Product"}
             </Button>
@@ -724,56 +832,66 @@ const ProductList = ({
           height: rows.length <= 10 ? 'auto' : calculateGridHeight(),
           minHeight: 400,
           maxHeight: 800,
-          boxShadow: '0 20px 35px -8px rgba(0, 0, 0, 0.12), 0 15px 20px -6px rgba(0, 0, 0, 0.08), 0 6px 12px -2px rgba(0, 0, 0, 0.06)',
-          borderRadius: '16px',
+          borderRadius: '12px',
           border: 'none',
           backgroundColor: '#ffffff',
+          boxShadow: 'none',
           overflow: 'hidden',
-          position: 'relative',
           '& .MuiDataGrid-main': {
-            borderRadius: '16px',
+            borderRadius: '12px',
           },
           '& .MuiDataGrid-columnHeaders': {
             backgroundColor: '#ffffff',
-            borderBottom: 'none',
-            borderTopLeftRadius: '16px',
-            borderTopRightRadius: '16px',
+            borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
+            minHeight: '56px !important',
+            maxHeight: '56px !important',
+            '& .MuiDataGrid-columnHeader': {
+              '&:focus, &:focus-within': {
+                outline: 'none',
+              },
+            },
             '& .MuiDataGrid-columnHeaderTitle': {
-              fontSize: '1rem',
+              fontSize: '0.8125rem',
               fontWeight: 600,
-              color: '#111827',
+              color: 'rgba(15, 23, 42, 0.7)',
+              letterSpacing: '-0.01em'
             },
           },
+          '& .MuiDataGrid-columnSeparator': {
+            display: 'none',
+          },
           '& .MuiDataGrid-toolbarContainer': {
-            padding: '24px 28px',
+            padding: '20px 24px',
             backgroundColor: '#ffffff',
-            borderBottom: 'none',
-            borderTopLeftRadius: '16px',
-            borderTopRightRadius: '16px',
+            borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
             display: 'flex',
             alignItems: 'center',
-            gap: '12px',
+            gap: 2,
             '& .MuiInputBase-root': {
-              fontSize: '0.95rem',
-              backgroundColor: '#ffffff',
+              fontSize: '0.875rem',
+              backgroundColor: 'rgba(15, 23, 42, 0.04)',
+              border: '1px solid rgba(15, 23, 42, 0.08)',
               borderRadius: '8px',
-              border: '1px solid rgba(209, 213, 219, 0.6)',
-              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-              minWidth: '280px',
+              boxShadow: 'none',
+              minWidth: '300px',
               height: '40px',
-              transition: 'all 0.2s ease-in-out',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              '& fieldset': {
+                border: 'none'
+              },
               '&:hover': {
-                borderColor: 'rgba(16, 185, 129, 0.5)',
-                boxShadow: '0 2px 6px 0 rgba(16, 185, 129, 0.15)',
+                backgroundColor: 'rgba(15, 23, 42, 0.06)',
+                borderColor: 'rgba(15, 23, 42, 0.12)',
               },
               '&.Mui-focused': {
-                borderColor: '#10b981',
-                boxShadow: '0 0 0 3px rgba(16, 185, 129, 0.12), 0 2px 6px 0 rgba(0, 0, 0, 0.1)',
+                backgroundColor: 'white',
+                borderColor: '#8b5cf6',
+                boxShadow: '0 0 0 3px rgba(139, 92, 246, 0.1)',
               },
               '& .MuiInputBase-input': {
-                padding: '8px 12px',
+                padding: '10px 14px',
                 '&::placeholder': {
-                  color: '#9ca3af',
+                  color: 'rgba(15, 23, 42, 0.4)',
                   fontWeight: 400,
                 },
               },
@@ -781,80 +899,87 @@ const ProductList = ({
             '& .MuiButton-root': {
               fontSize: '0.875rem',
               fontWeight: 500,
-              backgroundColor: '#ffffff',
-              border: '1px solid rgba(209, 213, 219, 0.6)',
+              backgroundColor: 'transparent',
+              border: 'none',
               borderRadius: '8px',
-              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-              padding: '8px 16px',
+              boxShadow: 'none',
+              padding: '8px 12px',
               minWidth: 'auto',
               height: '40px',
-              color: '#374151',
+              color: 'rgba(15, 23, 42, 0.6)',
               textTransform: 'none',
-              transition: 'all 0.2s ease-in-out',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
               '&:hover': {
-                backgroundColor: '#ffffff',
-                borderColor: '#10b981',
-                color: '#10b981',
-                boxShadow: '0 2px 6px 0 rgba(16, 185, 129, 0.2)',
-                transform: 'translateY(-1px)',
+                backgroundColor: 'rgba(15, 23, 42, 0.06)',
+                color: 'rgba(15, 23, 42, 0.8)',
               },
               '&.Mui-disabled': {
-                backgroundColor: '#f3f4f6',
-                borderColor: 'rgba(209, 213, 219, 0.4)',
-                color: '#9ca3af',
-                boxShadow: 'none',
-              },
-              '& .MuiButton-startIcon': {
-                marginRight: '6px',
-                '& svg': {
-                  fontSize: '18px',
-                },
+                backgroundColor: 'transparent',
+                color: 'rgba(15, 23, 42, 0.25)',
               },
             },
-            '& .MuiButtonBase-root[title*="Density"]': {
-              '& svg': {
-                color: '#6b7280',
-              },
-              '&:hover svg': {
-                color: '#10b981',
-              },
-            },
-            '& .MuiButtonBase-root[title*="Export"]': {
-              '& svg': {
-                color: '#6b7280',
-              },
-              '&:hover svg': {
-                color: '#10b981',
-              },
-            },
-            '& .MuiButtonBase-root[title*="Filter"]': {
-              '& svg': {
-                color: '#6b7280',
-              },
-              '&:hover svg': {
-                color: '#10b981',
-              },
-            },
-          },
-          '& .MuiDataGrid-footerContainer': {
-            borderTop: 'none',
-            backgroundColor: '#ffffff',
-            borderBottomLeftRadius: '16px',
-            borderBottomRightRadius: '16px',
           },
           '& .MuiDataGrid-row': {
-            backgroundColor: '#ffffff',
+            borderBottom: '1px solid rgba(15, 23, 42, 0.06)',
+            transition: 'all 0.15s ease',
             '&:hover': {
-              backgroundColor: 'rgba(16, 185, 129, 0.03)',
-              transform: 'translateY(-1px)',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+              backgroundColor: 'rgba(139, 92, 246, 0.02)',
+              cursor: 'pointer',
             },
-            '& .MuiDataGrid-cell': {
-              borderBottom: '1px solid rgba(243, 244, 246, 0.8)',
+            '&:last-child': {
+              borderBottom: 'none',
             },
           },
           '& .MuiDataGrid-cell': {
-            borderRight: 'none',
+            borderBottom: 'none',
+            '&:focus, &:focus-within': {
+              outline: 'none',
+            },
+          },
+          '& .MuiDataGrid-footerContainer': {
+            borderTop: '1px solid rgba(15, 23, 42, 0.08)',
+            backgroundColor: '#ffffff',
+            minHeight: '56px',
+            '& .MuiTablePagination-root': {
+              color: 'rgba(15, 23, 42, 0.7)',
+              fontSize: '0.875rem',
+            },
+            '& .MuiTablePagination-select': {
+              borderRadius: '6px',
+              backgroundColor: 'rgba(15, 23, 42, 0.04)',
+              padding: '4px 8px',
+              '&:hover': {
+                backgroundColor: 'rgba(15, 23, 42, 0.08)',
+              },
+            },
+            '& .MuiIconButton-root': {
+              color: 'rgba(15, 23, 42, 0.6)',
+              transition: 'all 0.15s ease',
+              '&:hover': {
+                backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                color: '#8b5cf6',
+              },
+              '&.Mui-disabled': {
+                color: 'rgba(15, 23, 42, 0.25)',
+              },
+            },
+          },
+          '& .MuiDataGrid-virtualScroller': {
+            '&::-webkit-scrollbar': {
+              width: '8px',
+              height: '8px',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: 'rgba(15, 23, 42, 0.04)',
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: 'rgba(15, 23, 42, 0.2)',
+              borderRadius: '4px',
+              '&:hover': {
+                background: 'rgba(15, 23, 42, 0.3)',
+              },
+            },
           },
         }}
       />
@@ -865,24 +990,74 @@ const ProductList = ({
         onClose={handleDeleteCancel}
         aria-labelledby="delete-dialog-title"
         aria-describedby="delete-dialog-description"
+        PaperProps={{
+          sx: {
+            borderRadius: '20px',
+            boxShadow: '0 20px 60px rgba(15, 23, 42, 0.15)'
+          }
+        }}
+        slotProps={{
+          backdrop: {
+            sx: {
+              backdropFilter: 'blur(12px)',
+              backgroundColor: 'rgba(15, 23, 42, 0.4)'
+            }
+          }
+        }}
       >
-        <DialogTitle id="delete-dialog-title" sx={{ color: '#dc2626', fontWeight: 600 }}>
+        <DialogTitle id="delete-dialog-title" sx={{ 
+          color: 'rgba(15, 23, 42, 0.95)', 
+          fontWeight: 700,
+          fontSize: '1.5rem',
+          letterSpacing: '-0.02em',
+          pt: 3,
+          px: 3,
+          pb: 1
+        }}>
           Delete Product
         </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="delete-dialog-description">
+        <DialogContent sx={{ px: 3, py: 2 }}>
+          <DialogContentText id="delete-dialog-description" sx={{
+            color: 'rgba(15, 23, 42, 0.65)',
+            fontSize: '0.9375rem',
+            lineHeight: 1.6
+          }}>
             Are you sure you want to delete{" "}
-            <strong>"{productToDelete?.name}"</strong>? This action cannot be undone and will permanently remove this product from your catalog.
+            <Box component="strong" sx={{ 
+              color: 'rgba(15, 23, 42, 0.95)',
+              fontWeight: 600
+            }}>
+              "{productToDelete?.name}"
+            </Box>? This action cannot be undone and will permanently remove this product from your catalog.
           </DialogContentText>
         </DialogContent>
-        <DialogActions sx={{ p: 3, pt: 1 }}>
+        <DialogActions sx={{ 
+          p: 3, 
+          pt: 2,
+          gap: 1.5,
+          borderTop: '1px solid rgba(15, 23, 42, 0.08)',
+          justifyContent: 'flex-end'
+        }}>
           <Button 
             onClick={handleDeleteCancel}
             variant="outlined"
             sx={{ 
-              borderColor: '#d1d5db',
-              color: '#6b7280',
-              '&:hover': { borderColor: '#9ca3af', backgroundColor: 'rgba(156, 163, 175, 0.1)' }
+              px: 3,
+              py: 1.25,
+              borderRadius: '10px',
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: '0.875rem',
+              color: 'rgba(15, 23, 42, 0.65)',
+              border: '1px solid rgba(15, 23, 42, 0.12)',
+              backgroundColor: 'white',
+              letterSpacing: '-0.01em',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                backgroundColor: 'rgba(15, 23, 42, 0.02)',
+                borderColor: 'rgba(15, 23, 42, 0.2)',
+                color: 'rgba(15, 23, 42, 0.85)'
+              }
             }}
             disabled={deleting}
           >
@@ -892,11 +1067,34 @@ const ProductList = ({
             onClick={handleDeleteConfirm}
             variant="contained"
             sx={{ 
-              backgroundColor: '#dc2626',
-              '&:hover': { backgroundColor: '#b91c1c' }
+              px: 3,
+              py: 1.25,
+              borderRadius: '10px',
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: '0.875rem',
+              letterSpacing: '-0.01em',
+              background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+              color: 'white',
+              border: 'none',
+              boxShadow: '0 1px 3px rgba(239, 68, 68, 0.2)',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+                boxShadow: '0 2px 6px rgba(239, 68, 68, 0.3)',
+                transform: 'translateY(-1px)'
+              },
+              '&:active': {
+                transform: 'translateY(0)'
+              },
+              '&:disabled': {
+                background: 'rgba(15, 23, 42, 0.08)',
+                color: 'rgba(15, 23, 42, 0.35)',
+                boxShadow: 'none'
+              }
             }}
             disabled={deleting}
-            startIcon={deleting ? <CircularProgress size={16} /> : null}
+            startIcon={deleting ? <CircularProgress size={16} sx={{ color: 'white' }} /> : null}
           >
             {deleting ? "Deleting..." : "Delete Product"}
           </Button>

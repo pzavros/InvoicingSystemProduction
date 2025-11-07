@@ -36,7 +36,16 @@ const FormGrid = ({ size, children }) => (
 
 const SectionTitle = ({ children }) => (
   <FormGrid size={{ xs: 12 }}>
-    <Typography variant="h6" sx={{ fontWeight: 600, color: "#1f2937", mb: 2 }}>
+    <Typography variant="h6" sx={{ 
+      fontWeight: 600, 
+      color: 'rgba(15, 23, 42, 0.95)', 
+      mb: 2,
+      mt: 3,
+      fontSize: '1rem',
+      letterSpacing: '-0.02em',
+      borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
+      pb: 1.5
+    }}>
       {children}
     </Typography>
   </FormGrid>
@@ -236,45 +245,96 @@ const ProductFormPage = () => {
   if (loading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", py: 8 }}>
-        <CircularProgress sx={{ color: "#10b981" }} />
+        <CircularProgress sx={{ color: "#8b5cf6" }} />
       </Box>
     );
   }
 
   return (
-    <Grid container spacing={{ xs: 2, md: 3 }}>
+    <Box>
       {/* Header */}
-      <FormGrid size={{ xs: 12 }}>
-        <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-          <IconButton onClick={handleBack} sx={{ mr: 2 }}>
-            <ArrowBackIcon />
-          </IconButton>
-          <Typography variant="h4" component="h1" sx={{ fontWeight: 600 }}>
+      <Box sx={{ 
+        display: "flex", 
+        alignItems: "center", 
+        mb: 2,
+        pb: 2,
+        borderBottom: '1px solid rgba(15, 23, 42, 0.08)'
+      }}>
+        <IconButton 
+          onClick={handleBack} 
+          sx={{ 
+            mr: 2,
+            width: 40,
+            height: 40,
+            borderRadius: '10px',
+            border: '1px solid rgba(15, 23, 42, 0.08)',
+            backgroundColor: 'rgba(15, 23, 42, 0.02)',
+            color: 'rgba(15, 23, 42, 0.65)',
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              backgroundColor: 'rgba(15, 23, 42, 0.06)',
+              borderColor: 'rgba(15, 23, 42, 0.12)',
+              color: 'rgba(15, 23, 42, 0.85)'
+            }
+          }}
+        >
+          <ArrowBackIcon fontSize="small" />
+        </IconButton>
+        <Box>
+          <Typography variant="h4" component="h1" sx={{ 
+            fontWeight: 700,
+            color: 'rgba(15, 23, 42, 0.95)',
+            fontSize: { xs: '1.5rem', sm: '2rem' },
+            letterSpacing: '-0.02em',
+            mb: 0.5
+          }}>
             {isEditing ? "Edit Product" : "Add New Product"}
           </Typography>
+          <Typography variant="body2" sx={{
+            color: 'rgba(15, 23, 42, 0.55)',
+            fontSize: '0.875rem',
+            fontWeight: 500
+          }}>
+            {isEditing ? "Update product information and settings" : "Create a new product for your catalog"}
+          </Typography>
         </Box>
-      </FormGrid>
+      </Box>
 
       {/* Notification */}
       {notification.show && (
-        <FormGrid size={{ xs: 12 }}>
-          <Alert
-            severity={notification.severity}
-            onClose={() => setNotification({ ...notification, show: false })}
-            sx={{ mb: 2 }}
-          >
-            {notification.message}
-          </Alert>
-        </FormGrid>
+        <Alert
+          severity={notification.severity}
+          onClose={() => setNotification({ ...notification, show: false })}
+          sx={{ 
+            mb: 2,
+            borderRadius: '12px',
+            border: '1px solid rgba(15, 23, 42, 0.06)',
+            '& .MuiAlert-icon': {
+              color: notification.severity === 'success' ? '#10b981' : 
+                     notification.severity === 'error' ? '#ef4444' : '#8b5cf6'
+            }
+          }}
+        >
+          {notification.message}
+        </Alert>
       )}
 
       {/* Form */}
-      <Grid container spacing={{ xs: 2, md: 3 }} component="form" onSubmit={handleSubmit}>
-        {/* Basic Information */}
-        <SectionTitle>Basic Information</SectionTitle>
+      <Box component="form" onSubmit={handleSubmit}>
+        <Grid container spacing={{ xs: 1.5, md: 2 }}>
+          {/* Basic Information */}
+          <SectionTitle>Basic Information</SectionTitle>
 
         <FormGrid size={{ xs: 12, md: 8 }}>
-          <FormLabel htmlFor="name">Product Name *</FormLabel>
+          <FormLabel htmlFor="name" sx={{
+            color: 'rgba(15, 23, 42, 0.75)',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            mb: 0.5,
+            display: 'block'
+          }}>
+            Product Name *
+          </FormLabel>
           <OutlinedInput
             id="name"
             name="name"
@@ -285,29 +345,48 @@ const ProductFormPage = () => {
             size="small"
             fullWidth
             sx={{
-              backgroundColor: '#ffffff',
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              fontSize: '0.875rem',
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#d1d5db',
-                borderWidth: '1.5px'
+                borderColor: 'rgba(15, 23, 42, 0.08)',
+                borderWidth: '1px'
               },
               '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#9ca3af'
+                borderColor: 'rgba(15, 23, 42, 0.15)'
               },
               '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#3b82f6',
-                borderWidth: '2px'
+                borderColor: 'rgba(15, 23, 42, 0.25)',
+                borderWidth: '1.5px'
+              },
+              '& .MuiInputBase-input': {
+                padding: '9px 12px'
               }
             }}
           />
           {errors.name && (
-            <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+            <Typography variant="caption" sx={{ 
+              mt: 0.5, 
+              display: 'block',
+              color: '#ef4444',
+              fontSize: '0.75rem',
+              fontWeight: 500
+            }}>
               {errors.name}
             </Typography>
           )}
         </FormGrid>
 
         <FormGrid size={{ xs: 12, md: 4 }}>
-          <FormLabel htmlFor="categoryId">Category</FormLabel>
+          <FormLabel htmlFor="categoryId" sx={{
+            color: 'rgba(15, 23, 42, 0.75)',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            mb: 0.5,
+            display: 'block'
+          }}>
+            Category
+          </FormLabel>
           <FormControl fullWidth size="small">
             <Select
               id="categoryId"
@@ -316,17 +395,47 @@ const ProductFormPage = () => {
               onChange={handleChange("categoryId")}
               displayEmpty
               sx={{
-                backgroundColor: '#ffffff',
+                backgroundColor: 'white',
+                borderRadius: '12px',
+                fontSize: '0.875rem',
                 '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#d1d5db',
-                  borderWidth: '1.5px'
+                  borderColor: 'rgba(15, 23, 42, 0.08)',
+                  borderWidth: '1px'
                 },
                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#9ca3af'
+                  borderColor: 'rgba(15, 23, 42, 0.15)'
                 },
                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#3b82f6',
-                  borderWidth: '2px'
+                  borderColor: 'rgba(15, 23, 42, 0.25)',
+                  borderWidth: '1.5px'
+                },
+                '& .MuiSelect-select': {
+                  padding: '9px 12px'
+                }
+              }}
+              MenuProps={{
+                PaperProps: {
+                  sx: {
+                    borderRadius: '12px',
+                    mt: 0.5,
+                    boxShadow: '0 4px 12px rgba(15, 23, 42, 0.08)',
+                    border: '1px solid rgba(15, 23, 42, 0.06)',
+                    '& .MuiMenuItem-root': {
+                      fontSize: '0.875rem',
+                      borderRadius: '8px',
+                      mx: 1,
+                      my: 0.5,
+                      '&:hover': {
+                        backgroundColor: 'rgba(139, 92, 246, 0.04)'
+                      },
+                      '&.Mui-selected': {
+                        backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                        '&:hover': {
+                          backgroundColor: 'rgba(139, 92, 246, 0.12)'
+                        }
+                      }
+                    }
+                  }
                 }
               }}
             >
@@ -341,7 +450,15 @@ const ProductFormPage = () => {
         </FormGrid>
 
         <FormGrid size={{ xs: 12 }}>
-          <FormLabel htmlFor="description">Description</FormLabel>
+          <FormLabel htmlFor="description" sx={{
+            color: 'rgba(15, 23, 42, 0.75)',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            mb: 0.5,
+            display: 'block'
+          }}>
+            Description
+          </FormLabel>
           <OutlinedInput
             id="description"
             name="description"
@@ -352,17 +469,22 @@ const ProductFormPage = () => {
             rows={3}
             fullWidth
             sx={{
-              backgroundColor: '#ffffff',
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              fontSize: '0.875rem',
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#d1d5db',
-                borderWidth: '1.5px'
+                borderColor: 'rgba(15, 23, 42, 0.08)',
+                borderWidth: '1px'
               },
               '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#9ca3af'
+                borderColor: 'rgba(15, 23, 42, 0.15)'
               },
               '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#3b82f6',
-                borderWidth: '2px'
+                borderColor: 'rgba(15, 23, 42, 0.25)',
+                borderWidth: '1.5px'
+              },
+              '& .MuiInputBase-input': {
+                padding: '9px 12px'
               }
             }}
           />
@@ -372,7 +494,15 @@ const ProductFormPage = () => {
         <SectionTitle>Pricing & Tax</SectionTitle>
 
         <FormGrid size={{ xs: 12, md: 6 }}>
-          <FormLabel htmlFor="unitPrice">Unit Price *</FormLabel>
+          <FormLabel htmlFor="unitPrice" sx={{
+            color: 'rgba(15, 23, 42, 0.75)',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            mb: 0.5,
+            display: 'block'
+          }}>
+            Unit Price *
+          </FormLabel>
           <OutlinedInput
             id="unitPrice"
             name="unitPrice"
@@ -383,31 +513,50 @@ const ProductFormPage = () => {
             required
             size="small"
             fullWidth
-            startAdornment={<InputAdornment position="start">€</InputAdornment>}
+            startAdornment={<InputAdornment position="start" sx={{ color: '#8b5cf6' }}>€</InputAdornment>}
             sx={{
-              backgroundColor: '#ffffff',
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              fontSize: '0.875rem',
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#d1d5db',
-                borderWidth: '1.5px'
+                borderColor: 'rgba(15, 23, 42, 0.08)',
+                borderWidth: '1px'
               },
               '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#9ca3af'
+                borderColor: 'rgba(15, 23, 42, 0.15)'
               },
               '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#3b82f6',
-                borderWidth: '2px'
+                borderColor: 'rgba(15, 23, 42, 0.25)',
+                borderWidth: '1.5px'
+              },
+              '& .MuiInputBase-input': {
+                padding: '9px 12px'
               }
             }}
           />
           {errors.unitPrice && (
-            <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+            <Typography variant="caption" sx={{ 
+              mt: 0.5, 
+              display: 'block',
+              color: '#ef4444',
+              fontSize: '0.75rem',
+              fontWeight: 500
+            }}>
               {errors.unitPrice}
             </Typography>
           )}
         </FormGrid>
 
         <FormGrid size={{ xs: 12, md: 6 }}>
-          <FormLabel htmlFor="unit">Unit of Measure</FormLabel>
+          <FormLabel htmlFor="unit" sx={{
+            color: 'rgba(15, 23, 42, 0.75)',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            mb: 0.5,
+            display: 'block'
+          }}>
+            Unit of Measure
+          </FormLabel>
           <OutlinedInput
             id="unit"
             name="unit"
@@ -417,17 +566,22 @@ const ProductFormPage = () => {
             size="small"
             fullWidth
             sx={{
-              backgroundColor: '#ffffff',
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              fontSize: '0.875rem',
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#d1d5db',
-                borderWidth: '1.5px'
+                borderColor: 'rgba(15, 23, 42, 0.08)',
+                borderWidth: '1px'
               },
               '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#9ca3af'
+                borderColor: 'rgba(15, 23, 42, 0.15)'
               },
               '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#3b82f6',
-                borderWidth: '2px'
+                borderColor: 'rgba(15, 23, 42, 0.25)',
+                borderWidth: '1.5px'
+              },
+              '& .MuiInputBase-input': {
+                padding: '9px 12px'
               }
             }}
           />
@@ -439,15 +593,38 @@ const ProductFormPage = () => {
               <Switch
                 checked={formData.isTaxable}
                 onChange={handleChange("isTaxable")}
+                sx={{
+                  '& .MuiSwitch-switchBase.Mui-checked': {
+                    color: '#8b5cf6'
+                  },
+                  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                    backgroundColor: '#8b5cf6'
+                  }
+                }}
               />
             }
             label="Taxable Product"
+            sx={{
+              '& .MuiFormControlLabel-label': {
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                color: 'rgba(15, 23, 42, 0.75)'
+              }
+            }}
           />
         </FormGrid>
 
         {formData.isTaxable && (
           <FormGrid size={{ xs: 12, md: 6 }}>
-            <FormLabel htmlFor="taxRate">Tax Rate</FormLabel>
+            <FormLabel htmlFor="taxRate" sx={{
+              color: 'rgba(15, 23, 42, 0.75)',
+              fontWeight: 600,
+              fontSize: '0.875rem',
+              mb: 0.5,
+              display: 'block'
+            }}>
+              Tax Rate
+            </FormLabel>
             <OutlinedInput
               id="taxRate"
               name="taxRate"
@@ -457,24 +634,35 @@ const ProductFormPage = () => {
               error={!!errors.taxRate}
               size="small"
               fullWidth
-              endAdornment={<InputAdornment position="end">%</InputAdornment>}
+              endAdornment={<InputAdornment position="end" sx={{ color: '#8b5cf6' }}>%</InputAdornment>}
               sx={{
-                backgroundColor: '#ffffff',
+                backgroundColor: 'white',
+                borderRadius: '12px',
+                fontSize: '0.875rem',
                 '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#d1d5db',
-                  borderWidth: '1.5px'
+                  borderColor: 'rgba(15, 23, 42, 0.08)',
+                  borderWidth: '1px'
                 },
                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#9ca3af'
+                  borderColor: 'rgba(15, 23, 42, 0.15)'
                 },
                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#3b82f6',
-                  borderWidth: '2px'
+                  borderColor: 'rgba(15, 23, 42, 0.25)',
+                  borderWidth: '1.5px'
+                },
+                '& .MuiInputBase-input': {
+                  padding: '9px 12px'
                 }
               }}
             />
             {errors.taxRate && (
-              <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+              <Typography variant="caption" sx={{ 
+                mt: 0.5, 
+                display: 'block',
+                color: '#ef4444',
+                fontSize: '0.75rem',
+                fontWeight: 500
+              }}>
                 {errors.taxRate}
               </Typography>
             )}
@@ -490,16 +678,39 @@ const ProductFormPage = () => {
               <Switch
                 checked={formData.trackInventory}
                 onChange={handleChange("trackInventory")}
+                sx={{
+                  '& .MuiSwitch-switchBase.Mui-checked': {
+                    color: '#8b5cf6'
+                  },
+                  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                    backgroundColor: '#8b5cf6'
+                  }
+                }}
               />
             }
             label="Track Inventory for this Product"
+            sx={{
+              '& .MuiFormControlLabel-label': {
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                color: 'rgba(15, 23, 42, 0.75)'
+              }
+            }}
           />
         </FormGrid>
 
         {formData.trackInventory && (
           <>
             <FormGrid size={{ xs: 12, md: 6 }}>
-              <FormLabel htmlFor="stockQuantity">Current Stock Quantity</FormLabel>
+              <FormLabel htmlFor="stockQuantity" sx={{
+                color: 'rgba(15, 23, 42, 0.75)',
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                mb: 0.5,
+                display: 'block'
+              }}>
+                Current Stock Quantity
+              </FormLabel>
               <OutlinedInput
                 id="stockQuantity"
                 name="stockQuantity"
@@ -511,29 +722,48 @@ const ProductFormPage = () => {
                 fullWidth
                 inputProps={{ min: 0 }}
                 sx={{
-                  backgroundColor: '#ffffff',
+                  backgroundColor: 'white',
+                  borderRadius: '12px',
+                  fontSize: '0.875rem',
                   '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#d1d5db',
-                    borderWidth: '1.5px'
+                    borderColor: 'rgba(15, 23, 42, 0.08)',
+                    borderWidth: '1px'
                   },
                   '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#9ca3af'
+                    borderColor: 'rgba(15, 23, 42, 0.15)'
                   },
                   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#3b82f6',
-                    borderWidth: '2px'
+                    borderColor: 'rgba(15, 23, 42, 0.25)',
+                    borderWidth: '1.5px'
+                  },
+                  '& .MuiInputBase-input': {
+                    padding: '9px 12px'
                   }
                 }}
               />
               {errors.stockQuantity && (
-                <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+                <Typography variant="caption" sx={{ 
+                  mt: 0.5, 
+                  display: 'block',
+                  color: '#ef4444',
+                  fontSize: '0.75rem',
+                  fontWeight: 500
+                }}>
                   {errors.stockQuantity}
                 </Typography>
               )}
             </FormGrid>
 
             <FormGrid size={{ xs: 12, md: 6 }}>
-              <FormLabel htmlFor="minStockLevel">Minimum Stock Level</FormLabel>
+              <FormLabel htmlFor="minStockLevel" sx={{
+                color: 'rgba(15, 23, 42, 0.75)',
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                mb: 0.5,
+                display: 'block'
+              }}>
+                Minimum Stock Level
+              </FormLabel>
               <OutlinedInput
                 id="minStockLevel"
                 name="minStockLevel"
@@ -545,22 +775,33 @@ const ProductFormPage = () => {
                 fullWidth
                 inputProps={{ min: 0 }}
                 sx={{
-                  backgroundColor: '#ffffff',
+                  backgroundColor: 'white',
+                  borderRadius: '12px',
+                  fontSize: '0.875rem',
                   '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#d1d5db',
-                    borderWidth: '1.5px'
+                    borderColor: 'rgba(15, 23, 42, 0.08)',
+                    borderWidth: '1px'
                   },
                   '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#9ca3af'
+                    borderColor: 'rgba(15, 23, 42, 0.15)'
                   },
                   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#3b82f6',
-                    borderWidth: '2px'
+                    borderColor: 'rgba(15, 23, 42, 0.25)',
+                    borderWidth: '1.5px'
+                  },
+                  '& .MuiInputBase-input': {
+                    padding: '9px 12px'
                   }
                 }}
               />
               {errors.minStockLevel && (
-                <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+                <Typography variant="caption" sx={{ 
+                  mt: 0.5, 
+                  display: 'block',
+                  color: '#ef4444',
+                  fontSize: '0.75rem',
+                  fontWeight: 500
+                }}>
                   {errors.minStockLevel}
                 </Typography>
               )}
@@ -577,9 +818,24 @@ const ProductFormPage = () => {
               <Switch
                 checked={formData.isActive}
                 onChange={handleChange("isActive")}
+                sx={{
+                  '& .MuiSwitch-switchBase.Mui-checked': {
+                    color: '#8b5cf6'
+                  },
+                  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                    backgroundColor: '#8b5cf6'
+                  }
+                }}
               />
             }
             label="Active Product"
+            sx={{
+              '& .MuiFormControlLabel-label': {
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                color: 'rgba(15, 23, 42, 0.75)'
+              }
+            }}
           />
         </FormGrid>
 
@@ -587,38 +843,34 @@ const ProductFormPage = () => {
         <FormGrid size={{ xs: 12 }}>
           <Box sx={{ 
             display: "flex", 
-            gap: 3, 
-            pt: 6,
+            gap: 2, 
+            pt: 2.5,
             mt: 2,
-            borderTop: "2px solid #e5e7eb",
-            justifyContent: { xs: "stretch", sm: "flex-start" },
+            borderTop: "1px solid rgba(15, 23, 42, 0.08)",
+            justifyContent: { xs: "stretch", sm: "flex-end" },
             flexDirection: { xs: "column", sm: "row" }
           }}>
             <Button
               onClick={handleBack}
               variant="outlined"
               disabled={saving}
-              size="large"
               sx={{
-                borderColor: "#d1d5db",
-                color: "#6b7280",
-                borderWidth: 2,
-                px: 5,
-                py: 1.5,
-                fontSize: "0.95rem",
+                px: 3,
+                py: 1.25,
+                borderRadius: '10px',
+                textTransform: 'none',
                 fontWeight: 600,
-                borderRadius: 2,
-                textTransform: "none",
-                "&:hover": {
-                  borderColor: "#9ca3af",
-                  backgroundColor: "#f9fafb",
-                  transform: "translateY(-1px)",
-                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)"
-                },
-                "&:active": {
-                  transform: "translateY(0)"
-                },
-                transition: "all 0.2s ease"
+                fontSize: '0.875rem',
+                color: 'rgba(15, 23, 42, 0.65)',
+                border: '1px solid rgba(15, 23, 42, 0.12)',
+                backgroundColor: 'white',
+                letterSpacing: '-0.01em',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  backgroundColor: 'rgba(15, 23, 42, 0.02)',
+                  borderColor: 'rgba(15, 23, 42, 0.2)',
+                  color: 'rgba(15, 23, 42, 0.85)'
+                }
               }}
             >
               Cancel
@@ -627,38 +879,41 @@ const ProductFormPage = () => {
               type="submit"
               variant="contained"
               disabled={saving}
-              startIcon={saving ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
-              size="large"
+              startIcon={saving ? <CircularProgress size={18} sx={{ color: 'white' }} /> : <SaveIcon sx={{ fontSize: '1.125rem' }} />}
               sx={{
-                backgroundColor: "#3b82f6",
-                px: 5,
-                py: 1.5,
-                fontSize: "0.95rem",
+                px: 3,
+                py: 1.25,
+                borderRadius: '10px',
+                textTransform: 'none',
                 fontWeight: 600,
-                borderRadius: 2,
-                textTransform: "none",
-                boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)",
-                "&:hover": {
-                  backgroundColor: "#2563eb",
-                  transform: "translateY(-1px)",
-                  boxShadow: "0 8px 20px rgba(59, 130, 246, 0.4)"
+                fontSize: '0.875rem',
+                letterSpacing: '-0.01em',
+                background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
+                color: 'white',
+                border: 'none',
+                boxShadow: '0 1px 3px rgba(139, 92, 246, 0.2)',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)',
+                  boxShadow: '0 2px 6px rgba(139, 92, 246, 0.3)',
+                  transform: 'translateY(-1px)'
                 },
-                "&:active": {
-                  transform: "translateY(0)"
+                '&:active': {
+                  transform: 'translateY(0)'
                 },
-                "&:disabled": {
-                  backgroundColor: "#9ca3af",
-                  boxShadow: "none",
-                  transform: "none"
-                },
-                transition: "all 0.2s ease"
+                '&:disabled': {
+                  background: 'rgba(15, 23, 42, 0.08)',
+                  color: 'rgba(15, 23, 42, 0.35)',
+                  boxShadow: 'none'
+                }
               }}
             >
               {saving ? "Saving..." : isEditing ? "Update Product" : "Create Product"}
             </Button>
           </Box>
         </FormGrid>
-      </Grid>
+        </Grid>
+      </Box>
       
       {/* Freemium Limit Reached Modal */}
       <LimitReachedModal
@@ -666,7 +921,7 @@ const ProductFormPage = () => {
         onClose={closeLimitModal}
         resource={limitModalResource}
       />
-    </Grid>
+    </Box>
   );
 };
 

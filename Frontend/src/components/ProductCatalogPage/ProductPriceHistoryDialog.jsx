@@ -84,42 +84,66 @@ const ProductPriceHistoryDialog = ({ open, product, onClose }) => {
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: 3,
-          boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+          borderRadius: '20px',
+          boxShadow: '0 20px 60px rgba(15, 23, 42, 0.15)',
           minHeight: '500px'
+        }
+      }}
+      slotProps={{
+        backdrop: {
+          sx: {
+            backdropFilter: 'blur(12px)',
+            backgroundColor: 'rgba(15, 23, 42, 0.4)'
+          }
         }
       }}
     >
       <DialogTitle 
         sx={{ 
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          color: 'white',
           display: 'flex',
-          alignItems: 'center',
+          alignItems: 'flex-start',
           justifyContent: 'space-between',
           pb: 2,
-          pt: 2
+          pt: 3,
+          px: 3
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <TimelineIcon sx={{ fontSize: 28 }} />
-          <Box>
-            <Typography variant="h5" sx={{ fontWeight: 600, mb: 0.5 }}>
-              Price History
-            </Typography>
-            <Typography variant="body2" sx={{ opacity: 0.9 }}>
-              {product?.name}
-            </Typography>
-          </Box>
+        <Box>
+          <Typography variant="h5" sx={{
+            fontWeight: 700,
+            color: 'rgba(15, 23, 42, 0.95)',
+            fontSize: '1.5rem',
+            letterSpacing: '-0.02em',
+            mb: 0.5
+          }}>
+            Price History
+          </Typography>
+          <Typography variant="body2" sx={{
+            color: 'rgba(15, 23, 42, 0.55)',
+            fontSize: '0.875rem',
+            fontWeight: 500
+          }}>
+            {product?.name}
+          </Typography>
         </Box>
         <IconButton 
           onClick={handleClose} 
           sx={{ 
-            color: 'white',
-            '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' }
+            width: 36,
+            height: 36,
+            borderRadius: '10px',
+            border: '1px solid rgba(15, 23, 42, 0.08)',
+            backgroundColor: 'rgba(15, 23, 42, 0.02)',
+            color: 'rgba(15, 23, 42, 0.65)',
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              backgroundColor: 'rgba(15, 23, 42, 0.06)',
+              borderColor: 'rgba(15, 23, 42, 0.12)',
+              color: 'rgba(15, 23, 42, 0.85)'
+            }
           }}
         >
-          <CloseIcon />
+          <CloseIcon sx={{ fontSize: '1.125rem' }} />
         </IconButton>
       </DialogTitle>
         <DialogContent sx={{ p: 0 }}>
@@ -128,18 +152,30 @@ const ProductPriceHistoryDialog = ({ open, product, onClose }) => {
           sx={{ 
             m: 3, 
             mb: 2,
-            background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
+            background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
             color: 'white',
-            boxShadow: '0 8px 32px rgba(17, 153, 142, 0.3)'
+            boxShadow: '0 4px 12px rgba(139, 92, 246, 0.25)',
+            borderRadius: '14px',
+            border: 'none'
           }}
         >
-          <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 2 }}>
-            <EuroIcon sx={{ fontSize: 32 }} />
+          <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 2.5, px: 3 }}>
+            <Box sx={{ 
+              width: 48,
+              height: 48,
+              borderRadius: '12px',
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <EuroIcon sx={{ fontSize: 28 }} />
+            </Box>
             <Box>
-              <Typography variant="body2" sx={{ opacity: 0.9, mb: 0.5 }}>
+              <Typography variant="body2" sx={{ opacity: 0.85, mb: 0.5, fontSize: '0.8125rem', fontWeight: 500 }}>
                 Current Price
               </Typography>
-              <Typography variant="h4" sx={{ fontWeight: 700 }}>
+              <Typography variant="h4" sx={{ fontWeight: 700, letterSpacing: '-0.02em' }}>
                 €{(product?.unitPrice || 0).toFixed(2)}
               </Typography>
             </Box>
@@ -161,19 +197,50 @@ const ProductPriceHistoryDialog = ({ open, product, onClose }) => {
             <TableContainer 
               component={Paper} 
               sx={{ 
-                borderRadius: 2,
-                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                borderRadius: '14px',
+                boxShadow: 'none',
+                border: '1px solid rgba(15, 23, 42, 0.08)',
                 overflow: 'hidden'
               }}
             >
               <Table>
                 <TableHead>
-                  <TableRow sx={{ backgroundColor: '#f8fafc' }}>
-                    <TableCell sx={{ fontWeight: 700, color: '#374151', py: 2 }}>Date</TableCell>
-                    <TableCell sx={{ fontWeight: 700, color: '#374151', py: 2 }}>Previous Price</TableCell>
-                    <TableCell sx={{ fontWeight: 700, color: '#374151', py: 2 }}>New Price</TableCell>
-                    <TableCell sx={{ fontWeight: 700, color: '#374151', py: 2 }}>Change</TableCell>
-                    <TableCell sx={{ fontWeight: 700, color: '#374151', py: 2 }}>Reason</TableCell>
+                  <TableRow sx={{ backgroundColor: 'rgba(15, 23, 42, 0.02)' }}>
+                    <TableCell sx={{ 
+                      fontWeight: 600, 
+                      color: 'rgba(15, 23, 42, 0.75)', 
+                      py: 2,
+                      fontSize: '0.8125rem',
+                      borderBottom: '1px solid rgba(15, 23, 42, 0.08)'
+                    }}>Date</TableCell>
+                    <TableCell sx={{ 
+                      fontWeight: 600, 
+                      color: 'rgba(15, 23, 42, 0.75)', 
+                      py: 2,
+                      fontSize: '0.8125rem',
+                      borderBottom: '1px solid rgba(15, 23, 42, 0.08)'
+                    }}>Previous Price</TableCell>
+                    <TableCell sx={{ 
+                      fontWeight: 600, 
+                      color: 'rgba(15, 23, 42, 0.75)', 
+                      py: 2,
+                      fontSize: '0.8125rem',
+                      borderBottom: '1px solid rgba(15, 23, 42, 0.08)'
+                    }}>New Price</TableCell>
+                    <TableCell sx={{ 
+                      fontWeight: 600, 
+                      color: 'rgba(15, 23, 42, 0.75)', 
+                      py: 2,
+                      fontSize: '0.8125rem',
+                      borderBottom: '1px solid rgba(15, 23, 42, 0.08)'
+                    }}>Change</TableCell>
+                    <TableCell sx={{ 
+                      fontWeight: 600, 
+                      color: 'rgba(15, 23, 42, 0.75)', 
+                      py: 2,
+                      fontSize: '0.8125rem',
+                      borderBottom: '1px solid rgba(15, 23, 42, 0.08)'
+                    }}>Reason</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -187,43 +254,73 @@ const ProductPriceHistoryDialog = ({ open, product, onClose }) => {
                         key={entry.id} 
                         hover
                         sx={{ 
-                          '&:hover': { backgroundColor: '#f8fafc' },
+                          '&:hover': { backgroundColor: 'rgba(15, 23, 42, 0.02)' },
                           transition: 'background-color 0.2s ease'
                         }}
                       >
-                        <TableCell sx={{ py: 2 }}>
+                        <TableCell sx={{ 
+                          py: 2,
+                          borderBottom: '1px solid rgba(15, 23, 42, 0.06)'
+                        }}>
                           <Chip
                             label={formatDate(entry.changeDate)}
                             variant="outlined"
                             size="small"
                             sx={{ 
-                              backgroundColor: '#e0f2fe',
-                              borderColor: '#0277bd',
-                              color: '#0277bd',
-                              fontWeight: 500
+                              backgroundColor: 'rgba(139, 92, 246, 0.06)',
+                              borderColor: 'rgba(139, 92, 246, 0.3)',
+                              color: '#8b5cf6',
+                              fontWeight: 500,
+                              fontSize: '0.8125rem',
+                              borderRadius: '8px'
                             }}
                           />
                         </TableCell>
-                        <TableCell sx={{ py: 2 }}>
-                          <Typography variant="body2" sx={{ color: '#6b7280', fontSize: '0.95rem' }}>
+                        <TableCell sx={{ 
+                          py: 2,
+                          borderBottom: '1px solid rgba(15, 23, 42, 0.06)'
+                        }}>
+                          <Typography variant="body2" sx={{ 
+                            color: 'rgba(15, 23, 42, 0.55)', 
+                            fontSize: '0.875rem',
+                            fontWeight: 500
+                          }}>
                             {previousPrice ? `€${previousPrice.toFixed(2)}` : "—"}
                           </Typography>
                         </TableCell>
-                        <TableCell sx={{ py: 2 }}>
-                          <Typography variant="body1" sx={{ fontWeight: 600, color: '#1f2937' }}>
+                        <TableCell sx={{ 
+                          py: 2,
+                          borderBottom: '1px solid rgba(15, 23, 42, 0.06)'
+                        }}>
+                          <Typography variant="body1" sx={{ 
+                            fontWeight: 600, 
+                            color: 'rgba(15, 23, 42, 0.95)',
+                            fontSize: '0.875rem'
+                          }}>
                             €{entry.newPrice.toFixed(2)}
                           </Typography>
                         </TableCell>
-                        <TableCell sx={{ py: 2 }}>
+                        <TableCell sx={{ 
+                          py: 2,
+                          borderBottom: '1px solid rgba(15, 23, 42, 0.06)'
+                        }}>
                           {priceChange ? (
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                               <Chip
-                                icon={priceChange.isIncrease ? <TrendingUpIcon /> : <TrendingDownIcon />}
+                                icon={priceChange.isIncrease ? <TrendingUpIcon sx={{ fontSize: '1rem' }} /> : <TrendingDownIcon sx={{ fontSize: '1rem' }} />}
                                 label={`${priceChange.isIncrease ? "+" : ""}€${Math.abs(priceChange.amount).toFixed(2)} (${priceChange.isIncrease ? "+" : ""}${priceChange.percentage}%)`}
-                                color={priceChange.isIncrease ? "success" : "error"}
-                                variant="filled"
                                 size="small"
-                                sx={{ fontWeight: 600 }}
+                                sx={{ 
+                                  fontWeight: 600,
+                                  fontSize: '0.8125rem',
+                                  borderRadius: '8px',
+                                  backgroundColor: priceChange.isIncrease ? 'rgba(16, 185, 129, 0.08)' : 'rgba(239, 68, 68, 0.08)',
+                                  color: priceChange.isIncrease ? '#10b981' : '#ef4444',
+                                  border: 'none',
+                                  '& .MuiChip-icon': {
+                                    color: priceChange.isIncrease ? '#10b981' : '#ef4444'
+                                  }
+                                }}
                               />
                             </Box>
                           ) : (
@@ -232,15 +329,24 @@ const ProductPriceHistoryDialog = ({ open, product, onClose }) => {
                               variant="outlined"
                               size="small"
                               sx={{ 
-                                backgroundColor: '#f3f4f6',
-                                color: '#6b7280',
-                                borderColor: '#d1d5db'
+                                backgroundColor: 'rgba(15, 23, 42, 0.04)',
+                                color: 'rgba(15, 23, 42, 0.55)',
+                                borderColor: 'rgba(15, 23, 42, 0.12)',
+                                fontSize: '0.8125rem',
+                                borderRadius: '8px'
                               }}
                             />
                           )}
                         </TableCell>
-                        <TableCell sx={{ py: 2 }}>
-                          <Typography variant="body2" sx={{ color: '#6b7280', maxWidth: 200 }}>
+                        <TableCell sx={{ 
+                          py: 2,
+                          borderBottom: '1px solid rgba(15, 23, 42, 0.06)'
+                        }}>
+                          <Typography variant="body2" sx={{ 
+                            color: 'rgba(15, 23, 42, 0.55)', 
+                            maxWidth: 200,
+                            fontSize: '0.875rem'
+                          }}>
                             {entry.changeReason || "No reason provided"}
                           </Typography>
                         </TableCell>
@@ -253,77 +359,103 @@ const ProductPriceHistoryDialog = ({ open, product, onClose }) => {
           )}          {/* Enhanced Price Summary */}
           {priceHistory.length > 1 && (
             <Box sx={{ mt: 4 }}>
-              <Typography variant="h6" sx={{ mb: 3, color: '#1f2937', fontWeight: 600 }}>
+              <Typography variant="h6" sx={{ 
+                mb: 2.5, 
+                color: 'rgba(15, 23, 42, 0.95)', 
+                fontWeight: 700,
+                fontSize: '1.125rem',
+                letterSpacing: '-0.02em'
+              }}>
                 Price Analytics
               </Typography>
-              <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 3 }}>
+              <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 2 }}>
                 <Card sx={{ 
-                  background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)',
+                  background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
                   color: 'white',
-                  boxShadow: '0 8px 32px rgba(238, 90, 36, 0.3)',
-                  transition: 'transform 0.2s ease',
-                  '&:hover': { transform: 'translateY(-4px)' }
+                  boxShadow: '0 2px 8px rgba(239, 68, 68, 0.2)',
+                  borderRadius: '14px',
+                  border: 'none',
+                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                  '&:hover': { 
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)'
+                  }
                 }}>
-                  <CardContent sx={{ textAlign: 'center', py: 3 }}>
-                    <TrendingUpIcon sx={{ fontSize: 32, mb: 1, opacity: 0.9 }} />
-                    <Typography variant="body2" sx={{ opacity: 0.9, mb: 1 }}>
+                  <CardContent sx={{ textAlign: 'center', py: 2.5 }}>
+                    <TrendingUpIcon sx={{ fontSize: 28, mb: 1, opacity: 0.9 }} />
+                    <Typography variant="body2" sx={{ opacity: 0.85, mb: 1, fontSize: '0.8125rem', fontWeight: 500 }}>
                       Highest Price
                     </Typography>
-                    <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                    <Typography variant="h5" sx={{ fontWeight: 700, letterSpacing: '-0.02em' }}>
                       €{Math.max(...priceHistory.map(h => h.newPrice)).toFixed(2)}
                     </Typography>
                   </CardContent>
                 </Card>
                 
                 <Card sx={{ 
-                  background: 'linear-gradient(135deg, #74b9ff 0%, #0984e3 100%)',
+                  background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
                   color: 'white',
-                  boxShadow: '0 8px 32px rgba(9, 132, 227, 0.3)',
-                  transition: 'transform 0.2s ease',
-                  '&:hover': { transform: 'translateY(-4px)' }
+                  boxShadow: '0 2px 8px rgba(59, 130, 246, 0.2)',
+                  borderRadius: '14px',
+                  border: 'none',
+                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                  '&:hover': { 
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
+                  }
                 }}>
-                  <CardContent sx={{ textAlign: 'center', py: 3 }}>
-                    <TrendingDownIcon sx={{ fontSize: 32, mb: 1, opacity: 0.9 }} />
-                    <Typography variant="body2" sx={{ opacity: 0.9, mb: 1 }}>
+                  <CardContent sx={{ textAlign: 'center', py: 2.5 }}>
+                    <TrendingDownIcon sx={{ fontSize: 28, mb: 1, opacity: 0.9 }} />
+                    <Typography variant="body2" sx={{ opacity: 0.85, mb: 1, fontSize: '0.8125rem', fontWeight: 500 }}>
                       Lowest Price
                     </Typography>
-                    <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                    <Typography variant="h5" sx={{ fontWeight: 700, letterSpacing: '-0.02em' }}>
                       €{Math.min(...priceHistory.map(h => h.newPrice)).toFixed(2)}
                     </Typography>
                   </CardContent>
                 </Card>
                 
                 <Card sx={{ 
-                  background: 'linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%)',
+                  background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
                   color: 'white',
-                  boxShadow: '0 8px 32px rgba(108, 92, 231, 0.3)',
-                  transition: 'transform 0.2s ease',
-                  '&:hover': { transform: 'translateY(-4px)' }
+                  boxShadow: '0 2px 8px rgba(139, 92, 246, 0.2)',
+                  borderRadius: '14px',
+                  border: 'none',
+                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                  '&:hover': { 
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)'
+                  }
                 }}>
-                  <CardContent sx={{ textAlign: 'center', py: 3 }}>
-                    <TimelineIcon sx={{ fontSize: 32, mb: 1, opacity: 0.9 }} />
-                    <Typography variant="body2" sx={{ opacity: 0.9, mb: 1 }}>
+                  <CardContent sx={{ textAlign: 'center', py: 2.5 }}>
+                    <TimelineIcon sx={{ fontSize: 28, mb: 1, opacity: 0.9 }} />
+                    <Typography variant="body2" sx={{ opacity: 0.85, mb: 1, fontSize: '0.8125rem', fontWeight: 500 }}>
                       Total Changes
                     </Typography>
-                    <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                    <Typography variant="h5" sx={{ fontWeight: 700, letterSpacing: '-0.02em' }}>
                       {priceHistory.length - 1}
                     </Typography>
                   </CardContent>
                 </Card>
 
                 <Card sx={{ 
-                  background: 'linear-gradient(135deg, #fd79a8 0%, #e84393 100%)',
+                  background: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
                   color: 'white',
-                  boxShadow: '0 8px 32px rgba(232, 67, 147, 0.3)',
-                  transition: 'transform 0.2s ease',
-                  '&:hover': { transform: 'translateY(-4px)' }
+                  boxShadow: '0 2px 8px rgba(236, 72, 153, 0.2)',
+                  borderRadius: '14px',
+                  border: 'none',
+                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                  '&:hover': { 
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 4px 12px rgba(236, 72, 153, 0.3)'
+                  }
                 }}>
-                  <CardContent sx={{ textAlign: 'center', py: 3 }}>
-                    <EuroIcon sx={{ fontSize: 32, mb: 1, opacity: 0.9 }} />
-                    <Typography variant="body2" sx={{ opacity: 0.9, mb: 1 }}>
+                  <CardContent sx={{ textAlign: 'center', py: 2.5 }}>
+                    <EuroIcon sx={{ fontSize: 28, mb: 1, opacity: 0.9 }} />
+                    <Typography variant="body2" sx={{ opacity: 0.85, mb: 1, fontSize: '0.8125rem', fontWeight: 500 }}>
                       Price Range
                     </Typography>
-                    <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                    <Typography variant="h5" sx={{ fontWeight: 700, letterSpacing: '-0.02em' }}>
                       €{(Math.max(...priceHistory.map(h => h.newPrice)) - Math.min(...priceHistory.map(h => h.newPrice))).toFixed(2)}
                     </Typography>
                   </CardContent>
@@ -332,22 +464,31 @@ const ProductPriceHistoryDialog = ({ open, product, onClose }) => {
             </Box>
           )}
         </Box>
-      </DialogContent>      <DialogActions sx={{ px: 3, py: 2, backgroundColor: '#f8fafc' }}>
+      </DialogContent>      <DialogActions sx={{ 
+        px: 3, 
+        py: 2.5, 
+        borderTop: '1px solid rgba(15, 23, 42, 0.08)',
+        justifyContent: 'flex-end'
+      }}>
         <Button 
           onClick={handleClose} 
           variant="outlined"
           sx={{
-            borderRadius: 2,
+            px: 3,
+            py: 1.25,
+            borderRadius: '10px',
             textTransform: 'none',
             fontWeight: 600,
-            px: 4,
-            py: 1.5,
-            borderColor: '#667eea',
-            color: '#667eea',
+            fontSize: '0.875rem',
+            color: 'rgba(15, 23, 42, 0.65)',
+            border: '1px solid rgba(15, 23, 42, 0.12)',
+            backgroundColor: 'white',
+            letterSpacing: '-0.01em',
+            transition: 'all 0.2s ease',
             '&:hover': {
-              backgroundColor: '#667eea',
-              color: 'white',
-              borderColor: '#667eea'
+              backgroundColor: 'rgba(15, 23, 42, 0.02)',
+              borderColor: 'rgba(15, 23, 42, 0.2)',
+              color: 'rgba(15, 23, 42, 0.85)'
             }
           }}
         >

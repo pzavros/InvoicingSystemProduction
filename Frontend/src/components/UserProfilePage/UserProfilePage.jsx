@@ -7,7 +7,6 @@ import {
   Alert
 } from '@mui/material';
 import { useAuth } from '../../utils/AuthContext';
-import Section from '../ReusableComponents/Section';
 import UserProfilePageHeader from './UserProfilePageHeader';
 import ProfileInfoCard from './ProfileInfoCard';
 import PreferencesCard from './PreferencesCard';
@@ -71,37 +70,31 @@ const UserProfilePage = () => {
   // Check authentication first
   if (authLoading) {
     return (
-      <Section>
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress size={60} />
-        </Box>
-      </Section>
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+        <CircularProgress size={60} />
+      </Box>
     );
   }
 
   if (!authenticated || !user) {
     return (
-      <Section>
-        <Alert severity="error" sx={{ mb: 2 }}>
-          You must be logged in to view your profile. Please log in and try again.
-        </Alert>
-      </Section>
+      <Alert severity="error" sx={{ mb: 2 }}>
+        You must be logged in to view your profile. Please log in and try again.
+      </Alert>
     );
   }
 
   if (loading) {
     return (
-      <Section>
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress size={60} />
-        </Box>
-      </Section>
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+        <CircularProgress size={60} />
+      </Box>
     );
   }
 
   if (error) {
     return (
-      <Section>
+      <>
         <Alert severity="error" sx={{ mb: 2 }}>
           Failed to load profile: {error}
         </Alert>
@@ -110,12 +103,12 @@ const UserProfilePage = () => {
             You may need to log out and log back in to refresh your authentication.
           </Alert>
         )}
-      </Section>
+      </>
     );
   }
 
   return (
-    <Section>
+    <>
       <UserProfilePageHeader profile={profile} />
 
       <SubscriptionAlert />
@@ -123,7 +116,19 @@ const UserProfilePage = () => {
       {/* Combined Form */}
       <Box component="form" onSubmit={handleSaveAll}>
         {/* Profile Information Section */}
-        <Box sx={{ mb: 4 }}>
+        <Box
+          sx={{
+            p: { xs: 3, md: 4 },
+            mb: 3,
+            borderRadius: '20px',
+            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(15, 23, 42, 0.06)',
+            boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
+            transition: 'all 0.2s ease'
+          }}
+        >
           <ProfileInfoCard
             formData={formData}
             setFormData={setFormData}
@@ -132,7 +137,19 @@ const UserProfilePage = () => {
         </Box>
 
         {/* Preferences Section */}
-        <Box sx={{ mb: 4 }}>
+        <Box
+          sx={{
+            p: { xs: 3, md: 4 },
+            mb: 3,
+            borderRadius: '20px',
+            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(15, 23, 42, 0.06)',
+            boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
+            transition: 'all 0.2s ease'
+          }}
+        >
           <PreferencesCard
             preferences={preferences}
             setPreferences={setPreferences}
@@ -145,53 +162,67 @@ const UserProfilePage = () => {
           <Button
             type="submit"
             variant="contained"
-            size="large"
             disabled={saving}
             sx={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
               color: 'white',
-              px: 5,
-              py: 1.5,
-              fontSize: "0.95rem",
+              px: 3,
+              py: 1.25,
+              fontSize: "0.875rem",
               fontWeight: 600,
-              borderRadius: 2,
+              borderRadius: '10px',
               textTransform: "none",
+              boxShadow: '0 1px 3px rgba(139, 92, 246, 0.15), 0 0 0 0.5px rgba(139, 92, 246, 0.1)',
+              letterSpacing: '-0.01em',
+              border: 'none',
               "&:hover": {
-                background: 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)',
-                transform: "translateY(-1px)"
+                background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                boxShadow: '0 2px 6px rgba(139, 92, 246, 0.2), 0 0 0 0.5px rgba(139, 92, 246, 0.15)',
+                transform: 'translateY(-1px)'
               },
               "&:active": {
-                transform: "translateY(0)"
+                transform: 'translateY(0px)',
+                boxShadow: '0 1px 2px rgba(139, 92, 246, 0.15)'
               },
               "&:disabled": {
-                backgroundColor: "#9ca3af",
-                background: "none",
-                transform: "none"
+                backgroundColor: "rgba(15, 23, 42, 0.08)",
+                background: "rgba(15, 23, 42, 0.08)",
+                color: 'rgba(15, 23, 42, 0.3)',
+                boxShadow: 'none'
               },
-              transition: "all 0.2s ease"
+              transition: 'all 0.15s ease'
             }}
           >
-            {saving ? <CircularProgress size={20} color="inherit" /> : 'Save All Changes'}
+            {saving ? <CircularProgress size={18} color="inherit" /> : 'Save All Changes'}
           </Button>
 
           <Button
-            variant="contained"
-            color="error"
-            size="large"
+            variant="outlined"
             sx={{
-              px: 5,
-              py: 1.5,
-              fontSize: "0.95rem",
+              px: 3,
+              py: 1.25,
+              fontSize: "0.875rem",
               fontWeight: 600,
-              borderRadius: 2,
+              borderRadius: '10px',
+              borderWidth: '1px',
               textTransform: "none",
+              borderColor: 'rgba(220, 38, 38, 0.25)',
+              color: '#dc2626',
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+              letterSpacing: '-0.01em',
+              boxShadow: '0 1px 2px rgba(220, 38, 38, 0.08)',
               "&:hover": {
-                transform: "translateY(-1px)"
+                backgroundColor: 'rgba(220, 38, 38, 0.06)',
+                borderColor: 'rgba(220, 38, 38, 0.35)',
+                borderWidth: '1px',
+                boxShadow: '0 2px 4px rgba(220, 38, 38, 0.12)',
+                transform: 'translateY(-1px)'
               },
               "&:active": {
-                transform: "translateY(0)"
+                transform: 'translateY(0px)',
+                boxShadow: '0 1px 2px rgba(220, 38, 38, 0.08)'
               },
-              transition: "all 0.2s ease"
+              transition: 'all 0.15s ease'
             }}
             onClick={() => setPasswordDialogOpen(true)}
           >
@@ -200,22 +231,31 @@ const UserProfilePage = () => {
 
           <Button
             variant="outlined"
-            color="warning"
-            size="large"
             sx={{
-              px: 5,
-              py: 1.5,
-              fontSize: "0.95rem",
+              px: 3,
+              py: 1.25,
+              fontSize: "0.875rem",
               fontWeight: 600,
-              borderRadius: 2,
+              borderRadius: '10px',
+              borderWidth: '1px',
               textTransform: "none",
+              borderColor: 'rgba(15, 23, 42, 0.12)',
+              color: 'rgba(15, 23, 42, 0.65)',
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+              letterSpacing: '-0.01em',
+              boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
               "&:hover": {
-                transform: "translateY(-1px)"
+                backgroundColor: 'rgba(15, 23, 42, 0.04)',
+                borderColor: 'rgba(15, 23, 42, 0.2)',
+                borderWidth: '1px',
+                boxShadow: '0 2px 4px rgba(15, 23, 42, 0.08)',
+                transform: 'translateY(-1px)'
               },
               "&:active": {
-                transform: "translateY(0)"
+                transform: 'translateY(0px)',
+                boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)'
               },
-              transition: "all 0.2s ease"
+              transition: 'all 0.15s ease'
             }}
             onClick={() => {
               // TODO: Implement change email functionality
@@ -238,7 +278,7 @@ const UserProfilePage = () => {
         onChangePassword={changePassword}
         showNotification={showNotification}
       />
-    </Section>
+    </>
   );
 };
 

@@ -1,12 +1,12 @@
 // src/pages/ProfilePage.jsx
 import React from "react";
-import Page from "../components/ReusableComponents/Page";
+import PageContainer from "../components/ReusableComponents/PageContainer";
 import UserProfilePage from "../components/UserProfilePage/UserProfilePage";
 
 export default function ProfilePageWrapper() {
   return (
-    <Page>
+    <PageContainer maxWidth="xl">
       <UserProfilePage />
-    </Page>
+    </PageContainer>
   );
 }

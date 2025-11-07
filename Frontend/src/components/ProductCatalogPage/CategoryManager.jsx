@@ -358,7 +358,7 @@ const CategoryManager = ({ categories, onCategoryUpdated, showNotification }) =>
             )}
           </TableBody>
         </Table>
-      </TableContainer>      {/* Enhanced Category Form Dialog */}
+      </TableContainer>      {/* Apple-Style Category Form Dialog */}
       <Dialog 
         open={categoryDialogOpen} 
         onClose={() => setCategoryDialogOpen(false)}
@@ -366,135 +366,141 @@ const CategoryManager = ({ categories, onCategoryUpdated, showNotification }) =>
         fullWidth
         PaperProps={{
           sx: {
-            borderRadius: 3,
-            border: '1px solid rgba(148, 163, 184, 0.2)',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
-            background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)'
+            borderRadius: '20px',
+            boxShadow: '0 20px 60px rgba(15, 23, 42, 0.15)'
+          }
+        }}
+        slotProps={{
+          backdrop: {
+            sx: {
+              backdropFilter: 'blur(12px)',
+              backgroundColor: 'rgba(15, 23, 42, 0.4)'
+            }
           }
         }}
       >
-        <DialogTitle 
-          sx={{
-            background: 'linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%)',
-            borderBottom: '1px solid rgba(148, 163, 184, 0.2)',
-            pb: 2,
-            pt: 3
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box 
-              sx={{ 
-                width: 48,
-                height: 48,
-                borderRadius: 3,
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 8px 16px rgba(16, 185, 129, 0.3)'
-              }}
-            >
-              {editingCategory ? <EditIcon sx={{ color: 'white', fontSize: 24 }} /> : <AddIcon sx={{ color: 'white', fontSize: 24 }} />}
-            </Box>
-            <Box>
-              <Typography 
-                variant="h6" 
-                sx={{ 
-                  fontWeight: 'bold',
-                  color: '#1f2937',
-                  mb: 0.5
-                }}
-              >
-                {editingCategory ? "Edit Category" : "Add New Category"}
-              </Typography>
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  color: '#6b7280'
-                }}
-              >
-                {editingCategory ? "Update category information" : "Create a new product category"}
-              </Typography>
-            </Box>
-          </Box>
+        <DialogTitle sx={{ 
+          color: 'rgba(15, 23, 42, 0.95)', 
+          fontWeight: 700,
+          fontSize: '1.5rem',
+          letterSpacing: '-0.02em',
+          pt: 3,
+          px: 3,
+          pb: 1
+        }}>
+          {editingCategory ? "Edit Category" : "Add New Category"}
         </DialogTitle>
-        <DialogContent sx={{ pt: 3, pb: 2 }}>
-          <Box sx={{ pt: 1 }}>
+        <DialogContent sx={{ px: 3, py: 2 }}>
+          <Box sx={{ pt: 1.5 }}>
+            <Typography sx={{
+              color: 'rgba(15, 23, 42, 0.75)',
+              fontWeight: 600,
+              fontSize: '0.875rem',
+              mb: 0.5,
+              display: 'block'
+            }}>
+              Category Name *
+            </Typography>
             <TextField
               name="name"
-              label="Category Name"
               value={categoryFormData.name}
               onChange={handleCategoryFormChange}
               fullWidth
               required
+              placeholder="Enter category name..."
+              size="small"
               sx={{ 
-                mb: 3,
+                mb: 2.5,
                 '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#10b981'
-                    }
+                  backgroundColor: 'white',
+                  borderRadius: '12px',
+                  fontSize: '0.875rem',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(15, 23, 42, 0.08)',
+                    borderWidth: '1px'
                   },
-                  '&.Mui-focused': {
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#10b981',
-                      borderWidth: '2px'
-                    }
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(15, 23, 42, 0.15)'
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(15, 23, 42, 0.25)',
+                    borderWidth: '1.5px'
+                  },
+                  '& .MuiInputBase-input': {
+                    padding: '9px 12px'
                   }
-                },
-                '& .MuiInputLabel-root.Mui-focused': {
-                  color: '#10b981'
                 }
               }}
             />
+            
+            <Typography sx={{
+              color: 'rgba(15, 23, 42, 0.75)',
+              fontWeight: 600,
+              fontSize: '0.875rem',
+              mb: 0.5,
+              display: 'block'
+            }}>
+              Description
+            </Typography>
             <TextField
               name="description"
-              label="Description"
               value={categoryFormData.description}
               onChange={handleCategoryFormChange}
               fullWidth
               multiline
               rows={3}
+              placeholder="Describe this category..."
               sx={{ 
                 '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#10b981'
-                    }
+                  backgroundColor: 'white',
+                  borderRadius: '12px',
+                  fontSize: '0.875rem',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(15, 23, 42, 0.08)',
+                    borderWidth: '1px'
                   },
-                  '&.Mui-focused': {
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#10b981',
-                      borderWidth: '2px'
-                    }
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(15, 23, 42, 0.15)'
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(15, 23, 42, 0.25)',
+                    borderWidth: '1.5px'
+                  },
+                  '& .MuiInputBase-input': {
+                    padding: '9px 12px'
                   }
-                },
-                '& .MuiInputLabel-root.Mui-focused': {
-                  color: '#10b981'
                 }
               }}
             />
           </Box>
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 3, gap: 2 }}>
+        <DialogActions sx={{ 
+          p: 3, 
+          pt: 2,
+          gap: 1.5,
+          borderTop: '1px solid rgba(15, 23, 42, 0.08)',
+          justifyContent: 'flex-end'
+        }}>
           <Button 
             onClick={() => setCategoryDialogOpen(false)} 
             disabled={loading}
+            variant="outlined"
             sx={{
-              borderRadius: 2,
               px: 3,
-              py: 1.5,
+              py: 1.25,
+              borderRadius: '10px',
+              textTransform: 'none',
               fontWeight: 600,
-              color: '#6b7280',
-              border: '1px solid rgba(148, 163, 184, 0.3)',
-              transition: 'all 0.3s ease',
+              fontSize: '0.875rem',
+              color: 'rgba(15, 23, 42, 0.65)',
+              border: '1px solid rgba(15, 23, 42, 0.12)',
+              backgroundColor: 'white',
+              letterSpacing: '-0.01em',
+              transition: 'all 0.2s ease',
               '&:hover': {
-                backgroundColor: 'rgba(148, 163, 184, 0.1)',
-                borderColor: '#94a3b8'
+                backgroundColor: 'rgba(15, 23, 42, 0.02)',
+                borderColor: 'rgba(15, 23, 42, 0.2)',
+                color: 'rgba(15, 23, 42, 0.85)'
               }
             }}
           >
@@ -505,31 +511,37 @@ const CategoryManager = ({ categories, onCategoryUpdated, showNotification }) =>
             variant="contained" 
             disabled={loading}
             sx={{
-              backgroundColor: '#10b981',
-              backgroundImage: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-              boxShadow: '0 8px 16px rgba(16, 185, 129, 0.3)',
-              borderRadius: 2,
               px: 3,
-              py: 1.5,
+              py: 1.25,
+              borderRadius: '10px',
+              textTransform: 'none',
               fontWeight: 600,
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              fontSize: '0.875rem',
+              letterSpacing: '-0.01em',
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
+              color: 'white',
+              border: 'none',
+              boxShadow: '0 1px 3px rgba(139, 92, 246, 0.2)',
+              transition: 'all 0.2s ease',
               '&:hover': {
-                backgroundColor: '#059669',
-                backgroundImage: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                transform: 'translateY(-1px)',
-                boxShadow: '0 12px 24px rgba(16, 185, 129, 0.4)'
+                background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)',
+                boxShadow: '0 2px 6px rgba(139, 92, 246, 0.3)',
+                transform: 'translateY(-1px)'
+              },
+              '&:active': {
+                transform: 'translateY(0)'
               },
               '&:disabled': {
-                backgroundColor: '#9ca3af',
-                color: 'white',
+                background: 'rgba(15, 23, 42, 0.08)',
+                color: 'rgba(15, 23, 42, 0.35)',
                 boxShadow: 'none'
               }
             }}
           >
-            {loading ? "Saving..." : (editingCategory ? "Update" : "Create")}
+            {loading ? "Saving..." : (editingCategory ? "Update Category" : "Create Category")}
           </Button>
         </DialogActions>
-      </Dialog>      {/* Enhanced Delete Confirmation Dialog */}
+      </Dialog>      {/* Apple-Style Delete Confirmation Dialog */}
       <Dialog 
         open={deleteDialogOpen} 
         onClose={() => setDeleteDialogOpen(false)}
@@ -537,132 +549,113 @@ const CategoryManager = ({ categories, onCategoryUpdated, showNotification }) =>
         fullWidth
         PaperProps={{
           sx: {
-            borderRadius: 3,
-            border: '1px solid rgba(239, 68, 68, 0.2)',
-            boxShadow: '0 20px 40px rgba(239, 68, 68, 0.1)',
-            background: 'linear-gradient(145deg, #ffffff 0%, #fef2f2 100%)'
+            borderRadius: '20px',
+            boxShadow: '0 20px 60px rgba(15, 23, 42, 0.15)'
+          }
+        }}
+        slotProps={{
+          backdrop: {
+            sx: {
+              backdropFilter: 'blur(12px)',
+              backgroundColor: 'rgba(15, 23, 42, 0.4)'
+            }
           }
         }}
       >
-        <DialogTitle 
-          sx={{
-            background: 'linear-gradient(145deg, #fef2f2 0%, #fee2e2 100%)',
-            borderBottom: '1px solid rgba(239, 68, 68, 0.2)',
-            pb: 2,
-            pt: 3
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box 
-              sx={{ 
-                width: 48,
-                height: 48,
-                borderRadius: 3,
-                background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+        <DialogTitle sx={{ 
+          color: 'rgba(15, 23, 42, 0.95)', 
+          fontWeight: 700,
+          fontSize: '1.5rem',
+          letterSpacing: '-0.02em',
+          pt: 3,
+          px: 3,
+          pb: 1
+        }}>
+          Delete Category
+        </DialogTitle>
+        <DialogContent sx={{ px: 3, py: 2 }}>
+          <Typography sx={{
+            color: 'rgba(15, 23, 42, 0.65)',
+            fontSize: '0.9375rem',
+            lineHeight: 1.6,
+            mb: 2
+          }}>
+            Are you sure you want to delete{" "}
+            <Box component="strong" sx={{ 
+              color: 'rgba(15, 23, 42, 0.95)',
+              fontWeight: 600
+            }}>
+              "{categoryToDelete?.name}"
+            </Box>? This action cannot be undone.
+          </Typography>
+          
+          {categoryToDelete?.productCount > 0 && (
+            <Box sx={{
+              p: 2,
+              borderRadius: '12px',
+              backgroundColor: 'rgba(251, 191, 36, 0.08)',
+              border: '1px solid rgba(251, 191, 36, 0.2)',
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 1.5
+            }}>
+              <Box sx={{
+                width: 20,
+                height: 20,
+                borderRadius: '50%',
+                backgroundColor: 'rgba(251, 191, 36, 0.2)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 8px 16px rgba(239, 68, 68, 0.3)'
-              }}
-            >
-              <DeleteIcon sx={{ color: 'white', fontSize: 24 }} />
-            </Box>
-            <Box>
-              <Typography 
-                variant="h6" 
-                sx={{ 
-                  fontWeight: 'bold',
-                  color: '#1f2937',
-                  mb: 0.5
-                }}
-              >
-                Delete Category
-              </Typography>
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  color: '#6b7280'
-                }}
-              >
-                This action cannot be undone
-              </Typography>
-            </Box>
-          </Box>
-        </DialogTitle>
-        <DialogContent sx={{ pt: 3, pb: 2 }}>
-          <Box 
-            sx={{
-              p: 3,
-              borderRadius: 2,
-              backgroundColor: 'rgba(249, 250, 251, 0.8)',
-              border: '1px solid rgba(209, 213, 219, 0.3)'
-            }}
-          >
-            <Typography 
-              variant="body1" 
-              sx={{ 
-                color: '#374151',
-                mb: 2,
-                lineHeight: 1.6
-              }}
-            >
-              Are you sure you want to delete the category <strong>"{categoryToDelete?.name}"</strong>?
-            </Typography>
-            {categoryToDelete?.productCount > 0 && (
-              <Box 
-                sx={{
-                  mt: 2,
-                  p: 2,
-                  borderRadius: 2,
-                  backgroundColor: 'rgba(251, 191, 36, 0.1)',
-                  border: '1px solid rgba(251, 191, 36, 0.3)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 2
-                }}
-              >
-                <Box 
-                  sx={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: '50%',
-                    backgroundColor: 'rgba(251, 191, 36, 0.2)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                >
-                  <Typography sx={{ color: '#f59e0b', fontWeight: 'bold', fontSize: '14px' }}>!</Typography>
-                </Box>
-                <Typography 
-                  sx={{ 
-                    color: '#92400e',
-                    fontWeight: 500,
-                    lineHeight: 1.5
-                  }}
-                >
-                  Warning: This category has {categoryToDelete.productCount} products associated with it.
-                  Those products will become uncategorized.
-                </Typography>
+                flexShrink: 0,
+                mt: 0.25
+              }}>
+                <Typography sx={{ 
+                  color: '#f59e0b', 
+                  fontWeight: 'bold', 
+                  fontSize: '11px',
+                  lineHeight: 1
+                }}>!</Typography>
               </Box>
-            )}
-          </Box>
+              <Typography sx={{ 
+                color: 'rgba(15, 23, 42, 0.75)',
+                fontSize: '0.8125rem',
+                fontWeight: 500,
+                lineHeight: 1.5
+              }}>
+                This category has {categoryToDelete.productCount} products associated with it.
+                Those products will become uncategorized.
+              </Typography>
+            </Box>
+          )}
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 3, gap: 2 }}>
+        <DialogActions sx={{ 
+          p: 3, 
+          pt: 2,
+          gap: 1.5,
+          borderTop: '1px solid rgba(15, 23, 42, 0.08)',
+          justifyContent: 'flex-end'
+        }}>
           <Button 
             onClick={() => setDeleteDialogOpen(false)} 
             disabled={loading}
+            variant="outlined"
             sx={{
-              borderRadius: 2,
               px: 3,
-              py: 1.5,
+              py: 1.25,
+              borderRadius: '10px',
+              textTransform: 'none',
               fontWeight: 600,
-              color: '#6b7280',
-              border: '1px solid rgba(148, 163, 184, 0.3)',
-              transition: 'all 0.3s ease',
+              fontSize: '0.875rem',
+              color: 'rgba(15, 23, 42, 0.65)',
+              border: '1px solid rgba(15, 23, 42, 0.12)',
+              backgroundColor: 'white',
+              letterSpacing: '-0.01em',
+              transition: 'all 0.2s ease',
               '&:hover': {
-                backgroundColor: 'rgba(148, 163, 184, 0.1)',
-                borderColor: '#94a3b8'
+                backgroundColor: 'rgba(15, 23, 42, 0.02)',
+                borderColor: 'rgba(15, 23, 42, 0.2)',
+                color: 'rgba(15, 23, 42, 0.85)'
               }
             }}
           >
@@ -673,28 +666,34 @@ const CategoryManager = ({ categories, onCategoryUpdated, showNotification }) =>
             variant="contained"
             disabled={loading}
             sx={{
-              backgroundColor: '#ef4444',
-              backgroundImage: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-              boxShadow: '0 8px 16px rgba(239, 68, 68, 0.3)',
-              borderRadius: 2,
               px: 3,
-              py: 1.5,
+              py: 1.25,
+              borderRadius: '10px',
+              textTransform: 'none',
               fontWeight: 600,
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              fontSize: '0.875rem',
+              letterSpacing: '-0.01em',
+              background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+              color: 'white',
+              border: 'none',
+              boxShadow: '0 1px 3px rgba(239, 68, 68, 0.2)',
+              transition: 'all 0.2s ease',
               '&:hover': {
-                backgroundColor: '#dc2626',
-                backgroundImage: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
-                transform: 'translateY(-1px)',
-                boxShadow: '0 12px 24px rgba(239, 68, 68, 0.4)'
+                background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+                boxShadow: '0 2px 6px rgba(239, 68, 68, 0.3)',
+                transform: 'translateY(-1px)'
+              },
+              '&:active': {
+                transform: 'translateY(0)'
               },
               '&:disabled': {
-                backgroundColor: '#9ca3af',
-                color: 'white',
+                background: 'rgba(15, 23, 42, 0.08)',
+                color: 'rgba(15, 23, 42, 0.35)',
                 boxShadow: 'none'
               }
             }}
           >
-            {loading ? "Deleting..." : "Delete"}
+            {loading ? "Deleting..." : "Delete Category"}
           </Button>
         </DialogActions>
       </Dialog>

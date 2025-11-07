@@ -1185,8 +1185,7 @@ const InvoiceForm = () => {
     <Box sx={{ 
       minHeight: '100vh', 
       backgroundColor: '#f8fafc',
-      backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3), transparent 50.2%), radial-gradient(circle at 80% 20%, rgba(120, 119, 198, 0.15), transparent 50.2%), radial-gradient(circle at 40% 80%, rgba(120, 119, 198, 0.1), transparent 50.2%)',
-      py: 2
+      py: 3
     }}>
       <form onSubmit={openModal} style={{ maxWidth: '100%' }}>
         {/* Header with Back Button */}
@@ -1197,13 +1196,51 @@ const InvoiceForm = () => {
           px: { xs: 2, sm: 3, md: 4 },
           mb: 3
         }}>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <IconButton onClick={() => navigate("/")} sx={{ mr: 2 }}>
-              <ArrowBackIcon />
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <IconButton 
+              onClick={() => navigate("/")} 
+              sx={{ 
+                width: 40,
+                height: 40,
+                borderRadius: '8px',
+                backgroundColor: 'rgba(15, 23, 42, 0.04)',
+                border: '1px solid rgba(15, 23, 42, 0.08)',
+                transition: 'all 0.15s ease',
+                '&:hover': {
+                  backgroundColor: 'rgba(15, 23, 42, 0.08)',
+                  borderColor: 'rgba(15, 23, 42, 0.12)',
+                }
+              }}
+            >
+              <ArrowBackIcon sx={{ fontSize: 20, color: 'rgba(15, 23, 42, 0.7)' }} />
             </IconButton>
-            <Typography variant="h4" component="h1" sx={{ fontWeight: 600 }}>
-              {isEdit ? "Edit Invoice" : isCopy ? "Copy Invoice" : "Create Invoice"}
-            </Typography>
+            <Box>
+              <Typography 
+                variant="h4" 
+                component="h1" 
+                sx={{ 
+                  fontWeight: 700,
+                  fontSize: { xs: '1.75rem', sm: '2rem' },
+                  color: 'rgba(15, 23, 42, 0.95)',
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1.1,
+                  mb: 0.5
+                }}
+              >
+                {isEdit ? "Edit Invoice" : isCopy ? "Copy Invoice" : "Create Invoice"}
+              </Typography>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  color: 'rgba(15, 23, 42, 0.5)',
+                  fontSize: '0.9375rem',
+                  fontWeight: 400,
+                  letterSpacing: '-0.01em'
+                }}
+              >
+                {isEdit ? "Update invoice details" : "Fill in the details below"}
+              </Typography>
+            </Box>
           </Box>
         </Box>
 
@@ -1219,21 +1256,24 @@ const InvoiceForm = () => {
             <Alert 
               severity="info" 
               sx={{ 
-                borderRadius: '16px',
-                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%)',
-                border: '1px solid rgba(59, 130, 246, 0.3)',
+                borderRadius: '12px',
+                backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                border: '1px solid rgba(59, 130, 246, 0.2)',
                 '& .MuiAlert-icon': {
                   color: '#3b82f6'
+                },
+                '& .MuiAlert-message': {
+                  color: 'rgba(15, 23, 42, 0.9)'
                 }
               }}
             >
-              <Typography variant="body1" sx={{ fontWeight: 600, mb: 1, color: '#1e40af' }}>
+              <Typography variant="body1" sx={{ fontWeight: 600, mb: 1, color: 'rgba(15, 23, 42, 0.9)' }}>
                 👋 Welcome! Complete your setup for a better invoice experience
               </Typography>
-              <Typography variant="body2" sx={{ mb: 1.5, color: '#1e3a8a' }}>
+              <Typography variant="body2" sx={{ mb: 1.5, color: 'rgba(15, 23, 42, 0.7)' }}>
                 Before creating invoices, we recommend setting up:
               </Typography>
-              <Box component="ul" sx={{ m: 0, pl: 2.5, color: '#1e3a8a' }}>
+              <Box component="ul" sx={{ m: 0, pl: 2.5, color: 'rgba(15, 23, 42, 0.7)' }}>
                 {!setupStatus.hasCompanyInfo && (
                   <li>
                     <Typography variant="body2" component="span">
@@ -1299,73 +1339,83 @@ const InvoiceForm = () => {
           margin: '0 auto',
           px: { xs: 2, sm: 3, md: 4 }
         }}>
-          <Card sx={{ 
+          <Box sx={{ 
             mb: 2, 
             borderRadius: '20px',
-            background: 'rgba(255, 255, 255, 0.25)',
+            backgroundColor: 'rgba(255, 255, 255, 0.7)',
             backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.18)',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(15, 23, 42, 0.06)',
+            boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
             overflow: 'visible',
             position: 'relative'
           }}>            <Box sx={{ 
               p: 3, 
-              borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+              borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
               display: 'flex',
               flexWrap: 'wrap',
               alignItems: 'center',
               justifyContent: 'space-between',
-              gap: 2,
-              background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
-              borderRadius: '20px 20px 0 0'
+              gap: 2
             }}>              <Typography variant="h6" component="div" sx={{ 
-                fontWeight: 700, 
-                color: '#2d3748',
+                fontWeight: 600, 
+                fontSize: '1.125rem',
+                color: 'rgba(15, 23, 42, 0.95)',
+                letterSpacing: '-0.01em',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 1
+                gap: 1.5
               }}>
                 <Box sx={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: '8px',
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  width: 36,
+                  height: 36,
+                  borderRadius: '10px',
+                  backgroundColor: 'rgba(139, 92, 246, 0.08)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'white',
-                  fontSize: '14px'
+                  color: '#8b5cf6',
+                  fontSize: '16px'
                 }}>
                   ⚙
                 </Box>
                 Invoice Settings
               </Typography>
-            </Box>              <Box sx={{ display: 'flex', flexWrap: 'wrap', p: 3, gap: 3,
-              background: 'rgba(255, 255, 255, 0.1)',
-              borderRadius: '0 0 20px 20px'
-            }}>
+            </Box>              <Box sx={{ display: 'flex', flexWrap: 'wrap', p: 3, gap: 3 }}>
               {/* 1. Currency Dropdown */}
               <FormControl sx={{ 
-                minWidth: '180px', 
+                minWidth: '160px', 
                 flexGrow: 1, 
-                maxWidth: { xs: '100%', sm: '220px' },
+                maxWidth: { xs: '100%', sm: '200px' },
                 '& .MuiOutlinedInput-root': {
-                  background: 'rgba(255, 255, 255, 0.15)',
-                  backdropFilter: 'blur(10px)',
-                  borderRadius: '12px',
+                  borderRadius: '10px',
+                  backgroundColor: 'rgba(139, 92, 246, 0.04)',
+                  border: '1px solid rgba(139, 92, 246, 0.12)',
+                  transition: 'all 0.15s ease',
+                  '& fieldset': {
+                    border: 'none'
+                  },
                   '&:hover': {
-                    background: 'rgba(255, 255, 255, 0.25)'
+                    backgroundColor: 'rgba(139, 92, 246, 0.06)',
+                    borderColor: 'rgba(139, 92, 246, 0.2)',
+                  },
+                  '&.Mui-focused': {
+                    backgroundColor: 'white',
+                    borderColor: '#8b5cf6',
+                    boxShadow: '0 0 0 3px rgba(139, 92, 246, 0.1)',
+                  }
+                },
+                '& .MuiInputLabel-root': {
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  color: 'rgba(15, 23, 42, 0.6)',
+                  '&.Mui-focused': { 
+                    color: '#8b5cf6'
                   }
                 }
               }}>
                 <InputLabel 
-                  id="currency-select-label" 
-                  sx={{ 
-                    fontSize: "0.9rem",
-                    color: '#4a5568',
-                    fontWeight: 600,
-                    '&.Mui-focused': { color: '#667eea' }
-                  }}
+                  id="currency-select-label"
                 >
                   Currency
                 </InputLabel>
@@ -1374,22 +1424,42 @@ const InvoiceForm = () => {
                   label="Currency"
                   onChange={(event) => onCurrencyChange(event.target.value)}
                   value={formData.currencyId}
-                  size="medium"
+                  size="small"
                   sx={{
-                    '.MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'rgba(255, 255, 255, 0.3)',
-                      borderWidth: '2px'
-                    },
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'rgba(102, 126, 234, 0.5)'
-                    },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#667eea',
-                      borderWidth: '2px'
-                    },
                     '& .MuiSelect-select': {
-                      color: '#2d3748',
-                      fontWeight: 600
+                      color: 'rgba(15, 23, 42, 0.9)',
+                      fontWeight: 500,
+                      fontSize: '0.875rem',
+                      padding: '7px 10px'
+                    },
+                    '& .MuiSelect-icon': {
+                      color: '#8b5cf6',
+                      right: 8
+                    }
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        borderRadius: '10px',
+                        boxShadow: '0 8px 24px rgba(139, 92, 246, 0.12)',
+                        border: '1px solid rgba(139, 92, 246, 0.08)',
+                        mt: 0.5,
+                        '& .MuiMenuItem-root': {
+                          fontSize: '0.875rem',
+                          padding: '8px 12px',
+                          margin: '0 4px',
+                          borderRadius: '6px',
+                          '&:hover': {
+                            backgroundColor: 'rgba(139, 92, 246, 0.06)'
+                          },
+                          '&.Mui-selected': {
+                            backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                            '&:hover': {
+                              backgroundColor: 'rgba(139, 92, 246, 0.12)'
+                            }
+                          }
+                        }
+                      }
                     }
                   }}
                 >
@@ -1410,66 +1480,85 @@ const InvoiceForm = () => {
                 placeholder="0.0"
                 label="Discount Rate"
                 variant="outlined"
-                size="medium"
+                size="small"
                 sx={{
-                  minWidth: '180px',
+                  minWidth: '160px',
                   flexGrow: 1,
-                  maxWidth: { xs: '100%', sm: '220px' },
+                  maxWidth: { xs: '100%', sm: '200px' },
                   '& .MuiOutlinedInput-root': {
-                    background: 'rgba(255, 255, 255, 0.15)',
-                    backdropFilter: 'blur(10px)',
-                    borderRadius: '12px',
+                    borderRadius: '10px',
+                    backgroundColor: 'rgba(139, 92, 246, 0.04)',
+                    border: '1px solid rgba(139, 92, 246, 0.12)',
+                    transition: 'all 0.15s ease',
+                    '& fieldset': {
+                      border: 'none'
+                    },
                     '&:hover': {
-                      background: 'rgba(255, 255, 255, 0.25)'
+                      backgroundColor: 'rgba(139, 92, 246, 0.06)',
+                      borderColor: 'rgba(139, 92, 246, 0.2)',
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: 'white',
+                      borderColor: '#8b5cf6',
+                      boxShadow: '0 0 0 3px rgba(139, 92, 246, 0.1)',
                     }
                   },
-                  '.MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'rgba(255, 255, 255, 0.3)',
-                    borderWidth: '2px'
-                  },
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'rgba(102, 126, 234, 0.5)'
-                  },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#667eea',
-                    borderWidth: '2px'
-                  },
                   '& .MuiInputLabel-root': {
-                    fontSize: "0.9rem",
-                    color: '#4a5568',
-                    fontWeight: 600,
-                    '&.Mui-focused': { color: '#667eea' }
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    color: 'rgba(15, 23, 42, 0.6)',
+                    '&.Mui-focused': {
+                      color: '#8b5cf6'
+                    }
                   },
-                  '& .MuiInputBase-input': {
-                    color: '#2d3748',
-                    fontWeight: 500
+                  '& .MuiOutlinedInput-input': {
+                    padding: '7px 10px',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    color: 'rgba(15, 23, 42, 0.9)',
+                    '&::placeholder': {
+                      color: 'rgba(15, 23, 42, 0.4)',
+                      opacity: 1
+                    }
                   }
                 }}
                 InputProps={{
-                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                  endAdornment: (
+                    <InputAdornment position="end">%</InputAdornment>
+                  ),
                 }}
               />
 
               {/* 3. Status Dropdown - Only in Edit Mode */}
               {isEdit && statuses.length > 0 && (
                 <FormControl sx={{ 
-                  minWidth: '180px', 
+                  minWidth: '160px', 
                   flexGrow: 1, 
-                  maxWidth: { xs: '100%', sm: '220px' },
+                  maxWidth: { xs: '100%', sm: '200px' },
                   '& .MuiOutlinedInput-root': {
-                    background: 'rgba(255, 255, 255, 0.15)',
-                    backdropFilter: 'blur(10px)',
-                    borderRadius: '12px',
+                    borderRadius: '10px',
+                    backgroundColor: 'rgba(139, 92, 246, 0.04)',
+                    border: '1px solid rgba(139, 92, 246, 0.12)',
+                    transition: 'all 0.15s ease',
+                    '& fieldset': {
+                      border: 'none'
+                    },
                     '&:hover': {
-                      background: 'rgba(255, 255, 255, 0.25)'
+                      backgroundColor: 'rgba(139, 92, 246, 0.06)',
+                      borderColor: 'rgba(139, 92, 246, 0.2)',
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: 'white',
+                      borderColor: '#8b5cf6',
+                      boxShadow: '0 0 0 3px rgba(139, 92, 246, 0.1)',
                     }
                   }
                 }}>
                   <InputLabel id="status-select-label" sx={{ 
-                    fontSize: "0.9rem",
-                    color: '#4a5568',
-                    fontWeight: 600,
-                    '&.Mui-focused': { color: '#667eea' }
+                    fontSize: "0.875rem",
+                    color: 'rgba(15, 23, 42, 0.6)',
+                    fontWeight: 500,
+                    '&.Mui-focused': { color: '#8b5cf6' }
                   }}>
                     Status
                   </InputLabel>
@@ -1479,22 +1568,42 @@ const InvoiceForm = () => {
                     value={formData.statusId || ''}
                     onChange={(event) => handleStatusChange(event.target.value)}
                     disabled={loading}
-                    size="medium"
+                    size="small"
                     sx={{
-                      '.MuiOutlinedInput-notchedOutline': { 
-                        borderColor: 'rgba(255, 255, 255, 0.3)',
-                        borderWidth: '2px'
-                      },
-                      '&:hover .MuiOutlinedInput-notchedOutline': { 
-                        borderColor: 'rgba(102, 126, 234, 0.5)' 
-                      },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { 
-                        borderColor: '#667eea',
-                        borderWidth: '2px'
-                      },
                       '& .MuiSelect-select': {
-                        color: '#2d3748',
-                        fontWeight: 600
+                        color: 'rgba(15, 23, 42, 0.9)',
+                        fontWeight: 500,
+                        fontSize: '0.875rem',
+                        padding: '7px 10px'
+                      },
+                      '& .MuiSelect-icon': {
+                        color: '#8b5cf6',
+                        right: 8
+                      }
+                    }}
+                    MenuProps={{
+                      PaperProps: {
+                        sx: {
+                          borderRadius: '10px',
+                          boxShadow: '0 8px 24px rgba(139, 92, 246, 0.12)',
+                          border: '1px solid rgba(139, 92, 246, 0.08)',
+                          mt: 0.5,
+                          '& .MuiMenuItem-root': {
+                            fontSize: '0.875rem',
+                            padding: '8px 12px',
+                            margin: '0 4px',
+                            borderRadius: '6px',
+                            '&:hover': {
+                              backgroundColor: 'rgba(139, 92, 246, 0.06)'
+                            },
+                            '&.Mui-selected': {
+                              backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                              '&:hover': {
+                                backgroundColor: 'rgba(139, 92, 246, 0.12)'
+                              }
+                            }
+                          }
+                        }
                       }
                     }}
                   >
@@ -1507,7 +1616,7 @@ const InvoiceForm = () => {
                 </FormControl>
               )}
             </Box>
-          </Card>
+          </Box>
         </Box>        <Box sx={{ 
           width: '100%', 
           maxWidth: '1200px', 
@@ -1515,15 +1624,16 @@ const InvoiceForm = () => {
           px: { xs: 2, sm: 3, md: 4 }
         }}>
           <Grid container spacing={{ xs: 2, md: 3 }}>            <Grid item xs={12} md={8} lg={9}>
-              <Card
+              <Box
                 sx={{
                   p: { xs: 3, md: 4 },
                   my: { xs: 2, md: 3 },
-                  background: 'rgba(255, 255, 255, 0.25)',
+                  background: 'rgba(255, 255, 255, 0.7)',
                   backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.18)',
+                  WebkitBackdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(15, 23, 42, 0.06)',
                   borderRadius: '20px',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                  boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
                   color: "#2d3748"
                 }}
               >              <Box
@@ -1535,9 +1645,9 @@ const InvoiceForm = () => {
                   mb: 4,
                   gap: 3,
                   padding: '20px',
-                  background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
+                  background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%)',
                   borderRadius: '16px',
-                  border: '1px solid rgba(255, 255, 255, 0.2)'
+                  border: '1px solid rgba(139, 92, 246, 0.15)'
                 }}
               >
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
@@ -1551,7 +1661,29 @@ const InvoiceForm = () => {
                     }}>
                       Category:
                     </Typography>
-                    <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 200 }, flex: 1 }}>
+                    <FormControl size="small" sx={{ 
+                      minWidth: { xs: '100%', sm: 160 }, 
+                      flex: 1,
+                      maxWidth: 200,
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: '10px',
+                        backgroundColor: 'rgba(139, 92, 246, 0.04)',
+                        border: '1px solid rgba(15, 23, 42, 0.12)',
+                        transition: 'all 0.15s ease',
+                        '& fieldset': {
+                          border: 'none'
+                        },
+                        '&:hover': {
+                          backgroundColor: 'rgba(139, 92, 246, 0.06)',
+                          borderColor: 'rgba(15, 23, 42, 0.2)',
+                        },
+                        '&.Mui-focused': {
+                          backgroundColor: 'white',
+                          borderColor: 'rgba(15, 23, 42, 0.25)',
+                          boxShadow: '0 0 0 3px rgba(139, 92, 246, 0.1)',
+                        }
+                      }
+                    }}>
                       <Select
                         value={documentCategory}
                         onChange={(e) => {
@@ -1574,25 +1706,40 @@ const InvoiceForm = () => {
                           }
                         }}
                         sx={{
-                          '& .MuiOutlinedInput-root': {
-                            background: 'rgba(255, 255, 255, 0.2)',
-                            backdropFilter: 'blur(10px)',
-                            borderRadius: '12px'
+                          '& .MuiSelect-select': {
+                            color: 'rgba(15, 23, 42, 0.9)',
+                            fontWeight: 500,
+                            fontSize: '0.875rem',
+                            padding: '7px 10px'
                           },
-                          '.MuiOutlinedInput-notchedOutline': {
-                            borderColor: 'rgba(255, 255, 255, 0.3)',
-                            borderWidth: '2px'
-                          },
-                          '&:hover .MuiOutlinedInput-notchedOutline': {
-                            borderColor: 'rgba(102, 126, 234, 0.5)'
-                          },
-                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                            borderColor: '#667eea',
-                            borderWidth: '2px'
-                          },
-                          '& .MuiInputBase-input': {
-                            color: '#2d3748',
-                            fontWeight: 500
+                          '& .MuiSelect-icon': {
+                            color: '#8b5cf6',
+                            right: 8
+                          }
+                        }}
+                        MenuProps={{
+                          PaperProps: {
+                            sx: {
+                              borderRadius: '10px',
+                              boxShadow: '0 8px 24px rgba(139, 92, 246, 0.12)',
+                              border: '1px solid rgba(139, 92, 246, 0.08)',
+                              mt: 0.5,
+                              '& .MuiMenuItem-root': {
+                                fontSize: '0.875rem',
+                                padding: '8px 12px',
+                                margin: '0 4px',
+                                borderRadius: '6px',
+                                '&:hover': {
+                                  backgroundColor: 'rgba(139, 92, 246, 0.06)'
+                                },
+                                '&.Mui-selected': {
+                                  backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                                  '&:hover': {
+                                    backgroundColor: 'rgba(139, 92, 246, 0.12)'
+                                  }
+                                }
+                              }
+                            }
                           }
                         }}
                       >
@@ -1612,30 +1759,67 @@ const InvoiceForm = () => {
                     }}>
                       Document Type:
                     </Typography>
-                    <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 200 }, flex: 1 }}>
+                    <FormControl size="small" sx={{ 
+                      minWidth: { xs: '100%', sm: 160 }, 
+                      flex: 1,
+                      maxWidth: 200,
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: '10px',
+                        backgroundColor: 'rgba(139, 92, 246, 0.04)',
+                        border: '1px solid rgba(15, 23, 42, 0.12)',
+                        transition: 'all 0.15s ease',
+                        '& fieldset': {
+                          border: 'none'
+                        },
+                        '&:hover': {
+                          backgroundColor: 'rgba(139, 92, 246, 0.06)',
+                          borderColor: 'rgba(15, 23, 42, 0.2)',
+                        },
+                        '&.Mui-focused': {
+                          backgroundColor: 'white',
+                          borderColor: 'rgba(15, 23, 42, 0.25)',
+                          boxShadow: '0 0 0 3px rgba(139, 92, 246, 0.1)',
+                        }
+                      }
+                    }}>
                       <Select
                         value={formData.documentTypeId || 1}
                         onChange={(e) => editField('documentTypeId', e.target.value)}
                         sx={{
-                          '& .MuiOutlinedInput-root': {
-                            background: 'rgba(255, 255, 255, 0.2)',
-                            backdropFilter: 'blur(10px)',
-                            borderRadius: '12px'
+                          '& .MuiSelect-select': {
+                            color: 'rgba(15, 23, 42, 0.9)',
+                            fontWeight: 500,
+                            fontSize: '0.875rem',
+                            padding: '7px 10px'
                           },
-                          '.MuiOutlinedInput-notchedOutline': {
-                            borderColor: 'rgba(255, 255, 255, 0.3)',
-                            borderWidth: '2px'
-                          },
-                          '&:hover .MuiOutlinedInput-notchedOutline': {
-                            borderColor: 'rgba(102, 126, 234, 0.5)'
-                          },
-                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                            borderColor: '#667eea',
-                            borderWidth: '2px'
-                          },
-                          '& .MuiInputBase-input': {
-                            color: '#2d3748',
-                            fontWeight: 500
+                          '& .MuiSelect-icon': {
+                            color: '#8b5cf6',
+                            right: 8
+                          }
+                        }}
+                        MenuProps={{
+                          PaperProps: {
+                            sx: {
+                              borderRadius: '10px',
+                              boxShadow: '0 8px 24px rgba(139, 92, 246, 0.12)',
+                              border: '1px solid rgba(139, 92, 246, 0.08)',
+                              mt: 0.5,
+                              '& .MuiMenuItem-root': {
+                                fontSize: '0.875rem',
+                                padding: '8px 12px',
+                                margin: '0 4px',
+                                borderRadius: '6px',
+                                '&:hover': {
+                                  backgroundColor: 'rgba(139, 92, 246, 0.06)'
+                                },
+                                '&.Mui-selected': {
+                                  backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                                  '&:hover': {
+                                    backgroundColor: 'rgba(139, 92, 246, 0.12)'
+                                  }
+                                }
+                              }
+                            }
                           }
                         }}
                       >
@@ -1667,20 +1851,27 @@ const InvoiceForm = () => {
                       sx={{ 
                         width: "160px",
                         '& .MuiOutlinedInput-root': {
-                          background: 'rgba(255, 255, 255, 0.2)',
+                          background: 'rgba(255, 255, 255, 0.6)',
                           backdropFilter: 'blur(10px)',
-                          borderRadius: '12px'
+                          borderRadius: '12px',
+                          transition: 'all 0.2s ease',
+                          '&:hover': {
+                            background: 'rgba(255, 255, 255, 0.8)'
+                          },
+                          '&.Mui-focused': {
+                            background: 'rgba(255, 255, 255, 0.9)'
+                          }
                         },
-                        '.MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'rgba(255, 255, 255, 0.3)',
-                          borderWidth: '2px'
+                        '& .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(15, 23, 42, 0.08)',
+                          borderWidth: '1px'
                         },
                         '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'rgba(102, 126, 234, 0.5)'
+                          borderColor: 'rgba(15, 23, 42, 0.15)'
                         },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#667eea',
-                          borderWidth: '2px'
+                        '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(15, 23, 42, 0.25)',
+                          borderWidth: '1.5px'
                         },
                         '& .MuiInputBase-input': {
                           color: '#2d3748',
@@ -1707,20 +1898,27 @@ const InvoiceForm = () => {
                       sx={{ 
                         width: "160px",
                         '& .MuiOutlinedInput-root': {
-                          background: 'rgba(255, 255, 255, 0.2)',
+                          background: 'rgba(255, 255, 255, 0.6)',
                           backdropFilter: 'blur(10px)',
-                          borderRadius: '12px'
+                          borderRadius: '12px',
+                          transition: 'all 0.2s ease',
+                          '&:hover': {
+                            background: 'rgba(255, 255, 255, 0.8)'
+                          },
+                          '&.Mui-focused': {
+                            background: 'rgba(255, 255, 255, 0.9)'
+                          }
                         },
-                        '.MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'rgba(255, 255, 255, 0.3)',
-                          borderWidth: '2px'
+                        '& .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(15, 23, 42, 0.08)',
+                          borderWidth: '1px'
                         },
                         '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'rgba(102, 126, 234, 0.5)'
+                          borderColor: 'rgba(15, 23, 42, 0.15)'
                         },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#667eea',
-                          borderWidth: '2px'
+                        '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(15, 23, 42, 0.25)',
+                          borderWidth: '1.5px'
                         },
                         '& .MuiInputBase-input': {
                           color: '#2d3748',
@@ -1732,9 +1930,9 @@ const InvoiceForm = () => {
                 </Box>
               </Box>              <Divider sx={{ 
                 my: 3, 
-                borderColor: "rgba(102, 126, 234, 0.2)",
+                borderColor: "rgba(15, 23, 42, 0.08)",
                 '&::before, &::after': {
-                  borderColor: "rgba(102, 126, 234, 0.2)"
+                  borderColor: "rgba(15, 23, 42, 0.08)"
                 }
               }} />
 
@@ -1780,11 +1978,14 @@ const InvoiceForm = () => {
                           borderRadius: '8px',
                           textTransform: 'none',
                           fontSize: '0.8rem',
-                          backgroundColor: clientSelectionMode === "select" ? '#667eea' : 'transparent',
-                          borderColor: '#667eea',
-                          color: clientSelectionMode === "select" ? 'white' : '#667eea',
+                          px: 2,
+                          py: 0.75,
+                          backgroundColor: clientSelectionMode === "select" ? '#8b5cf6' : 'rgba(139, 92, 246, 0.04)',
+                          borderColor: 'rgba(15, 23, 42, 0.12)',
+                          color: clientSelectionMode === "select" ? 'white' : 'rgba(15, 23, 42, 0.75)',
                           '&:hover': {
-                            backgroundColor: clientSelectionMode === "select" ? '#5a67d8' : 'rgba(102, 126, 234, 0.1)'
+                            backgroundColor: clientSelectionMode === "select" ? '#7c3aed' : 'rgba(139, 92, 246, 0.08)',
+                            borderColor: 'rgba(15, 23, 42, 0.2)'
                           }
                         }}
                       >
@@ -1798,11 +1999,14 @@ const InvoiceForm = () => {
                           borderRadius: '8px',
                           textTransform: 'none',
                           fontSize: '0.8rem',
-                          backgroundColor: clientSelectionMode === "manual" ? '#667eea' : 'transparent',
-                          borderColor: '#667eea',
-                          color: clientSelectionMode === "manual" ? 'white' : '#667eea',
+                          px: 2,
+                          py: 0.75,
+                          backgroundColor: clientSelectionMode === "manual" ? '#8b5cf6' : 'rgba(139, 92, 246, 0.04)',
+                          borderColor: 'rgba(15, 23, 42, 0.12)',
+                          color: clientSelectionMode === "manual" ? 'white' : 'rgba(15, 23, 42, 0.75)',
                           '&:hover': {
-                            backgroundColor: clientSelectionMode === "manual" ? '#5a67d8' : 'rgba(102, 126, 234, 0.1)'
+                            backgroundColor: clientSelectionMode === "manual" ? '#7c3aed' : 'rgba(139, 92, 246, 0.08)',
+                            borderColor: 'rgba(15, 23, 42, 0.2)'
                           }
                         }}
                       >
@@ -1828,30 +2032,37 @@ const InvoiceForm = () => {
                             sx={{
                               mb: 2,
                               '& .MuiOutlinedInput-root': {
-                                background: 'rgba(255, 255, 255, 0.2)',
+                                background: 'rgba(255, 255, 255, 0.6)',
                                 backdropFilter: 'blur(10px)',
-                                borderRadius: '12px'
+                                borderRadius: '12px',
+                                transition: 'all 0.2s ease',
+                                '&:hover': {
+                                  background: 'rgba(255, 255, 255, 0.8)'
+                                },
+                                '&.Mui-focused': {
+                                  background: 'rgba(255, 255, 255, 0.9)'
+                                }
                               },
-                              '.MuiOutlinedInput-notchedOutline': {
-                                borderColor: 'rgba(255, 255, 255, 0.3)',
-                                borderWidth: '2px'
+                              '& .MuiOutlinedInput-notchedOutline': {
+                                borderColor: 'rgba(15, 23, 42, 0.08)',
+                                borderWidth: '1px'
                               },
                               '&:hover .MuiOutlinedInput-notchedOutline': {
-                                borderColor: 'rgba(102, 126, 234, 0.5)'
+                                borderColor: 'rgba(15, 23, 42, 0.15)'
                               },
-                              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                borderColor: '#667eea',
-                                borderWidth: '2px'
+                              '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                borderColor: 'rgba(15, 23, 42, 0.25)',
+                                borderWidth: '1.5px'
                               },
                               '& .MuiInputBase-input': {
                                 color: '#2d3748',
                                 fontWeight: 500
                               },
                               '& .MuiInputLabel-root': {
-                                fontSize: "0.9rem",
-                                color: '#4a5568',
-                                fontWeight: 600,
-                                '&.Mui-focused': { color: '#667eea' }
+                                fontSize: "0.875rem",
+                                color: 'rgba(15, 23, 42, 0.55)',
+                                fontWeight: 500,
+                                '&.Mui-focused': { color: 'rgba(15, 23, 42, 0.75)' }
                               }
                             }}
                           />
@@ -1886,10 +2097,10 @@ const InvoiceForm = () => {
                         clearOnEscape
                         sx={{
                           '& .MuiAutocomplete-popupIndicator': {
-                            color: '#667eea'
+                            color: 'rgba(15, 23, 42, 0.55)'
                           },
                           '& .MuiAutocomplete-clearIndicator': {
-                            color: '#667eea'
+                            color: 'rgba(15, 23, 42, 0.55)'
                           }
                         }}
                       />
@@ -1909,21 +2120,30 @@ const InvoiceForm = () => {
                         mb: 2,
                         '& .MuiOutlinedInput-root': {
                           background: (clientSelectionMode === "select" && selectedClientId) 
-                            ? 'rgba(200, 200, 200, 0.2)' 
-                            : 'rgba(255, 255, 255, 0.2)',
+                            ? 'rgba(200, 200, 200, 0.3)' 
+                            : 'rgba(255, 255, 255, 0.6)',
                           backdropFilter: 'blur(10px)',
-                          borderRadius: '12px'
+                          borderRadius: '12px',
+                          transition: 'all 0.2s ease',
+                          '&:hover': {
+                            background: (clientSelectionMode === "select" && selectedClientId) 
+                              ? 'rgba(200, 200, 200, 0.3)'
+                              : 'rgba(255, 255, 255, 0.8)'
+                          },
+                          '&.Mui-focused': {
+                            background: 'rgba(255, 255, 255, 0.9)'
+                          }
                         },
-                        '.MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'rgba(255, 255, 255, 0.3)',
-                          borderWidth: '2px'
+                        '& .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(15, 23, 42, 0.08)',
+                          borderWidth: '1px'
                         },
                         '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'rgba(102, 126, 234, 0.5)'
+                          borderColor: 'rgba(15, 23, 42, 0.15)'
                         },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#667eea',
-                          borderWidth: '2px'
+                        '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(15, 23, 42, 0.25)',
+                          borderWidth: '1.5px'
                         },
                         '& .MuiInputBase-input': {
                           color: '#2d3748',
@@ -1944,21 +2164,30 @@ const InvoiceForm = () => {
                         mb: 2,
                         '& .MuiOutlinedInput-root': {
                           background: (clientSelectionMode === "select" && selectedClientId) 
-                            ? 'rgba(200, 200, 200, 0.2)' 
-                            : 'rgba(255, 255, 255, 0.2)',
+                            ? 'rgba(200, 200, 200, 0.3)' 
+                            : 'rgba(255, 255, 255, 0.6)',
                           backdropFilter: 'blur(10px)',
-                          borderRadius: '12px'
+                          borderRadius: '12px',
+                          transition: 'all 0.2s ease',
+                          '&:hover': {
+                            background: (clientSelectionMode === "select" && selectedClientId) 
+                              ? 'rgba(200, 200, 200, 0.3)'
+                              : 'rgba(255, 255, 255, 0.8)'
+                          },
+                          '&.Mui-focused': {
+                            background: 'rgba(255, 255, 255, 0.9)'
+                          }
                         },
-                        '.MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'rgba(255, 255, 255, 0.3)',
-                          borderWidth: '2px'
+                        '& .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(15, 23, 42, 0.08)',
+                          borderWidth: '1px'
                         },
                         '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'rgba(102, 126, 234, 0.5)'
+                          borderColor: 'rgba(15, 23, 42, 0.15)'
                         },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#667eea',
-                          borderWidth: '2px'
+                        '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(15, 23, 42, 0.25)',
+                          borderWidth: '1.5px'
                         },
                         '& .MuiInputBase-input': {
                           color: '#2d3748',
@@ -1978,21 +2207,30 @@ const InvoiceForm = () => {
                         mb: 2,
                         '& .MuiOutlinedInput-root': {
                           background: (clientSelectionMode === "select" && selectedClientId) 
-                            ? 'rgba(200, 200, 200, 0.2)' 
-                            : 'rgba(255, 255, 255, 0.2)',
+                            ? 'rgba(200, 200, 200, 0.3)' 
+                            : 'rgba(255, 255, 255, 0.6)',
                           backdropFilter: 'blur(10px)',
-                          borderRadius: '12px'
+                          borderRadius: '12px',
+                          transition: 'all 0.2s ease',
+                          '&:hover': {
+                            background: (clientSelectionMode === "select" && selectedClientId) 
+                              ? 'rgba(200, 200, 200, 0.3)'
+                              : 'rgba(255, 255, 255, 0.8)'
+                          },
+                          '&.Mui-focused': {
+                            background: 'rgba(255, 255, 255, 0.9)'
+                          }
                         },
-                        '.MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'rgba(255, 255, 255, 0.3)',
-                          borderWidth: '2px'
+                        '& .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(15, 23, 42, 0.08)',
+                          borderWidth: '1px'
                         },
                         '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'rgba(102, 126, 234, 0.5)'
+                          borderColor: 'rgba(15, 23, 42, 0.15)'
                         },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#667eea',
-                          borderWidth: '2px'
+                        '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(15, 23, 42, 0.25)',
+                          borderWidth: '1.5px'
                         },
                         '& .MuiInputBase-input': {
                           color: '#2d3748',
@@ -2006,11 +2244,11 @@ const InvoiceForm = () => {
                       <Box sx={{ 
                         mt: 2, 
                         p: 2, 
-                        backgroundColor: 'rgba(102, 126, 234, 0.1)', 
-                        borderRadius: '8px',
-                        border: '1px solid rgba(102, 126, 234, 0.2)'
+                        backgroundColor: 'rgba(139, 92, 246, 0.06)', 
+                        borderRadius: '12px',
+                        border: '1px solid rgba(139, 92, 246, 0.15)'
                       }}>
-                        <Typography variant="caption" sx={{ color: '#667eea', fontWeight: 600, mb: 1, display: 'block' }}>
+                        <Typography variant="caption" sx={{ color: '#8b5cf6', fontWeight: 600, mb: 1, display: 'block' }}>
                           Selected Client Details:
                         </Typography>
                         <Typography variant="body2" sx={{ mb: 0.5 }}>
@@ -2028,9 +2266,9 @@ const InvoiceForm = () => {
                 </Grid>                <Grid item xs={12} sm={6}>
                   <Box sx={{
                     padding: '20px',
-                    background: 'rgba(118, 75, 162, 0.05)',
+                    background: 'linear-gradient(135deg, rgba(118, 75, 162, 0.03) 0%, rgba(102, 126, 234, 0.03) 100%)',
                     borderRadius: '16px',
-                    border: '1px solid rgba(118, 75, 162, 0.1)',
+                    border: '1px solid rgba(139, 92, 246, 0.12)',
                     height: '100%'
                   }}>                    <Typography component="div" sx={{ 
                       fontWeight: 700, 
@@ -2066,20 +2304,27 @@ const InvoiceForm = () => {
                       sx={{ 
                         mb: 2,
                         '& .MuiOutlinedInput-root': {
-                          background: 'rgba(255, 255, 255, 0.2)',
+                          background: 'rgba(255, 255, 255, 0.6)',
                           backdropFilter: 'blur(10px)',
-                          borderRadius: '12px'
+                          borderRadius: '12px',
+                          transition: 'all 0.2s ease',
+                          '&:hover': {
+                            background: 'rgba(255, 255, 255, 0.8)'
+                          },
+                          '&.Mui-focused': {
+                            background: 'rgba(255, 255, 255, 0.9)'
+                          }
                         },
-                        '.MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'rgba(255, 255, 255, 0.3)',
-                          borderWidth: '2px'
+                        '& .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(15, 23, 42, 0.08)',
+                          borderWidth: '1px'
                         },
                         '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'rgba(118, 75, 162, 0.5)'
+                          borderColor: 'rgba(15, 23, 42, 0.15)'
                         },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#764ba2',
-                          borderWidth: '2px'
+                        '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(15, 23, 42, 0.25)',
+                          borderWidth: '1.5px'
                         },
                         '& .MuiInputBase-input': {
                           color: '#2d3748',
@@ -2098,20 +2343,27 @@ const InvoiceForm = () => {
                       sx={{ 
                         mb: 2,
                         '& .MuiOutlinedInput-root': {
-                          background: 'rgba(255, 255, 255, 0.2)',
+                          background: 'rgba(255, 255, 255, 0.6)',
                           backdropFilter: 'blur(10px)',
-                          borderRadius: '12px'
+                          borderRadius: '12px',
+                          transition: 'all 0.2s ease',
+                          '&:hover': {
+                            background: 'rgba(255, 255, 255, 0.8)'
+                          },
+                          '&.Mui-focused': {
+                            background: 'rgba(255, 255, 255, 0.9)'
+                          }
                         },
-                        '.MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'rgba(255, 255, 255, 0.3)',
-                          borderWidth: '2px'
+                        '& .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(15, 23, 42, 0.08)',
+                          borderWidth: '1px'
                         },
                         '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'rgba(118, 75, 162, 0.5)'
+                          borderColor: 'rgba(15, 23, 42, 0.15)'
                         },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#764ba2',
-                          borderWidth: '2px'
+                        '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(15, 23, 42, 0.25)',
+                          borderWidth: '1.5px'
                         },
                         '& .MuiInputBase-input': {
                           color: '#2d3748',
@@ -2129,20 +2381,27 @@ const InvoiceForm = () => {
                       sx={{ 
                         mb: 2,
                         '& .MuiOutlinedInput-root': {
-                          background: 'rgba(255, 255, 255, 0.2)',
+                          background: 'rgba(255, 255, 255, 0.6)',
                           backdropFilter: 'blur(10px)',
-                          borderRadius: '12px'
+                          borderRadius: '12px',
+                          transition: 'all 0.2s ease',
+                          '&:hover': {
+                            background: 'rgba(255, 255, 255, 0.8)'
+                          },
+                          '&.Mui-focused': {
+                            background: 'rgba(255, 255, 255, 0.9)'
+                          }
                         },
-                        '.MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'rgba(255, 255, 255, 0.3)',
-                          borderWidth: '2px'
+                        '& .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(15, 23, 42, 0.08)',
+                          borderWidth: '1px'
                         },
                         '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'rgba(118, 75, 162, 0.5)'
+                          borderColor: 'rgba(15, 23, 42, 0.15)'
                         },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor: '#764ba2',
-                          borderWidth: '2px'
+                        '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'rgba(15, 23, 42, 0.25)',
+                          borderWidth: '1.5px'
                         },
                         '& .MuiInputBase-input': {
                           color: '#2d3748',
@@ -2228,7 +2487,7 @@ const InvoiceForm = () => {
                           ))}
                         </>
                       )}
-                      <Divider sx={{ my: 2, borderColor: "rgba(102, 126, 234, 0.2)" }} />
+                      <Divider sx={{ my: 2, borderColor: "rgba(15, 23, 42, 0.08)" }} />
                       <Box
                         sx={{
                           display: "flex",
@@ -2239,7 +2498,7 @@ const InvoiceForm = () => {
                         }}
                       >
                         <Typography sx={{ fontSize: "1.2rem", fontWeight: 700, color: '#2d3748' }}>Total (incl. VAT):</Typography>
-                        <Typography sx={{ fontSize: "1.2rem", fontWeight: 700, color: '#667eea' }}>
+                        <Typography sx={{ fontSize: "1.2rem", fontWeight: 700, color: '#8b5cf6' }}>
                           {formData.currency}{formData.total || 0}
                         </Typography>
                       </Box>
@@ -2267,20 +2526,27 @@ const InvoiceForm = () => {
                   size="small"
                   sx={{ 
                     '& .MuiOutlinedInput-root': {
-                      background: 'rgba(255, 255, 255, 0.2)',
+                      background: 'rgba(255, 255, 255, 0.6)',
                       backdropFilter: 'blur(10px)',
-                      borderRadius: '12px'
+                      borderRadius: '12px',
+                      transition: 'all 0.2s ease',
+                      '&:hover': {
+                        background: 'rgba(255, 255, 255, 0.8)'
+                      },
+                      '&.Mui-focused': {
+                        background: 'rgba(255, 255, 255, 0.9)'
+                      }
                     },
-                    '.MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'rgba(255, 255, 255, 0.3)',
-                      borderWidth: '2px'
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(15, 23, 42, 0.08)',
+                      borderWidth: '1px'
                     },
                     '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'rgba(118, 75, 162, 0.5)'
+                      borderColor: 'rgba(15, 23, 42, 0.15)'
                     },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#764ba2',
-                      borderWidth: '2px'
+                    '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(15, 23, 42, 0.25)',
+                      borderWidth: '1.5px'
                     },
                     '& .MuiInputBase-input': {
                       color: '#2d3748',
@@ -2289,7 +2555,7 @@ const InvoiceForm = () => {
                   }}
                 />
               </Box>
-            </Card>
+            </Box>
           </Grid>        <Grid item xs={12} md={4} lg={3}>
           <Box
             sx={{
@@ -2370,22 +2636,23 @@ const InvoiceForm = () => {
             variant="outlined"
             type="submit"
             sx={{ 
-              minWidth: '160px',
-              height: '48px',
-              borderRadius: '12px',
-              backgroundColor: 'transparent',
-              borderColor: '#667eea',
-              color: '#667eea',
+              px: 3,
+              py: 1.25,
+              borderRadius: '10px',
+              backgroundColor: 'rgba(255, 255, 255, 0.7)',
+              backdropFilter: 'blur(10px)',
+              borderColor: 'rgba(15, 23, 42, 0.12)',
+              color: 'rgba(15, 23, 42, 0.85)',
               fontWeight: 600,
-              fontSize: '0.95rem',
+              fontSize: '0.875rem',
               textTransform: 'none',
-              border: '2px solid #667eea',
-              transition: 'all 0.3s ease',
+              border: '1px solid rgba(15, 23, 42, 0.12)',
+              transition: 'all 0.2s ease',
+              boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
               '&:hover': {
-                backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                borderColor: '#667eea',
-                transform: 'translateY(-2px)',
-                boxShadow: '0 4px 20px rgba(102, 126, 234, 0.3)'
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                borderColor: 'rgba(15, 23, 42, 0.25)',
+                boxShadow: '0 1px 3px rgba(15, 23, 42, 0.08)'
               }
             }}
             disabled={loading}
@@ -2396,20 +2663,20 @@ const InvoiceForm = () => {
             variant="contained"
             onClick={handleAddInvoice}
             sx={{ 
-              minWidth: '180px',
-              height: '48px',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              px: 3,
+              py: 1.25,
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
               color: 'white',
               fontWeight: 600,
-              fontSize: '0.95rem',
+              fontSize: '0.875rem',
               textTransform: 'none',
               border: 'none',
-              transition: 'all 0.3s ease',
+              transition: 'all 0.2s ease',
+              boxShadow: '0 1px 3px rgba(139, 92, 246, 0.15)',
               '&:hover': {
-                background: 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)',
-                transform: 'translateY(-2px)',
-                boxShadow: '0 8px 30px rgba(102, 126, 234, 0.4)'
+                background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)',
+                boxShadow: '0 2px 6px rgba(139, 92, 246, 0.25)'
               }
             }}
             disabled={loading}
