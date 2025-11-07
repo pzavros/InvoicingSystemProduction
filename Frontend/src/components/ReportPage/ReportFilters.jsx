@@ -44,28 +44,19 @@ const ReportFilters = ({ filters, onFiltersChange, onRunReport, loading }) => {
         {/* Section Header */}
         <Grid item xs={12}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
-            <Box
-              sx={{
-                width: 36,
-                height: 36,
-                borderRadius: '8px',
-                background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 4px 12px rgba(79, 70, 229, 0.25)'
-              }}
-            >
-              <FilterIcon sx={{ color: 'white', fontSize: 18 }} />
-            </Box>
             <Box>
               <Typography variant="h6" sx={{ 
-                fontWeight: 'bold',
-                color: '#000000',
+                fontWeight: 700,
+                color: 'rgba(15, 23, 42, 0.95)',
+                letterSpacing: '-0.02em'
               }}>
                 Report Filters
               </Typography>
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+              <Typography variant="caption" sx={{ 
+                color: 'rgba(15, 23, 42, 0.55)',
+                fontSize: '0.875rem',
+                fontWeight: 500
+              }}>
                 Define your report parameters
               </Typography>
             </Box>
@@ -83,22 +74,34 @@ const ReportFilters = ({ filters, onFiltersChange, onRunReport, loading }) => {
             onChange={(e) => handleFilterChange('startDate', e.target.value)}
             InputLabelProps={{ shrink: true }}
             InputProps={{
-              startAdornment: <CalendarIcon sx={{ mr: 1, fontSize: 18, color: '#6b7280' }} />
+              startAdornment: <CalendarIcon sx={{ mr: 1, fontSize: 18, color: 'rgba(15, 23, 42, 0.55)' }} />
             }}
             sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 2,
-                transition: 'all 0.2s',
-                '&:hover': {
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#4f46e5',
-                  }
-                },
+              '& .MuiInputLabel-root': {
+                color: 'rgba(15, 23, 42, 0.75)',
+                fontWeight: 600,
+                fontSize: '0.875rem',
                 '&.Mui-focused': {
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#4f46e5',
-                    borderWidth: 2
-                  }
+                  color: 'rgba(15, 23, 42, 0.85)'
+                }
+              },
+              '& .MuiOutlinedInput-root': {
+                backgroundColor: 'white',
+                borderRadius: '12px',
+                fontSize: '0.875rem',
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(15, 23, 42, 0.08)',
+                  borderWidth: '1px'
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(15, 23, 42, 0.15)'
+                },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(15, 23, 42, 0.25)',
+                  borderWidth: '1.5px'
+                },
+                '& .MuiInputBase-input': {
+                  padding: '8px 12px'
                 }
               }
             }}
@@ -115,46 +118,72 @@ const ReportFilters = ({ filters, onFiltersChange, onRunReport, loading }) => {
             onChange={(e) => handleFilterChange('endDate', e.target.value)}
             InputLabelProps={{ shrink: true }}
             InputProps={{
-              startAdornment: <CalendarIcon sx={{ mr: 1, fontSize: 18, color: '#6b7280' }} />
+              startAdornment: <CalendarIcon sx={{ mr: 1, fontSize: 18, color: 'rgba(15, 23, 42, 0.55)' }} />
             }}
             sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 2,
-                transition: 'all 0.2s',
-                '&:hover': {
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#4f46e5',
-                  }
-                },
+              '& .MuiInputLabel-root': {
+                color: 'rgba(15, 23, 42, 0.75)',
+                fontWeight: 600,
+                fontSize: '0.875rem',
                 '&.Mui-focused': {
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#4f46e5',
-                    borderWidth: 2
-                  }
+                  color: 'rgba(15, 23, 42, 0.85)'
+                }
+              },
+              '& .MuiOutlinedInput-root': {
+                backgroundColor: 'white',
+                borderRadius: '12px',
+                fontSize: '0.875rem',
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(15, 23, 42, 0.08)',
+                  borderWidth: '1px'
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(15, 23, 42, 0.15)'
+                },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(15, 23, 42, 0.25)',
+                  borderWidth: '1.5px'
+                },
+                '& .MuiInputBase-input': {
+                  padding: '8px 12px'
                 }
               }
             }}
           />
         </Grid>
 
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6} md={4}>
           <FormControl 
             fullWidth 
             size="small"
             sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 2,
-                transition: 'all 0.2s',
-                '&:hover': {
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#4f46e5',
-                  }
-                },
+              '& .MuiInputLabel-root': {
+                color: 'rgba(15, 23, 42, 0.75)',
+                fontWeight: 600,
+                fontSize: '0.875rem',
                 '&.Mui-focused': {
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#4f46e5',
-                    borderWidth: 2
-                  }
+                  color: 'rgba(15, 23, 42, 0.85)'
+                }
+              },
+              '& .MuiOutlinedInput-root': {
+                backgroundColor: 'white',
+                borderRadius: '12px',
+                fontSize: '0.875rem',
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(15, 23, 42, 0.08)',
+                  borderWidth: '1px'
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(15, 23, 42, 0.15)'
+                },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgba(15, 23, 42, 0.25)',
+                  borderWidth: '1.5px'
+                },
+                '& .MuiSelect-select': {
+                  padding: '8px 12px',
+                  display: 'flex',
+                  alignItems: 'center'
                 }
               }
             }}
@@ -164,7 +193,7 @@ const ReportFilters = ({ filters, onFiltersChange, onRunReport, loading }) => {
               value={filters.status}
               label="Invoice Status"
               onChange={(e) => handleFilterChange('status', e.target.value)}
-              startAdornment={<StatusIcon sx={{ ml: 1, mr: 0.5, fontSize: 18, color: '#6b7280' }} />}
+              startAdornment={<StatusIcon sx={{ ml: 1, mr: 0.5, fontSize: 18, color: 'rgba(15, 23, 42, 0.55)' }} />}
               renderValue={(value) => (
                 <Chip
                   label={value.charAt(0).toUpperCase() + value.slice(1)}
@@ -172,22 +201,161 @@ const ReportFilters = ({ filters, onFiltersChange, onRunReport, loading }) => {
                   sx={{
                     backgroundColor: `${getStatusColor(value)}15`,
                     color: getStatusColor(value),
-                    fontWeight: 'medium',
+                    fontWeight: 600,
+                    fontSize: '0.8125rem',
                     border: `1px solid ${getStatusColor(value)}30`
                   }}
                 />
               )}
+              MenuProps={{
+                PaperProps: {
+                  sx: {
+                    borderRadius: '12px',
+                    mt: 1,
+                    boxShadow: '0 4px 12px rgba(15, 23, 42, 0.08)',
+                    border: '1px solid rgba(15, 23, 42, 0.08)',
+                    '& .MuiList-root': {
+                      py: 1
+                    }
+                  }
+                }
+              }}
             >
-              <MenuItem value="all">All Statuses</MenuItem>
-              <MenuItem value="paid">Paid</MenuItem>
-              <MenuItem value="pending">Pending</MenuItem>
-              <MenuItem value="overdue">Overdue</MenuItem>
-              <MenuItem value="draft">Draft</MenuItem>
+              <MenuItem 
+                value="all"
+                sx={{
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  color: 'rgba(15, 23, 42, 0.85)',
+                  py: 1.25,
+                  px: 2,
+                  mx: 1,
+                  borderRadius: '8px',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    backgroundColor: 'rgba(15, 23, 42, 0.04)'
+                  },
+                  '&.Mui-selected': {
+                    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                    color: '#8b5cf6',
+                    fontWeight: 600,
+                    '&:hover': {
+                      backgroundColor: 'rgba(139, 92, 246, 0.12)'
+                    }
+                  }
+                }}
+              >
+                All Statuses
+              </MenuItem>
+              <MenuItem 
+                value="paid"
+                sx={{
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  color: 'rgba(15, 23, 42, 0.85)',
+                  py: 1.25,
+                  px: 2,
+                  mx: 1,
+                  borderRadius: '8px',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    backgroundColor: 'rgba(15, 23, 42, 0.04)'
+                  },
+                  '&.Mui-selected': {
+                    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                    color: '#8b5cf6',
+                    fontWeight: 600,
+                    '&:hover': {
+                      backgroundColor: 'rgba(139, 92, 246, 0.12)'
+                    }
+                  }
+                }}
+              >
+                Paid
+              </MenuItem>
+              <MenuItem 
+                value="pending"
+                sx={{
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  color: 'rgba(15, 23, 42, 0.85)',
+                  py: 1.25,
+                  px: 2,
+                  mx: 1,
+                  borderRadius: '8px',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    backgroundColor: 'rgba(15, 23, 42, 0.04)'
+                  },
+                  '&.Mui-selected': {
+                    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                    color: '#8b5cf6',
+                    fontWeight: 600,
+                    '&:hover': {
+                      backgroundColor: 'rgba(139, 92, 246, 0.12)'
+                    }
+                  }
+                }}
+              >
+                Pending
+              </MenuItem>
+              <MenuItem 
+                value="overdue"
+                sx={{
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  color: 'rgba(15, 23, 42, 0.85)',
+                  py: 1.25,
+                  px: 2,
+                  mx: 1,
+                  borderRadius: '8px',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    backgroundColor: 'rgba(15, 23, 42, 0.04)'
+                  },
+                  '&.Mui-selected': {
+                    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                    color: '#8b5cf6',
+                    fontWeight: 600,
+                    '&:hover': {
+                      backgroundColor: 'rgba(139, 92, 246, 0.12)'
+                    }
+                  }
+                }}
+              >
+                Overdue
+              </MenuItem>
+              <MenuItem 
+                value="draft"
+                sx={{
+                  fontSize: '0.875rem',
+                  fontWeight: 500,
+                  color: 'rgba(15, 23, 42, 0.85)',
+                  py: 1.25,
+                  px: 2,
+                  mx: 1,
+                  borderRadius: '8px',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    backgroundColor: 'rgba(15, 23, 42, 0.04)'
+                  },
+                  '&.Mui-selected': {
+                    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                    color: '#8b5cf6',
+                    fontWeight: 600,
+                    '&:hover': {
+                      backgroundColor: 'rgba(139, 92, 246, 0.12)'
+                    }
+                  }
+                }}
+              >
+                Draft
+              </MenuItem>
             </Select>
           </FormControl>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6} md={2}>
           <Button
             variant="contained"
             fullWidth
@@ -195,24 +363,25 @@ const ReportFilters = ({ filters, onFiltersChange, onRunReport, loading }) => {
             onClick={onRunReport}
             disabled={loading}
             sx={{
-              background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
               color: 'white',
-              borderRadius: 2,
-              py: 1.5,
-              fontWeight: 'medium',
+              borderRadius: '10px',
+              px: 3,
+              py: 1,
+              fontWeight: 600,
               textTransform: 'none',
-              boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)',
+              fontSize: '0.9375rem',
+              boxShadow: 'none',
+              transition: 'all 0.2s ease',
               '&:hover': {
-                background: 'linear-gradient(135deg, #4338ca 0%, #6d28d9 100%)',
+                background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)',
                 transform: 'translateY(-2px)',
-                boxShadow: '0 8px 20px rgba(79, 70, 229, 0.4)',
+                boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)',
               },
               '&:disabled': {
-                background: 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
-                color: 'white',
-                opacity: 0.7
-              },
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                background: 'rgba(15, 23, 42, 0.12)',
+                color: 'rgba(15, 23, 42, 0.4)',
+              }
             }}
           >
             {loading ? 'Running...' : 'Run Report'}

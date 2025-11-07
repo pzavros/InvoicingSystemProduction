@@ -136,7 +136,7 @@ const ReportPage = () => {
       minHeight: { xs: '100vh', md: 'auto' },
       width: '100%', 
       position: 'relative',
-      backgroundColor: '#f8fafc',
+      backgroundColor: '#ffffff',
       flexDirection: { xs: 'column', md: 'row' }
     }}>
       {/* Collapsible Drawer - Column Selector & Export */}
@@ -161,39 +161,16 @@ const ReportPage = () => {
               display: 'flex', 
               alignItems: 'center', 
               justifyContent: 'space-between',
-              borderBottom: '1px solid rgba(79, 70, 229, 0.1)',
-              background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-              minHeight: '64px',
-              position: 'relative',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '3px',
-                background: 'linear-gradient(90deg, #4f46e5 0%, #7c3aed 50%, #3b82f6 100%)',
-              }
+              borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
+              backgroundColor: 'white',
+              minHeight: '64px'
             }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                <Box
-                  sx={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: '10px',
-                    background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)'
-                  }}
-                >
-                  <Settings sx={{ color: 'white', fontSize: 18 }} />
-                </Box>
                 <Typography variant="h6" sx={{ 
-                  fontWeight: 'bold',
-                  color: '#000000',
-                  fontSize: '1.125rem'
+                  fontWeight: 700,
+                  color: 'rgba(15, 23, 42, 0.95)',
+                  fontSize: '1.125rem',
+                  letterSpacing: '-0.02em'
                 }}>
                   Report Settings
                 </Typography>
@@ -202,12 +179,12 @@ const ReportPage = () => {
                 onClick={() => setDrawerOpen(false)}
                 size="small"
                 sx={{ 
-                  backgroundColor: '#f3f4f6',
+                  backgroundColor: 'rgba(15, 23, 42, 0.06)',
+                  transition: 'all 0.2s ease',
                   '&:hover': { 
-                    backgroundColor: '#e5e7eb',
+                    backgroundColor: 'rgba(15, 23, 42, 0.12)',
                     transform: 'scale(1.05)'
-                  },
-                  transition: 'all 0.2s'
+                  }
                 }}
               >
                 <ChevronLeft />
@@ -220,8 +197,8 @@ const ReportPage = () => {
               <Box sx={{ p: 2 }}>
                 <Typography variant="subtitle2" sx={{ 
                   mb: 1.5, 
-                  fontWeight: 'bold', 
-                  color: '#000000',
+                  fontWeight: 600, 
+                  color: 'rgba(15, 23, 42, 0.75)',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px',
                   fontSize: '0.75rem'
@@ -234,14 +211,14 @@ const ReportPage = () => {
                 />
               </Box>
 
-              <Divider sx={{ borderColor: 'rgba(79, 70, 229, 0.08)' }} />
+              <Divider sx={{ borderColor: 'rgba(15, 23, 42, 0.08)' }} />
 
               {/* Export Section */}
               <Box sx={{ p: 2 }}>
                 <Typography variant="subtitle2" sx={{ 
                   mb: 2, 
-                  fontWeight: 'bold', 
-                  color: '#4f46e5',
+                  fontWeight: 600, 
+                  color: 'rgba(15, 23, 42, 0.75)',
                   textTransform: 'uppercase',
                   letterSpacing: '0.5px',
                   fontSize: '0.75rem'
@@ -259,8 +236,8 @@ const ReportPage = () => {
             {/* Selected Info Footer */}
             <Box sx={{ 
               p: 2, 
-              background: 'linear-gradient(145deg, #f8fafc 0%, #ffffff 100%)',
-              borderTop: '1px solid rgba(79, 70, 229, 0.1)',
+              backgroundColor: 'rgba(15, 23, 42, 0.02)',
+              borderTop: '1px solid rgba(15, 23, 42, 0.08)',
               display: 'flex',
               alignItems: 'center',
               gap: 1
@@ -275,28 +252,34 @@ const ReportPage = () => {
                 }}
               />
               <Typography variant="caption" sx={{ 
-                color: 'text.secondary',
-                fontWeight: 'medium'
+                color: 'rgba(15, 23, 42, 0.65)',
+                fontWeight: 500
               }}>
                 {selectedColumns.length} column{selectedColumns.length !== 1 ? 's' : ''} selected
               </Typography>
             </Box>
 
             {/* Close Button */}
-            <Box sx={{ p: 2, borderTop: '1px solid rgba(79, 70, 229, 0.1)' }}>
+            <Box sx={{ p: 2, borderTop: '1px solid rgba(15, 23, 42, 0.08)' }}>
               <Button
                 fullWidth
                 variant="contained"
                 onClick={() => setDrawerOpen(false)}
                 sx={{
-                  background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+                  background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
                   color: 'white',
-                  borderRadius: 2,
-                  py: 1.5,
-                  fontWeight: 'medium',
+                  borderRadius: '10px',
+                  px: 3,
+                  py: 1.25,
+                  fontWeight: 600,
                   textTransform: 'none',
+                  fontSize: '0.9375rem',
+                  boxShadow: 'none',
+                  transition: 'all 0.2s ease',
                   '&:hover': {
-                    background: 'linear-gradient(135deg, #4338ca 0%, #6d28d9 100%)',
+                    background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)',
                   }
                 }}
               >
@@ -314,14 +297,14 @@ const ReportPage = () => {
             flexShrink: 0,
             transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             overflow: 'hidden',
-            borderRight: drawerOpen ? '1px solid rgba(79, 70, 229, 0.1)' : 'none',
+            borderRight: drawerOpen ? '1px solid rgba(15, 23, 42, 0.08)' : 'none',
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
             backgroundColor: '#ffffff',
             position: 'relative',
             zIndex: 1300,
-            boxShadow: drawerOpen ? '4px 0 12px rgba(79, 70, 229, 0.08)' : 'none'
+            boxShadow: drawerOpen ? '4px 0 12px rgba(15, 23, 42, 0.06)' : 'none'
           }}
         >
           {drawerOpen && (
@@ -333,38 +316,15 @@ const ReportPage = () => {
                 display: 'flex', 
                 alignItems: 'center', 
                 justifyContent: 'space-between',
-                borderBottom: '1px solid rgba(79, 70, 229, 0.1)',
-                background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-                minHeight: '72px',
-                position: 'relative',
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: '3px',
-                  background: 'linear-gradient(90deg, #4f46e5 0%, #7c3aed 50%, #3b82f6 100%)',
-                }
+                borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
+                backgroundColor: 'white',
+                minHeight: '72px'
               }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                  <Box
-                    sx={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: '10px',
-                      background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)'
-                    }}
-                  >
-                    <Settings sx={{ color: 'white', fontSize: 20 }} />
-                  </Box>
                   <Typography variant="h6" sx={{ 
-                    fontWeight: 'bold',
-                    color: '#000000',
+                    fontWeight: 700,
+                    color: 'rgba(15, 23, 42, 0.95)',
+                    letterSpacing: '-0.02em'
                   }}>
                     Report Settings
                   </Typography>
@@ -373,12 +333,12 @@ const ReportPage = () => {
                   onClick={() => setDrawerOpen(false)}
                   size="small"
                   sx={{ 
-                    backgroundColor: '#f3f4f6',
+                    backgroundColor: 'rgba(15, 23, 42, 0.06)',
+                    transition: 'all 0.2s ease',
                     '&:hover': { 
-                      backgroundColor: '#e5e7eb',
+                      backgroundColor: 'rgba(15, 23, 42, 0.12)',
                       transform: 'scale(1.05)'
-                    },
-                    transition: 'all 0.2s'
+                    }
                   }}
                 >
                   <ChevronLeft />
@@ -391,8 +351,8 @@ const ReportPage = () => {
                 <Box sx={{ p: 2.5 }}>
                   <Typography variant="subtitle2" sx={{ 
                     mb: 1.5, 
-                    fontWeight: 'bold', 
-                    color: '#000000',
+                    fontWeight: 600, 
+                    color: 'rgba(15, 23, 42, 0.75)',
                     textTransform: 'uppercase',
                     letterSpacing: '0.5px',
                     fontSize: '0.75rem'
@@ -405,14 +365,14 @@ const ReportPage = () => {
                   />
                 </Box>
 
-                <Divider sx={{ borderColor: 'rgba(79, 70, 229, 0.08)' }} />
+                <Divider sx={{ borderColor: 'rgba(15, 23, 42, 0.08)' }} />
 
                 {/* Export Section */}
                 <Box sx={{ p: 2.5 }}>
                   <Typography variant="subtitle2" sx={{ 
                     mb: 2, 
-                    fontWeight: 'bold', 
-                    color: '#4f46e5',
+                    fontWeight: 600, 
+                    color: 'rgba(15, 23, 42, 0.75)',
                     textTransform: 'uppercase',
                     letterSpacing: '0.5px',
                     fontSize: '0.75rem'
@@ -430,8 +390,8 @@ const ReportPage = () => {
               {/* Selected Info Footer */}
               <Box sx={{ 
                 p: 2.5, 
-                background: 'linear-gradient(145deg, #f8fafc 0%, #ffffff 100%)',
-                borderTop: '1px solid rgba(79, 70, 229, 0.1)',
+                backgroundColor: 'rgba(15, 23, 42, 0.02)',
+                borderTop: '1px solid rgba(15, 23, 42, 0.08)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 1
@@ -446,8 +406,8 @@ const ReportPage = () => {
                   }}
                 />
                 <Typography variant="caption" sx={{ 
-                  color: 'text.secondary',
-                  fontWeight: 'medium'
+                  color: 'rgba(15, 23, 42, 0.65)',
+                  fontWeight: 500
                 }}>
                   {selectedColumns.length} column{selectedColumns.length !== 1 ? 's' : ''} selected
                 </Typography>
@@ -481,17 +441,19 @@ const ReportPage = () => {
               <IconButton
                 onClick={() => setDrawerOpen(true)}
                 sx={{
-                  background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
-                  color: 'white',
+                  color: 'rgba(15, 23, 42, 0.75)',
+                  backgroundColor: 'white',
                   borderRadius: '12px',
                   padding: { xs: '10px', md: '12px' },
-                  boxShadow: '0 8px 24px rgba(79, 70, 229, 0.4)',
+                  border: '1px solid rgba(15, 23, 42, 0.08)',
+                  boxShadow: '0 2px 8px rgba(15, 23, 42, 0.06)',
+                  transition: 'all 0.2s ease',
                   '&:hover': {
-                    background: 'linear-gradient(135deg, #4338ca 0%, #6d28d9 100%)',
-                    transform: 'scale(1.05)',
-                    boxShadow: '0 12px 32px rgba(79, 70, 229, 0.5)',
-                  },
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                    backgroundColor: 'rgba(15, 23, 42, 0.04)',
+                    borderColor: 'rgba(15, 23, 42, 0.15)',
+                    boxShadow: '0 4px 12px rgba(15, 23, 42, 0.1)',
+                    transform: 'scale(1.05)'
+                  }
                 }}
               >
                 <Settings />
@@ -505,7 +467,7 @@ const ReportPage = () => {
           <Paper
             elevation={0}
             sx={{
-              borderBottom: '1px solid rgba(79, 70, 229, 0.08)',
+              borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
               borderRadius: 0,
               backgroundColor: '#ffffff'
             }}
@@ -529,18 +491,19 @@ const ReportPage = () => {
         }}>
           <Fade in={true} timeout={1000}>
             <Paper
-              elevation={2}
+              elevation={0}
               sx={{
                 flex: 1,
                 display: 'flex',
                 flexDirection: 'column',
-                borderRadius: { xs: 2, md: 3 },
+                borderRadius: { xs: '12px', md: '14px' },
                 overflow: 'hidden',
-                background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-                border: '1px solid rgba(79, 70, 229, 0.1)',
-                transition: 'all 0.3s ease',
+                backgroundColor: 'white',
+                border: '1px solid rgba(15, 23, 42, 0.08)',
+                boxShadow: '0 1px 3px rgba(15, 23, 42, 0.06)',
+                transition: 'all 0.2s ease',
                 '&:hover': {
-                  boxShadow: { xs: 'none', md: '0 8px 24px rgba(79, 70, 229, 0.12)' }
+                  boxShadow: { xs: 'none', md: '0 4px 12px rgba(15, 23, 42, 0.08)' }
                 }
               }}
             >
@@ -560,8 +523,8 @@ const ReportPage = () => {
         <Fade in={true} timeout={1200}>
           <Box sx={{ 
             p: { xs: 1.5, sm: 2 },
-            background: 'linear-gradient(145deg, #f8fafc 0%, #ffffff 100%)',
-            borderTop: '1px solid rgba(79, 70, 229, 0.1)',
+            backgroundColor: 'rgba(15, 23, 42, 0.02)',
+            borderTop: '1px solid rgba(15, 23, 42, 0.08)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -585,32 +548,40 @@ const ReportPage = () => {
                     boxShadow: data?.length > 0 ? '0 0 8px rgba(16, 185, 129, 0.5)' : 'none'
                   }}
                 />
-                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'medium', fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
+                <Typography variant="caption" sx={{ 
+                  color: 'rgba(15, 23, 42, 0.65)',
+                  fontWeight: 500,
+                  fontSize: { xs: '0.7rem', sm: '0.75rem' }
+                }}>
                   {data?.length || 0} records
                 </Typography>
               </Box>
-              <Divider orientation="vertical" flexItem sx={{ borderColor: 'rgba(79, 70, 229, 0.1)', display: { xs: 'none', sm: 'block' } }} />
-              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 'medium', fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
+              <Divider orientation="vertical" flexItem sx={{ borderColor: 'rgba(15, 23, 42, 0.08)', display: { xs: 'none', sm: 'block' } }} />
+              <Typography variant="caption" sx={{ 
+                color: 'rgba(15, 23, 42, 0.65)',
+                fontWeight: 500,
+                fontSize: { xs: '0.7rem', sm: '0.75rem' }
+              }}>
                 {selectedColumns.length} columns
               </Typography>
               {error && (
                 <>
                   <Divider orientation="vertical" flexItem sx={{ borderColor: 'rgba(239, 68, 68, 0.2)', display: { xs: 'none', sm: 'block' } }} />
-                  <Typography variant="caption" sx={{ color: '#ef4444', fontWeight: 'medium', fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
+                  <Typography variant="caption" sx={{ color: '#ef4444', fontWeight: 500, fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
                     Error: {error}
                   </Typography>
                 </>
               )}
               {loading && (
                 <>
-                  <Divider orientation="vertical" flexItem sx={{ borderColor: 'rgba(79, 70, 229, 0.1)', display: { xs: 'none', sm: 'block' } }} />
-                  <Typography variant="caption" sx={{ color: '#4f46e5', fontWeight: 'medium', fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
+                  <Divider orientation="vertical" flexItem sx={{ borderColor: 'rgba(15, 23, 42, 0.08)', display: { xs: 'none', sm: 'block' } }} />
+                  <Typography variant="caption" sx={{ color: '#8b5cf6', fontWeight: 500, fontSize: { xs: '0.7rem', sm: '0.75rem' } }}>
                     Loading...
                   </Typography>
                 </>
               )}
             </Box>
-            <Box sx={{ display: 'flex', gap: 1, width: { xs: '100%', sm: 'auto' } }}>
+            <Box sx={{ display: 'flex', gap: 1.5, width: { xs: '100%', sm: 'auto' } }}>
               <Button 
                 size="small" 
                 variant="outlined" 
@@ -618,20 +589,22 @@ const ReportPage = () => {
                 startIcon={<ChevronRight sx={{ fontSize: { xs: 16, sm: 18 } }} />}
                 fullWidth={isMobile}
                 sx={{
-                  borderColor: '#4f46e5',
-                  color: '#4f46e5',
-                  borderRadius: 2,
+                  borderColor: 'rgba(15, 23, 42, 0.15)',
+                  color: 'rgba(15, 23, 42, 0.85)',
+                  borderRadius: '10px',
                   textTransform: 'none',
-                  fontWeight: 'medium',
+                  fontWeight: 600,
                   fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                  px: { xs: 2, sm: 2.5 },
                   py: { xs: 0.75, sm: 1 },
+                  transition: 'all 0.2s ease',
+                  boxShadow: 'none',
                   '&:hover': {
-                    borderColor: '#4338ca',
-                    backgroundColor: 'rgba(79, 70, 229, 0.04)',
+                    borderColor: 'rgba(15, 23, 42, 0.25)',
+                    backgroundColor: 'rgba(15, 23, 42, 0.04)',
                     transform: { xs: 'none', md: 'translateY(-1px)' },
-                    boxShadow: { xs: 'none', md: '0 4px 12px rgba(79, 70, 229, 0.15)' }
-                  },
-                  transition: 'all 0.2s'
+                    boxShadow: { xs: 'none', md: '0 2px 8px rgba(15, 23, 42, 0.08)' }
+                  }
                 }}
               >
                 {isMobile ? 'Reload' : 'Reload Data'}
@@ -689,25 +662,27 @@ const ReportPage = () => {
                 disabled={!data || data.length === 0}
                 fullWidth={isMobile}
                 sx={{
-                  background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+                  background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
                   color: 'white',
-                  borderRadius: 2,
+                  borderRadius: '10px',
                   textTransform: 'none',
-                  fontWeight: 'medium',
+                  fontWeight: 600,
                   fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                  px: { xs: 2, sm: 2.5 },
                   py: { xs: 0.75, sm: 1 },
-                  boxShadow: '0 2px 8px rgba(79, 70, 229, 0.25)',
+                  boxShadow: 'none',
+                  transition: 'all 0.2s ease',
+                  border: 'none',
                   '&:hover': {
-                    background: 'linear-gradient(135deg, #4338ca 0%, #6d28d9 100%)',
-                    transform: { xs: 'none', md: 'translateY(-1px)' },
-                    boxShadow: { xs: '0 2px 8px rgba(79, 70, 229, 0.25)', md: '0 4px 12px rgba(79, 70, 229, 0.3)' }
+                    background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)',
+                    transform: { xs: 'none', md: 'translateY(-2px)' },
+                    boxShadow: { xs: 'none', md: '0 4px 12px rgba(139, 92, 246, 0.3)' }
                   },
                   '&:disabled': {
-                    background: 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)',
-                    color: 'white',
-                    opacity: 0.7
-                  },
-                  transition: 'all 0.2s'
+                    background: 'rgba(15, 23, 42, 0.12)',
+                    color: 'rgba(15, 23, 42, 0.4)',
+                    boxShadow: 'none'
+                  }
                 }}
               >
                 {isMobile ? 'CSV' : 'Export CSV'}

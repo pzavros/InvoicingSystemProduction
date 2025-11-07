@@ -198,14 +198,13 @@ export default function NavBar() {
         borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
         minHeight: 72,
       }}>
-        {effectiveDrawerOpen ? (
+        {effectiveDrawerOpen && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             {/* Minimal Logo */}
             <Box
               sx={{
-                width: 36,
-                height: 36,
-                borderRadius: '8px',
+                width: 44,
+                height: 44,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -218,7 +217,7 @@ export default function NavBar() {
                 sx={{
                   width: '100%',
                   height: '100%',
-                  objectFit: 'contain',
+                  objectFit: 'contain'
                 }}
               />
             </Box>
@@ -249,28 +248,6 @@ export default function NavBar() {
                 BETA
               </Typography>
             </Box>
-          </Box>
-        ) : (
-          <Box
-            sx={{
-              width: 36,
-              height: 36,
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Box
-              component="img"
-              src={`${import.meta.env.BASE_URL}media/logo.svg`}
-              alt="E-Nvoicing Logo"
-              sx={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'contain',
-              }}
-            />
           </Box>
         )}
         <Tooltip title={effectiveDrawerOpen ? (isMobile ? "Close menu" : "Collapse") : "Expand"} placement="right">
@@ -633,9 +610,9 @@ export default function NavBar() {
               {/* Logo in Mobile AppBar */}
               <Box
                 sx={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: '6px',
+                  width: 36,
+                  height: 36,
+                  borderRadius: '12px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',

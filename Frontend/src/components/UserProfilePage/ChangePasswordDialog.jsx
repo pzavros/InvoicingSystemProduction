@@ -236,7 +236,16 @@ const ChangePasswordDialog = ({ open, onClose, onChangePassword, showNotificatio
       case 1:
         return (
           <>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                mb: 3,
+                color: 'rgba(15, 23, 42, 0.65)',
+                fontSize: '0.9375rem',
+                lineHeight: 1.6,
+                letterSpacing: '-0.01em'
+              }}
+            >
               We'll send a 6-digit verification code to your email address to confirm the password change.
             </Typography>
           </>
@@ -245,16 +254,34 @@ const ChangePasswordDialog = ({ open, onClose, onChangePassword, showNotificatio
       case 2:
         return (
           <>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                mb: 3,
+                color: 'rgba(15, 23, 42, 0.65)',
+                fontSize: '0.9375rem',
+                lineHeight: 1.6,
+                letterSpacing: '-0.01em'
+              }}
+            >
               Enter the 6-digit verification code sent to your email address.
             </Typography>
             
             {/* Individual OTP Input Boxes */}
             <Box sx={{ mb: 3 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  mb: 2,
+                  color: 'rgba(15, 23, 42, 0.55)',
+                  fontSize: '0.8125rem',
+                  fontWeight: 500,
+                  letterSpacing: '-0.01em'
+                }}
+              >
                 Verification Code
               </Typography>
-              <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
+              <Box sx={{ display: 'flex', gap: 1.5, justifyContent: 'center' }}>
                 {passwordData.otp.map((digit, index) => (
                   <TextField
                     key={index}
@@ -269,15 +296,28 @@ const ChangePasswordDialog = ({ open, onClose, onChangePassword, showNotificatio
                       style: { 
                         textAlign: 'center', 
                         fontSize: '1.5rem',
-                        padding: '12px'
+                        padding: '14px 8px',
+                        fontWeight: 600
                       }
                     }}
                     sx={{
-                      width: '50px',
+                      width: '52px',
                       '& .MuiOutlinedInput-root': {
+                        borderRadius: '12px',
+                        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                        '& fieldset': {
+                          borderColor: 'rgba(15, 23, 42, 0.12)',
+                          transition: 'all 0.2s ease'
+                        },
+                        '&:hover fieldset': {
+                          borderColor: 'rgba(15, 23, 42, 0.2)'
+                        },
                         '&.Mui-focused fieldset': {
-                          borderColor: 'primary.main',
-                          borderWidth: 2
+                          borderColor: 'rgba(15, 23, 42, 0.3)',
+                          borderWidth: '1.5px'
+                        },
+                        '&.Mui-error fieldset': {
+                          borderColor: '#dc2626'
                         }
                       }
                     }}
@@ -286,14 +326,31 @@ const ChangePasswordDialog = ({ open, onClose, onChangePassword, showNotificatio
                 ))}
               </Box>
               {errors.otp && (
-                <Typography variant="caption" color="error" sx={{ mt: 1, display: 'block', textAlign: 'center' }}>
+                <Typography 
+                  variant="caption" 
+                  sx={{ 
+                    mt: 1.5, 
+                    display: 'block', 
+                    textAlign: 'center',
+                    color: '#dc2626',
+                    fontSize: '0.8125rem'
+                  }}
+                >
                   {errors.otp}
                 </Typography>
               )}
             </Box>
 
             {countdown > 0 && (
-              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  textAlign: 'center',
+                  color: 'rgba(15, 23, 42, 0.5)',
+                  fontSize: '0.875rem',
+                  fontWeight: 500
+                }}
+              >
                 Code expires in: {formatCountdown(countdown)}
               </Typography>
             )}
@@ -303,11 +360,20 @@ const ChangePasswordDialog = ({ open, onClose, onChangePassword, showNotificatio
       case 3:
         return (
           <>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                mb: 3,
+                color: 'rgba(15, 23, 42, 0.65)',
+                fontSize: '0.9375rem',
+                lineHeight: 1.6,
+                letterSpacing: '-0.01em'
+              }}
+            >
               OTP verified successfully! Now set your new password.
             </Typography>
             
-            <Grid container spacing={2}>
+            <Grid container spacing={2.5}>
               <Grid item xs={12}>
                 <TextField
                   fullWidth
@@ -326,10 +392,58 @@ const ChangePasswordDialog = ({ open, onClose, onChangePassword, showNotificatio
                         onClick={() => togglePasswordVisibility('new')}
                         edge="end"
                         size="small"
+                        sx={{
+                          color: 'rgba(15, 23, 42, 0.45)',
+                          '&:hover': {
+                            backgroundColor: 'rgba(15, 23, 42, 0.06)',
+                            color: 'rgba(15, 23, 42, 0.7)'
+                          }
+                        }}
                       >
                         {showPasswords.new ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     )
+                  }}
+                  sx={{
+                    '& .MuiInputLabel-root': {
+                      fontSize: '0.9375rem',
+                      fontWeight: 500,
+                      color: 'rgba(15, 23, 42, 0.55)',
+                      '&.Mui-focused': {
+                        color: 'rgba(15, 23, 42, 0.75)',
+                        fontWeight: 600
+                      }
+                    },
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '12px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.6)',
+                      fontSize: '0.9375rem',
+                      '& fieldset': {
+                        borderColor: 'rgba(15, 23, 42, 0.08)',
+                        transition: 'all 0.2s ease'
+                      },
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        '& fieldset': { 
+                          borderColor: 'rgba(15, 23, 42, 0.15)' 
+                        }
+                      },
+                      '&.Mui-focused': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        '& fieldset': { 
+                          borderColor: 'rgba(15, 23, 42, 0.25)',
+                          borderWidth: '1.5px'
+                        }
+                      }
+                    },
+                    '& .MuiOutlinedInput-input': {
+                      padding: '13px 15px',
+                      fontWeight: 500
+                    },
+                    '& .MuiFormHelperText-root': {
+                      fontSize: '0.8125rem',
+                      marginLeft: '2px'
+                    }
                   }}
                 />
               </Grid>
@@ -350,10 +464,58 @@ const ChangePasswordDialog = ({ open, onClose, onChangePassword, showNotificatio
                         onClick={() => togglePasswordVisibility('confirm')}
                         edge="end"
                         size="small"
+                        sx={{
+                          color: 'rgba(15, 23, 42, 0.45)',
+                          '&:hover': {
+                            backgroundColor: 'rgba(15, 23, 42, 0.06)',
+                            color: 'rgba(15, 23, 42, 0.7)'
+                          }
+                        }}
                       >
                         {showPasswords.confirm ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
                     )
+                  }}
+                  sx={{
+                    '& .MuiInputLabel-root': {
+                      fontSize: '0.9375rem',
+                      fontWeight: 500,
+                      color: 'rgba(15, 23, 42, 0.55)',
+                      '&.Mui-focused': {
+                        color: 'rgba(15, 23, 42, 0.75)',
+                        fontWeight: 600
+                      }
+                    },
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '12px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.6)',
+                      fontSize: '0.9375rem',
+                      '& fieldset': {
+                        borderColor: 'rgba(15, 23, 42, 0.08)',
+                        transition: 'all 0.2s ease'
+                      },
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        '& fieldset': { 
+                          borderColor: 'rgba(15, 23, 42, 0.15)' 
+                        }
+                      },
+                      '&.Mui-focused': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        '& fieldset': { 
+                          borderColor: 'rgba(15, 23, 42, 0.25)',
+                          borderWidth: '1.5px'
+                        }
+                      }
+                    },
+                    '& .MuiOutlinedInput-input': {
+                      padding: '13px 15px',
+                      fontWeight: 500
+                    },
+                    '& .MuiFormHelperText-root': {
+                      fontSize: '0.8125rem',
+                      marginLeft: '2px'
+                    }
                   }}
                 />
               </Grid>
@@ -383,18 +545,39 @@ const ChangePasswordDialog = ({ open, onClose, onChangePassword, showNotificatio
             onClick={handleRequestOtp}
             variant="contained"
             disabled={loading}
-            size="large"
             sx={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              px: 4,
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+              color: 'white',
+              px: 3.5,
+              py: 1.25,
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              borderRadius: '10px',
+              textTransform: "none",
+              boxShadow: '0 1px 3px rgba(139, 92, 246, 0.15), 0 0 0 0.5px rgba(139, 92, 246, 0.1)',
+              letterSpacing: '-0.01em',
+              border: 'none',
               "&:hover": {
-                background: 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)',
-              }
+                background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                boxShadow: '0 2px 6px rgba(139, 92, 246, 0.2), 0 0 0 0.5px rgba(139, 92, 246, 0.15)',
+                transform: 'translateY(-1px)'
+              },
+              "&:active": {
+                transform: 'translateY(0px)',
+                boxShadow: '0 1px 2px rgba(139, 92, 246, 0.15)'
+              },
+              "&:disabled": {
+                backgroundColor: "rgba(15, 23, 42, 0.08)",
+                background: "rgba(15, 23, 42, 0.08)",
+                color: 'rgba(15, 23, 42, 0.3)',
+                boxShadow: 'none'
+              },
+              transition: 'all 0.15s ease'
             }}
           >
             {loading ? (
               <>
-                <CircularProgress size={20} color="inherit" sx={{ mr: 1 }} />
+                <CircularProgress size={18} color="inherit" sx={{ mr: 1 }} />
                 Sending Code...
               </>
             ) : (
@@ -410,8 +593,31 @@ const ChangePasswordDialog = ({ open, onClose, onChangePassword, showNotificatio
               <Button
                 onClick={handleRequestOtp}
                 disabled={loading}
-                size="large"
-                sx={{ mr: 1 }}
+                sx={{
+                  mr: 1.5,
+                  px: 3,
+                  py: 1.25,
+                  fontSize: "0.875rem",
+                  fontWeight: 600,
+                  borderRadius: '10px',
+                  textTransform: "none",
+                  borderColor: 'rgba(15, 23, 42, 0.12)',
+                  color: 'rgba(15, 23, 42, 0.65)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                  letterSpacing: '-0.01em',
+                  boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
+                  "&:hover": {
+                    backgroundColor: 'rgba(15, 23, 42, 0.04)',
+                    borderColor: 'rgba(15, 23, 42, 0.2)',
+                    boxShadow: '0 2px 4px rgba(15, 23, 42, 0.08)',
+                    transform: 'translateY(-1px)'
+                  },
+                  "&:active": {
+                    transform: 'translateY(0px)',
+                    boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)'
+                  },
+                  transition: 'all 0.15s ease'
+                }}
               >
                 Resend Code
               </Button>
@@ -420,18 +626,39 @@ const ChangePasswordDialog = ({ open, onClose, onChangePassword, showNotificatio
               onClick={handleVerifyOtp}
               variant="contained"
               disabled={loading || passwordData.otp.join('').length !== 6}
-              size="large"
               sx={{
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                px: 4,
+                background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                color: 'white',
+                px: 3.5,
+                py: 1.25,
+                fontSize: "0.875rem",
+                fontWeight: 600,
+                borderRadius: '10px',
+                textTransform: "none",
+                boxShadow: '0 1px 3px rgba(139, 92, 246, 0.15), 0 0 0 0.5px rgba(139, 92, 246, 0.1)',
+                letterSpacing: '-0.01em',
+                border: 'none',
                 "&:hover": {
-                  background: 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)',
-                }
+                  background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                  boxShadow: '0 2px 6px rgba(139, 92, 246, 0.2), 0 0 0 0.5px rgba(139, 92, 246, 0.15)',
+                  transform: 'translateY(-1px)'
+                },
+                "&:active": {
+                  transform: 'translateY(0px)',
+                  boxShadow: '0 1px 2px rgba(139, 92, 246, 0.15)'
+                },
+                "&:disabled": {
+                  backgroundColor: "rgba(15, 23, 42, 0.08)",
+                  background: "rgba(15, 23, 42, 0.08)",
+                  color: 'rgba(15, 23, 42, 0.3)',
+                  boxShadow: 'none'
+                },
+                transition: 'all 0.15s ease'
               }}
             >
               {loading ? (
                 <>
-                  <CircularProgress size={20} color="inherit" sx={{ mr: 1 }} />
+                  <CircularProgress size={18} color="inherit" sx={{ mr: 1 }} />
                   Verifying...
                 </>
               ) : (
@@ -447,18 +674,39 @@ const ChangePasswordDialog = ({ open, onClose, onChangePassword, showNotificatio
             onClick={handleChangePassword}
             variant="contained"
             disabled={loading || !passwordData.newPassword || !passwordData.confirmPassword}
-            size="large"
             sx={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              px: 4,
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+              color: 'white',
+              px: 3.5,
+              py: 1.25,
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              borderRadius: '10px',
+              textTransform: "none",
+              boxShadow: '0 1px 3px rgba(139, 92, 246, 0.15), 0 0 0 0.5px rgba(139, 92, 246, 0.1)',
+              letterSpacing: '-0.01em',
+              border: 'none',
               "&:hover": {
-                background: 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)',
-              }
+                background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                boxShadow: '0 2px 6px rgba(139, 92, 246, 0.2), 0 0 0 0.5px rgba(139, 92, 246, 0.15)',
+                transform: 'translateY(-1px)'
+              },
+              "&:active": {
+                transform: 'translateY(0px)',
+                boxShadow: '0 1px 2px rgba(139, 92, 246, 0.15)'
+              },
+              "&:disabled": {
+                backgroundColor: "rgba(15, 23, 42, 0.08)",
+                background: "rgba(15, 23, 42, 0.08)",
+                color: 'rgba(15, 23, 42, 0.3)',
+                boxShadow: 'none'
+              },
+              transition: 'all 0.15s ease'
             }}
           >
             {loading ? (
               <>
-                <CircularProgress size={20} color="inherit" sx={{ mr: 1 }} />
+                <CircularProgress size={18} color="inherit" sx={{ mr: 1 }} />
                 Changing Password...
               </>
             ) : (
@@ -479,29 +727,84 @@ const ChangePasswordDialog = ({ open, onClose, onChangePassword, showNotificatio
       maxWidth="sm"
       fullWidth
       PaperProps={{
-        sx: { borderRadius: 3 }
+        sx: { 
+          borderRadius: '20px',
+          boxShadow: '0 8px 32px rgba(15, 23, 42, 0.12)',
+          border: '1px solid rgba(15, 23, 42, 0.08)',
+          backgroundColor: 'rgba(255, 255, 255, 0.98)',
+          backdropFilter: 'blur(20px)'
+        }
+      }}
+      BackdropProps={{
+        sx: {
+          backgroundColor: 'rgba(15, 23, 42, 0.3)',
+          backdropFilter: 'blur(8px)'
+        }
       }}
     >
-      <DialogTitle sx={{ pb: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontWeight: 'bold' }}>
+      <DialogTitle sx={{ 
+        pb: 2, 
+        pt: 3.5,
+        px: 4,
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'space-between', 
+        fontWeight: 600,
+        fontSize: '1.25rem',
+        letterSpacing: '-0.02em',
+        color: 'rgba(15, 23, 42, 0.95)'
+      }}>
         {getStepTitle()}
-        <IconButton onClick={handleClose} size="small">
+        <IconButton 
+          onClick={handleClose} 
+          size="small"
+          sx={{
+            color: 'rgba(15, 23, 42, 0.5)',
+            '&:hover': {
+              backgroundColor: 'rgba(15, 23, 42, 0.06)',
+              color: 'rgba(15, 23, 42, 0.7)'
+            }
+          }}
+        >
           <CloseIcon />
         </IconButton>
       </DialogTitle>
 
-      <DialogContent sx={{ pb: 2 }}>
+      <DialogContent sx={{ pb: 2, px: 4 }}>
         {/* Step Indicator */}
-        <Stepper activeStep={step - 1} sx={{ mb: 3 }}>
+        <Stepper 
+          activeStep={step - 1} 
+          sx={{ 
+            mb: 4,
+            '& .MuiStepLabel-label': {
+              fontSize: '0.8125rem',
+              fontWeight: 500,
+              color: 'rgba(15, 23, 42, 0.5)',
+              '&.Mui-active': {
+                color: 'rgba(15, 23, 42, 0.75)',
+                fontWeight: 600
+              },
+              '&.Mui-completed': {
+                color: 'rgba(15, 23, 42, 0.6)'
+              }
+            },
+            '& .MuiStepIcon-root': {
+              color: 'rgba(15, 23, 42, 0.12)',
+              '&.Mui-active': {
+                color: '#8b5cf6'
+              },
+              '&.Mui-completed': {
+                color: 'rgba(139, 92, 246, 0.7)'
+              }
+            },
+            '& .MuiStepConnector-line': {
+              borderColor: 'rgba(15, 23, 42, 0.1)'
+            }
+          }}
+        >
           {[1, 2, 3].map((stepNumber) => (
             <Step key={stepNumber}>
-              <StepLabel 
-                icon={getStepIcon(stepNumber)}
-                sx={{
-                  '& .MuiStepIcon-root': {
-                    color: step >= stepNumber ? 'primary.main' : 'grey.300',
-                  }
-                }}
-              >
+              <StepLabel icon={getStepIcon(stepNumber)}>
                 {stepNumber === 1 && 'Send Code'}
                 {stepNumber === 2 && 'Verify OTP'}
                 {stepNumber === 3 && 'New Password'}
@@ -517,22 +820,49 @@ const ChangePasswordDialog = ({ open, onClose, onChangePassword, showNotificatio
 
         {/* Errors */}
         {Object.keys(errors).length > 0 && (
-          <Alert severity="error" sx={{ mt: 2 }}>
+          <Alert 
+            severity="error" 
+            sx={{ 
+              mt: 3,
+              borderRadius: '12px',
+              backgroundColor: 'rgba(220, 38, 38, 0.08)',
+              border: '1px solid rgba(220, 38, 38, 0.2)',
+              color: '#dc2626',
+              fontSize: '0.875rem',
+              '& .MuiAlert-icon': {
+                color: '#dc2626'
+              }
+            }}
+          >
             Please fix the errors above before continuing.
           </Alert>
         )}
       </DialogContent>
 
-      <DialogActions sx={{ px: 3, pb: 3, justifyContent: 'space-between' }}>
+      <DialogActions sx={{ px: 4, pb: 3.5, pt: 2, justifyContent: 'space-between' }}>
         <Button 
           onClick={handleClose} 
           disabled={loading}
-          size="large"
+          sx={{
+            px: 3,
+            py: 1.25,
+            fontSize: "0.875rem",
+            fontWeight: 600,
+            borderRadius: '10px',
+            textTransform: "none",
+            color: 'rgba(15, 23, 42, 0.65)',
+            letterSpacing: '-0.01em',
+            "&:hover": {
+              backgroundColor: 'rgba(15, 23, 42, 0.06)',
+              color: 'rgba(15, 23, 42, 0.8)'
+            },
+            transition: 'all 0.15s ease'
+          }}
         >
           Cancel
         </Button>
         
-        <Box sx={{ display: 'flex', gap: 1 }}>
+        <Box sx={{ display: 'flex', gap: 1.5 }}>
           {step > 1 && (
             <Button
               onClick={() => {
@@ -543,7 +873,21 @@ const ChangePasswordDialog = ({ open, onClose, onChangePassword, showNotificatio
                 }
               }}
               disabled={loading}
-              size="large"
+              sx={{
+                px: 3,
+                py: 1.25,
+                fontSize: "0.875rem",
+                fontWeight: 600,
+                borderRadius: '10px',
+                textTransform: "none",
+                color: 'rgba(15, 23, 42, 0.65)',
+                letterSpacing: '-0.01em',
+                "&:hover": {
+                  backgroundColor: 'rgba(15, 23, 42, 0.06)',
+                  color: 'rgba(15, 23, 42, 0.8)'
+                },
+                transition: 'all 0.15s ease'
+              }}
             >
               Back
             </Button>

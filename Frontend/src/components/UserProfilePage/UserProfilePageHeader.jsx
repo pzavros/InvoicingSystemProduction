@@ -43,21 +43,40 @@ const UserProfilePageHeader = ({ profile }) => {
         flexDirection: { xs: 'column', sm: 'row' },
         justifyContent: 'space-between',
         alignItems: { xs: 'flex-start', sm: 'center' },
-        gap: { xs: 2, sm: 3 },
-        mb: 3,
-        pb: 3,
-        borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
+        gap: { xs: 2.5, sm: 3 },
+        mb: 4,
+        p: { xs: 3.5, md: 4.5 },
+        borderRadius: '20px',
+        background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.06) 0%, rgba(124, 58, 237, 0.06) 100%)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: '1px solid rgba(139, 92, 246, 0.08)',
+        boxShadow: '0 1px 2px rgba(139, 92, 246, 0.04)',
+        position: 'relative',
+        overflow: 'hidden',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'radial-gradient(circle at top right, rgba(139, 92, 246, 0.03) 0%, transparent 60%)',
+          pointerEvents: 'none'
+        }
       }}
     >
       {/* Left Side - Title and Description */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, position: 'relative', zIndex: 1 }}>
         <Avatar
           sx={{
-            width: 48,
-            height: 48,
+            width: 60,
+            height: 60,
             background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-            fontSize: '1.25rem',
+            fontSize: '1.5rem',
             fontWeight: 600,
+            boxShadow: '0 4px 16px rgba(139, 92, 246, 0.3)',
+            border: '2.5px solid rgba(255, 255, 255, 0.6)'
           }}
         >
           {profile?.firstName?.[0]}{profile?.lastName?.[0]}
@@ -70,8 +89,8 @@ const UserProfilePageHeader = ({ profile }) => {
               fontWeight: 700,
               fontSize: { xs: '1.75rem', sm: '2rem' },
               color: 'rgba(15, 23, 42, 0.95)',
-              letterSpacing: '-0.02em',
-              lineHeight: 1.1,
+              letterSpacing: '-0.03em',
+              lineHeight: 1.2,
               mb: 0.5
             }}
           >
@@ -80,9 +99,9 @@ const UserProfilePageHeader = ({ profile }) => {
           <Typography
             variant="body2"
             sx={{
-              color: 'rgba(15, 23, 42, 0.5)',
+              color: 'rgba(15, 23, 42, 0.6)',
               fontSize: '0.9375rem',
-              fontWeight: 400,
+              fontWeight: 500,
               letterSpacing: '-0.01em'
             }}
           >
@@ -92,25 +111,45 @@ const UserProfilePageHeader = ({ profile }) => {
       </Box>
 
       {/* Right Side - Subscription Status */}
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: { xs: 'flex-start', sm: 'flex-end' } }}>
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: 1.25, 
+          alignItems: { xs: 'flex-start', sm: 'flex-end' },
+          p: { xs: 2, sm: 2.5 },
+          borderRadius: '16px',
+          background: 'rgba(255, 255, 255, 0.5)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(15, 23, 42, 0.06)',
+          boxShadow: '0 1px 2px rgba(15, 23, 42, 0.02)',
+          position: 'relative',
+          zIndex: 1
+        }}
+      >
         <Chip
-          icon={profile?.isTrialUser ? <TrialIcon /> : <VerifiedIcon />}
+          icon={profile?.isTrialUser ? <TrialIcon sx={{ fontSize: 16 }} /> : <VerifiedIcon sx={{ fontSize: 16 }} />}
           label={getSubscriptionLabel()}
           color={getSubscriptionColor()}
-          size="small"
           sx={{
             fontWeight: 600,
-            fontSize: '0.75rem',
-            height: '24px',
-            borderRadius: '6px',
+            fontSize: '0.8125rem',
+            height: '28px',
+            borderRadius: '8px',
+            px: 0.5,
+            '& .MuiChip-icon': {
+              fontSize: 16
+            }
           }}
         />
         {profile?.subscriptionExpiryDate && (
           <Typography
             variant="caption"
             sx={{
-              color: 'rgba(15, 23, 42, 0.5)',
+              color: 'rgba(15, 23, 42, 0.6)',
               fontSize: '0.8125rem',
+              fontWeight: 500
             }}
           >
             Expires: {formatDate(profile?.subscriptionExpiryDate)}

@@ -31,7 +31,16 @@ const FormGrid = ({ size, children }) => (
 
 const SectionTitle = ({ children }) => (
   <FormGrid size={{ xs: 12 }}>
-    <Typography variant="h6" sx={{ fontWeight: 600, color: "#1f2937", mb: 2 }}>
+    <Typography variant="h6" sx={{ 
+      fontWeight: 600, 
+      color: 'rgba(15, 23, 42, 0.95)', 
+      mb: 2,
+      mt: 3,
+      fontSize: '1rem',
+      letterSpacing: '-0.02em',
+      borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
+      pb: 1.5
+    }}>
       {children}
     </Typography>
   </FormGrid>
@@ -208,39 +217,90 @@ const ClientFormPage = () => {
   }
 
   return (
-    <Grid container spacing={{ xs: 2, md: 3 }}>
+    <Box>
       {/* Header */}
-      <FormGrid size={{ xs: 12 }}>
-        <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-          <IconButton onClick={handleBack} sx={{ mr: 2 }}>
-            <ArrowBackIcon />
-          </IconButton>
-          <Typography variant="h4" component="h1" sx={{ fontWeight: 600 }}>
-            {isEditing ? "Edit Client" : "Add New Client"}
+      <Box sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        mb: 2,
+        pb: 2,
+        borderBottom: '1px solid rgba(15, 23, 42, 0.08)'
+      }}>
+        <IconButton 
+          onClick={handleBack}
+          sx={{ 
+            mr: 2,
+            width: 40,
+            height: 40,
+            borderRadius: '10px',
+            border: '1px solid rgba(15, 23, 42, 0.08)',
+            backgroundColor: 'rgba(15, 23, 42, 0.02)',
+            color: 'rgba(15, 23, 42, 0.65)',
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              backgroundColor: 'rgba(15, 23, 42, 0.06)',
+              borderColor: 'rgba(15, 23, 42, 0.12)',
+              color: 'rgba(15, 23, 42, 0.85)'
+            }
+          }}
+        >
+          <ArrowBackIcon fontSize="small" />
+        </IconButton>
+        <Box>
+          <Typography variant="h4" component="h1" sx={{ 
+            fontWeight: 700,
+            color: 'rgba(15, 23, 42, 0.95)',
+            fontSize: { xs: '1.5rem', sm: '2rem' },
+            letterSpacing: '-0.02em',
+            mb: 0.5
+          }}>
+            {isEditing ? 'Edit Client' : 'Add New Client'}
+          </Typography>
+          <Typography variant="body2" sx={{
+            color: 'rgba(15, 23, 42, 0.55)',
+            fontSize: '0.875rem',
+            fontWeight: 500
+          }}>
+            {isEditing ? 'Update client information' : 'Create a new client for your invoices'}
           </Typography>
         </Box>
-      </FormGrid>
+      </Box>
 
       {/* Notification */}
       {notification.show && (
-        <FormGrid size={{ xs: 12 }}>
-          <Alert
-            severity={notification.severity}
-            onClose={() => setNotification({ ...notification, show: false })}
-            sx={{ mb: 2 }}
-          >
-            {notification.message}
-          </Alert>
-        </FormGrid>
+        <Alert
+          severity={notification.severity}
+          onClose={() => setNotification({ ...notification, show: false })}
+          sx={{ 
+            mb: 2,
+            borderRadius: '12px',
+            border: '1px solid rgba(15, 23, 42, 0.06)',
+            '& .MuiAlert-icon': {
+              color: notification.severity === 'success' ? '#10b981' : 
+                     notification.severity === 'error' ? '#ef4444' : '#8b5cf6'
+            }
+          }}
+        >
+          {notification.message}
+        </Alert>
       )}
 
       {/* Form */}
-      <Grid container spacing={{ xs: 2, md: 3 }} component="form" onSubmit={handleSubmit}>
+      <Box component="form" onSubmit={handleSubmit}>
+        <Grid container spacing={{ xs: 1.5, md: 2 }}>
         {/* Basic Information */}
         <SectionTitle>Basic Information</SectionTitle>
 
         <FormGrid size={{ xs: 12, md: 4 }}>
-          <FormLabel htmlFor="name">Full Name *</FormLabel>
+          <FormLabel sx={{ 
+            color: 'rgba(15, 23, 42, 0.75)',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            mb: 0.5,
+            display: 'block'
+          }}>
+            Full Name *
+          </FormLabel>
           <OutlinedInput
             id="name"
             name="name"
@@ -250,30 +310,50 @@ const ClientFormPage = () => {
             required
             size="small"
             fullWidth
+            placeholder="John Doe"
             sx={{
-              backgroundColor: '#ffffff',
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              fontSize: '0.875rem',
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#d1d5db',
-                borderWidth: '1.5px'
+                borderColor: errors.name ? '#ef4444' : 'rgba(15, 23, 42, 0.08)',
+                borderWidth: '1px'
               },
               '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#9ca3af'
+                borderColor: errors.name ? '#ef4444' : 'rgba(15, 23, 42, 0.15)'
               },
               '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#3b82f6',
-                borderWidth: '2px'
+                borderColor: errors.name ? '#ef4444' : 'rgba(15, 23, 42, 0.25)',
+                borderWidth: '1.5px'
+              },
+              '& .MuiInputBase-input': {
+                padding: '9px 12px'
               }
             }}
           />
           {errors.name && (
-            <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+            <Typography variant="caption" sx={{ 
+              mt: 0.5, 
+              display: 'block',
+              color: '#ef4444',
+              fontSize: '0.75rem',
+              fontWeight: 500
+            }}>
               {errors.name}
             </Typography>
           )}
         </FormGrid>
 
         <FormGrid size={{ xs: 12, md: 4 }}>
-          <FormLabel htmlFor="email">Email Address *</FormLabel>
+          <FormLabel sx={{ 
+            color: 'rgba(15, 23, 42, 0.75)',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            mb: 0.5,
+            display: 'block'
+          }}>
+            Email Address *
+          </FormLabel>
           <OutlinedInput
             id="email"
             name="email"
@@ -284,30 +364,50 @@ const ClientFormPage = () => {
             required
             size="small"
             fullWidth
+            placeholder="john@example.com"
             sx={{
-              backgroundColor: '#ffffff',
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              fontSize: '0.875rem',
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#d1d5db',
-                borderWidth: '1.5px'
+                borderColor: errors.email ? '#ef4444' : 'rgba(15, 23, 42, 0.08)',
+                borderWidth: '1px'
               },
               '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#9ca3af'
+                borderColor: errors.email ? '#ef4444' : 'rgba(15, 23, 42, 0.15)'
               },
               '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#3b82f6',
-                borderWidth: '2px'
+                borderColor: errors.email ? '#ef4444' : 'rgba(15, 23, 42, 0.25)',
+                borderWidth: '1.5px'
+              },
+              '& .MuiInputBase-input': {
+                padding: '9px 12px'
               }
             }}
           />
           {errors.email && (
-            <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
+            <Typography variant="caption" sx={{ 
+              mt: 0.5, 
+              display: 'block',
+              color: '#ef4444',
+              fontSize: '0.75rem',
+              fontWeight: 500
+            }}>
               {errors.email}
             </Typography>
           )}
         </FormGrid>
 
         <FormGrid size={{ xs: 12, md: 4 }}>
-          <FormLabel htmlFor="company">Company</FormLabel>
+          <FormLabel sx={{ 
+            color: 'rgba(15, 23, 42, 0.75)',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            mb: 0.5,
+            display: 'block'
+          }}>
+            Company
+          </FormLabel>
           <OutlinedInput
             id="company"
             name="company"
@@ -315,25 +415,39 @@ const ClientFormPage = () => {
             onChange={handleChange("company")}
             size="small"
             fullWidth
+            placeholder="Acme Inc."
             sx={{
-              backgroundColor: '#ffffff',
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              fontSize: '0.875rem',
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#d1d5db',
-                borderWidth: '1.5px'
+                borderColor: 'rgba(15, 23, 42, 0.08)',
+                borderWidth: '1px'
               },
               '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#9ca3af'
+                borderColor: 'rgba(15, 23, 42, 0.15)'
               },
               '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#3b82f6',
-                borderWidth: '2px'
+                borderColor: 'rgba(15, 23, 42, 0.25)',
+                borderWidth: '1.5px'
+              },
+              '& .MuiInputBase-input': {
+                padding: '9px 12px'
               }
             }}
           />
         </FormGrid>
 
         <FormGrid size={{ xs: 12, md: 4 }}>
-          <FormLabel htmlFor="phone">Phone Number</FormLabel>
+          <FormLabel sx={{ 
+            color: 'rgba(15, 23, 42, 0.75)',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            mb: 0.5,
+            display: 'block'
+          }}>
+            Phone Number
+          </FormLabel>
           <OutlinedInput
             id="phone"
             name="phone"
@@ -341,25 +455,39 @@ const ClientFormPage = () => {
             onChange={handleChange("phone")}
             size="small"
             fullWidth
+            placeholder="+1 (555) 123-4567"
             sx={{
-              backgroundColor: '#ffffff',
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              fontSize: '0.875rem',
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#d1d5db',
-                borderWidth: '1.5px'
+                borderColor: 'rgba(15, 23, 42, 0.08)',
+                borderWidth: '1px'
               },
               '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#9ca3af'
+                borderColor: 'rgba(15, 23, 42, 0.15)'
               },
               '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#3b82f6',
-                borderWidth: '2px'
+                borderColor: 'rgba(15, 23, 42, 0.25)',
+                borderWidth: '1.5px'
+              },
+              '& .MuiInputBase-input': {
+                padding: '9px 12px'
               }
             }}
           />
         </FormGrid>
 
         <FormGrid size={{ xs: 12, md: 4 }}>
-          <FormLabel htmlFor="website">Website</FormLabel>
+          <FormLabel sx={{ 
+            color: 'rgba(15, 23, 42, 0.75)',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            mb: 0.5,
+            display: 'block'
+          }}>
+            Website
+          </FormLabel>
           <OutlinedInput
             id="website"
             name="website"
@@ -369,24 +497,37 @@ const ClientFormPage = () => {
             size="small"
             fullWidth
             sx={{
-              backgroundColor: '#ffffff',
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              fontSize: '0.875rem',
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#d1d5db',
-                borderWidth: '1.5px'
+                borderColor: 'rgba(15, 23, 42, 0.08)',
+                borderWidth: '1px'
               },
               '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#9ca3af'
+                borderColor: 'rgba(15, 23, 42, 0.15)'
               },
               '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#3b82f6',
-                borderWidth: '2px'
+                borderColor: 'rgba(15, 23, 42, 0.25)',
+                borderWidth: '1.5px'
+              },
+              '& .MuiInputBase-input': {
+                padding: '9px 12px'
               }
             }}
           />
         </FormGrid>
 
         <FormGrid size={{ xs: 12, md: 4 }}>
-          <FormLabel htmlFor="taxNumber">Tax Number</FormLabel>
+          <FormLabel sx={{ 
+            color: 'rgba(15, 23, 42, 0.75)',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            mb: 0.5,
+            display: 'block'
+          }}>
+            Tax Number
+          </FormLabel>
           <OutlinedInput
             id="taxNumber"
             name="taxNumber"
@@ -394,18 +535,24 @@ const ClientFormPage = () => {
             onChange={handleChange("taxNumber")}
             size="small"
             fullWidth
+            placeholder="123-45-6789"
             sx={{
-              backgroundColor: '#ffffff',
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              fontSize: '0.875rem',
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#d1d5db',
-                borderWidth: '1.5px'
+                borderColor: 'rgba(15, 23, 42, 0.08)',
+                borderWidth: '1px'
               },
               '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#9ca3af'
+                borderColor: 'rgba(15, 23, 42, 0.15)'
               },
               '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#3b82f6',
-                borderWidth: '2px'
+                borderColor: 'rgba(15, 23, 42, 0.25)',
+                borderWidth: '1.5px'
+              },
+              '& .MuiInputBase-input': {
+                padding: '9px 12px'
               }
             }}
           />
@@ -415,7 +562,15 @@ const ClientFormPage = () => {
         <SectionTitle>Address</SectionTitle>
 
         <FormGrid size={{ xs: 12, md: 6 }}>
-          <FormLabel htmlFor="address">Address</FormLabel>
+          <FormLabel sx={{ 
+            color: 'rgba(15, 23, 42, 0.75)',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            mb: 0.5,
+            display: 'block'
+          }}>
+            Address
+          </FormLabel>
           <OutlinedInput
             id="address"
             name="address"
@@ -423,25 +578,39 @@ const ClientFormPage = () => {
             onChange={handleChange("address")}
             size="small"
             fullWidth
+            placeholder="123 Main Street"
             sx={{
-              backgroundColor: '#ffffff',
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              fontSize: '0.875rem',
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#d1d5db',
-                borderWidth: '1.5px'
+                borderColor: 'rgba(15, 23, 42, 0.08)',
+                borderWidth: '1px'
               },
               '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#9ca3af'
+                borderColor: 'rgba(15, 23, 42, 0.15)'
               },
               '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#3b82f6',
-                borderWidth: '2px'
+                borderColor: 'rgba(15, 23, 42, 0.25)',
+                borderWidth: '1.5px'
+              },
+              '& .MuiInputBase-input': {
+                padding: '9px 12px'
               }
             }}
           />
         </FormGrid>
 
         <FormGrid size={{ xs: 12, md: 6 }}>
-          <FormLabel htmlFor="city">City</FormLabel>
+          <FormLabel sx={{ 
+            color: 'rgba(15, 23, 42, 0.75)',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            mb: 0.5,
+            display: 'block'
+          }}>
+            City
+          </FormLabel>
           <OutlinedInput
             id="city"
             name="city"
@@ -449,25 +618,39 @@ const ClientFormPage = () => {
             onChange={handleChange("city")}
             size="small"
             fullWidth
+            placeholder="New York"
             sx={{
-              backgroundColor: '#ffffff',
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              fontSize: '0.875rem',
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#d1d5db',
-                borderWidth: '1.5px'
+                borderColor: 'rgba(15, 23, 42, 0.08)',
+                borderWidth: '1px'
               },
               '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#9ca3af'
+                borderColor: 'rgba(15, 23, 42, 0.15)'
               },
               '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#3b82f6',
-                borderWidth: '2px'
+                borderColor: 'rgba(15, 23, 42, 0.25)',
+                borderWidth: '1.5px'
+              },
+              '& .MuiInputBase-input': {
+                padding: '9px 12px'
               }
             }}
           />
         </FormGrid>
 
         <FormGrid size={{ xs: 12, md: 4 }}>
-          <FormLabel htmlFor="state">State/Province</FormLabel>
+          <FormLabel sx={{ 
+            color: 'rgba(15, 23, 42, 0.75)',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            mb: 0.5,
+            display: 'block'
+          }}>
+            State/Province
+          </FormLabel>
           <OutlinedInput
             id="state"
             name="state"
@@ -475,25 +658,39 @@ const ClientFormPage = () => {
             onChange={handleChange("state")}
             size="small"
             fullWidth
+            placeholder="NY"
             sx={{
-              backgroundColor: '#ffffff',
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              fontSize: '0.875rem',
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#d1d5db',
-                borderWidth: '1.5px'
+                borderColor: 'rgba(15, 23, 42, 0.08)',
+                borderWidth: '1px'
               },
               '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#9ca3af'
+                borderColor: 'rgba(15, 23, 42, 0.15)'
               },
               '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#3b82f6',
-                borderWidth: '2px'
+                borderColor: 'rgba(15, 23, 42, 0.25)',
+                borderWidth: '1.5px'
+              },
+              '& .MuiInputBase-input': {
+                padding: '9px 12px'
               }
             }}
           />
         </FormGrid>
 
         <FormGrid size={{ xs: 12, md: 4 }}>
-          <FormLabel htmlFor="postalCode">Postal Code</FormLabel>
+          <FormLabel sx={{ 
+            color: 'rgba(15, 23, 42, 0.75)',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            mb: 0.5,
+            display: 'block'
+          }}>
+            Postal Code
+          </FormLabel>
           <OutlinedInput
             id="postalCode"
             name="postalCode"
@@ -501,25 +698,39 @@ const ClientFormPage = () => {
             onChange={handleChange("postalCode")}
             size="small"
             fullWidth
+            placeholder="10001"
             sx={{
-              backgroundColor: '#ffffff',
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              fontSize: '0.875rem',
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#d1d5db',
-                borderWidth: '1.5px'
+                borderColor: 'rgba(15, 23, 42, 0.08)',
+                borderWidth: '1px'
               },
               '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#9ca3af'
+                borderColor: 'rgba(15, 23, 42, 0.15)'
               },
               '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#3b82f6',
-                borderWidth: '2px'
+                borderColor: 'rgba(15, 23, 42, 0.25)',
+                borderWidth: '1.5px'
+              },
+              '& .MuiInputBase-input': {
+                padding: '9px 12px'
               }
             }}
           />
         </FormGrid>
 
         <FormGrid size={{ xs: 12, md: 4 }}>
-          <FormLabel htmlFor="country">Country</FormLabel>
+          <FormLabel sx={{ 
+            color: 'rgba(15, 23, 42, 0.75)',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            mb: 0.5,
+            display: 'block'
+          }}>
+            Country
+          </FormLabel>
           <OutlinedInput
             id="country"
             name="country"
@@ -527,18 +738,24 @@ const ClientFormPage = () => {
             onChange={handleChange("country")}
             size="small"
             fullWidth
+            placeholder="United States"
             sx={{
-              backgroundColor: '#ffffff',
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              fontSize: '0.875rem',
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#d1d5db',
-                borderWidth: '1.5px'
+                borderColor: 'rgba(15, 23, 42, 0.08)',
+                borderWidth: '1px'
               },
               '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#9ca3af'
+                borderColor: 'rgba(15, 23, 42, 0.15)'
               },
               '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#3b82f6',
-                borderWidth: '2px'
+                borderColor: 'rgba(15, 23, 42, 0.25)',
+                borderWidth: '1.5px'
+              },
+              '& .MuiInputBase-input': {
+                padding: '9px 12px'
               }
             }}
           />
@@ -553,9 +770,24 @@ const ClientFormPage = () => {
               <Switch
                 checked={formData.isActive}
                 onChange={handleChange("isActive")}
+                sx={{
+                  '& .MuiSwitch-switchBase.Mui-checked': {
+                    color: '#8b5cf6'
+                  },
+                  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                    backgroundColor: '#8b5cf6'
+                  }
+                }}
               />
             }
             label="Active Client"
+            sx={{ 
+              color: 'rgba(15, 23, 42, 0.75)', 
+              fontWeight: 500,
+              '& .MuiFormControlLabel-label': {
+                fontSize: '0.875rem'
+              }
+            }}
           />
         </FormGrid>
 
@@ -563,7 +795,15 @@ const ClientFormPage = () => {
         <SectionTitle>Notes</SectionTitle>
 
         <FormGrid size={{ xs: 12 }}>
-          <FormLabel htmlFor="notes">Notes</FormLabel>
+          <FormLabel sx={{ 
+            color: 'rgba(15, 23, 42, 0.75)',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            mb: 0.5,
+            display: 'block'
+          }}>
+            Notes
+          </FormLabel>
           <OutlinedInput
             id="notes"
             name="notes"
@@ -574,17 +814,22 @@ const ClientFormPage = () => {
             rows={4}
             fullWidth
             sx={{
-              backgroundColor: '#ffffff',
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              fontSize: '0.875rem',
               '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#d1d5db',
-                borderWidth: '1.5px'
+                borderColor: 'rgba(15, 23, 42, 0.08)',
+                borderWidth: '1px'
               },
               '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#9ca3af'
+                borderColor: 'rgba(15, 23, 42, 0.15)'
               },
               '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#3b82f6',
-                borderWidth: '2px'
+                borderColor: 'rgba(15, 23, 42, 0.25)',
+                borderWidth: '1.5px'
+              },
+              '& .MuiInputBase-input': {
+                padding: '12px'
               }
             }}
           />
@@ -594,38 +839,35 @@ const ClientFormPage = () => {
         <FormGrid size={{ xs: 12 }}>
           <Box sx={{ 
             display: "flex", 
-            gap: 3, 
-            pt: 6,
-            mt: 2,
-            borderTop: "2px solid #e5e7eb",
-            justifyContent: { xs: "stretch", sm: "flex-start" },
-            flexDirection: { xs: "column", sm: "row" }
+            gap: 2, 
+            pt: 2.5,
+            mt: 4,
+            mb: 3,
+            borderTop: '1px solid rgba(15, 23, 42, 0.08)',
+            justifyContent: { xs: 'stretch', sm: 'flex-end' },
+            flexDirection: { xs: 'column', sm: 'row' }
           }}>
             <Button
               onClick={handleBack}
-              variant="outlined"
               disabled={saving}
-              size="large"
+              variant="outlined"
               sx={{
-                borderColor: "#d1d5db",
-                color: "#6b7280",
-                borderWidth: 2,
-                px: 5,
-                py: 1.5,
-                fontSize: "0.95rem",
+                px: 3,
+                py: 1.25,
+                borderRadius: '10px',
+                textTransform: 'none',
                 fontWeight: 600,
-                borderRadius: 2,
-                textTransform: "none",
-                "&:hover": {
-                  borderColor: "#9ca3af",
-                  backgroundColor: "#f9fafb",
-                  transform: "translateY(-1px)",
-                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)"
-                },
-                "&:active": {
-                  transform: "translateY(0)"
-                },
-                transition: "all 0.2s ease"
+                fontSize: '0.875rem',
+                color: 'rgba(15, 23, 42, 0.65)',
+                border: '1px solid rgba(15, 23, 42, 0.12)',
+                backgroundColor: 'white',
+                letterSpacing: '-0.01em',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  backgroundColor: 'rgba(15, 23, 42, 0.02)',
+                  borderColor: 'rgba(15, 23, 42, 0.2)',
+                  color: 'rgba(15, 23, 42, 0.85)'
+                }
               }}
             >
               Cancel
@@ -634,38 +876,41 @@ const ClientFormPage = () => {
               type="submit"
               variant="contained"
               disabled={saving}
-              startIcon={saving ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
-              size="large"
+              startIcon={saving ? <CircularProgress size={18} sx={{ color: 'white' }} /> : <SaveIcon sx={{ fontSize: '1.125rem' }} />}
               sx={{
-                backgroundColor: "#3b82f6",
-                px: 5,
-                py: 1.5,
-                fontSize: "0.95rem",
+                px: 3,
+                py: 1.25,
+                borderRadius: '10px',
+                textTransform: 'none',
                 fontWeight: 600,
-                borderRadius: 2,
-                textTransform: "none",
-                boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)",
-                "&:hover": {
-                  backgroundColor: "#2563eb",
-                  transform: "translateY(-1px)",
-                  boxShadow: "0 8px 20px rgba(59, 130, 246, 0.4)"
+                fontSize: '0.875rem',
+                letterSpacing: '-0.01em',
+                background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
+                color: 'white',
+                border: 'none',
+                boxShadow: '0 1px 3px rgba(139, 92, 246, 0.2)',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)',
+                  boxShadow: '0 2px 6px rgba(139, 92, 246, 0.3)',
+                  transform: 'translateY(-1px)'
                 },
-                "&:active": {
-                  transform: "translateY(0)"
+                '&:active': {
+                  transform: 'translateY(0)'
                 },
-                "&:disabled": {
-                  backgroundColor: "#9ca3af",
-                  boxShadow: "none",
-                  transform: "none"
-                },
-                transition: "all 0.2s ease"
+                '&:disabled': {
+                  background: 'rgba(15, 23, 42, 0.08)',
+                  color: 'rgba(15, 23, 42, 0.35)',
+                  boxShadow: 'none'
+                }
               }}
             >
               {saving ? "Saving..." : isEditing ? "Update Client" : "Create Client"}
             </Button>
           </Box>
         </FormGrid>
-      </Grid>
+        </Grid>
+      </Box>
       
       {/* Freemium Limit Reached Modal */}
       <LimitReachedModal
@@ -673,7 +918,7 @@ const ClientFormPage = () => {
         onClose={closeLimitModal}
         resource={limitModalResource}
       />
-    </Grid>
+    </Box>
   );
 };
 

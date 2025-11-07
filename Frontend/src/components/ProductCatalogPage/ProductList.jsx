@@ -655,24 +655,74 @@ const ProductList = ({
           fullScreen={isMobile}
           aria-labelledby="delete-dialog-title"
           aria-describedby="delete-dialog-description"
+          PaperProps={{
+            sx: {
+              borderRadius: isMobile ? 0 : '20px',
+              boxShadow: '0 20px 60px rgba(15, 23, 42, 0.15)'
+            }
+          }}
+          slotProps={{
+            backdrop: {
+              sx: {
+                backdropFilter: 'blur(12px)',
+                backgroundColor: 'rgba(15, 23, 42, 0.4)'
+              }
+            }
+          }}
         >
-          <DialogTitle id="delete-dialog-title" sx={{ color: '#dc2626', fontWeight: 600 }}>
+          <DialogTitle id="delete-dialog-title" sx={{ 
+            color: 'rgba(15, 23, 42, 0.95)', 
+            fontWeight: 700,
+            fontSize: '1.5rem',
+            letterSpacing: '-0.02em',
+            pt: 3,
+            px: 3,
+            pb: 1
+          }}>
             Delete Product
           </DialogTitle>
-          <DialogContent>
-            <DialogContentText id="delete-dialog-description">
+          <DialogContent sx={{ px: 3, py: 2 }}>
+            <DialogContentText id="delete-dialog-description" sx={{
+              color: 'rgba(15, 23, 42, 0.65)',
+              fontSize: '0.9375rem',
+              lineHeight: 1.6
+            }}>
               Are you sure you want to delete{" "}
-              <strong>"{productToDelete?.name}"</strong>? This action cannot be undone and will permanently remove this product from your catalog.
+              <Box component="strong" sx={{ 
+                color: 'rgba(15, 23, 42, 0.95)',
+                fontWeight: 600
+              }}>
+                "{productToDelete?.name}"
+              </Box>? This action cannot be undone and will permanently remove this product from your catalog.
             </DialogContentText>
           </DialogContent>
-          <DialogActions sx={{ p: 3, pt: 1 }}>
+          <DialogActions sx={{ 
+            p: 3, 
+            pt: 2,
+            gap: 1.5,
+            borderTop: '1px solid rgba(15, 23, 42, 0.08)',
+            justifyContent: 'flex-end'
+          }}>
             <Button 
               onClick={handleDeleteCancel}
               variant="outlined"
               sx={{ 
-                borderColor: '#d1d5db',
-                color: '#6b7280',
-                '&:hover': { borderColor: '#9ca3af', backgroundColor: 'rgba(156, 163, 175, 0.1)' }
+                px: 3,
+                py: 1.25,
+                borderRadius: '10px',
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                color: 'rgba(15, 23, 42, 0.65)',
+                border: '1px solid rgba(15, 23, 42, 0.12)',
+                backgroundColor: 'white',
+                letterSpacing: '-0.01em',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  backgroundColor: 'rgba(15, 23, 42, 0.02)',
+                  borderColor: 'rgba(15, 23, 42, 0.2)',
+                  color: 'rgba(15, 23, 42, 0.85)'
+                }
               }}
               disabled={deleting}
             >
@@ -682,11 +732,34 @@ const ProductList = ({
               onClick={handleDeleteConfirm}
               variant="contained"
               sx={{ 
-                backgroundColor: '#dc2626',
-                '&:hover': { backgroundColor: '#b91c1c' }
+                px: 3,
+                py: 1.25,
+                borderRadius: '10px',
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                letterSpacing: '-0.01em',
+                background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                color: 'white',
+                border: 'none',
+                boxShadow: '0 1px 3px rgba(239, 68, 68, 0.2)',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+                  boxShadow: '0 2px 6px rgba(239, 68, 68, 0.3)',
+                  transform: 'translateY(-1px)'
+                },
+                '&:active': {
+                  transform: 'translateY(0)'
+                },
+                '&:disabled': {
+                  background: 'rgba(15, 23, 42, 0.08)',
+                  color: 'rgba(15, 23, 42, 0.35)',
+                  boxShadow: 'none'
+                }
               }}
               disabled={deleting}
-              startIcon={deleting ? <CircularProgress size={16} /> : null}
+              startIcon={deleting ? <CircularProgress size={16} sx={{ color: 'white' }} /> : null}
             >
               {deleting ? "Deleting..." : "Delete Product"}
             </Button>
@@ -917,24 +990,74 @@ const ProductList = ({
         onClose={handleDeleteCancel}
         aria-labelledby="delete-dialog-title"
         aria-describedby="delete-dialog-description"
+        PaperProps={{
+          sx: {
+            borderRadius: '20px',
+            boxShadow: '0 20px 60px rgba(15, 23, 42, 0.15)'
+          }
+        }}
+        slotProps={{
+          backdrop: {
+            sx: {
+              backdropFilter: 'blur(12px)',
+              backgroundColor: 'rgba(15, 23, 42, 0.4)'
+            }
+          }
+        }}
       >
-        <DialogTitle id="delete-dialog-title" sx={{ color: '#dc2626', fontWeight: 600 }}>
+        <DialogTitle id="delete-dialog-title" sx={{ 
+          color: 'rgba(15, 23, 42, 0.95)', 
+          fontWeight: 700,
+          fontSize: '1.5rem',
+          letterSpacing: '-0.02em',
+          pt: 3,
+          px: 3,
+          pb: 1
+        }}>
           Delete Product
         </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="delete-dialog-description">
+        <DialogContent sx={{ px: 3, py: 2 }}>
+          <DialogContentText id="delete-dialog-description" sx={{
+            color: 'rgba(15, 23, 42, 0.65)',
+            fontSize: '0.9375rem',
+            lineHeight: 1.6
+          }}>
             Are you sure you want to delete{" "}
-            <strong>"{productToDelete?.name}"</strong>? This action cannot be undone and will permanently remove this product from your catalog.
+            <Box component="strong" sx={{ 
+              color: 'rgba(15, 23, 42, 0.95)',
+              fontWeight: 600
+            }}>
+              "{productToDelete?.name}"
+            </Box>? This action cannot be undone and will permanently remove this product from your catalog.
           </DialogContentText>
         </DialogContent>
-        <DialogActions sx={{ p: 3, pt: 1 }}>
+        <DialogActions sx={{ 
+          p: 3, 
+          pt: 2,
+          gap: 1.5,
+          borderTop: '1px solid rgba(15, 23, 42, 0.08)',
+          justifyContent: 'flex-end'
+        }}>
           <Button 
             onClick={handleDeleteCancel}
             variant="outlined"
             sx={{ 
-              borderColor: '#d1d5db',
-              color: '#6b7280',
-              '&:hover': { borderColor: '#9ca3af', backgroundColor: 'rgba(156, 163, 175, 0.1)' }
+              px: 3,
+              py: 1.25,
+              borderRadius: '10px',
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: '0.875rem',
+              color: 'rgba(15, 23, 42, 0.65)',
+              border: '1px solid rgba(15, 23, 42, 0.12)',
+              backgroundColor: 'white',
+              letterSpacing: '-0.01em',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                backgroundColor: 'rgba(15, 23, 42, 0.02)',
+                borderColor: 'rgba(15, 23, 42, 0.2)',
+                color: 'rgba(15, 23, 42, 0.85)'
+              }
             }}
             disabled={deleting}
           >
@@ -944,11 +1067,34 @@ const ProductList = ({
             onClick={handleDeleteConfirm}
             variant="contained"
             sx={{ 
-              backgroundColor: '#dc2626',
-              '&:hover': { backgroundColor: '#b91c1c' }
+              px: 3,
+              py: 1.25,
+              borderRadius: '10px',
+              textTransform: 'none',
+              fontWeight: 600,
+              fontSize: '0.875rem',
+              letterSpacing: '-0.01em',
+              background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+              color: 'white',
+              border: 'none',
+              boxShadow: '0 1px 3px rgba(239, 68, 68, 0.2)',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
+                boxShadow: '0 2px 6px rgba(239, 68, 68, 0.3)',
+                transform: 'translateY(-1px)'
+              },
+              '&:active': {
+                transform: 'translateY(0)'
+              },
+              '&:disabled': {
+                background: 'rgba(15, 23, 42, 0.08)',
+                color: 'rgba(15, 23, 42, 0.35)',
+                boxShadow: 'none'
+              }
             }}
             disabled={deleting}
-            startIcon={deleting ? <CircularProgress size={16} /> : null}
+            startIcon={deleting ? <CircularProgress size={16} sx={{ color: 'white' }} /> : null}
           >
             {deleting ? "Deleting..." : "Delete Product"}
           </Button>

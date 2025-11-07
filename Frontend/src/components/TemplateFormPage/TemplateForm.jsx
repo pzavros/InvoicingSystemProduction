@@ -43,7 +43,16 @@ const FormGrid = ({ size, children }) => (
 
 const SectionTitle = ({ children }) => (
   <FormGrid size={{ xs: 12 }}>
-    <Typography variant="h6" sx={{ fontWeight: 600, color: "#1f2937", mb: 2 }}>
+    <Typography variant="h6" sx={{ 
+      fontWeight: 600, 
+      color: 'rgba(15, 23, 42, 0.95)', 
+      mb: 2,
+      mt: 3,
+      fontSize: '1rem',
+      letterSpacing: '-0.02em',
+      borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
+      pb: 1.5
+    }}>
       {children}
     </Typography>
   </FormGrid>
@@ -507,81 +516,87 @@ const TemplateForm = () => {
   }
 
   return (
-    <Box sx={{ 
-      minHeight: '100vh', 
-      backgroundColor: '#f8fafc',
-      backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3), transparent 50.2%), radial-gradient(circle at 80% 20%, rgba(120, 119, 198, 0.15), transparent 50.2%), radial-gradient(circle at 40% 80%, rgba(120, 119, 198, 0.1), transparent 50.2%)',
-      py: 3,
-      px: { xs: 2, sm: 3, md: 4 }
-    }}>
+    <Box sx={{ pl: 3, pt: 3, pr: 3 }}>
       {/* Header */}
       <Box sx={{ 
         display: 'flex', 
         alignItems: 'center', 
-        mb: 4, 
-        maxWidth: '1000px', 
-        margin: '0 auto',
-        px: { xs: 0, sm: 2 }
+        mb: 2,
+        pb: 2,
+        borderBottom: '1px solid rgba(15, 23, 42, 0.08)'
       }}>
         <IconButton 
           onClick={handleBack}
           sx={{ 
             mr: 2,
-            background: 'rgba(255, 255, 255, 0.25)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.18)',
-            color: '#4a5568',
+            width: 40,
+            height: 40,
+            borderRadius: '10px',
+            border: '1px solid rgba(15, 23, 42, 0.08)',
+            backgroundColor: 'rgba(15, 23, 42, 0.02)',
+            color: 'rgba(15, 23, 42, 0.65)',
+            transition: 'all 0.2s ease',
             '&:hover': {
-              background: 'rgba(255, 255, 255, 0.35)'
+              backgroundColor: 'rgba(15, 23, 42, 0.06)',
+              borderColor: 'rgba(15, 23, 42, 0.12)',
+              color: 'rgba(15, 23, 42, 0.85)'
             }
           }}
         >
-          <ArrowBackIcon />
+          <ArrowBackIcon fontSize="small" />
         </IconButton>
         <Box>
-          <Typography variant="h4" sx={{ 
-            fontWeight: 700, 
-            color: "#1f2937",
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1
+          <Typography variant="h4" component="h1" sx={{ 
+            fontWeight: 700,
+            color: 'rgba(15, 23, 42, 0.95)',
+            fontSize: { xs: '1.5rem', sm: '2rem' },
+            letterSpacing: '-0.02em',
+            mb: 0.5
           }}>
-            <PaletteIcon sx={{ color: '#667eea' }} />
             {isEditing ? 'Edit Template' : 'Create New Template'}
           </Typography>
-          <Typography variant="body1" sx={{ color: "#6b7280", mt: 0.5 }}>
+          <Typography variant="body2" sx={{
+            color: 'rgba(15, 23, 42, 0.55)',
+            fontSize: '0.875rem',
+            fontWeight: 500
+          }}>
             {isEditing ? 'Update your custom invoice template' : 'Design a custom invoice template for your business'}
           </Typography>
         </Box>
       </Box>
 
-      {/* Form */}
-      <Box sx={{ 
-        maxWidth: '1000px', 
-        margin: '0 auto',
-        px: { xs: 0, sm: 2 }
-      }}>
-        <Box
-          component="form"
-          sx={{
-            background: 'rgba(255, 255, 255, 0.25)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.18)',
-            borderRadius: '20px',
-            p: { xs: 3, md: 4 },
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+      {/* Notification */}
+      {notification.show && (
+        <Alert
+          severity={notification.severity}
+          onClose={() => setNotification({ ...notification, show: false })}
+          sx={{ 
+            mb: 2,
+            borderRadius: '12px',
+            border: '1px solid rgba(15, 23, 42, 0.06)',
+            '& .MuiAlert-icon': {
+              color: notification.severity === 'success' ? '#10b981' : 
+                     notification.severity === 'error' ? '#ef4444' : '#8b5cf6'
+            }
           }}
         >
-          <Grid container spacing={{ xs: 2, md: 3 }}>
+          {notification.message}
+        </Alert>
+      )}
+
+      {/* Form */}
+      <Box component="form">
+        <Grid container spacing={{ xs: 1.5, md: 2 }}>
             {/* Basic Information */}
-            <SectionTitle>📝 Basic Information</SectionTitle>
+            <SectionTitle>Basic Information</SectionTitle>
             
             <FormGrid size={{ xs: 12, sm: 6 }}>
               <FormLabel sx={{ 
-                display: "block", 
-                mb: 1, 
-                fontWeight: 600, 
-                color: "#374151" 
+                color: 'rgba(15, 23, 42, 0.75)',
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                mb: 0.5,
+                display: 'block'
               }}>
                 Template Name *
               </FormLabel>
@@ -593,21 +608,33 @@ const TemplateForm = () => {
                 onChange={(e) => handleInputChange('name', e.target.value)}
                 error={!!errors.name}
                 sx={{
-                  backgroundColor: "rgba(255, 255, 255, 0.8)",
-                  borderRadius: "12px",
+                  backgroundColor: 'white',
+                  borderRadius: '12px',
+                  fontSize: '0.875rem',
                   '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: errors.name ? '#ef4444' : 'rgba(0, 0, 0, 0.12)',
+                    borderColor: errors.name ? '#ef4444' : 'rgba(15, 23, 42, 0.08)',
+                    borderWidth: '1px'
                   },
                   '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: errors.name ? '#ef4444' : '#667eea',
+                    borderColor: errors.name ? '#ef4444' : 'rgba(15, 23, 42, 0.15)'
                   },
                   '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: errors.name ? '#ef4444' : '#667eea',
+                    borderColor: errors.name ? '#ef4444' : 'rgba(15, 23, 42, 0.25)',
+                    borderWidth: '1.5px'
+                  },
+                  '& .MuiInputBase-input': {
+                    padding: '9px 12px'
                   }
                 }}
               />
               {errors.name && (
-                <Typography variant="caption" sx={{ color: '#ef4444', mt: 0.5, display: 'block' }}>
+                <Typography variant="caption" sx={{ 
+                  mt: 0.5, 
+                  display: 'block',
+                  color: '#ef4444',
+                  fontSize: '0.75rem',
+                  fontWeight: 500
+                }}>
                   {errors.name}
                 </Typography>
               )}
@@ -615,10 +642,11 @@ const TemplateForm = () => {
 
             <FormGrid size={{ xs: 12, sm: 6 }}>
               <FormLabel sx={{ 
-                display: "block", 
-                mb: 1, 
-                fontWeight: 600, 
-                color: "#374151" 
+                color: 'rgba(15, 23, 42, 0.75)',
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                mb: 0.5,
+                display: 'block'
               }}>
                 Document Type *
               </FormLabel>
@@ -642,8 +670,48 @@ const TemplateForm = () => {
                     }
                   }}
                   sx={{
-                    backgroundColor: "rgba(255, 255, 255, 0.8)",
-                    borderRadius: "12px"
+                    backgroundColor: 'white',
+                    borderRadius: '12px',
+                    fontSize: '0.875rem',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(15, 23, 42, 0.08)',
+                      borderWidth: '1px'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(15, 23, 42, 0.15)'
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(15, 23, 42, 0.25)',
+                      borderWidth: '1.5px'
+                    },
+                    '& .MuiSelect-select': {
+                      padding: '9px 12px'
+                    }
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        borderRadius: '12px',
+                        mt: 0.5,
+                        boxShadow: '0 4px 12px rgba(15, 23, 42, 0.08)',
+                        border: '1px solid rgba(15, 23, 42, 0.06)',
+                        '& .MuiMenuItem-root': {
+                          fontSize: '0.875rem',
+                          borderRadius: '8px',
+                          mx: 1,
+                          my: 0.5,
+                          '&:hover': {
+                            backgroundColor: 'rgba(139, 92, 246, 0.04)'
+                          },
+                          '&.Mui-selected': {
+                            backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                            '&:hover': {
+                              backgroundColor: 'rgba(139, 92, 246, 0.12)'
+                            }
+                          }
+                        }
+                      }
+                    }
                   }}
                 >
                   <MenuItem value="" disabled>Select Document Type</MenuItem>
@@ -655,7 +723,13 @@ const TemplateForm = () => {
                 </Select>
               </FormControl>
               {errors.documentTypeId && (
-                <Typography variant="caption" sx={{ color: '#ef4444', mt: 0.5, display: 'block' }}>
+                <Typography variant="caption" sx={{ 
+                  mt: 0.5, 
+                  display: 'block',
+                  color: '#ef4444',
+                  fontSize: '0.75rem',
+                  fontWeight: 500
+                }}>
                   {errors.documentTypeId}
                 </Typography>
               )}
@@ -663,10 +737,11 @@ const TemplateForm = () => {
 
             <FormGrid size={{ xs: 12, sm: 6 }}>
               <FormLabel sx={{ 
-                display: "block", 
-                mb: 1, 
-                fontWeight: 600, 
-                color: "#374151" 
+                color: 'rgba(15, 23, 42, 0.75)',
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                mb: 0.5,
+                display: 'block'
               }}>
                 Color Theme
               </FormLabel>
@@ -675,8 +750,48 @@ const TemplateForm = () => {
                   value={formData.colorTheme}
                   onChange={(e) => handleInputChange('colorTheme', e.target.value)}
                   sx={{
-                    backgroundColor: "rgba(255, 255, 255, 0.8)",
-                    borderRadius: "12px"
+                    backgroundColor: 'white',
+                    borderRadius: '12px',
+                    fontSize: '0.875rem',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(15, 23, 42, 0.08)',
+                      borderWidth: '1px'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(15, 23, 42, 0.15)'
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(15, 23, 42, 0.25)',
+                      borderWidth: '1.5px'
+                    },
+                    '& .MuiSelect-select': {
+                      padding: '9px 12px'
+                    }
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        borderRadius: '12px',
+                        mt: 0.5,
+                        boxShadow: '0 4px 12px rgba(15, 23, 42, 0.08)',
+                        border: '1px solid rgba(15, 23, 42, 0.06)',
+                        '& .MuiMenuItem-root': {
+                          fontSize: '0.875rem',
+                          borderRadius: '8px',
+                          mx: 1,
+                          my: 0.5,
+                          '&:hover': {
+                            backgroundColor: 'rgba(139, 92, 246, 0.04)'
+                          },
+                          '&.Mui-selected': {
+                            backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                            '&:hover': {
+                              backgroundColor: 'rgba(139, 92, 246, 0.12)'
+                            }
+                          }
+                        }
+                      }
+                    }
                   }}
                 >
                   {Object.values(COLOR_THEMES).map((theme) => (
@@ -702,10 +817,11 @@ const TemplateForm = () => {
 
             <FormGrid size={{ xs: 12 }}>
               <FormLabel sx={{ 
-                display: "block", 
-                mb: 1, 
-                fontWeight: 600, 
-                color: "#374151" 
+                color: 'rgba(15, 23, 42, 0.75)',
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                mb: 0.5,
+                display: 'block'
               }}>
                 Description
               </FormLabel>
@@ -718,21 +834,37 @@ const TemplateForm = () => {
                 value={formData.description}
                 onChange={(e) => handleInputChange('description', e.target.value)}
                 sx={{
-                  backgroundColor: "rgba(255, 255, 255, 0.8)",
-                  borderRadius: "12px"
+                  backgroundColor: 'white',
+                  borderRadius: '12px',
+                  fontSize: '0.875rem',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(15, 23, 42, 0.08)',
+                    borderWidth: '1px'
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(15, 23, 42, 0.15)'
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'rgba(15, 23, 42, 0.25)',
+                    borderWidth: '1.5px'
+                  },
+                  '& .MuiInputBase-input': {
+                    padding: '9px 12px'
+                  }
                 }}
               />
             </FormGrid>
 
             {/* Design Settings */}
-            <SectionTitle>🎨 Design Settings</SectionTitle>
+            <SectionTitle>Design Settings</SectionTitle>
             
             <FormGrid size={{ xs: 12, sm: 6 }}>
               <FormLabel sx={{ 
-                display: "block", 
-                mb: 1, 
-                fontWeight: 600, 
-                color: "#374151" 
+                color: 'rgba(15, 23, 42, 0.75)',
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                mb: 0.5,
+                display: 'block'
               }}>
                 Font Family
               </FormLabel>
@@ -741,8 +873,48 @@ const TemplateForm = () => {
                   value={formData.fontStyle}
                   onChange={(e) => handleInputChange('fontStyle', e.target.value)}
                   sx={{
-                    backgroundColor: "rgba(255, 255, 255, 0.8)",
-                    borderRadius: "12px"
+                    backgroundColor: 'white',
+                    borderRadius: '12px',
+                    fontSize: '0.875rem',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(15, 23, 42, 0.08)',
+                      borderWidth: '1px'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(15, 23, 42, 0.15)'
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(15, 23, 42, 0.25)',
+                      borderWidth: '1.5px'
+                    },
+                    '& .MuiSelect-select': {
+                      padding: '9px 12px'
+                    }
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        borderRadius: '12px',
+                        mt: 0.5,
+                        boxShadow: '0 4px 12px rgba(15, 23, 42, 0.08)',
+                        border: '1px solid rgba(15, 23, 42, 0.06)',
+                        '& .MuiMenuItem-root': {
+                          fontSize: '0.875rem',
+                          borderRadius: '8px',
+                          mx: 1,
+                          my: 0.5,
+                          '&:hover': {
+                            backgroundColor: 'rgba(139, 92, 246, 0.04)'
+                          },
+                          '&.Mui-selected': {
+                            backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                            '&:hover': {
+                              backgroundColor: 'rgba(139, 92, 246, 0.12)'
+                            }
+                          }
+                        }
+                      }
+                    }
                   }}
                 >
                   <MenuItem value="modern">Modern (Inter)</MenuItem>
@@ -755,10 +927,11 @@ const TemplateForm = () => {
 
             <FormGrid size={{ xs: 12, sm: 6 }}>
               <FormLabel sx={{ 
-                display: "block", 
-                mb: 1, 
-                fontWeight: 600, 
-                color: "#374151" 
+                color: 'rgba(15, 23, 42, 0.75)',
+                fontWeight: 600,
+                fontSize: '0.875rem',
+                mb: 0.5,
+                display: 'block'
               }}>
                 Border Radius
               </FormLabel>
@@ -767,8 +940,48 @@ const TemplateForm = () => {
                   value={formData.borderRadius}
                   onChange={(e) => handleInputChange('borderRadius', e.target.value)}
                   sx={{
-                    backgroundColor: "rgba(255, 255, 255, 0.8)",
-                    borderRadius: "12px"
+                    backgroundColor: 'white',
+                    borderRadius: '12px',
+                    fontSize: '0.875rem',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(15, 23, 42, 0.08)',
+                      borderWidth: '1px'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(15, 23, 42, 0.15)'
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'rgba(15, 23, 42, 0.25)',
+                      borderWidth: '1.5px'
+                    },
+                    '& .MuiSelect-select': {
+                      padding: '9px 12px'
+                    }
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        borderRadius: '12px',
+                        mt: 0.5,
+                        boxShadow: '0 4px 12px rgba(15, 23, 42, 0.08)',
+                        border: '1px solid rgba(15, 23, 42, 0.06)',
+                        '& .MuiMenuItem-root': {
+                          fontSize: '0.875rem',
+                          borderRadius: '8px',
+                          mx: 1,
+                          my: 0.5,
+                          '&:hover': {
+                            backgroundColor: 'rgba(139, 92, 246, 0.04)'
+                          },
+                          '&.Mui-selected': {
+                            backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                            '&:hover': {
+                              backgroundColor: 'rgba(139, 92, 246, 0.12)'
+                            }
+                          }
+                        }
+                      }
+                    }
                   }}
                 >
                   <MenuItem value="0px">Sharp (0px)</MenuItem>
@@ -780,7 +993,7 @@ const TemplateForm = () => {
             </FormGrid>
 
             {/* Section Visibility */}
-            <SectionTitle>👁️ Sections to Include</SectionTitle>
+            <SectionTitle>Sections to Include</SectionTitle>
             
             <FormGrid size={{ xs: 12, sm: 6 }}>
               <FormControlLabel
@@ -1016,14 +1229,15 @@ const TemplateForm = () => {
             {/* Disclaimer Customization - Only for Quotation and Proforma */}
             {(formData.type === 'quote' || formData.type === 'proforma') && (
               <>
-                <SectionTitle>⚠️ Disclaimer Settings</SectionTitle>
+                <SectionTitle>Disclaimer Settings</SectionTitle>
                 
                 <FormGrid size={{ xs: 12 }}>
                   <FormLabel sx={{ 
-                    display: "block", 
-                    mb: 1, 
-                    fontWeight: 600, 
-                    color: "#374151" 
+                    color: 'rgba(15, 23, 42, 0.75)',
+                    fontWeight: 600,
+                    fontSize: '0.875rem',
+                    mb: 0.5,
+                    display: 'block'
                   }}>
                     Disclaimer Text
                   </FormLabel>
@@ -1038,11 +1252,31 @@ const TemplateForm = () => {
                     value={formData.disclaimer}
                     onChange={(e) => handleInputChange('disclaimer', e.target.value)}
                     sx={{
-                      backgroundColor: "rgba(255, 255, 255, 0.8)",
-                      borderRadius: "12px"
+                      backgroundColor: 'white',
+                      borderRadius: '12px',
+                      fontSize: '0.875rem',
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(15, 23, 42, 0.08)',
+                        borderWidth: '1px'
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(15, 23, 42, 0.15)'
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'rgba(15, 23, 42, 0.25)',
+                        borderWidth: '1.5px'
+                      },
+                      '& .MuiInputBase-input': {
+                        padding: '9px 12px'
+                      }
                     }}
                   />
-                  <Typography variant="caption" sx={{ display: 'block', color: '#6b7280', mt: 0.5 }}>
+                  <Typography variant="caption" sx={{ 
+                    display: 'block', 
+                    color: 'rgba(15, 23, 42, 0.55)', 
+                    mt: 0.5,
+                    fontSize: '0.75rem'
+                  }}>
                     This disclaimer will appear at the bottom of {formData.type === 'quote' ? 'quotation' : 'proforma invoice'} documents
                   </Typography>
                 </FormGrid>
@@ -1050,7 +1284,7 @@ const TemplateForm = () => {
             )}
 
             {/* Status */}
-            <SectionTitle>⚡ Template Status</SectionTitle>
+            <SectionTitle>Template Status</SectionTitle>
             
             <FormGrid size={{ xs: 12 }}>
               <FormControlLabel
@@ -1060,18 +1294,29 @@ const TemplateForm = () => {
                     onChange={(e) => handleInputChange('isActive', e.target.checked)}
                     sx={{
                       '& .MuiSwitch-switchBase.Mui-checked': {
-                        color: '#22c55e',
+                        color: '#8b5cf6'
                       },
                       '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                        backgroundColor: '#22c55e',
-                      },
+                        backgroundColor: '#8b5cf6'
+                      }
                     }}
                   />
                 }
                 label="Set as Active Template"
-                sx={{ color: "#374151", fontWeight: 500 }}
+                sx={{ 
+                  color: 'rgba(15, 23, 42, 0.75)', 
+                  fontWeight: 500,
+                  '& .MuiFormControlLabel-label': {
+                    fontSize: '0.875rem'
+                  }
+                }}
               />
-              <Typography variant="caption" sx={{ display: 'block', color: '#6b7280', mt: 0.5 }}>
+              <Typography variant="caption" sx={{ 
+                display: 'block', 
+                color: 'rgba(15, 23, 42, 0.55)', 
+                mt: 0.5,
+                fontSize: '0.75rem'
+              }}>
                 The active template will be used by default for new invoices
               </Typography>
             </FormGrid>
@@ -1081,14 +1326,22 @@ const TemplateForm = () => {
           <Box sx={{ 
             mt: 4,
             pt: 4,
-            borderTop: '1px solid rgba(255, 255, 255, 0.2)'
+            borderTop: '1px solid rgba(15, 23, 42, 0.08)'
           }}>
             <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, color: "#1f2937", display: 'flex', alignItems: 'center', gap: 1 }}>
-                <PreviewIcon sx={{ color: '#667eea' }} />
+              <Typography variant="h6" sx={{ 
+                fontWeight: 600, 
+                color: 'rgba(15, 23, 42, 0.95)',
+                fontSize: '1rem',
+                letterSpacing: '-0.02em'
+              }}>
                 Preview
               </Typography>
-              <Typography variant="body2" sx={{ color: "#6b7280", mt: 0.5 }}>
+              <Typography variant="body2" sx={{ 
+                color: 'rgba(15, 23, 42, 0.55)', 
+                mt: 0.5,
+                fontSize: '0.875rem'
+              }}>
                 See how your template will look in real invoices
               </Typography>
             </Box>
@@ -1096,53 +1349,77 @@ const TemplateForm = () => {
             {/* Preview Container */}
             <Box
               sx={{
-                border: '2px solid rgba(102, 126, 234, 0.2)',
-                borderRadius: formData.borderRadius,
+                border: '1px solid rgba(15, 23, 42, 0.08)',
+                borderRadius: '14px',
                 overflow: 'hidden',
-                backgroundColor: '#ffffff',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                p: 4
+                backgroundColor: '#f8fafc',
+                boxShadow: '0 1px 3px rgba(15, 23, 42, 0.06)',
+                p: 3,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'flex-start'
               }}
             >
-              <InvoiceTemplatePreview
-                templateConfig={previewConfig}
-                templateMeta={{ name: formData.name || '' }}
-                containerSx={{
-                  maxWidth: '100%',
-                  boxShadow: 'none',
-                  border: 'none',
-                  p: 0,
+              <Box
+                sx={{
+                  transform: 'scale(0.85)',
+                  transformOrigin: 'top center',
+                  width: '117.647%', // 100% / 0.85 to account for scale
+                  maxWidth: '850px',
+                  backgroundColor: '#ffffff',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 12px rgba(15, 23, 42, 0.1)',
+                  overflow: 'hidden',
+                  p: 3
                 }}
-              />
+              >
+                <InvoiceTemplatePreview
+                  templateConfig={previewConfig}
+                  templateMeta={{ name: formData.name || '' }}
+                  containerSx={{
+                    maxWidth: '100%',
+                    boxShadow: 'none',
+                    border: 'none',
+                    p: 0,
+                  }}
+                />
+              </Box>
             </Box>
           </Box>
 
           {/* Actions */}
           <Box sx={{ 
             display: 'flex', 
-            justifyContent: 'flex-end', 
             gap: 2, 
+            pt: 2.5,
             mt: 4,
-            pt: 3,
-            borderTop: '1px solid rgba(255, 255, 255, 0.2)'
+            mb: 3,
+            borderTop: '1px solid rgba(15, 23, 42, 0.08)',
+            justifyContent: { xs: 'stretch', sm: 'flex-end' },
+            flexDirection: { xs: 'column', sm: 'row' }
           }}>
             <Button
               onClick={handleBack}
               disabled={saving}
+              variant="outlined"
               sx={{
-                px: 4,
-                py: 1.5,
-                borderRadius: '12px',
+                px: 3,
+                py: 1.25,
+                borderRadius: '10px',
                 textTransform: 'none',
                 fontWeight: 600,
-                color: '#6b7280',
-                borderColor: '#d1d5db',
+                fontSize: '0.875rem',
+                color: 'rgba(15, 23, 42, 0.65)',
+                border: '1px solid rgba(15, 23, 42, 0.12)',
+                backgroundColor: 'white',
+                letterSpacing: '-0.01em',
+                transition: 'all 0.2s ease',
                 '&:hover': {
-                  borderColor: '#9ca3af',
-                  backgroundColor: 'rgba(107, 114, 128, 0.1)'
+                  backgroundColor: 'rgba(15, 23, 42, 0.02)',
+                  borderColor: 'rgba(15, 23, 42, 0.2)',
+                  color: 'rgba(15, 23, 42, 0.85)'
                 }
               }}
-              variant="outlined"
             >
               Cancel
             </Button>
@@ -1150,45 +1427,40 @@ const TemplateForm = () => {
             <Button
               onClick={handleSave}
               disabled={saving}
+              variant="contained"
+              startIcon={saving ? <CircularProgress size={18} sx={{ color: 'white' }} /> : <SaveIcon sx={{ fontSize: '1.125rem' }} />}
               sx={{
-                px: 4,
-                py: 1.5,
-                borderRadius: '12px',
+                px: 3,
+                py: 1.25,
+                borderRadius: '10px',
                 textTransform: 'none',
                 fontWeight: 600,
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                fontSize: '0.875rem',
+                letterSpacing: '-0.01em',
+                background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
+                color: 'white',
+                border: 'none',
+                boxShadow: '0 1px 3px rgba(139, 92, 246, 0.2)',
+                transition: 'all 0.2s ease',
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)'
+                  background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)',
+                  boxShadow: '0 2px 6px rgba(139, 92, 246, 0.3)',
+                  transform: 'translateY(-1px)'
+                },
+                '&:active': {
+                  transform: 'translateY(0)'
                 },
                 '&:disabled': {
-                  background: '#9ca3af'
+                  background: 'rgba(15, 23, 42, 0.08)',
+                  color: 'rgba(15, 23, 42, 0.35)',
+                  boxShadow: 'none'
                 }
               }}
-              variant="contained"
-              startIcon={saving ? <CircularProgress size={20} color="inherit" /> : <SaveIcon />}
             >
               {saving ? 'Saving...' : (isEditing ? 'Update Template' : 'Create Template')}
             </Button>
           </Box>
-        </Box>
       </Box>
-
-      {/* Notification */}
-      {notification.show && (
-        <Alert
-          severity={notification.severity}
-          onClose={() => setNotification({ ...notification, show: false })}
-          sx={{
-            position: 'fixed',
-            top: 20,
-            right: 20,
-            zIndex: 9999,
-            borderRadius: '12px'
-          }}
-        >
-          {notification.message}
-        </Alert>
-      )}
     </Box>
   );
 };

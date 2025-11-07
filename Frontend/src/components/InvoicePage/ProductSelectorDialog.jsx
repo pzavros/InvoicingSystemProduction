@@ -147,81 +147,83 @@ const ProductSelectorDialog = ({
     return 'In Stock';
   };
 
-  return (    <Dialog 
+  return (
+    <Dialog 
       open={open} 
       onClose={handleClose}
       maxWidth="lg"
       fullWidth
       fullScreen={isMobile}
+      slotProps={{
+        backdrop: {
+          sx: {
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            backgroundColor: 'rgba(15, 23, 42, 0.4)'
+          }
+        }
+      }}
       PaperProps={{
         sx: {
-          height: isMobile ? '100vh' : '80vh',
-          background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9))',
+          height: isMobile ? '100vh' : '85vh',
+          background: 'rgba(255, 255, 255, 0.98)',
           backdropFilter: 'blur(20px)',
-          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
+          WebkitBackdropFilter: 'blur(20px)',
+          boxShadow: '0 25px 50px rgba(15, 23, 42, 0.12)',
           borderRadius: isMobile ? 0 : '20px',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
+          border: '1px solid rgba(15, 23, 42, 0.06)',
           overflow: 'hidden',
           m: isMobile ? 0 : undefined
         }
       }}
     >
       <DialogTitle sx={{
-        background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08))',
-        borderBottom: '1px solid rgba(102, 126, 234, 0.15)',
-        position: 'relative',
-        py: { xs: 2, sm: 3 },
-        px: { xs: 2, sm: 3 },
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '4px',
-          background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
-        }
+        background: 'rgba(255, 255, 255, 0.95)',
+        borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
+        position: 'sticky',
+        top: 0,
+        zIndex: 10,
+        py: { xs: 2.5, sm: 3 },
+        px: { xs: 2.5, sm: 4 }
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography variant="h6" component="div" sx={{
-            fontWeight: 700,
-            color: '#2d3748',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            fontSize: { xs: '1rem', sm: '1.25rem' }
-          }}>
-            <Box sx={{
-              width: { xs: 28, sm: 32 },
-              height: { xs: 28, sm: 32 },
-              borderRadius: '8px',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-              fontSize: { xs: '14px', sm: '16px' }
+          <Box>
+            <Typography variant="h6" component="div" sx={{
+              fontWeight: 700,
+              color: 'rgba(15, 23, 42, 0.95)',
+              fontSize: { xs: '1.125rem', sm: '1.375rem' },
+              letterSpacing: '-0.02em',
+              mb: 0.5
             }}>
-              🛍️
-            </Box>
-            Select Products{isMobile ? '' : ' for Invoice'}
-          </Typography>
+              Select Products
+            </Typography>
+            <Typography variant="body2" sx={{
+              color: 'rgba(15, 23, 42, 0.55)',
+              fontSize: '0.875rem',
+              fontWeight: 500
+            }}>
+              {multipleSelection ? 'Choose one or more products to add' : 'Choose a product to add to invoice'}
+            </Typography>
+          </Box>
           <IconButton 
             onClick={handleClose} 
             size="small"
             sx={{
-              backgroundColor: 'rgba(239, 68, 68, 0.1)',
-              color: '#dc2626',
-              width: { xs: 36, sm: 40 },
-              height: { xs: 36, sm: 40 },
+              width: 36,
+              height: 36,
+              borderRadius: '10px',
+              border: '1px solid rgba(15, 23, 42, 0.08)',
+              backgroundColor: 'rgba(15, 23, 42, 0.02)',
+              color: 'rgba(15, 23, 42, 0.65)',
+              transition: 'all 0.2s ease',
               '&:hover': {
-                backgroundColor: 'rgba(239, 68, 68, 0.2)',
-                transform: 'scale(1.1)'
-              },
-              transition: 'all 0.2s ease'
+                backgroundColor: 'rgba(15, 23, 42, 0.06)',
+                borderColor: 'rgba(15, 23, 42, 0.12)',
+                color: 'rgba(15, 23, 42, 0.85)'
+              }
             }}
           >
-            <CloseIcon fontSize={isMobile ? 'small' : 'medium'} />
+            <CloseIcon fontSize="small" />
           </IconButton>
         </Box>
       </DialogTitle><DialogContent>
@@ -231,106 +233,158 @@ const ProductSelectorDialog = ({
           </Alert>
         )}
 
-        {/* Search and Filter Section */}        <Box sx={{ 
-          mb: { xs: 2, sm: 3 }, 
-          p: { xs: 2, sm: 3 },
-          background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7))',
-          backdropFilter: 'blur(10px)',
+        {/* Search and Filter Section */}
+        <Box sx={{ 
+          mb: 3, 
+          p: { xs: 2.5, sm: 3 },
+          background: 'rgba(255, 255, 255, 0.6)',
           borderRadius: '16px',
-          border: '1px solid rgba(102, 126, 234, 0.1)',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+          border: '1px solid rgba(15, 23, 42, 0.06)',
+          boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)'
         }}>
-          <Typography variant="subtitle1" sx={{ 
-            mb: 2, 
+          <Typography variant="subtitle2" sx={{ 
+            mb: 2.5, 
             fontWeight: 600,
-            color: '#2d3748',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            fontSize: { xs: '0.875rem', sm: '1rem' }
+            color: 'rgba(15, 23, 42, 0.75)',
+            fontSize: '0.8125rem',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em'
           }}>
-            Search & Filter Products
+            Search & Filter
           </Typography>
           <Box sx={{ 
             display: 'flex', 
             flexDirection: { xs: 'column', sm: 'row' },
-            gap: 2, 
-            flexWrap: 'wrap' 
-          }}>          <TextField
-            label="Search Products"
-            variant="outlined"
-            size="small"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            fullWidth={isMobile}
-            sx={{ 
-              flexGrow: 1, 
-              minWidth: { xs: '100%', sm: 250 },
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '12px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                  transform: 'translateY(-1px)',
-                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
+            gap: 2
+          }}>
+            <TextField
+              placeholder="Search by name or description..."
+              variant="outlined"
+              size="small"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              fullWidth={isMobile}
+              sx={{ 
+                flexGrow: 1, 
+                minWidth: { xs: '100%', sm: 300 },
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '12px',
+                  backgroundColor: 'white',
+                  fontSize: '0.875rem',
+                  transition: 'all 0.2s ease',
+                  '& fieldset': {
+                    borderColor: 'rgba(15, 23, 42, 0.08)',
+                    borderWidth: '1px'
+                  },
+                  '&:hover': {
+                    backgroundColor: 'white',
+                    '& fieldset': {
+                      borderColor: 'rgba(15, 23, 42, 0.15)'
+                    }
+                  },
+                  '&.Mui-focused': {
+                    backgroundColor: 'white',
+                    '& fieldset': {
+                      borderColor: 'rgba(15, 23, 42, 0.25)',
+                      borderWidth: '1.5px'
+                    }
+                  }
                 },
-                '&.Mui-focused': {
-                  backgroundColor: 'rgba(255, 255, 255, 1)',
-                  boxShadow: '0 0 0 3px rgba(102, 126, 234, 0.1)',
-                  transform: 'translateY(-1px)'
+                '& .MuiInputBase-input': {
+                  padding: '9px 12px'
                 }
-              }
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon sx={{ color: '#667eea' }} />
-                </InputAdornment>
-              ),
-            }}
-          />
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ 
+                      color: '#8b5cf6',
+                      fontSize: '1.125rem'
+                    }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
           
-          <FormControl 
-            size="small" 
-            fullWidth={isMobile}
-            sx={{ 
-              minWidth: { xs: '100%', sm: 200 },
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '12px',
-                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                  transform: 'translateY(-1px)',
-                  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
+            <FormControl 
+              size="small" 
+              fullWidth={isMobile}
+              sx={{ 
+                minWidth: { xs: '100%', sm: 200 },
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '12px',
+                  backgroundColor: 'white',
+                  fontSize: '0.875rem',
+                  transition: 'all 0.2s ease',
+                  '& fieldset': {
+                    borderColor: 'rgba(15, 23, 42, 0.08)',
+                    borderWidth: '1px'
+                  },
+                  '&:hover': {
+                    backgroundColor: 'white',
+                    '& fieldset': {
+                      borderColor: 'rgba(15, 23, 42, 0.15)'
+                    }
+                  },
+                  '&.Mui-focused': {
+                    backgroundColor: 'white',
+                    '& fieldset': {
+                      borderColor: 'rgba(15, 23, 42, 0.25)',
+                      borderWidth: '1.5px'
+                    }
+                  }
                 },
-                '&.Mui-focused': {
-                  backgroundColor: 'rgba(255, 255, 255, 1)',
-                  boxShadow: '0 0 0 3px rgba(102, 126, 234, 0.1)',
-                  transform: 'translateY(-1px)'
+                '& .MuiInputBase-input': {
+                  padding: '9px 12px'
+                },
+                '& .MuiInputLabel-root': {
+                  fontSize: '0.875rem',
+                  color: 'rgba(15, 23, 42, 0.55)',
+                  '&.Mui-focused': {
+                    color: '#8b5cf6'
+                  }
                 }
-              }
-            }}
-          >
-            <InputLabel>Category</InputLabel>
-            <Select
-              value={selectedCategory}
-              label="Category"
-              onChange={(e) => setSelectedCategory(e.target.value)}
-            >              <MenuItem value="">
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  All Categories
-                </Box>
-              </MenuItem>
-              {categories.map((category) => (
-                <MenuItem key={category.id} value={category.id}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              }}
+            >
+              <InputLabel>Category</InputLabel>
+              <Select
+                value={selectedCategory}
+                label="Category"
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                MenuProps={{
+                  PaperProps: {
+                    sx: {
+                      borderRadius: '12px',
+                      mt: 0.5,
+                      boxShadow: '0 4px 12px rgba(15, 23, 42, 0.08)',
+                      border: '1px solid rgba(15, 23, 42, 0.06)',
+                      '& .MuiMenuItem-root': {
+                        fontSize: '0.875rem',
+                        borderRadius: '8px',
+                        mx: 1,
+                        my: 0.5,
+                        '&:hover': {
+                          backgroundColor: 'rgba(139, 92, 246, 0.04)'
+                        },
+                        '&.Mui-selected': {
+                          backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                          '&:hover': {
+                            backgroundColor: 'rgba(139, 92, 246, 0.12)'
+                          }
+                        }
+                      }
+                    }
+                  }
+                }}
+              >
+                <MenuItem value="">All Categories</MenuItem>
+                {categories.map((category) => (
+                  <MenuItem key={category.id} value={category.id}>
                     {category.name}
-                  </Box>
-                </MenuItem>
-              ))}</Select>
-          </FormControl>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Box>
         </Box>        {/* Products Table */}
         {loading ? (
@@ -342,10 +396,14 @@ const ProductSelectorDialog = ({
             {filteredProducts.length === 0 ? (
               <Box sx={{ 
                 textAlign: 'center', 
-                py: 4,
+                py: 6,
                 px: 2
               }}>
-                <Typography color="textSecondary">
+                <Typography sx={{
+                  color: 'rgba(15, 23, 42, 0.45)',
+                  fontSize: '0.9375rem',
+                  fontWeight: 500
+                }}>
                   {searchTerm || selectedCategory 
                     ? 'No products found matching your criteria.'
                     : 'No products available.'
@@ -363,59 +421,53 @@ const ProductSelectorDialog = ({
                     key={product.id}
                     onClick={!multipleSelection ? () => handleProductSelect(product) : undefined}
                     sx={{
-                      borderRadius: '16px',
-                      overflow: 'hidden',
+                      borderRadius: '14px',
                       background: isSelected 
-                        ? 'linear-gradient(145deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15))'
-                        : 'linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9))',
-                      backdropFilter: 'blur(20px)',
+                        ? 'linear-gradient(135deg, rgba(139, 92, 246, 0.06) 0%, rgba(99, 102, 241, 0.06) 100%)'
+                        : 'white',
                       boxShadow: isSelected 
-                        ? '0 4px 20px rgba(102, 126, 234, 0.3)'
-                        : '0 4px 16px rgba(0, 0, 0, 0.08)',
+                        ? '0 2px 8px rgba(139, 92, 246, 0.15), inset 0 0 0 1.5px #8b5cf6'
+                        : '0 1px 3px rgba(15, 23, 42, 0.06)',
                       border: isSelected 
-                        ? '2px solid #667eea'
-                        : '1px solid rgba(255, 255, 255, 0.2)',
-                      position: 'relative',
+                        ? 'none'
+                        : '1px solid rgba(15, 23, 42, 0.06)',
                       cursor: !multipleSelection ? 'pointer' : 'default',
-                      transition: 'all 0.3s ease',
+                      transition: 'all 0.2s ease',
                       '&:active': {
-                        transform: 'scale(0.98)'
-                      },
-                      '&:before': {
-                        content: '""',
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        height: '3px',
-                        background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)'
+                        transform: 'scale(0.99)'
                       }
                     }}
                   >
-                    <CardContent sx={{ p: 2 }}>
+                    <CardContent sx={{ p: 2.5 }}>
                       {/* Header with checkbox and product name */}
-                      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5, mb: 2 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2.5 }}>
                         {multipleSelection && (
                           <Checkbox
                             checked={!!isSelected}
                             onChange={() => handleProductSelect(product)}
                             sx={{ 
                               p: 0,
-                              mt: 0.5,
+                              mt: -0.25,
+                              color: 'rgba(15, 23, 42, 0.25)',
+                              '&.Mui-checked': {
+                                color: '#8b5cf6'
+                              },
                               '& .MuiSvgIcon-root': {
-                                fontSize: '1.5rem'
+                                fontSize: '1.375rem'
                               }
                             }}
                           />
                         )}
-                        <Box sx={{ flexGrow: 1 }}>
+                        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
                           <Typography 
                             variant="subtitle1" 
                             sx={{ 
-                              fontWeight: 700,
-                              color: '#2d3748',
-                              mb: 0.5,
-                              fontSize: '1rem'
+                              fontWeight: 600,
+                              color: 'rgba(15, 23, 42, 0.95)',
+                              mb: 0.75,
+                              fontSize: '1rem',
+                              letterSpacing: '-0.01em',
+                              lineHeight: 1.3
                             }}
                           >
                             {product.name}
@@ -423,10 +475,14 @@ const ProductSelectorDialog = ({
                           {product.description && (
                             <Typography 
                               variant="body2" 
-                              color="textSecondary"
                               sx={{ 
+                                color: 'rgba(15, 23, 42, 0.55)',
                                 fontSize: '0.8125rem',
-                                lineHeight: 1.4
+                                lineHeight: 1.5,
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden'
                               }}
                             >
                               {product.description}
@@ -439,21 +495,21 @@ const ProductSelectorDialog = ({
                       <Box sx={{ 
                         display: 'grid', 
                         gridTemplateColumns: '1fr 1fr',
-                        gap: 2,
-                        pt: 2,
-                        borderTop: '1px solid rgba(102, 126, 234, 0.1)'
+                        gap: 2.5,
+                        pt: 2.5,
+                        borderTop: '1px solid rgba(15, 23, 42, 0.06)'
                       }}>
                         <Box>
                           <Typography 
                             variant="caption" 
                             sx={{ 
-                              color: '#667eea',
-                              fontWeight: 700,
+                              color: 'rgba(15, 23, 42, 0.45)',
+                              fontWeight: 600,
                               textTransform: 'uppercase',
-                              letterSpacing: '0.5px',
-                              fontSize: '0.65rem',
+                              letterSpacing: '0.05em',
+                              fontSize: '0.6875rem',
                               display: 'block',
-                              mb: 0.5
+                              mb: 0.75
                             }}
                           >
                             Category
@@ -461,9 +517,10 @@ const ProductSelectorDialog = ({
                           <Typography 
                             variant="body2"
                             sx={{ 
-                              fontWeight: 600,
-                              color: '#2d3748',
-                              fontSize: '0.875rem'
+                              fontWeight: 500,
+                              color: 'rgba(15, 23, 42, 0.75)',
+                              fontSize: '0.875rem',
+                              lineHeight: 1.3
                             }}
                           >
                             {category?.name || 'Uncategorized'}
@@ -474,13 +531,13 @@ const ProductSelectorDialog = ({
                           <Typography 
                             variant="caption" 
                             sx={{ 
-                              color: '#667eea',
-                              fontWeight: 700,
+                              color: 'rgba(15, 23, 42, 0.45)',
+                              fontWeight: 600,
                               textTransform: 'uppercase',
-                              letterSpacing: '0.5px',
-                              fontSize: '0.65rem',
+                              letterSpacing: '0.05em',
+                              fontSize: '0.6875rem',
                               display: 'block',
-                              mb: 0.5
+                              mb: 0.75
                             }}
                           >
                             Price
@@ -488,9 +545,10 @@ const ProductSelectorDialog = ({
                           <Typography 
                             variant="h6"
                             sx={{ 
-                              fontWeight: 700,
-                              color: '#667eea',
-                              fontSize: '1.1rem'
+                              fontWeight: 600,
+                              color: '#8b5cf6',
+                              fontSize: '1.125rem',
+                              letterSpacing: '-0.01em'
                             }}
                           >
                             {currency}{(product.unitPrice || 0).toFixed(2)}
@@ -499,17 +557,17 @@ const ProductSelectorDialog = ({
                       </Box>
 
                       {/* Stock status */}
-                      <Box sx={{ mt: 2 }}>
+                      <Box sx={{ mt: 2.5 }}>
                         <Typography 
                           variant="caption" 
                           sx={{ 
-                            color: '#667eea',
-                            fontWeight: 700,
+                            color: 'rgba(15, 23, 42, 0.45)',
+                            fontWeight: 600,
                             textTransform: 'uppercase',
-                            letterSpacing: '0.5px',
-                            fontSize: '0.65rem',
+                            letterSpacing: '0.05em',
+                            fontSize: '0.6875rem',
                             display: 'block',
-                            mb: 0.5
+                            mb: 0.75
                           }}
                         >
                           Stock Status
@@ -520,12 +578,18 @@ const ProductSelectorDialog = ({
                             color={getStockStatusColor(product.stockQuantity, product.minStockLevel)}
                             size="small"
                             sx={{ 
-                              fontWeight: 600,
-                              fontSize: '0.75rem'
+                              fontWeight: 500,
+                              fontSize: '0.75rem',
+                              height: 24,
+                              borderRadius: '6px'
                             }}
                           />
                         ) : (
-                          <Typography variant="body2" color="textSecondary" sx={{ fontSize: '0.875rem' }}>
+                          <Typography variant="body2" sx={{ 
+                            color: 'rgba(15, 23, 42, 0.55)',
+                            fontSize: '0.875rem',
+                            fontWeight: 500
+                          }}>
                             Service
                           </Typography>
                         )}
@@ -541,73 +605,68 @@ const ProductSelectorDialog = ({
           <TableContainer
             component={Paper} 
             sx={{ 
-              maxHeight: 400,
-              borderRadius: '16px',
-              background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85))',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(102, 126, 234, 0.1)',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+              maxHeight: 420,
+              borderRadius: '14px',
+              background: 'white',
+              border: '1px solid rgba(15, 23, 42, 0.06)',
+              boxShadow: '0 1px 3px rgba(15, 23, 42, 0.04)',
               overflow: 'hidden',
-              position: 'relative',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '3px',
-                background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
-                zIndex: 1
-              },
               '& .MuiTable-root': {
                 minWidth: 650
               },
               '& .MuiTableCell-root': {
-                borderBottom: '1px solid rgba(224, 224, 224, 0.3)',
-                py: 1.5,
-                transition: 'all 0.2s ease'
+                borderBottom: '1px solid rgba(15, 23, 42, 0.06)',
+                py: 1.75,
+                px: 2.5,
+                fontSize: '0.875rem'
               },
               '& .MuiTableHead-root .MuiTableCell-root': {
-                backgroundColor: 'rgba(102, 126, 234, 0.05)',
-                fontWeight: 'bold',
-                color: '#2d3748',
-                borderBottom: '2px solid rgba(102, 126, 234, 0.1)'
+                backgroundColor: 'rgba(249, 250, 251, 0.8)',
+                fontWeight: 600,
+                color: 'rgba(15, 23, 42, 0.75)',
+                fontSize: '0.8125rem',
+                textTransform: 'uppercase',
+                letterSpacing: '0.025em',
+                borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
+                position: 'sticky',
+                top: 0,
+                zIndex: 2
               },
-              '& .MuiTableRow-root:hover': {
-                backgroundColor: 'rgba(102, 126, 234, 0.08)',
-                transform: 'translateY(-1px)',
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+              '& .MuiTableBody-root .MuiTableRow-root': {
+                transition: 'all 0.15s ease',
+                '&:hover': {
+                  backgroundColor: 'rgba(139, 92, 246, 0.02)',
+                  cursor: 'pointer'
+                },
+                '&.Mui-selected': {
+                  backgroundColor: 'rgba(139, 92, 246, 0.04)',
+                  '&:hover': {
+                    backgroundColor: 'rgba(139, 92, 246, 0.06)'
+                  }
+                }
               }
-            }}          >
+            }}
+          >
             <Table stickyHeader>
               <TableHead>
                 <TableRow>
                   {multipleSelection && (
                     <TableCell padding="checkbox" sx={{ width: '60px' }}>
-                      <Typography variant="body2" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        Select
-                      </Typography>
+                      Select
                     </TableCell>
                   )}
                   <TableCell sx={{ width: '40%' }}>
-                    <Typography variant="body2" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      Product
-                    </Typography>
+                    Product
                   </TableCell>
                   <TableCell sx={{ width: '20%' }}>
-                    <Typography variant="body2" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      Category
-                    </Typography>
+                    Category
                   </TableCell>
                   <TableCell align="right" sx={{ width: '15%' }}>
-                    <Typography variant="body2" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, justifyContent: 'flex-end' }}>
-                      Price
-                    </Typography>
+                    Price
                   </TableCell>
                   <TableCell sx={{ width: '25%' }}>
-                    <Typography variant="body2" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                      Stock Status
-                    </Typography></TableCell>
+                    Stock
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -616,9 +675,13 @@ const ProductSelectorDialog = ({
                     <TableCell 
                       colSpan={multipleSelection ? 5 : 4} 
                       align="center"
-                      sx={{ py: 4 }}
+                      sx={{ py: 6 }}
                     >
-                      <Typography color="textSecondary">
+                      <Typography sx={{
+                        color: 'rgba(15, 23, 42, 0.45)',
+                        fontSize: '0.9375rem',
+                        fontWeight: 500
+                      }}>
                         {searchTerm || selectedCategory 
                           ? 'No products found matching your criteria.'
                           : 'No products available.'
@@ -639,29 +702,42 @@ const ProductSelectorDialog = ({
                         selected={isSelected}
                         onClick={!multipleSelection ? () => handleProductSelect(product) : undefined}
                         sx={{
-                          cursor: !multipleSelection ? 'pointer' : 'default',
-                          '&:hover': !multipleSelection ? {
-                            backgroundColor: 'rgba(25, 118, 210, 0.08)'
-                          } : {}
+                          cursor: !multipleSelection ? 'pointer' : 'default'
                         }}
-                      >{multipleSelection && (
+                      >
+                        {multipleSelection && (
                           <TableCell padding="checkbox" sx={{ width: '60px' }}>
                             <Checkbox
                               checked={!!isSelected}
                               onChange={() => handleProductSelect(product)}
+                              sx={{
+                                color: 'rgba(15, 23, 42, 0.25)',
+                                '&.Mui-checked': {
+                                  color: '#8b5cf6'
+                                }
+                              }}
                             />
                           </TableCell>
                         )}
                         <TableCell sx={{ width: '40%' }}>
                           <Box>
-                            <Typography variant="body2" fontWeight="medium">
+                            <Typography variant="body2" sx={{
+                              fontWeight: 600,
+                              color: 'rgba(15, 23, 42, 0.95)',
+                              mb: 0.25,
+                              letterSpacing: '-0.01em'
+                            }}>
                               {product.name}
                             </Typography>
                             {product.description && (
                               <Typography 
                                 variant="caption" 
-                                color="textSecondary"
-                                sx={{ display: 'block', mt: 0.5 }}
+                                sx={{ 
+                                  display: 'block',
+                                  color: 'rgba(15, 23, 42, 0.55)',
+                                  mt: 0.25,
+                                  lineHeight: 1.4
+                                }}
                               >
                                 {product.description}
                               </Typography>
@@ -669,12 +745,19 @@ const ProductSelectorDialog = ({
                           </Box>
                         </TableCell>
                         <TableCell sx={{ width: '20%' }}>
-                          <Typography variant="body2">
+                          <Typography variant="body2" sx={{
+                            color: 'rgba(15, 23, 42, 0.75)',
+                            fontWeight: 500
+                          }}>
                             {category?.name || 'Uncategorized'}
                           </Typography>
                         </TableCell>
                         <TableCell align="right" sx={{ width: '15%' }}>
-                          <Typography variant="body2" fontWeight="medium">
+                          <Typography variant="body2" sx={{
+                            fontWeight: 600,
+                            color: '#8b5cf6',
+                            letterSpacing: '-0.01em'
+                          }}>
                             {currency}{(product.unitPrice || 0).toFixed(2)}
                           </Typography>
                         </TableCell>
@@ -684,10 +767,18 @@ const ProductSelectorDialog = ({
                               label={`${product.stockQuantity} - ${getStockStatusText(product.stockQuantity, product.minStockLevel)}`}
                               color={getStockStatusColor(product.stockQuantity, product.minStockLevel)}
                               size="small"
-                              sx={{ maxWidth: '100%' }}
+                              sx={{ 
+                                fontWeight: 500,
+                                fontSize: '0.75rem',
+                                height: 24,
+                                borderRadius: '6px'
+                              }}
                             />
                           ) : (
-                            <Typography variant="body2" color="textSecondary">
+                            <Typography variant="body2" sx={{
+                              color: 'rgba(15, 23, 42, 0.55)',
+                              fontWeight: 500
+                            }}>
                               Service
                             </Typography>
                           )}
@@ -701,64 +792,73 @@ const ProductSelectorDialog = ({
           </TableContainer>
         )}
       </DialogContent>      <DialogActions sx={{ 
-        p: { xs: 2, sm: 3 }, 
-        background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05))',
-        borderTop: '1px solid rgba(102, 126, 234, 0.1)',
-        gap: { xs: 1, sm: 2 },
-        flexDirection: { xs: 'column-reverse', sm: 'row' }
+        p: { xs: 2.5, sm: 3 }, 
+        background: 'rgba(249, 250, 251, 0.6)',
+        borderTop: '1px solid rgba(15, 23, 42, 0.08)',
+        gap: 2,
+        flexDirection: { xs: 'column-reverse', sm: 'row' },
+        justifyContent: 'flex-end'
       }}>
         <Button 
           onClick={handleClose}
           fullWidth={isMobile}
           sx={{
-            borderRadius: '12px',
+            px: 3,
+            py: 1.25,
+            borderRadius: '10px',
             textTransform: 'none',
             fontWeight: 600,
-            px: 3,
-            py: { xs: 1.25, sm: 1.5 },
-            color: '#64748b',
-            border: '1px solid rgba(100, 116, 139, 0.2)',
-            fontSize: { xs: '0.875rem', sm: '1rem' },
+            fontSize: '0.875rem',
+            color: 'rgba(15, 23, 42, 0.65)',
+            border: '1px solid rgba(15, 23, 42, 0.12)',
+            backgroundColor: 'white',
+            letterSpacing: '-0.01em',
+            transition: 'all 0.2s ease',
             '&:hover': {
-              backgroundColor: 'rgba(100, 116, 139, 0.05)',
-              borderColor: 'rgba(100, 116, 139, 0.3)',
-              transform: 'translateY(-1px)',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
-            },
-            transition: 'all 0.3s ease'
+              backgroundColor: 'rgba(15, 23, 42, 0.02)',
+              borderColor: 'rgba(15, 23, 42, 0.2)',
+              color: 'rgba(15, 23, 42, 0.85)'
+            }
           }}
         >
-          ❌ Cancel
+          Cancel
         </Button>
         {multipleSelection && (
           <Button
             variant="contained"
             onClick={handleAddSelectedProducts}
             disabled={selectedProducts.length === 0}
-            startIcon={<AddShoppingCartIcon />}
+            startIcon={<AddShoppingCartIcon sx={{ fontSize: '1.125rem' }} />}
             fullWidth={isMobile}
             sx={{
-              borderRadius: '12px',
+              px: 3,
+              py: 1.25,
+              borderRadius: '10px',
               textTransform: 'none',
               fontWeight: 600,
-              px: 3,
-              py: { xs: 1.25, sm: 1.5 },
-              fontSize: { xs: '0.875rem', sm: '1rem' },
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              boxShadow: '0 8px 25px rgba(102, 126, 234, 0.3)',
+              fontSize: '0.875rem',
+              letterSpacing: '-0.01em',
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
+              color: 'white',
+              border: 'none',
+              boxShadow: '0 1px 3px rgba(139, 92, 246, 0.2)',
+              transition: 'all 0.2s ease',
               '&:hover': {
-                background: 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)',
-                transform: 'translateY(-2px)',
-                boxShadow: '0 12px 35px rgba(102, 126, 234, 0.4)'
+                background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)',
+                boxShadow: '0 2px 6px rgba(139, 92, 246, 0.3)',
+                transform: 'translateY(-1px)'
+              },
+              '&:active': {
+                transform: 'translateY(0)'
               },
               '&:disabled': {
-                background: 'rgba(102, 126, 234, 0.3)',
-                color: 'rgba(255, 255, 255, 0.7)'
-              },
-              transition: 'all 0.3s ease'
+                background: 'rgba(15, 23, 42, 0.08)',
+                color: 'rgba(15, 23, 42, 0.35)',
+                boxShadow: 'none'
+              }
             }}
           >
-            🛒 Add {selectedProducts.length > 0 ? `${selectedProducts.length} ` : ''}Products
+            Add {selectedProducts.length > 0 ? `${selectedProducts.length} ` : ''}Product{selectedProducts.length !== 1 ? 's' : ''}
           </Button>
         )}
       </DialogActions>

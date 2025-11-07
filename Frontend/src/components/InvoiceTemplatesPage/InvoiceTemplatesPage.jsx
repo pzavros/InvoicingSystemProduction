@@ -781,7 +781,7 @@ const InvoiceTemplatesPage = () => {
             </Button>
           </Box>
         ) : (
-          <Box sx={{ height: 600, width: '100%' }}>
+          <Box sx={{ height: 700, width: '100%' }}>
             <DataGrid
               rows={rows}
               columns={columns}
