@@ -1393,24 +1393,37 @@ const InvoiceForm = () => {
                   border: '1px solid rgba(139, 92, 246, 0.12)',
                   transition: 'all 0.15s ease',
                   '& fieldset': {
-                    border: 'none'
+                    borderColor: 'rgba(139, 92, 246, 0.12)',
+                    borderWidth: '1px'
                   },
                   '&:hover': {
                     backgroundColor: 'rgba(139, 92, 246, 0.06)',
                     borderColor: 'rgba(139, 92, 246, 0.2)',
+                    '& fieldset': {
+                      borderColor: 'rgba(139, 92, 246, 0.2)',
+                    }
                   },
                   '&.Mui-focused': {
                     backgroundColor: 'white',
                     borderColor: '#8b5cf6',
                     boxShadow: '0 0 0 3px rgba(139, 92, 246, 0.1)',
+                    '& fieldset': {
+                      borderColor: '#8b5cf6',
+                      borderWidth: '1.5px'
+                    }
                   }
                 },
                 '& .MuiInputLabel-root': {
                   fontSize: '0.875rem',
                   fontWeight: 500,
                   color: 'rgba(15, 23, 42, 0.6)',
+                  backgroundColor: 'transparent',
                   '&.Mui-focused': { 
                     color: '#8b5cf6'
+                  },
+                  '&.MuiInputLabel-shrink': {
+                    backgroundColor: 'white',
+                    px: 0.5
                   }
                 }
               }}>
@@ -1491,24 +1504,37 @@ const InvoiceForm = () => {
                     border: '1px solid rgba(139, 92, 246, 0.12)',
                     transition: 'all 0.15s ease',
                     '& fieldset': {
-                      border: 'none'
+                      borderColor: 'rgba(139, 92, 246, 0.12)',
+                      borderWidth: '1px'
                     },
                     '&:hover': {
                       backgroundColor: 'rgba(139, 92, 246, 0.06)',
                       borderColor: 'rgba(139, 92, 246, 0.2)',
+                      '& fieldset': {
+                        borderColor: 'rgba(139, 92, 246, 0.2)',
+                      }
                     },
                     '&.Mui-focused': {
                       backgroundColor: 'white',
                       borderColor: '#8b5cf6',
                       boxShadow: '0 0 0 3px rgba(139, 92, 246, 0.1)',
+                      '& fieldset': {
+                        borderColor: '#8b5cf6',
+                        borderWidth: '1.5px'
+                      }
                     }
                   },
                   '& .MuiInputLabel-root': {
                     fontSize: '0.875rem',
                     fontWeight: 500,
                     color: 'rgba(15, 23, 42, 0.6)',
+                    backgroundColor: 'transparent',
                     '&.Mui-focused': {
                       color: '#8b5cf6'
+                    },
+                    '&.MuiInputLabel-shrink': {
+                      backgroundColor: 'white',
+                      px: 0.5
                     }
                   },
                   '& .MuiOutlinedInput-input': {
@@ -1541,16 +1567,24 @@ const InvoiceForm = () => {
                     border: '1px solid rgba(139, 92, 246, 0.12)',
                     transition: 'all 0.15s ease',
                     '& fieldset': {
-                      border: 'none'
+                      borderColor: 'rgba(139, 92, 246, 0.12)',
+                      borderWidth: '1px'
                     },
                     '&:hover': {
                       backgroundColor: 'rgba(139, 92, 246, 0.06)',
                       borderColor: 'rgba(139, 92, 246, 0.2)',
+                      '& fieldset': {
+                        borderColor: 'rgba(139, 92, 246, 0.2)',
+                      }
                     },
                     '&.Mui-focused': {
                       backgroundColor: 'white',
                       borderColor: '#8b5cf6',
                       boxShadow: '0 0 0 3px rgba(139, 92, 246, 0.1)',
+                      '& fieldset': {
+                        borderColor: '#8b5cf6',
+                        borderWidth: '1.5px'
+                      }
                     }
                   }
                 }}>
@@ -1558,7 +1592,12 @@ const InvoiceForm = () => {
                     fontSize: "0.875rem",
                     color: 'rgba(15, 23, 42, 0.6)',
                     fontWeight: 500,
-                    '&.Mui-focused': { color: '#8b5cf6' }
+                    backgroundColor: 'transparent',
+                    '&.Mui-focused': { color: '#8b5cf6' },
+                    '&.MuiInputLabel-shrink': {
+                      backgroundColor: 'white',
+                      px: 0.5
+                    }
                   }}>
                     Status
                   </InputLabel>

@@ -12,24 +12,19 @@ import {
   CircularProgress,
   Alert,
   IconButton,
-  Toolbar,
   Box,
   Paper,
   useMediaQuery,
   useTheme,
-  Card,
-  CardContent,
-  Divider,
   Select,
   MenuItem,
   FormControl
 } from "@mui/material";
 import {
-  FileDownload as DownloadIcon,
-  Refresh as RefreshIcon,
   TableChart as TableIcon,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  ErrorOutline as ErrorIcon
 } from "@mui/icons-material";
 
 const ReportDisplay = ({ 
@@ -76,12 +71,12 @@ const ReportDisplay = ({
       const userStr = localStorage.getItem('user');
       if (userStr) {
         const user = JSON.parse(userStr);
-        return user.currency || 'EUR'; // Default to EUR
+        return user.currency || 'EUR';
       }
     } catch (error) {
       console.error('Error getting user currency:', error);
     }
-    return 'EUR'; // Default fallback
+    return 'EUR';
   };
 
   const formatCurrency = (amount) => {
@@ -103,32 +98,29 @@ const ReportDisplay = ({
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case 'paid':
-        return 'success';
+        return { bg: '#34c759', text: '#ffffff' };
       case 'pending':
-        return 'warning';
+        return { bg: '#ff9500', text: '#ffffff' };
       case 'overdue':
-        return 'error';
+        return { bg: '#ff3b30', text: '#ffffff' };
       case 'draft':
-        return 'default';
+        return { bg: '#8e8e93', text: '#ffffff' };
       default:
-        return 'default';
+        return { bg: '#d1d1d6', text: '#1d1d1f' };
     }
   };
 
   const getColumnLabel = (columnId) => {
     const labels = {
-      // Invoice columns
       invoiceNumber: 'Invoice #',
       date: 'Invoice Date',
       dueDate: 'Due Date',
       status: 'Status',
       totalAmount: 'Total Amount',
       invoiceNotes: 'Notes',
-      // Customer columns
       customer: 'Customer',
       billToEmail: 'Customer Email',
       billToAddress: 'Customer Address',
-      // Item columns
       itemTitle: 'Item Title',
       itemDescription: 'Item Description',
       quantity: 'Quantity',
@@ -142,96 +134,131 @@ const ReportDisplay = ({
 
   const renderCellContent = (invoice, columnId) => {
     switch (columnId) {
-      // Currency fields
       case 'totalAmount':
       case 'vatAmount':
       case 'discountAmount':
       case 'unitPrice':
       case 'subtotal':
-        return formatCurrency(invoice[columnId] || 0);
-      // Number fields
+        return (
+          <Typography sx={{ 
+            fontVariantNumeric: 'tabular-nums',
+            fontWeight: 500,
+            color: '#1d1d1f',
+            fontSize: '0.9375rem',
+            letterSpacing: '-0.01em'
+          }}>
+            {formatCurrency(invoice[columnId] || 0)}
+          </Typography>
+        );
       case 'quantity':
-        return invoice[columnId] || 0;
-      // Date fields
+        return (
+          <Typography sx={{ 
+            fontVariantNumeric: 'tabular-nums',
+            fontWeight: 400,
+            color: '#1d1d1f',
+            fontSize: '0.9375rem',
+            letterSpacing: '-0.01em'
+          }}>
+            {invoice[columnId] || 0}
+          </Typography>
+        );
       case 'date':
       case 'dueDate':
-        return invoice[columnId] ? formatDate(invoice[columnId]) : '-';
-      // Status chip
+        return (
+          <Typography sx={{ 
+            fontWeight: 400,
+            color: '#1d1d1f',
+            fontSize: '0.9375rem',
+            letterSpacing: '-0.01em'
+          }}>
+            {invoice[columnId] ? formatDate(invoice[columnId]) : '-'}
+          </Typography>
+        );
       case 'status':
+        const statusColors = getStatusColor(invoice[columnId]);
         return (
           <Chip
             label={invoice[columnId] || 'Unknown'}
             size="small"
-            color={getStatusColor(invoice[columnId])}
-            variant="filled"
+            sx={{
+              backgroundColor: statusColors.bg,
+              color: statusColors.text,
+              fontWeight: 500,
+              fontSize: '0.8125rem',
+              letterSpacing: '-0.01em',
+              borderRadius: '8px',
+              height: '26px',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+              border: 'none'
+            }}
           />
         );
-      // Text fields
-      case 'invoiceNumber':
-      case 'customer':
-      case 'billToEmail':
-      case 'billToAddress':
-      case 'itemTitle':
-      case 'itemDescription':
-      case 'invoiceNotes':
-        return invoice[columnId] || '-';
       default:
-        return invoice[columnId] || '-';
+        return (
+          <Typography sx={{ 
+            fontWeight: 400,
+            color: '#1d1d1f',
+            fontSize: '0.9375rem',
+            letterSpacing: '-0.01em'
+          }}>
+            {invoice[columnId] || '-'}
+          </Typography>
+        );
     }
-  };
-
-  const handleExport = () => {
-    const headers = selectedColumns.map(col => getColumnLabel(col));
-    const rows = invoices.map(invoice => 
-      selectedColumns.map(col => {
-        if (col === 'amount' || col === 'taxAmount' || col === 'totalAmount') {
-          return invoice[col] || 0;
-        }
-        return invoice[col] || '';
-      })
-    );
-    
-    const csvContent = [headers, ...rows]
-      .map(row => row.map(field => `"${field}"`).join(','))
-      .join('\n');
-    
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    const today = new Date().toISOString().split('T')[0];
-    a.href = url;
-    a.download = `invoice-report-${today}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
   };
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+      <Box sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100%',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif'
+      }}>
         <Box sx={{ textAlign: 'center' }}>
           <Box
             sx={{
-              width: 80,
-              height: 80,
+              width: 88,
+              height: 88,
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               margin: '0 auto',
-              mb: 2,
-              boxShadow: '0 8px 24px rgba(79, 70, 229, 0.3)',
-              animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+              mb: 3,
+              boxShadow: '0 8px 32px rgba(139, 92, 246, 0.3)',
+              animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              '@keyframes pulse': {
+                '0%, 100%': {
+                  opacity: 1,
+                  transform: 'scale(1)'
+                },
+                '50%': {
+                  opacity: 0.9,
+                  transform: 'scale(1.05)'
+                }
+              }
             }}
           >
-            <CircularProgress size={40} sx={{ color: 'white' }} />
+            <CircularProgress size={44} sx={{ color: 'white' }} thickness={3} />
           </Box>
-          <Typography variant="h6" sx={{ fontWeight: 'medium', color: '#4f46e5', mb: 0.5 }}>
-            Loading invoice data...
+          <Typography variant="h5" sx={{ 
+            fontWeight: 600, 
+            color: '#1d1d1f', 
+            mb: 1,
+            fontSize: '1.5rem',
+            letterSpacing: '-0.015em'
+          }}>
+            Loading data
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body1" sx={{ 
+            color: '#86868b',
+            fontSize: '1.0625rem',
+            fontWeight: 400,
+            letterSpacing: '-0.01em'
+          }}>
             Please wait while we fetch your report
           </Typography>
         </Box>
@@ -241,23 +268,49 @@ const ReportDisplay = ({
 
   if (error) {
     return (
-      <Box sx={{ p: 4, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Box sx={{ maxWidth: { xs: '100%', md: '66.666667%', lg: '50%' }, width: '100%' }}>
-          <Alert 
-            severity="error" 
-            sx={{ 
-              borderRadius: 3,
-              boxShadow: '0 4px 12px rgba(239, 68, 68, 0.15)',
-              border: '1px solid rgba(239, 68, 68, 0.2)'
+      <Box sx={{ 
+        p: 4, 
+        height: '100%', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif'
+      }}>
+        <Box sx={{ maxWidth: { xs: '100%', md: '66.666667%', lg: '50%' }, width: '100%', textAlign: 'center' }}>
+          <Box
+            sx={{
+              width: 88,
+              height: 88,
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #ff3b30 0%, #d70015 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto',
+              mb: 3,
+              boxShadow: '0 8px 32px rgba(255, 59, 48, 0.25)'
             }}
           >
-            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-              Error loading invoice data
-            </Typography>
-            <Typography variant="body2">
-              {error}
-            </Typography>
-          </Alert>
+            <ErrorIcon sx={{ color: 'white', fontSize: 44 }} />
+          </Box>
+          <Typography variant="h5" sx={{ 
+            fontWeight: 600, 
+            color: '#1d1d1f', 
+            mb: 1,
+            fontSize: '1.5rem',
+            letterSpacing: '-0.015em'
+          }}>
+            Unable to load data
+          </Typography>
+          <Typography variant="body1" sx={{ 
+            color: '#86868b',
+            fontSize: '1.0625rem',
+            fontWeight: 400,
+            letterSpacing: '-0.01em',
+            mb: 3
+          }}>
+            {error}
+          </Typography>
         </Box>
       </Box>
     );
@@ -269,64 +322,81 @@ const ReportDisplay = ({
       width: '100%',
       display: 'flex', 
       flexDirection: 'column',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif'
     }}>
       {/* Report content */}
       <Box sx={{ 
         flex: 1, 
         overflow: 'auto',
         '&::-webkit-scrollbar': {
-          width: '8px',
-          height: '8px',
+          width: '10px',
+          height: '10px',
         },
         '&::-webkit-scrollbar-track': {
-          backgroundColor: '#f1f5f9',
+          background: '#f5f5f7',
         },
         '&::-webkit-scrollbar-thumb': {
-          backgroundColor: '#cbd5e1',
-          borderRadius: '4px',
+          background: 'rgba(0, 0, 0, 0.15)',
+          borderRadius: '10px',
           '&:hover': {
-            backgroundColor: '#94a3b8',
+            background: 'rgba(0, 0, 0, 0.2)',
           },
         },
       }}>
         {!invoices || invoices.length === 0 ? (
-          <Box sx={{ p: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+          <Box sx={{ p: 5, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
             <Box sx={{ textAlign: 'center', maxWidth: { xs: '100%', md: '66.666667%', lg: '50%' } }}>
               <Box
                 sx={{
-                  width: 80,
-                  height: 80,
+                  width: 88,
+                  height: 88,
                   borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #6b7280 0%, #9ca3af 100%)',
+                  background: 'linear-gradient(135deg, #8e8e93 0%, #636366 100%)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   margin: '0 auto',
                   mb: 3,
-                  boxShadow: '0 8px 24px rgba(107, 114, 128, 0.2)'
+                  boxShadow: '0 8px 32px rgba(142, 142, 147, 0.2)'
                 }}
               >
-                <TableIcon sx={{ color: 'white', fontSize: 36 }} />
+                <TableIcon sx={{ color: 'white', fontSize: 44 }} />
               </Box>
-              <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1f2937', mb: 1 }}>
+              <Typography variant="h5" sx={{ 
+                fontWeight: 600, 
+                color: '#1d1d1f', 
+                mb: 1.5,
+                fontSize: '1.5rem',
+                letterSpacing: '-0.015em'
+              }}>
                 No invoices found
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              <Typography variant="body1" sx={{ 
+                color: '#86868b', 
+                mb: 3,
+                fontSize: '1.0625rem',
+                fontWeight: 400,
+                letterSpacing: '-0.01em'
+              }}>
                 Try adjusting your date range or status filter to see results
               </Typography>
-              <Alert 
-                severity="info"
-                sx={{ 
-                  borderRadius: 2,
-                  textAlign: 'left',
-                  border: '1px solid rgba(59, 130, 246, 0.2)'
-                }}
-              >
-                <Typography variant="body2">
-                  <strong>Tip:</strong> Use a broader date range or select "All Statuses" to see more results.
+              <Box sx={{
+                p: 2.5,
+                borderRadius: '12px',
+                background: 'rgba(0, 122, 255, 0.06)',
+                border: '0.5px solid rgba(0, 122, 255, 0.15)',
+                textAlign: 'left'
+              }}>
+                <Typography variant="body2" sx={{ 
+                  color: '#1d1d1f',
+                  fontSize: '0.9375rem',
+                  fontWeight: 400,
+                  letterSpacing: '-0.01em'
+                }}>
+                  <strong style={{ fontWeight: 600 }}>Tip:</strong> Use a broader date range or select "All Statuses" to see more results.
                 </Typography>
-              </Alert>
+              </Box>
             </Box>
           </Box>
         ) : isMobile ? (
@@ -340,13 +410,13 @@ const ReportDisplay = ({
                 height: '6px',
               },
               '&::-webkit-scrollbar-track': {
-                backgroundColor: '#f1f5f9',
+                background: '#f5f5f7',
               },
               '&::-webkit-scrollbar-thumb': {
-                backgroundColor: '#cbd5e1',
-                borderRadius: '3px',
+                background: 'rgba(0, 0, 0, 0.15)',
+                borderRadius: '10px',
                 '&:hover': {
-                  backgroundColor: '#94a3b8',
+                  background: 'rgba(0, 0, 0, 0.2)',
                 },
               },
             }}>
@@ -358,18 +428,20 @@ const ReportDisplay = ({
                         <TableCell 
                           key={columnId}
                           sx={{ 
-                            fontWeight: 'bold',
-                            background: 'linear-gradient(145deg, #f9fafb 0%, #f3f4f6 100%)',
-                            borderBottom: '2px solid rgba(79, 70, 229, 0.2)',
-                            color: '#1f2937',
-                            fontSize: '0.75rem',
+                            fontWeight: 600,
+                            background: 'rgba(255, 255, 255, 0.95)',
+                            backdropFilter: 'blur(20px)',
+                            borderBottom: '0.5px solid rgba(0, 0, 0, 0.1)',
+                            color: '#1d1d1f',
+                            fontSize: '0.8125rem',
                             textTransform: 'uppercase',
-                            letterSpacing: '0.3px',
-                            padding: '12px 8px',
+                            letterSpacing: '0.03em',
+                            padding: '14px 12px',
                             whiteSpace: 'nowrap',
                             position: 'sticky',
                             top: 0,
-                            zIndex: 10
+                            zIndex: 10,
+                            fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif'
                           }}
                         >
                           {getColumnLabel(columnId)}
@@ -386,21 +458,22 @@ const ReportDisplay = ({
                             backgroundColor: '#fafafa'
                           },
                           '&:active': {
-                            backgroundColor: 'rgba(79, 70, 229, 0.08)',
+                            backgroundColor: 'rgba(139, 92, 246, 0.08)',
                           },
-                          transition: 'background-color 0.15s'
+                          transition: 'background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1)'
                         }}
                       >
                         {selectedColumns.map((columnId) => (
                           <TableCell 
                             key={columnId}
                             sx={{
-                              fontSize: '0.8rem',
-                              color: '#374151',
-                              padding: '10px 8px',
+                              fontSize: '0.875rem',
+                              color: '#1d1d1f',
+                              padding: '12px 12px',
                               whiteSpace: ['itemDescription', 'invoiceNotes', 'billToAddress'].includes(columnId) ? 'normal' : 'nowrap',
                               maxWidth: ['itemDescription', 'invoiceNotes', 'billToAddress'].includes(columnId) ? '200px' : 'none',
-                              borderBottom: '1px solid rgba(229, 231, 235, 0.8)'
+                              borderBottom: '0.5px solid rgba(0, 0, 0, 0.06)',
+                              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif'
                             }}
                           >
                             {renderCellContent(invoice, columnId)}
@@ -415,39 +488,46 @@ const ReportDisplay = ({
             
             {/* Mobile Pagination Controls */}
             <Box sx={{ 
-              borderTop: '2px solid rgba(79, 70, 229, 0.1)',
-              p: 1.5,
-              backgroundColor: '#ffffff',
+              borderTop: '0.5px solid rgba(0, 0, 0, 0.1)',
+              p: 2,
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(20px)',
               display: 'flex',
               flexDirection: 'column',
-              gap: 1.5,
-              boxShadow: '0 -2px 8px rgba(0, 0, 0, 0.05)'
+              gap: 2,
+              boxShadow: '0 -2px 16px rgba(0, 0, 0, 0.04)'
             }}>
               {/* Page Info and Navigation */}
               <Box sx={{ 
                 display: 'flex', 
                 justifyContent: 'space-between', 
                 alignItems: 'center',
-                gap: 1
+                gap: 1.5
               }}>
                 <IconButton
                   onClick={() => handleChangePage(page - 1)}
                   disabled={page === 0}
-                  size="small"
+                  size="medium"
                   sx={{
-                    backgroundColor: page === 0 ? '#f3f4f6' : 'rgba(79, 70, 229, 0.1)',
-                    color: page === 0 ? '#9ca3af' : '#4f46e5',
-                    padding: '8px',
+                    backgroundColor: page === 0 ? 'rgba(0, 0, 0, 0.04)' : 'rgba(139, 92, 246, 0.1)',
+                    color: page === 0 ? '#d1d1d6' : '#8b5cf6',
+                    width: 40,
+                    height: 40,
+                    borderRadius: '10px',
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                     '&:hover': {
-                      backgroundColor: page === 0 ? '#f3f4f6' : 'rgba(79, 70, 229, 0.2)',
+                      backgroundColor: page === 0 ? 'rgba(0, 0, 0, 0.04)' : 'rgba(139, 92, 246, 0.15)',
+                    },
+                    '&:active': {
+                      transform: page === 0 ? 'none' : 'scale(0.96)'
                     },
                     '&:disabled': {
-                      backgroundColor: '#f3f4f6',
-                      color: '#d1d5db',
+                      backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                      color: '#d1d1d6',
                     }
                   }}
                 >
-                  <ChevronLeft fontSize="small" />
+                  <ChevronLeft fontSize="medium" />
                 </IconButton>
 
                 <Box sx={{ 
@@ -456,10 +536,20 @@ const ReportDisplay = ({
                   alignItems: 'center', 
                   flex: 1,
                 }}>
-                  <Typography variant="body2" sx={{ fontWeight: 600, color: '#1f2937', fontSize: '0.85rem' }}>
+                  <Typography variant="body1" sx={{ 
+                    fontWeight: 600, 
+                    color: '#1d1d1f', 
+                    fontSize: '0.9375rem',
+                    letterSpacing: '-0.01em'
+                  }}>
                     Page {page + 1} of {Math.ceil(invoices.length / rowsPerPage)}
                   </Typography>
-                  <Typography variant="caption" sx={{ color: '#6b7280', fontSize: '0.7rem' }}>
+                  <Typography variant="body2" sx={{ 
+                    color: '#86868b', 
+                    fontSize: '0.8125rem',
+                    fontWeight: 400,
+                    letterSpacing: '-0.01em'
+                  }}>
                     {invoices.length} total records
                   </Typography>
                 </Box>
@@ -467,21 +557,27 @@ const ReportDisplay = ({
                 <IconButton
                   onClick={() => handleChangePage(page + 1)}
                   disabled={page >= Math.ceil(invoices.length / rowsPerPage) - 1}
-                  size="small"
+                  size="medium"
                   sx={{
-                    backgroundColor: page >= Math.ceil(invoices.length / rowsPerPage) - 1 ? '#f3f4f6' : 'rgba(79, 70, 229, 0.1)',
-                    color: page >= Math.ceil(invoices.length / rowsPerPage) - 1 ? '#9ca3af' : '#4f46e5',
-                    padding: '8px',
+                    backgroundColor: page >= Math.ceil(invoices.length / rowsPerPage) - 1 ? 'rgba(0, 0, 0, 0.04)' : 'rgba(139, 92, 246, 0.1)',
+                    color: page >= Math.ceil(invoices.length / rowsPerPage) - 1 ? '#d1d1d6' : '#8b5cf6',
+                    width: 40,
+                    height: 40,
+                    borderRadius: '10px',
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                     '&:hover': {
-                      backgroundColor: page >= Math.ceil(invoices.length / rowsPerPage) - 1 ? '#f3f4f6' : 'rgba(79, 70, 229, 0.2)',
+                      backgroundColor: page >= Math.ceil(invoices.length / rowsPerPage) - 1 ? 'rgba(0, 0, 0, 0.04)' : 'rgba(139, 92, 246, 0.15)',
+                    },
+                    '&:active': {
+                      transform: page >= Math.ceil(invoices.length / rowsPerPage) - 1 ? 'none' : 'scale(0.96)'
                     },
                     '&:disabled': {
-                      backgroundColor: '#f3f4f6',
-                      color: '#d1d5db',
+                      backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                      color: '#d1d1d6',
                     }
                   }}
                 >
-                  <ChevronRight fontSize="small" />
+                  <ChevronRight fontSize="medium" />
                 </IconButton>
               </Box>
 
@@ -490,9 +586,14 @@ const ReportDisplay = ({
                 display: 'flex', 
                 alignItems: 'center', 
                 justifyContent: 'center',
-                gap: 1
+                gap: 1.5
               }}>
-                <Typography variant="caption" sx={{ color: '#6b7280', fontWeight: 500, fontSize: '0.75rem' }}>
+                <Typography variant="body2" sx={{ 
+                  color: '#86868b', 
+                  fontWeight: 500, 
+                  fontSize: '0.875rem',
+                  letterSpacing: '-0.01em'
+                }}>
                   Rows:
                 </Typography>
                 <FormControl size="small">
@@ -500,17 +601,20 @@ const ReportDisplay = ({
                     value={rowsPerPage}
                     onChange={handleChangeRowsPerPage}
                     sx={{
-                      fontSize: '0.8rem',
-                      minWidth: '60px',
-                      height: '32px',
+                      fontSize: '0.875rem',
+                      minWidth: '70px',
+                      height: '36px',
+                      borderRadius: '10px',
+                      fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
                       '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'rgba(79, 70, 229, 0.2)',
+                        borderColor: 'rgba(0, 0, 0, 0.1)',
                       },
                       '&:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'rgba(79, 70, 229, 0.4)',
+                        borderColor: 'rgba(0, 0, 0, 0.2)',
                       },
                       '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: '#4f46e5',
+                        borderColor: '#8b5cf6',
+                        borderWidth: '2px'
                       }
                     }}
                   >
@@ -527,49 +631,54 @@ const ReportDisplay = ({
           // Desktop Table View with Horizontal Scroll
           <TableContainer 
             component={Paper}
+            elevation={0}
             sx={{ 
               height: '100%',
               maxHeight: '100%',
               overflow: 'auto',
+              backgroundColor: 'transparent',
               '&::-webkit-scrollbar': {
-                width: '8px',
-                height: '8px',
+                width: '10px',
+                height: '10px',
               },
               '&::-webkit-scrollbar-track': {
-                backgroundColor: '#f1f5f9',
+                background: '#f5f5f7',
               },
               '&::-webkit-scrollbar-thumb': {
-                backgroundColor: '#cbd5e1',
-                borderRadius: '4px',
+                background: 'rgba(0, 0, 0, 0.15)',
+                borderRadius: '10px',
                 '&:hover': {
-                  backgroundColor: '#94a3b8',
+                  background: 'rgba(0, 0, 0, 0.2)',
                 },
               },
             }}
           >
-            <Table stickyHeader size="small" sx={{ minWidth: 800 }}>
+            <Table stickyHeader size="medium" sx={{ minWidth: 800 }}>
               <TableHead>
                 <TableRow>
                   {selectedColumns.map((columnId) => (
                     <TableCell 
                       key={columnId}
                       sx={{ 
-                        fontWeight: 'bold',
-                        background: 'linear-gradient(145deg, #f9fafb 0%, #f3f4f6 100%)',
-                        borderBottom: '2px solid rgba(79, 70, 229, 0.2)',
-                        color: '#000000',
-                        fontSize: '0.875rem',
+                        fontWeight: 600,
+                        background: 'rgba(255, 255, 255, 0.95)',
+                        backdropFilter: 'blur(20px) saturate(180%)',
+                        borderBottom: '0.5px solid rgba(0, 0, 0, 0.1)',
+                        color: '#1d1d1f',
+                        fontSize: '0.8125rem',
                         textTransform: 'uppercase',
-                        letterSpacing: '0.5px',
+                        letterSpacing: '0.03em',
                         whiteSpace: 'nowrap',
-                        minWidth: ['status'].includes(columnId) ? '100px' : 
-                                  ['invoiceNumber', 'date', 'dueDate', 'quantity'].includes(columnId) ? '120px' :
-                                  ['totalAmount', 'vatAmount', 'discountAmount', 'unitPrice', 'subtotal'].includes(columnId) ? '140px' :
-                                  ['customer', 'billToEmail', 'itemTitle'].includes(columnId) ? '180px' :
-                                  ['billToAddress', 'itemDescription', 'invoiceNotes'].includes(columnId) ? '220px' : '150px',
+                        padding: '16px 20px',
+                        minWidth: ['status'].includes(columnId) ? '110px' : 
+                                  ['invoiceNumber', 'date', 'dueDate', 'quantity'].includes(columnId) ? '130px' :
+                                  ['totalAmount', 'vatAmount', 'discountAmount', 'unitPrice', 'subtotal'].includes(columnId) ? '150px' :
+                                  ['customer', 'billToEmail', 'itemTitle'].includes(columnId) ? '200px' :
+                                  ['billToAddress', 'itemDescription', 'invoiceNotes'].includes(columnId) ? '250px' : '160px',
                         position: 'sticky',
                         top: 0,
-                        zIndex: 10
+                        zIndex: 10,
+                        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif'
                       }}
                     >
                       {getColumnLabel(columnId)}
@@ -587,11 +696,10 @@ const ReportDisplay = ({
                         backgroundColor: '#fafafa'
                       },
                       '&:hover': {
-                        backgroundColor: 'rgba(79, 70, 229, 0.04)',
-                        transform: 'scale(1.001)',
-                        boxShadow: '0 2px 8px rgba(79, 70, 229, 0.08)'
+                        backgroundColor: 'rgba(139, 92, 246, 0.04)',
+                        transform: 'scale(1.001)'
                       },
-                      transition: 'all 0.2s',
+                      transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                       cursor: 'pointer'
                     }}
                   >
@@ -599,10 +707,13 @@ const ReportDisplay = ({
                       <TableCell 
                         key={columnId}
                         sx={{
-                          fontSize: '0.875rem',
-                          color: '#374151',
+                          fontSize: '0.9375rem',
+                          color: '#1d1d1f',
+                          padding: '16px 20px',
+                          borderBottom: '0.5px solid rgba(0, 0, 0, 0.06)',
                           whiteSpace: ['itemDescription', 'invoiceNotes', 'billToAddress'].includes(columnId) ? 'normal' : 'nowrap',
-                          maxWidth: ['itemDescription', 'invoiceNotes', 'billToAddress'].includes(columnId) ? '300px' : 'none'
+                          maxWidth: ['itemDescription', 'invoiceNotes', 'billToAddress'].includes(columnId) ? '300px' : 'none',
+                          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif'
                         }}
                       >
                         {renderCellContent(invoice, columnId)}

@@ -13,7 +13,8 @@ import {
   InputAdornment,
   IconButton,
   Fade,
-  Grow
+  Grow,
+  keyframes
 } from '@mui/material';
 import {
   Email as EmailIcon,
@@ -27,6 +28,21 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { registerUser } from './api';
 import { useAuth } from '../../utils/AuthContext';
+
+// Animation for success state
+const scaleIn = keyframes`
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+`;
 
 const RegisterForm = () => {
   const navigate = useNavigate();
@@ -119,166 +135,244 @@ const RegisterForm = () => {
     <Box
       sx={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#f5f5f7',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        p: 2
+        p: { xs: 2, sm: 3 }
       }}
     >
-      <Container maxWidth="sm">
-        <Fade in={true} timeout={800}>
-          <Card
-            elevation={24}
-            sx={{
-              borderRadius: 4,
-              background: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)'
-            }}
-          >
-            <CardContent sx={{ p: 4 }}>
+      <Container maxWidth="xs">
+        <Fade in={true} timeout={600}>
+          <Box>
+            {/* Card */}
+            <Card
+              elevation={0}
+              sx={{
+                borderRadius: '18px',
+                background: '#ffffff',
+                border: '1px solid rgba(0, 0, 0, 0.06)',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+                overflow: 'hidden'
+              }}
+            >
+              <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
+                {/* Logo/Icon */}
+                <Box sx={{ textAlign: 'center', mb: 3 }}>
+                  <Box
+                    sx={{
+                      width: 56,
+                      height: 56,
+                      borderRadius: '16px',
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      mb: 2,
+                      boxShadow: '0 4px 12px rgba(102, 126, 234, 0.2)'
+                    }}
+                  >
+                    <PersonAddIcon sx={{ color: 'white', fontSize: 28 }} />
+                  </Box>
+                  <Typography
+                    sx={{
+                      fontSize: { xs: '1.75rem', sm: '2rem' },
+                      fontWeight: 600,
+                      color: '#1d1d1f',
+                      letterSpacing: '-0.02em',
+                      mb: 0.5
+                    }}
+                  >
+                    Create Account
+                  </Typography>
+                  <Typography 
+                    sx={{ 
+                      color: '#86868b',
+                      fontSize: '0.9375rem',
+                      fontWeight: 400
+                    }}
+                  >
+                    Start your 30-day free trial
+                  </Typography>
+                </Box>
+
               {/* Success State */}
               {registrationSuccess ? (
                 <Box sx={{ textAlign: 'center' }}>
                   <Box
                     sx={{
-                      width: 80,
-                      height: 80,
-                      borderRadius: '20px',
-                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                      width: 56,
+                      height: 56,
+                      borderRadius: '50%',
+                      background: '#34c759',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       margin: '0 auto',
-                      mb: 3,
-                      boxShadow: '0 10px 30px rgba(16, 185, 129, 0.3)'
+                      mb: 2.5,
+                      boxShadow: '0 4px 12px rgba(52, 199, 89, 0.3)',
+                      animation: `${scaleIn} 0.5s ease`
                     }}
                   >
-                    <CheckCircleIcon sx={{ color: 'white', fontSize: 40 }} />
+                    <CheckCircleIcon sx={{ color: 'white', fontSize: 32 }} />
                   </Box>
                   <Typography
-                    variant="h4"
                     sx={{
-                      fontWeight: 'bold',
-                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                      backgroundClip: 'text',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      mb: 2
+                      fontWeight: 600,
+                      fontSize: '1.5rem',
+                      color: '#1d1d1f',
+                      mb: 2,
+                      letterSpacing: '-0.01em'
                     }}
                   >
-                    Registration Successful!
+                    Account Created
                   </Typography>
-                  <Typography variant="body1" sx={{ mb: 1, color: 'text.primary', fontWeight: 500 }}>
-                    A verification code has been sent to
+                  <Typography 
+                    sx={{ 
+                      mb: 1.5, 
+                      color: '#1d1d1f', 
+                      fontWeight: 400,
+                      fontSize: '0.9375rem'
+                    }}
+                  >
+                    Verification code sent to
                   </Typography>
-                  <Typography variant="body1" sx={{ mb: 3, color: 'primary.main', fontWeight: 600 }}>
+                  <Typography 
+                    sx={{ 
+                      mb: 3, 
+                      color: '#0071e3', 
+                      fontWeight: 500,
+                      fontSize: '0.9375rem'
+                    }}
+                  >
                     {registeredEmail}
                   </Typography>
-                  <Alert severity="info" sx={{ mb: 3, borderRadius: 2, textAlign: 'left' }}>
-                    Please check your email inbox and click the <strong>Login</strong> button below. 
-                    You will be prompted to enter the verification code to activate your account.
+                  <Alert 
+                    severity="info" 
+                    sx={{ 
+                      mb: 3, 
+                      borderRadius: '10px', 
+                      textAlign: 'left',
+                      border: 'none',
+                      backgroundColor: '#e8f4fd',
+                      color: '#1d1d1f',
+                      fontSize: '0.875rem',
+                      '& .MuiAlert-icon': {
+                        color: '#0071e3'
+                      }
+                    }}
+                  >
+                    Check your email inbox and click <strong>Login</strong> below to enter your verification code.
                   </Alert>
                   <Button
                     fullWidth
                     variant="contained"
-                    size="large"
                     onClick={handleGoToLogin}
                     sx={{
                       py: 1.5,
-                      borderRadius: 2,
+                      borderRadius: '10px',
                       textTransform: 'none',
-                      fontSize: '1.1rem',
-                      fontWeight: 600,
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                      boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
+                      fontSize: '1.0625rem',
+                      fontWeight: 500,
+                      background: '#0071e3',
+                      boxShadow: 'none',
                       '&:hover': {
-                        background: 'linear-gradient(135deg, #5568d3 0%, #63408b 100%)',
-                        boxShadow: '0 6px 20px rgba(102, 126, 234, 0.6)',
+                        background: '#0077ed',
+                        boxShadow: 'none'
+                      },
+                      '&:active': {
+                        background: '#006edb'
                       }
                     }}
                   >
-                    Go to Login & Verify
+                    Continue to Login
                   </Button>
                 </Box>
               ) : (
                 <>
-                  <Grow in={true} timeout={1000}>
-                    <Box sx={{ textAlign: 'center', mb: 4 }}>
-                      <Box
-                        sx={{
-                          width: 80,
-                          height: 80,
-                          borderRadius: '20px',
-                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          margin: '0 auto',
-                          mb: 3,
-                          boxShadow: '0 10px 30px rgba(102, 126, 234, 0.3)'
-                        }}
-                      >
-                        <PersonAddIcon sx={{ color: 'white', fontSize: 32 }} />
-                      </Box>
-                      <Typography
-                        variant="h4"
-                        sx={{
-                          fontWeight: 'bold',
-                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                          backgroundClip: 'text',
-                          WebkitBackgroundClip: 'text',
-                          WebkitTextFillColor: 'transparent',
-                          mb: 1
-                        }}
-                      >
-                        Create Account
-                      </Typography>
-                      <Typography variant="body1" color="text.secondary">
-                        Start your 30-day free trial today
-                      </Typography>
-                    </Box>
-                  </Grow>
-
                   {error && (
-                    <Fade in={true}>
-                      <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
-                        {error}
-                      </Alert>
-                    </Fade>
+                    <Alert 
+                      severity="error" 
+                      sx={{ 
+                        mb: 3,
+                        borderRadius: '12px',
+                        border: 'none',
+                        backgroundColor: '#fff0f0',
+                        color: '#c41e1e',
+                        fontSize: '0.875rem',
+                        '& .MuiAlert-icon': {
+                          color: '#c41e1e'
+                        }
+                      }}
+                    >
+                      {error}
+                    </Alert>
                   )}
 
                   <Box component="form" onSubmit={handleSubmit}>
-                <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
+                <Box sx={{ display: 'flex', gap: 1.5, mb: 1.5 }}>
                   <TextField
                     fullWidth
                     name="firstName"
-                    label="First Name"
+                    placeholder="First name"
                     value={formData.firstName}
                     onChange={handleChange}
                     required
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <PersonIcon color="action" />
-                        </InputAdornment>
-                      ),
+                    size="small"
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: '8px',
+                        backgroundColor: '#ffffff',
+                        fontSize: '0.9375rem',
+                        fontWeight: 400,
+                        '& input': {
+                          padding: '10px 14px'
+                        },
+                        '& fieldset': {
+                          borderColor: '#d2d2d7',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#86868b',
+                        },
+                        '&.Mui-focused': {
+                          '& fieldset': {
+                            borderColor: '#0071e3',
+                            borderWidth: '2px'
+                          }
+                        }
+                      }
                     }}
                   />
                   <TextField
                     fullWidth
                     name="lastName"
-                    label="Last Name"
+                    placeholder="Last name"
                     value={formData.lastName}
                     onChange={handleChange}
                     required
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <PersonIcon color="action" />
-                        </InputAdornment>
-                      ),
+                    size="small"
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: '8px',
+                        backgroundColor: '#ffffff',
+                        fontSize: '0.9375rem',
+                        fontWeight: 400,
+                        '& input': {
+                          padding: '10px 14px'
+                        },
+                        '& fieldset': {
+                          borderColor: '#d2d2d7',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#86868b',
+                        },
+                        '&.Mui-focused': {
+                          '& fieldset': {
+                            borderColor: '#0071e3',
+                            borderWidth: '2px'
+                          }
+                        }
+                      }
                     }}
                   />
                 </Box>
@@ -287,17 +381,34 @@ const RegisterForm = () => {
                   fullWidth
                   name="email"
                   type="email"
-                  label="Email Address"
+                  placeholder="Email"
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  sx={{ mb: 3 }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <EmailIcon color="action" />
-                      </InputAdornment>
-                    ),
+                  size="small"
+                  sx={{ 
+                    mb: 1.5,
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '8px',
+                      backgroundColor: '#ffffff',
+                      fontSize: '0.9375rem',
+                      fontWeight: 400,
+                      '& input': {
+                        padding: '10px 14px'
+                      },
+                      '& fieldset': {
+                        borderColor: '#d2d2d7',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#86868b',
+                      },
+                      '&.Mui-focused': {
+                        '& fieldset': {
+                          borderColor: '#0071e3',
+                          borderWidth: '2px'
+                        }
+                      }
+                    }
                   }}
                 />
 
@@ -305,24 +416,50 @@ const RegisterForm = () => {
                   fullWidth
                   name="password"
                   type={showPassword ? 'text' : 'password'}
-                  label="Password"
+                  placeholder="Password"
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  sx={{ mb: 3 }}
+                  size="small"
+                  sx={{ 
+                    mb: 1.5,
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '8px',
+                      backgroundColor: '#ffffff',
+                      fontSize: '0.9375rem',
+                      fontWeight: 400,
+                      '& input': {
+                        padding: '10px 14px'
+                      },
+                      '& fieldset': {
+                        borderColor: '#d2d2d7',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#86868b',
+                      },
+                      '&.Mui-focused': {
+                        '& fieldset': {
+                          borderColor: '#0071e3',
+                          borderWidth: '2px'
+                        }
+                      }
+                    }
+                  }}
                   InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <LockIcon color="action" />
-                      </InputAdornment>
-                    ),
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
                           onClick={() => setShowPassword(!showPassword)}
                           edge="end"
+                          size="small"
+                          sx={{
+                            color: '#86868b',
+                            '&:hover': {
+                              backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                            }
+                          }}
                         >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                          {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
                         </IconButton>
                       </InputAdornment>
                     ),
@@ -333,24 +470,50 @@ const RegisterForm = () => {
                   fullWidth
                   name="confirmPassword"
                   type={showConfirmPassword ? 'text' : 'password'}
-                  label="Confirm Password"
+                  placeholder="Confirm password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   required
-                  sx={{ mb: 4 }}
+                  size="small"
+                  sx={{ 
+                    mb: 2.5,
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '8px',
+                      backgroundColor: '#ffffff',
+                      fontSize: '0.9375rem',
+                      fontWeight: 400,
+                      '& input': {
+                        padding: '10px 14px'
+                      },
+                      '& fieldset': {
+                        borderColor: '#d2d2d7',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#86868b',
+                      },
+                      '&.Mui-focused': {
+                        '& fieldset': {
+                          borderColor: '#0071e3',
+                          borderWidth: '2px'
+                        }
+                      }
+                    }
+                  }}
                   InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <LockIcon color="action" />
-                      </InputAdornment>
-                    ),
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                           edge="end"
+                          size="small"
+                          sx={{
+                            color: '#86868b',
+                            '&:hover': {
+                              backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                            }
+                          }}
                         >
-                          {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                          {showConfirmPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
                         </IconButton>
                       </InputAdornment>
                     ),
@@ -361,48 +524,68 @@ const RegisterForm = () => {
                   type="submit"
                   fullWidth
                   variant="contained"
-                  size="large"
                   disabled={loading}
                   sx={{
-                    py: 1.5,
-                    borderRadius: 2,
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    boxShadow: '0 8px 25px rgba(102, 126, 234, 0.3)',
+                    py: 1.25,
+                    borderRadius: '8px',
+                    textTransform: 'none',
+                    fontSize: '0.9375rem',
+                    fontWeight: 500,
+                    letterSpacing: '-0.01em',
+                    background: '#0071e3',
+                    boxShadow: 'none',
                     '&:hover': {
-                      background: 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)',
-                      boxShadow: '0 12px 35px rgba(102, 126, 234, 0.4)',
+                      background: '#0077ed',
+                      boxShadow: 'none'
                     },
-                    mb: 3
+                    '&:active': {
+                      background: '#006edb'
+                    },
+                    '&.Mui-disabled': {
+                      background: '#86868b',
+                      color: '#ffffff',
+                      opacity: 0.5
+                    },
+                    mb: 2.5
                   }}
                 >
-                  {loading ? 'Creating Account...' : 'Create Account'}
+                  {loading ? <CircularProgress size={22} sx={{ color: '#ffffff' }} /> : 'Continue'}
                 </Button>
 
-                <Divider sx={{ my: 3 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Already have an account?
-                  </Typography>
-                </Divider>
+                <Divider sx={{ 
+                  my: 2,
+                  '&::before, &::after': {
+                    borderColor: 'rgba(0, 0, 0, 0.06)'
+                  }
+                }} />
 
                 <Box sx={{ textAlign: 'center' }}>
+                  <Typography 
+                    variant="body2" 
+                    sx={{ 
+                      color: '#86868b',
+                      fontSize: '0.8125rem',
+                      mb: 1.5
+                    }}
+                  >
+                    Already have an account?
+                  </Typography>
                   <Link
                     component="button"
                     type="button"
-                    variant="body2"
                     onClick={() => navigate('/login')}
                     sx={{
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                      backgroundClip: 'text',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      fontWeight: 'medium',
+                      color: '#0071e3',
+                      fontWeight: 400,
+                      fontSize: '0.8125rem',
                       textDecoration: 'none',
+                      transition: 'opacity 0.2s ease',
                       '&:hover': {
-                        textDecoration: 'underline'
+                        opacity: 0.7
                       }
                     }}
                   >
-                    Sign in to your existing account
+                    Sign in
                   </Link>
                 </Box>
               </Box>
@@ -410,8 +593,9 @@ const RegisterForm = () => {
               )}
             </CardContent>
           </Card>
-        </Fade>
-      </Container>
+        </Box>
+      </Fade>
+    </Container>
     </Box>
   );
 };

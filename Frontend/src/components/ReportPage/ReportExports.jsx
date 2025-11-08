@@ -14,33 +14,42 @@ import {
 
 const ReportExports = ({ onExport, loading, reportType }) => {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+    <Box sx={{ 
+      display: 'flex', 
+      flexDirection: 'column', 
+      gap: 1.5,
+      fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif'
+    }}>
       <Button
         variant="contained"
         fullWidth
-        startIcon={loading ? <CircularProgress size={18} color="inherit" /> : <PdfIcon sx={{ fontSize: 20 }} />}
+        startIcon={loading ? <CircularProgress size={18} sx={{ color: 'inherit' }} thickness={3} /> : <PdfIcon sx={{ fontSize: 20 }} />}
         onClick={() => onExport('pdf')}
         disabled={loading}
         sx={{
-          background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+          background: '#ff3b30',
           color: 'white',
-          px: 2.5,
-          py: 1.25,
-          fontWeight: 600,
-          fontSize: '0.875rem',
+          px: 3,
+          py: 1.5,
+          fontWeight: 500,
+          fontSize: '0.9375rem',
+          letterSpacing: '-0.01em',
           textTransform: 'none',
-          borderRadius: '10px',
+          borderRadius: '12px',
           boxShadow: 'none',
           border: 'none',
-          transition: 'all 0.2s ease',
+          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
           '&:hover': {
-            background: 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)',
-            transform: 'translateY(-2px)',
-            boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)',
+            background: '#d70015',
+            boxShadow: 'none'
+          },
+          '&:active': {
+            transform: 'scale(0.98)'
           },
           '&:disabled': {
-            background: 'rgba(15, 23, 42, 0.12)',
-            color: 'rgba(15, 23, 42, 0.4)',
+            background: 'rgba(0, 0, 0, 0.06)',
+            color: 'rgba(0, 0, 0, 0.26)',
             boxShadow: 'none'
           }
         }}
@@ -51,29 +60,33 @@ const ReportExports = ({ onExport, loading, reportType }) => {
       <Button
         variant="contained"
         fullWidth
-        startIcon={loading ? <CircularProgress size={18} color="inherit" /> : <ExcelIcon sx={{ fontSize: 20 }} />}
+        startIcon={loading ? <CircularProgress size={18} sx={{ color: 'inherit' }} thickness={3} /> : <ExcelIcon sx={{ fontSize: 20 }} />}
         onClick={() => onExport('excel')}
         disabled={loading}
         sx={{
-          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+          background: '#34c759',
           color: 'white',
-          px: 2.5,
-          py: 1.25,
-          fontWeight: 600,
-          fontSize: '0.875rem',
+          px: 3,
+          py: 1.5,
+          fontWeight: 500,
+          fontSize: '0.9375rem',
+          letterSpacing: '-0.01em',
           textTransform: 'none',
-          borderRadius: '10px',
+          borderRadius: '12px',
           boxShadow: 'none',
           border: 'none',
-          transition: 'all 0.2s ease',
+          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
           '&:hover': {
-            background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-            transform: 'translateY(-2px)',
-            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+            background: '#248a3d',
+            boxShadow: 'none'
+          },
+          '&:active': {
+            transform: 'scale(0.98)'
           },
           '&:disabled': {
-            background: 'rgba(15, 23, 42, 0.12)',
-            color: 'rgba(15, 23, 42, 0.4)',
+            background: 'rgba(0, 0, 0, 0.06)',
+            color: 'rgba(0, 0, 0, 0.26)',
             boxShadow: 'none'
           }
         }}
@@ -83,24 +96,31 @@ const ReportExports = ({ onExport, loading, reportType }) => {
 
       <Box 
         sx={{ 
-          mt: 1, 
-          p: 2, 
+          mt: 1.5, 
+          p: 2.5, 
           borderRadius: '12px',
-          backgroundColor: 'rgba(15, 23, 42, 0.02)',
-          border: '1px solid rgba(15, 23, 42, 0.08)'
+          background: 'rgba(0, 0, 0, 0.02)',
+          border: '0.5px solid rgba(0, 0, 0, 0.06)'
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-          <DownloadIcon sx={{ fontSize: 16, color: 'rgba(15, 23, 42, 0.55)' }} />
-          <Typography variant="caption" sx={{ fontWeight: 600, color: 'rgba(15, 23, 42, 0.75)' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
+          <DownloadIcon sx={{ fontSize: 18, color: '#86868b' }} />
+          <Typography variant="body2" sx={{ 
+            fontWeight: 600, 
+            color: '#1d1d1f',
+            fontSize: '0.8125rem',
+            letterSpacing: '-0.01em'
+          }}>
             Export Info
           </Typography>
         </Box>
-        <Typography variant="caption" sx={{ 
-          color: 'rgba(15, 23, 42, 0.65)', 
+        <Typography variant="body2" sx={{ 
+          color: '#86868b', 
           lineHeight: 1.5, 
           display: 'block',
-          fontSize: '0.8125rem'
+          fontSize: '0.875rem',
+          fontWeight: 400,
+          letterSpacing: '-0.01em'
         }}>
           Export options will use your selected columns and current filters
         </Typography>

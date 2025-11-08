@@ -29,42 +29,23 @@ const ReportFilters = ({ filters, onFiltersChange, onRunReport, loading }) => {
 
   const getStatusColor = (status) => {
     const colors = {
-      all: '#6366f1',
-      paid: '#10b981',
-      pending: '#f59e0b',
-      overdue: '#ef4444',
-      draft: '#6b7280'
+      all: '#8b5cf6',
+      paid: '#34c759',
+      pending: '#ff9500',
+      overdue: '#ff3b30',
+      draft: '#8e8e93'
     };
-    return colors[status] || '#6366f1';
+    return colors[status] || '#8b5cf6';
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Grid container spacing={3}>
-        {/* Section Header */}
-        <Grid item xs={12}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
-            <Box>
-              <Typography variant="h6" sx={{ 
-                fontWeight: 700,
-                color: 'rgba(15, 23, 42, 0.95)',
-                letterSpacing: '-0.02em'
-              }}>
-                Report Filters
-              </Typography>
-              <Typography variant="caption" sx={{ 
-                color: 'rgba(15, 23, 42, 0.55)',
-                fontSize: '0.875rem',
-                fontWeight: 500
-              }}>
-                Define your report parameters
-              </Typography>
-            </Box>
-          </Box>
-        </Grid>
-
+    <Box sx={{ 
+      p: { xs: 2, md: 2.5 },
+      fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif'
+    }}>
+      <Grid container spacing={2} alignItems="flex-end">
         {/* Filter Inputs */}
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6} md={2.5}>
           <TextField
             fullWidth
             size="small"
@@ -73,42 +54,44 @@ const ReportFilters = ({ filters, onFiltersChange, onRunReport, loading }) => {
             value={filters.startDate}
             onChange={(e) => handleFilterChange('startDate', e.target.value)}
             InputLabelProps={{ shrink: true }}
-            InputProps={{
-              startAdornment: <CalendarIcon sx={{ mr: 1, fontSize: 18, color: 'rgba(15, 23, 42, 0.55)' }} />
-            }}
             sx={{
               '& .MuiInputLabel-root': {
-                color: 'rgba(15, 23, 42, 0.75)',
-                fontWeight: 600,
+                color: '#86868b',
+                fontWeight: 500,
                 fontSize: '0.875rem',
+                letterSpacing: '-0.01em',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
                 '&.Mui-focused': {
-                  color: 'rgba(15, 23, 42, 0.85)'
+                  color: '#86868b'
                 }
               },
               '& .MuiOutlinedInput-root': {
                 backgroundColor: 'white',
-                borderRadius: '12px',
+                borderRadius: '10px',
                 fontSize: '0.875rem',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+                letterSpacing: '-0.01em',
                 '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(15, 23, 42, 0.08)',
+                  borderColor: '#d1d1d6',
                   borderWidth: '1px'
                 },
                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(15, 23, 42, 0.15)'
+                  borderColor: '#86868b'
                 },
                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(15, 23, 42, 0.25)',
-                  borderWidth: '1.5px'
+                  borderColor: '#86868b',
+                  borderWidth: '2px'
                 },
                 '& .MuiInputBase-input': {
-                  padding: '8px 12px'
+                  padding: '8px 12px',
+                  fontWeight: 400
                 }
               }
             }}
           />
         </Grid>
 
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6} md={2.5}>
           <TextField
             fullWidth
             size="small"
@@ -117,83 +100,89 @@ const ReportFilters = ({ filters, onFiltersChange, onRunReport, loading }) => {
             value={filters.endDate}
             onChange={(e) => handleFilterChange('endDate', e.target.value)}
             InputLabelProps={{ shrink: true }}
-            InputProps={{
-              startAdornment: <CalendarIcon sx={{ mr: 1, fontSize: 18, color: 'rgba(15, 23, 42, 0.55)' }} />
-            }}
             sx={{
               '& .MuiInputLabel-root': {
-                color: 'rgba(15, 23, 42, 0.75)',
-                fontWeight: 600,
+                color: '#86868b',
+                fontWeight: 500,
                 fontSize: '0.875rem',
+                letterSpacing: '-0.01em',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
                 '&.Mui-focused': {
-                  color: 'rgba(15, 23, 42, 0.85)'
+                  color: '#86868b'
                 }
               },
               '& .MuiOutlinedInput-root': {
                 backgroundColor: 'white',
-                borderRadius: '12px',
+                borderRadius: '10px',
                 fontSize: '0.875rem',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+                letterSpacing: '-0.01em',
                 '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(15, 23, 42, 0.08)',
+                  borderColor: '#d1d1d6',
                   borderWidth: '1px'
                 },
                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(15, 23, 42, 0.15)'
+                  borderColor: '#86868b'
                 },
                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(15, 23, 42, 0.25)',
-                  borderWidth: '1.5px'
+                  borderColor: '#86868b',
+                  borderWidth: '2px'
                 },
                 '& .MuiInputBase-input': {
-                  padding: '8px 12px'
+                  padding: '8px 12px',
+                  fontWeight: 400
                 }
               }
             }}
           />
         </Grid>
 
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid item xs={12} sm={6} md={5}>
           <FormControl 
             fullWidth 
             size="small"
             sx={{
               '& .MuiInputLabel-root': {
-                color: 'rgba(15, 23, 42, 0.75)',
-                fontWeight: 600,
+                color: '#86868b',
+                fontWeight: 500,
                 fontSize: '0.875rem',
+                letterSpacing: '-0.01em',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
                 '&.Mui-focused': {
-                  color: 'rgba(15, 23, 42, 0.85)'
+                  color: '#86868b'
                 }
               },
               '& .MuiOutlinedInput-root': {
                 backgroundColor: 'white',
-                borderRadius: '12px',
+                borderRadius: '10px',
                 fontSize: '0.875rem',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+                letterSpacing: '-0.01em',
                 '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(15, 23, 42, 0.08)',
+                  borderColor: '#d1d1d6',
                   borderWidth: '1px'
                 },
                 '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(15, 23, 42, 0.15)'
+                  borderColor: '#86868b'
                 },
                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'rgba(15, 23, 42, 0.25)',
-                  borderWidth: '1.5px'
+                  borderColor: '#86868b',
+                  borderWidth: '2px'
                 },
                 '& .MuiSelect-select': {
-                  padding: '8px 12px',
+                  padding: '8px 16px',
                   display: 'flex',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  fontWeight: 400
                 }
               }
             }}
           >
-            <InputLabel>Invoice Status</InputLabel>
+            <InputLabel>Status</InputLabel>
             <Select
               value={filters.status}
-              label="Invoice Status"
+              label="Status"
               onChange={(e) => handleFilterChange('status', e.target.value)}
-              startAdornment={<StatusIcon sx={{ ml: 1, mr: 0.5, fontSize: 18, color: 'rgba(15, 23, 42, 0.55)' }} />}
               renderValue={(value) => (
                 <Chip
                   label={value.charAt(0).toUpperCase() + value.slice(1)}
@@ -201,21 +190,23 @@ const ReportFilters = ({ filters, onFiltersChange, onRunReport, loading }) => {
                   sx={{
                     backgroundColor: `${getStatusColor(value)}15`,
                     color: getStatusColor(value),
-                    fontWeight: 600,
-                    fontSize: '0.8125rem',
-                    border: `1px solid ${getStatusColor(value)}30`
+                    fontWeight: 500,
+                    fontSize: '0.875rem',
+                    letterSpacing: '-0.01em',
+                    border: `1px solid ${getStatusColor(value)}40`,
+                    fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif'
                   }}
                 />
               )}
               MenuProps={{
                 PaperProps: {
                   sx: {
-                    borderRadius: '12px',
-                    mt: 1,
-                    boxShadow: '0 4px 12px rgba(15, 23, 42, 0.08)',
-                    border: '1px solid rgba(15, 23, 42, 0.08)',
+                    borderRadius: '16px',
+                    mt: 1.5,
+                    boxShadow: '0 4px 24px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.04)',
+                    border: 'none',
                     '& .MuiList-root': {
-                      py: 1
+                      py: 1.5
                     }
                   }
                 }
@@ -224,23 +215,25 @@ const ReportFilters = ({ filters, onFiltersChange, onRunReport, loading }) => {
               <MenuItem 
                 value="all"
                 sx={{
-                  fontSize: '0.875rem',
-                  fontWeight: 500,
-                  color: 'rgba(15, 23, 42, 0.85)',
-                  py: 1.25,
-                  px: 2,
-                  mx: 1,
-                  borderRadius: '8px',
-                  transition: 'all 0.2s ease',
+                  fontSize: '0.9375rem',
+                  fontWeight: 400,
+                  color: '#1d1d1f',
+                  letterSpacing: '-0.01em',
+                  py: 1.5,
+                  px: 2.5,
+                  mx: 1.5,
+                  borderRadius: '10px',
+                  fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                   '&:hover': {
-                    backgroundColor: 'rgba(15, 23, 42, 0.04)'
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)'
                   },
                   '&.Mui-selected': {
-                    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
                     color: '#8b5cf6',
-                    fontWeight: 600,
+                    fontWeight: 500,
                     '&:hover': {
-                      backgroundColor: 'rgba(139, 92, 246, 0.12)'
+                      backgroundColor: 'rgba(139, 92, 246, 0.15)'
                     }
                   }
                 }}
@@ -250,23 +243,25 @@ const ReportFilters = ({ filters, onFiltersChange, onRunReport, loading }) => {
               <MenuItem 
                 value="paid"
                 sx={{
-                  fontSize: '0.875rem',
-                  fontWeight: 500,
-                  color: 'rgba(15, 23, 42, 0.85)',
-                  py: 1.25,
-                  px: 2,
-                  mx: 1,
-                  borderRadius: '8px',
-                  transition: 'all 0.2s ease',
+                  fontSize: '0.9375rem',
+                  fontWeight: 400,
+                  color: '#1d1d1f',
+                  letterSpacing: '-0.01em',
+                  py: 1.5,
+                  px: 2.5,
+                  mx: 1.5,
+                  borderRadius: '10px',
+                  fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                   '&:hover': {
-                    backgroundColor: 'rgba(15, 23, 42, 0.04)'
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)'
                   },
                   '&.Mui-selected': {
-                    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
                     color: '#8b5cf6',
-                    fontWeight: 600,
+                    fontWeight: 500,
                     '&:hover': {
-                      backgroundColor: 'rgba(139, 92, 246, 0.12)'
+                      backgroundColor: 'rgba(139, 92, 246, 0.15)'
                     }
                   }
                 }}
@@ -276,23 +271,25 @@ const ReportFilters = ({ filters, onFiltersChange, onRunReport, loading }) => {
               <MenuItem 
                 value="pending"
                 sx={{
-                  fontSize: '0.875rem',
-                  fontWeight: 500,
-                  color: 'rgba(15, 23, 42, 0.85)',
-                  py: 1.25,
-                  px: 2,
-                  mx: 1,
-                  borderRadius: '8px',
-                  transition: 'all 0.2s ease',
+                  fontSize: '0.9375rem',
+                  fontWeight: 400,
+                  color: '#1d1d1f',
+                  letterSpacing: '-0.01em',
+                  py: 1.5,
+                  px: 2.5,
+                  mx: 1.5,
+                  borderRadius: '10px',
+                  fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                   '&:hover': {
-                    backgroundColor: 'rgba(15, 23, 42, 0.04)'
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)'
                   },
                   '&.Mui-selected': {
-                    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
                     color: '#8b5cf6',
-                    fontWeight: 600,
+                    fontWeight: 500,
                     '&:hover': {
-                      backgroundColor: 'rgba(139, 92, 246, 0.12)'
+                      backgroundColor: 'rgba(139, 92, 246, 0.15)'
                     }
                   }
                 }}
@@ -302,23 +299,25 @@ const ReportFilters = ({ filters, onFiltersChange, onRunReport, loading }) => {
               <MenuItem 
                 value="overdue"
                 sx={{
-                  fontSize: '0.875rem',
-                  fontWeight: 500,
-                  color: 'rgba(15, 23, 42, 0.85)',
-                  py: 1.25,
-                  px: 2,
-                  mx: 1,
-                  borderRadius: '8px',
-                  transition: 'all 0.2s ease',
+                  fontSize: '0.9375rem',
+                  fontWeight: 400,
+                  color: '#1d1d1f',
+                  letterSpacing: '-0.01em',
+                  py: 1.5,
+                  px: 2.5,
+                  mx: 1.5,
+                  borderRadius: '10px',
+                  fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                   '&:hover': {
-                    backgroundColor: 'rgba(15, 23, 42, 0.04)'
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)'
                   },
                   '&.Mui-selected': {
-                    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
                     color: '#8b5cf6',
-                    fontWeight: 600,
+                    fontWeight: 500,
                     '&:hover': {
-                      backgroundColor: 'rgba(139, 92, 246, 0.12)'
+                      backgroundColor: 'rgba(139, 92, 246, 0.15)'
                     }
                   }
                 }}
@@ -328,23 +327,25 @@ const ReportFilters = ({ filters, onFiltersChange, onRunReport, loading }) => {
               <MenuItem 
                 value="draft"
                 sx={{
-                  fontSize: '0.875rem',
-                  fontWeight: 500,
-                  color: 'rgba(15, 23, 42, 0.85)',
-                  py: 1.25,
-                  px: 2,
-                  mx: 1,
-                  borderRadius: '8px',
-                  transition: 'all 0.2s ease',
+                  fontSize: '0.9375rem',
+                  fontWeight: 400,
+                  color: '#1d1d1f',
+                  letterSpacing: '-0.01em',
+                  py: 1.5,
+                  px: 2.5,
+                  mx: 1.5,
+                  borderRadius: '10px',
+                  fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                   '&:hover': {
-                    backgroundColor: 'rgba(15, 23, 42, 0.04)'
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)'
                   },
                   '&.Mui-selected': {
-                    backgroundColor: 'rgba(139, 92, 246, 0.08)',
+                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
                     color: '#8b5cf6',
-                    fontWeight: 600,
+                    fontWeight: 500,
                     '&:hover': {
-                      backgroundColor: 'rgba(139, 92, 246, 0.12)'
+                      backgroundColor: 'rgba(139, 92, 246, 0.15)'
                     }
                   }
                 }}
@@ -359,28 +360,34 @@ const ReportFilters = ({ filters, onFiltersChange, onRunReport, loading }) => {
           <Button
             variant="contained"
             fullWidth
-            startIcon={<RunIcon />}
+            startIcon={<RunIcon sx={{ fontSize: 18 }} />}
             onClick={onRunReport}
             disabled={loading}
             sx={{
-              background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
               color: 'white',
               borderRadius: '10px',
-              px: 3,
+              px: 2.5,
               py: 1,
-              fontWeight: 600,
+              height: '40px',
+              fontWeight: 500,
               textTransform: 'none',
-              fontSize: '0.9375rem',
+              fontSize: '0.875rem',
+              letterSpacing: '-0.01em',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
               boxShadow: 'none',
-              transition: 'all 0.2s ease',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
               '&:hover': {
-                background: 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)',
-                transform: 'translateY(-2px)',
-                boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)',
+                background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                boxShadow: 'none',
+                transform: 'translateY(-1px)'
+              },
+              '&:active': {
+                transform: 'scale(0.98)'
               },
               '&:disabled': {
-                background: 'rgba(15, 23, 42, 0.12)',
-                color: 'rgba(15, 23, 42, 0.4)',
+                background: 'rgba(0, 0, 0, 0.06)',
+                color: 'rgba(0, 0, 0, 0.26)',
               }
             }}
           >

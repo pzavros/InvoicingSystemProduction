@@ -644,7 +644,7 @@ const CompanyProfileSettings = () => {
                   </Stack>
                 </Box>                {/* Company Details Form */}
                 <Grid container spacing={3}>
-                  <Grid item xs={12} md={6}>
+                  <Grid item xs={12} md={4}>
                     <TextField
                       name="name"
                       label="Company Name"
@@ -657,19 +657,30 @@ const CompanyProfileSettings = () => {
                       }}
                       sx={{
                         '& .MuiOutlinedInput-root': {
-                          borderRadius: '8px',
-                          '&:hover fieldset': { 
-                            borderColor: '#8b5cf6' 
+                          borderRadius: '12px',
+                          backgroundColor: 'white',
+                          transition: 'all 0.2s ease',
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgba(15, 23, 42, 0.08)',
+                            borderWidth: '1px'
                           },
-                          '&.Mui-focused fieldset': { 
-                            borderColor: '#8b5cf6' 
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#8b5cf6'
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#8b5cf6',
+                            borderWidth: '1.5px'
+                          },
+                          '& .MuiInputBase-input': {
+                            padding: '9px 12px',
+                            fontSize: '0.875rem'
                           }
                         }
                       }}
                     />
                   </Grid>
                   
-                  <Grid item xs={12} md={6}>
+                  <Grid item xs={12} md={4}>
                     <TextField
                       name="email"
                       label="Email Address"
@@ -678,24 +689,34 @@ const CompanyProfileSettings = () => {
                       fullWidth
                       variant="outlined"
                       InputProps={{
-                        startAdornment: <EmailIcon sx={{ mr: 1, color: '#667eea' }} />
+                        startAdornment: <EmailIcon sx={{ mr: 1, color: '#8b5cf6' }} />
                       }}
                       sx={{
                         '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                          transition: 'all 0.3s ease',
-                          '&:hover': {
-                            '& > fieldset': { borderColor: '#667eea' }
+                          borderRadius: '12px',
+                          backgroundColor: 'white',
+                          transition: 'all 0.2s ease',
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgba(15, 23, 42, 0.08)',
+                            borderWidth: '1px'
                           },
-                          '&.Mui-focused': {
-                            '& > fieldset': { borderColor: '#667eea', borderWidth: 2 }
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#8b5cf6'
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#8b5cf6',
+                            borderWidth: '1.5px'
+                          },
+                          '& .MuiInputBase-input': {
+                            padding: '9px 12px',
+                            fontSize: '0.875rem'
                           }
                         }
                       }}
                     />
                   </Grid>
 
-                  <Grid item xs={12} md={6}>
+                  <Grid item xs={12} md={4}>
                     <TextField
                       name="website"
                       label="Website URL"
@@ -705,22 +726,34 @@ const CompanyProfileSettings = () => {
                       variant="outlined"
                       placeholder="https://www.example.com"
                       InputProps={{
-                        startAdornment: <WebIcon sx={{ mr: 1, color: '#667eea' }} />
+                        startAdornment: <WebIcon sx={{ mr: 1, color: '#8b5cf6' }} />
                       }}
                       sx={{
                         '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                          transition: 'all 0.3s ease',
-                          '&:hover': {
-                            '& > fieldset': { borderColor: '#667eea' }
+                          borderRadius: '12px',
+                          backgroundColor: 'white',
+                          transition: 'all 0.2s ease',
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgba(15, 23, 42, 0.08)',
+                            borderWidth: '1px'
                           },
-                          '&.Mui-focused': {
-                            '& > fieldset': { borderColor: '#667eea', borderWidth: 2 }
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#8b5cf6'
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#8b5cf6',
+                            borderWidth: '1.5px'
+                          },
+                          '& .MuiInputBase-input': {
+                            padding: '9px 12px',
+                            fontSize: '0.875rem'
                           }
                         }
                       }}
                     />
-                  </Grid>                  <Grid item xs={12} md={6}>
+                  </Grid>
+
+                  <Grid item xs={12} md={4}>
                     <TextField
                       name="companyNo"
                       label="Company Registration Number"
@@ -730,22 +763,34 @@ const CompanyProfileSettings = () => {
                       variant="outlined"
                       placeholder="HE 123456"
                       InputProps={{
-                        startAdornment: <VerifiedIcon sx={{ mr: 1, color: '#667eea' }} />
+                        startAdornment: <VerifiedIcon sx={{ mr: 1, color: '#8b5cf6' }} />
                       }}
                       sx={{
                         '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                          transition: 'all 0.3s ease',
-                          '&:hover': {
-                            '& > fieldset': { borderColor: '#667eea' }
+                          borderRadius: '12px',
+                          backgroundColor: 'white',
+                          transition: 'all 0.2s ease',
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgba(15, 23, 42, 0.08)',
+                            borderWidth: '1px'
                           },
-                          '&.Mui-focused': {
-                            '& > fieldset': { borderColor: '#667eea', borderWidth: 2 }
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#8b5cf6'
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#8b5cf6',
+                            borderWidth: '1.5px'
+                          },
+                          '& .MuiInputBase-input': {
+                            padding: '9px 12px',
+                            fontSize: '0.875rem'
                           }
                         }
                       }}
                     />
-                  </Grid>                  <Grid item xs={12} md={6}>
+                  </Grid>
+
+                  <Grid item xs={12} md={4}>
                     <TextField
                       name="vatNo"
                       label="VAT Number"
@@ -755,22 +800,34 @@ const CompanyProfileSettings = () => {
                       variant="outlined"
                       placeholder="6789456"
                       InputProps={{
-                        startAdornment: <CardIcon sx={{ mr: 1, color: '#667eea' }} />
+                        startAdornment: <CardIcon sx={{ mr: 1, color: '#8b5cf6' }} />
                       }}
                       sx={{
                         '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                          transition: 'all 0.3s ease',
-                          '&:hover': {
-                            '& > fieldset': { borderColor: '#667eea' }
+                          borderRadius: '12px',
+                          backgroundColor: 'white',
+                          transition: 'all 0.2s ease',
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgba(15, 23, 42, 0.08)',
+                            borderWidth: '1px'
                           },
-                          '&.Mui-focused': {
-                            '& > fieldset': { borderColor: '#667eea', borderWidth: 2 }
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#8b5cf6'
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#8b5cf6',
+                            borderWidth: '1.5px'
+                          },
+                          '& .MuiInputBase-input': {
+                            padding: '9px 12px',
+                            fontSize: '0.875rem'
                           }
                         }
                       }}
                     />
-                  </Grid>                  <Grid item xs={12} md={6}>
+                  </Grid>
+
+                  <Grid item xs={12} md={4}>
                     <TextField
                       name="ticNo"
                       label="TIC Number"
@@ -780,17 +837,27 @@ const CompanyProfileSettings = () => {
                       variant="outlined"
                       placeholder="1234563"
                       InputProps={{
-                        startAdornment: <WalletIcon sx={{ mr: 1, color: '#667eea' }} />
+                        startAdornment: <WalletIcon sx={{ mr: 1, color: '#8b5cf6' }} />
                       }}
                       sx={{
                         '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                          transition: 'all 0.3s ease',
-                          '&:hover': {
-                            '& > fieldset': { borderColor: '#667eea' }
+                          borderRadius: '12px',
+                          backgroundColor: 'white',
+                          transition: 'all 0.2s ease',
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgba(15, 23, 42, 0.08)',
+                            borderWidth: '1px'
                           },
-                          '&.Mui-focused': {
-                            '& > fieldset': { borderColor: '#667eea', borderWidth: 2 }
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#8b5cf6'
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#8b5cf6',
+                            borderWidth: '1.5px'
+                          },
+                          '& .MuiInputBase-input': {
+                            padding: '9px 12px',
+                            fontSize: '0.875rem'
                           }
                         }
                       }}
@@ -809,17 +876,27 @@ const CompanyProfileSettings = () => {
                       variant="outlined"
                       placeholder="Enter your complete business address"
                       InputProps={{
-                        startAdornment: <AddressIcon sx={{ mr: 1, color: '#667eea', alignSelf: 'flex-start', mt: 1 }} />
+                        startAdornment: <AddressIcon sx={{ mr: 1, color: '#8b5cf6', alignSelf: 'flex-start', mt: 1 }} />
                       }}
                       sx={{
                         '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                          transition: 'all 0.3s ease',
-                          '&:hover': {
-                            '& > fieldset': { borderColor: '#667eea' }
+                          borderRadius: '12px',
+                          backgroundColor: 'white',
+                          transition: 'all 0.2s ease',
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgba(15, 23, 42, 0.08)',
+                            borderWidth: '1px'
                           },
-                          '&.Mui-focused': {
-                            '& > fieldset': { borderColor: '#667eea', borderWidth: 2 }
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#8b5cf6'
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#8b5cf6',
+                            borderWidth: '1.5px'
+                          },
+                          '& .MuiInputBase-input': {
+                            padding: '9px 12px',
+                            fontSize: '0.875rem'
                           }
                         }
                       }}
@@ -830,23 +907,33 @@ const CompanyProfileSettings = () => {
             )}
 
             {activeTab === 1 && (
-              <Box sx={{ py: 3 }}>
+              <Box
+                sx={{
+                  p: { xs: 2, sm: 3, md: 4 },
+                  borderRadius: '12px',
+                  backgroundColor: 'white',
+                  border: '1px solid rgba(15, 23, 42, 0.06)',
+                }}
+              >
                 {/* Banking Details Tab */}
-                <Typography 
-                  variant="h6" 
-                  sx={{ 
-                    fontWeight: 600, 
-                    mb: 3,
-                    fontSize: '1.125rem',
-                    color: 'rgba(15, 23, 42, 0.9)'
-                  }}
-                >
-                  Banking Information
-                </Typography>
+                <Box sx={{ mb: { xs: 3, md: 4 } }}>
+                  <Typography 
+                    variant="h6" 
+                    sx={{ 
+                      fontWeight: 600, 
+                      color: 'rgba(15, 23, 42, 0.9)',
+                      fontSize: '1.125rem',
+                      letterSpacing: '-0.01em'
+                    }}
+                  >
+                    Banking Information
+                  </Typography>
+                </Box>
 
                 {/* Banking Form */}
                 <Grid container spacing={3}>
-                  <Grid item xs={12} md={6}>
+                  {/* Row 1: Bank Name, Account Holder, Account Number */}
+                  <Grid item xs={12} md={4}>
                     <TextField
                       name="bankName"
                       label="Bank Name"
@@ -856,24 +943,34 @@ const CompanyProfileSettings = () => {
                       variant="outlined"
                       placeholder="e.g. Hellenic Bank"
                       InputProps={{
-                        startAdornment: <BankIcon sx={{ mr: 1, color: '#667eea' }} />
+                        startAdornment: <BankIcon sx={{ mr: 1, color: '#8b5cf6' }} />
                       }}
                       sx={{
                         '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                          transition: 'all 0.3s ease',
-                          '&:hover': {
-                            '& > fieldset': { borderColor: '#667eea' }
+                          borderRadius: '12px',
+                          backgroundColor: 'white',
+                          transition: 'all 0.2s ease',
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgba(15, 23, 42, 0.08)',
+                            borderWidth: '1px'
                           },
-                          '&.Mui-focused': {
-                            '& > fieldset': { borderColor: '#667eea', borderWidth: 2 }
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#8b5cf6'
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#8b5cf6',
+                            borderWidth: '1.5px'
+                          },
+                          '& .MuiInputBase-input': {
+                            padding: '9px 12px',
+                            fontSize: '0.875rem'
                           }
                         }
                       }}
                     />
                   </Grid>
 
-                  <Grid item xs={12} md={6}>
+                  <Grid item xs={12} md={4}>
                     <TextField
                       name="accountName"
                       label="Account Holder Name"
@@ -883,22 +980,34 @@ const CompanyProfileSettings = () => {
                       variant="outlined"
                       placeholder="Account holder's full name"
                       InputProps={{
-                        startAdornment: <BusinessIcon sx={{ mr: 1, color: '#667eea' }} />
+                        startAdornment: <BusinessIcon sx={{ mr: 1, color: '#8b5cf6' }} />
                       }}
                       sx={{
                         '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                          transition: 'all 0.3s ease',
-                          '&:hover': {
-                            '& > fieldset': { borderColor: '#667eea' }
+                          borderRadius: '12px',
+                          backgroundColor: 'white',
+                          transition: 'all 0.2s ease',
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgba(15, 23, 42, 0.08)',
+                            borderWidth: '1px'
                           },
-                          '&.Mui-focused': {
-                            '& > fieldset': { borderColor: '#667eea', borderWidth: 2 }
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#8b5cf6'
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#8b5cf6',
+                            borderWidth: '1.5px'
+                          },
+                          '& .MuiInputBase-input': {
+                            padding: '9px 12px',
+                            fontSize: '0.875rem'
                           }
                         }
                       }}
                     />
-                  </Grid>                  <Grid item xs={12} md={6}>
+                  </Grid>
+
+                  <Grid item xs={12} md={4}>
                     <TextField
                       name="accountNo"
                       label="Account Number"
@@ -908,22 +1017,35 @@ const CompanyProfileSettings = () => {
                       variant="outlined"
                       placeholder="350-01-H01712-01"
                       InputProps={{
-                        startAdornment: <CardIcon sx={{ mr: 1, color: '#667eea' }} />
+                        startAdornment: <CardIcon sx={{ mr: 1, color: '#8b5cf6' }} />
                       }}
                       sx={{
                         '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                          transition: 'all 0.3s ease',
-                          '&:hover': {
-                            '& > fieldset': { borderColor: '#667eea' }
+                          borderRadius: '12px',
+                          backgroundColor: 'white',
+                          transition: 'all 0.2s ease',
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgba(15, 23, 42, 0.08)',
+                            borderWidth: '1px'
                           },
-                          '&.Mui-focused': {
-                            '& > fieldset': { borderColor: '#667eea', borderWidth: 2 }
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#8b5cf6'
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#8b5cf6',
+                            borderWidth: '1.5px'
+                          },
+                          '& .MuiInputBase-input': {
+                            padding: '9px 12px',
+                            fontSize: '0.875rem'
                           }
                         }
                       }}
                     />
-                  </Grid>                  <Grid item xs={12} md={6}>
+                  </Grid>
+
+                  {/* Row 2: SWIFT/BIC, IBAN */}
+                  <Grid item xs={12} md={4}>
                     <TextField
                       name="swift"
                       label="SWIFT/BIC Code"
@@ -933,22 +1055,34 @@ const CompanyProfileSettings = () => {
                       variant="outlined"
                       placeholder="HEBACY2N"
                       InputProps={{
-                        startAdornment: <WalletIcon sx={{ mr: 1, color: '#667eea' }} />
+                        startAdornment: <WalletIcon sx={{ mr: 1, color: '#8b5cf6' }} />
                       }}
                       sx={{
                         '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                          transition: 'all 0.3s ease',
-                          '&:hover': {
-                            '& > fieldset': { borderColor: '#667eea' }
+                          borderRadius: '12px',
+                          backgroundColor: 'white',
+                          transition: 'all 0.2s ease',
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: 'rgba(15, 23, 42, 0.08)',
+                            borderWidth: '1px'
                           },
-                          '&.Mui-focused': {
-                            '& > fieldset': { borderColor: '#667eea', borderWidth: 2 }
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#8b5cf6'
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: '#8b5cf6',
+                            borderWidth: '1.5px'
+                          },
+                          '& .MuiInputBase-input': {
+                            padding: '9px 12px',
+                            fontSize: '0.875rem'
                           }
                         }
                       }}
                     />
-                  </Grid>                  <Grid item xs={12}>
+                  </Grid>
+
+                  <Grid item xs={12} md={8}>
                     <TextField
                       name="iban"
                       label="IBAN Number"
@@ -960,17 +1094,27 @@ const CompanyProfileSettings = () => {
                       error={!!ibanError}
                       helperText={ibanError || "Enter the complete IBAN number"}
                       InputProps={{
-                        startAdornment: <BankIcon sx={{ mr: 1, color: ibanError ? '#f44336' : '#667eea' }} />
+                        startAdornment: <BankIcon sx={{ mr: 1, color: ibanError ? '#f44336' : '#8b5cf6' }} />
                       }}
                       sx={{
                         '& .MuiOutlinedInput-root': {
-                          borderRadius: 2,
-                          transition: 'all 0.3s ease',
-                          '&:hover': {
-                            '& > fieldset': { borderColor: ibanError ? '#f44336' : '#667eea' }
+                          borderRadius: '12px',
+                          backgroundColor: 'white',
+                          transition: 'all 0.2s ease',
+                          '& .MuiOutlinedInput-notchedOutline': {
+                            borderColor: ibanError ? '#ef4444' : 'rgba(15, 23, 42, 0.08)',
+                            borderWidth: '1px'
                           },
-                          '&.Mui-focused': {
-                            '& > fieldset': { borderColor: ibanError ? '#f44336' : '#667eea', borderWidth: 2 }
+                          '&:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor: ibanError ? '#ef4444' : '#8b5cf6'
+                          },
+                          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                            borderColor: ibanError ? '#ef4444' : '#8b5cf6',
+                            borderWidth: '1.5px'
+                          },
+                          '& .MuiInputBase-input': {
+                            padding: '9px 12px',
+                            fontSize: '0.875rem'
                           }
                         }
                       }}

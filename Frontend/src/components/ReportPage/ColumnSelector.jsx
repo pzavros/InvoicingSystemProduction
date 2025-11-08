@@ -82,13 +82,17 @@ const ColumnSelector = ({ selectedColumns, onColumnsChange }) => {
   };
 
   return (
-    <Grid container direction="column">
+    <Grid container direction="column" sx={{
+      fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif'
+    }}>
       <Grid item>
         <Typography variant="body2" sx={{ 
-          mb: 2, 
-          lineHeight: 1.6,
-          color: 'rgba(15, 23, 42, 0.65)',
-          fontSize: '0.875rem'
+          mb: 2.5, 
+          lineHeight: 1.5,
+          color: '#86868b',
+          fontSize: '0.9375rem',
+          fontWeight: 400,
+          letterSpacing: '-0.01em'
         }}>
           Choose and reorder columns for your report by dragging them
         </Typography>
@@ -96,20 +100,20 @@ const ColumnSelector = ({ selectedColumns, onColumnsChange }) => {
 
       {/* Selected Columns - Draggable to reorder */}
       {selectedColumns.length > 0 && (
-        <Grid item sx={{ mb: 2 }}>
+        <Grid item sx={{ mb: 2.5 }}>
           <Typography 
             variant="caption" 
             sx={{ 
               fontWeight: 600, 
-              color: 'rgba(15, 23, 42, 0.75)',
+              color: '#1d1d1f',
               textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              fontSize: '0.7rem',
+              letterSpacing: '0.06em',
+              fontSize: '0.6875rem',
               display: 'block',
-              mb: 1.5
+              mb: 2
             }}
           >
-            Selected Columns (Drag to reorder)
+            Selected Columns
           </Typography>
           <Box sx={{ mt: 1 }}>
             {selectedColumns.map((columnId, index) => (
@@ -123,51 +127,55 @@ const ColumnSelector = ({ selectedColumns, onColumnsChange }) => {
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  py: 1,
-                  px: 1.5,
+                  py: 1.25,
+                  px: 2,
                   mb: 1,
                   borderRadius: '12px',
                   backgroundColor: draggedIndex === index 
                     ? 'rgba(139, 92, 246, 0.08)' 
                     : 'white',
                   cursor: 'move',
-                  border: '1px solid',
-                  borderColor: draggedIndex === index ? '#8b5cf6' : 'rgba(15, 23, 42, 0.08)',
+                  border: '0.5px solid',
+                  borderColor: draggedIndex === index ? '#8b5cf6' : 'rgba(0, 0, 0, 0.08)',
                   boxShadow: draggedIndex === index 
-                    ? '0 4px 12px rgba(139, 92, 246, 0.15)' 
+                    ? '0 4px 16px rgba(139, 92, 246, 0.15)' 
                     : 'none',
-                  transition: 'all 0.2s ease',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                   '&:hover': {
-                    backgroundColor: 'rgba(15, 23, 42, 0.02)',
-                    borderColor: 'rgba(15, 23, 42, 0.15)',
-                    boxShadow: '0 2px 8px rgba(15, 23, 42, 0.06)',
+                    backgroundColor: draggedIndex === index ? 'rgba(139, 92, 246, 0.08)' : 'rgba(0, 0, 0, 0.02)',
+                    borderColor: draggedIndex === index ? '#8b5cf6' : 'rgba(0, 0, 0, 0.12)',
                     transform: 'translateX(4px)'
+                  },
+                  '&:active': {
+                    transform: 'scale(0.99)'
                   }
                 }}
               >
-                <DragIcon sx={{ fontSize: 18, color: 'rgba(15, 23, 42, 0.55)', mr: 1.5 }} />
+                <DragIcon sx={{ fontSize: 20, color: '#86868b', mr: 2 }} />
                 <Box
                   sx={{
-                    width: 24,
-                    height: 24,
-                    borderRadius: '6px',
-                    background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)',
+                    width: 28,
+                    height: 28,
+                    borderRadius: '8px',
+                    background: '#8b5cf6',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    mr: 1.5,
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
-                    color: 'white'
+                    mr: 2,
+                    fontSize: '0.8125rem',
+                    fontWeight: 600,
+                    color: 'white',
+                    fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif'
                   }}
                 >
                   {index + 1}
                 </Box>
                 <Typography variant="body2" sx={{ 
-                  fontSize: '0.875rem', 
+                  fontSize: '0.9375rem', 
                   flex: 1, 
-                  fontWeight: 500, 
-                  color: 'rgba(15, 23, 42, 0.85)'
+                  fontWeight: 400, 
+                  color: '#1d1d1f',
+                  letterSpacing: '-0.01em'
                 }}>
                   {getColumnLabel(columnId)}
                 </Typography>
@@ -177,7 +185,7 @@ const ColumnSelector = ({ selectedColumns, onColumnsChange }) => {
                   size="small"
                   sx={{
                     p: 0,
-                    color: 'rgba(15, 23, 42, 0.25)',
+                    color: 'rgba(0, 0, 0, 0.2)',
                     '&.Mui-checked': {
                       color: '#8b5cf6',
                     },
@@ -189,7 +197,7 @@ const ColumnSelector = ({ selectedColumns, onColumnsChange }) => {
         </Grid>
       )}
 
-      <Divider sx={{ my: 2, borderColor: 'rgba(15, 23, 42, 0.08)' }} />
+      <Divider sx={{ my: 3, borderColor: 'rgba(0, 0, 0, 0.08)' }} />
 
       {/* Available Columns */}
       <Grid item>
@@ -197,12 +205,12 @@ const ColumnSelector = ({ selectedColumns, onColumnsChange }) => {
           variant="caption" 
           sx={{ 
             fontWeight: 600, 
-            color: 'rgba(15, 23, 42, 0.65)',
+            color: '#1d1d1f',
             textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-            fontSize: '0.7rem',
+            letterSpacing: '0.06em',
+            fontSize: '0.6875rem',
             display: 'block',
-            mb: 1.5
+            mb: 2
           }}
         >
           Available Columns
@@ -219,7 +227,7 @@ const ColumnSelector = ({ selectedColumns, onColumnsChange }) => {
                       onChange={() => handleColumnToggle(column.id)}
                       size="small"
                       sx={{
-                        color: 'rgba(15, 23, 42, 0.25)',
+                        color: 'rgba(0, 0, 0, 0.2)',
                         '&.Mui-checked': {
                           color: '#8b5cf6',
                         },
@@ -228,22 +236,23 @@ const ColumnSelector = ({ selectedColumns, onColumnsChange }) => {
                   }
                   label={
                     <Typography variant="body2" sx={{ 
-                      fontSize: '0.875rem', 
-                      fontWeight: 500, 
-                      color: 'rgba(15, 23, 42, 0.75)'
+                      fontSize: '0.9375rem', 
+                      fontWeight: 400, 
+                      color: '#1d1d1f',
+                      letterSpacing: '-0.01em'
                     }}>
                       {column.label}
                     </Typography>
                   }
                   sx={{ 
                     m: 0,
-                    py: 0.75,
-                    pl: 1.5,
-                    pr: 1,
+                    py: 1,
+                    pl: 2,
+                    pr: 1.5,
                     borderRadius: '12px',
-                    transition: 'all 0.2s ease',
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                     '&:hover': {
-                      backgroundColor: 'rgba(15, 23, 42, 0.02)',
+                      backgroundColor: 'rgba(0, 0, 0, 0.02)',
                       transform: 'translateX(4px)'
                     }
                   }}

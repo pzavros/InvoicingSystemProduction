@@ -47,25 +47,29 @@ export default function PageHelper({ title, description, steps = [], tips = [] }
             position: 'fixed',
             top: { xs: 80, md: 20 },
             right: { xs: 16, md: 24 },
-            width: { xs: 40, md: 36 },
-            height: { xs: 40, md: 36 },
-            backgroundColor: 'rgba(0, 0, 0, 0.15)',
-            color: 'rgba(0, 0, 0, 0.65)',
+            width: { xs: 48, md: 44 },
+            height: { xs: 48, md: 44 },
+            backgroundColor: 'rgba(139, 92, 246, 0.08)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(139, 92, 246, 0.15)',
+            color: '#8b5cf6',
             zIndex: 9999,
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-            transition: 'all 0.2s ease-in-out',
+            borderRadius: '12px',
+            boxShadow: '0 4px 16px rgba(139, 92, 246, 0.15)',
+            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
             '&:hover': {
-              backgroundColor: 'rgba(0, 0, 0, 0.2)',
-              color: 'rgba(0, 0, 0, 0.85)',
-              transform: 'scale(1.05)',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+              backgroundColor: 'rgba(139, 92, 246, 0.12)',
+              borderColor: 'rgba(139, 92, 246, 0.25)',
+              transform: 'translateY(-2px)',
+              boxShadow: '0 8px 24px rgba(139, 92, 246, 0.25)',
             },
             '&:active': {
-              transform: 'scale(0.98)',
+              transform: 'translateY(0)',
             }
           }}
         >
-          <HelpIcon sx={{ fontSize: { xs: 22, md: 20 } }} />
+          <HelpIcon sx={{ fontSize: { xs: 24, md: 22 } }} />
         </IconButton>
       </Tooltip>
 
@@ -77,10 +81,15 @@ export default function PageHelper({ title, description, steps = [], tips = [] }
         fullScreen={{ xs: true, sm: false }}
         PaperProps={{
           sx: {
-            borderRadius: { xs: 0, sm: 3 },
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+            borderRadius: { xs: 0, sm: '20px' },
+            background: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(40px)',
+            WebkitBackdropFilter: 'blur(40px)',
+            boxShadow: '0 20px 60px rgba(15, 23, 42, 0.15), 0 0 1px rgba(15, 23, 42, 0.1)',
+            border: { xs: 'none', sm: '1px solid rgba(15, 23, 42, 0.08)' },
             margin: { xs: 0, sm: 2 },
-            maxHeight: { xs: '100vh', sm: '90vh' }
+            maxHeight: { xs: '100vh', sm: '90vh' },
+            overflow: 'hidden'
           }
         }}
       >
@@ -89,47 +98,81 @@ export default function PageHelper({ title, description, steps = [], tips = [] }
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
-            color: 'white',
-            py: { xs: 1.5, sm: 2 },
-            px: { xs: 2, sm: 3 }
+            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.06) 0%, rgba(168, 85, 247, 0.06) 100%)',
+            borderBottom: '1px solid rgba(139, 92, 246, 0.1)',
+            py: { xs: 2.5, sm: 3 },
+            px: { xs: 3, sm: 4 }
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 } }}>
-            <HelpIcon sx={{ fontSize: { xs: 24, sm: 28 } }} />
-            <Typography variant="h6" component="div" sx={{ fontWeight: 600, fontSize: { xs: '1rem', sm: '1.25rem' } }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2 } }}>
+            <Box
+              sx={{
+                width: { xs: 40, sm: 48 },
+                height: { xs: 40, sm: 48 },
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 12px rgba(139, 92, 246, 0.25)'
+              }}
+            >
+              <HelpIcon sx={{ fontSize: { xs: 22, sm: 26 }, color: 'white' }} />
+            </Box>
+            <Typography 
+              variant="h6" 
+              component="div" 
+              sx={{ 
+                fontWeight: 700, 
+                fontSize: { xs: '1.125rem', sm: '1.375rem' },
+                color: 'rgba(15, 23, 42, 0.95)',
+                letterSpacing: '-0.02em'
+              }}
+            >
               {title}
             </Typography>
           </Box>
           <IconButton
             onClick={handleClose}
             sx={{
-              color: 'white',
+              width: 36,
+              height: 36,
+              borderRadius: '10px',
+              backgroundColor: 'rgba(15, 23, 42, 0.04)',
+              border: '1px solid rgba(15, 23, 42, 0.08)',
+              color: 'rgba(15, 23, 42, 0.6)',
+              transition: 'all 0.15s ease',
               '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                backgroundColor: 'rgba(15, 23, 42, 0.08)',
+                borderColor: 'rgba(15, 23, 42, 0.12)',
+                color: 'rgba(15, 23, 42, 0.9)',
               }
             }}
           >
-            <CloseIcon />
+            <CloseIcon sx={{ fontSize: 20 }} />
           </IconButton>
         </DialogTitle>
 
-        <DialogContent sx={{ px: { xs: 2, sm: 3 }, py: { xs: 2, sm: 3 }, overflowY: 'auto' }}>
+        <DialogContent sx={{ px: { xs: 3, sm: 4 }, py: { xs: 3, sm: 4 }, overflowY: 'auto' }}>
           {description && (
             <>
-              <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+              <Box sx={{ mb: { xs: 3, sm: 4 } }}>
                 <Typography
                   variant="body1"
                   sx={{
-                    color: 'text.secondary',
+                    color: 'rgba(15, 23, 42, 0.7)',
                     lineHeight: 1.7,
-                    fontSize: { xs: '0.9rem', sm: '1rem' }
+                    fontSize: { xs: '0.9375rem', sm: '1rem' },
+                    fontWeight: 400
                   }}
                 >
                   {description}
                 </Typography>
               </Box>
-              <Divider sx={{ mb: { xs: 2, sm: 3 } }} />
+              <Divider sx={{ 
+                mb: { xs: 3, sm: 4 },
+                borderColor: 'rgba(15, 23, 42, 0.08)'
+              }} />
             </>
           )}
 
@@ -138,10 +181,11 @@ export default function PageHelper({ title, description, steps = [], tips = [] }
               <Typography
                 variant="h6"
                 sx={{
-                  mb: 2,
-                  fontWeight: 600,
-                  color: 'text.primary',
-                  fontSize: { xs: '1rem', sm: '1.125rem' }
+                  mb: 3,
+                  fontWeight: 700,
+                  color: 'rgba(15, 23, 42, 0.95)',
+                  fontSize: { xs: '1rem', sm: '1.125rem' },
+                  letterSpacing: '-0.01em'
                 }}
               >
                 How to Use This Page
@@ -152,26 +196,53 @@ export default function PageHelper({ title, description, steps = [], tips = [] }
                     key={index}
                     sx={{
                       alignItems: 'flex-start',
-                      px: 0,
-                      py: { xs: 1, sm: 1.5 },
+                      px: 2.5,
+                      py: { xs: 2, sm: 2.5 },
+                      mb: 1.5,
+                      borderRadius: '12px',
+                      backgroundColor: 'rgba(139, 92, 246, 0.03)',
+                      border: '1px solid rgba(139, 92, 246, 0.08)',
+                      transition: 'all 0.2s ease',
                       '&:hover': {
-                        backgroundColor: 'rgba(139, 92, 246, 0.04)',
-                        borderRadius: 2
+                        backgroundColor: 'rgba(139, 92, 246, 0.06)',
+                        borderColor: 'rgba(139, 92, 246, 0.15)',
+                        transform: 'translateX(4px)',
+                        boxShadow: '0 2px 8px rgba(139, 92, 246, 0.1)'
                       }
                     }}
                   >
-                    <ListItemIcon sx={{ minWidth: { xs: 36, sm: 40 }, mt: 0.5 }}>
-                      {step.icon || <CheckIcon sx={{ color: '#8b5cf6', fontSize: { xs: 20, sm: 24 } }} />}
+                    <ListItemIcon sx={{ minWidth: { xs: 40, sm: 48 }, mt: 0.25 }}>
+                      <Box
+                        sx={{
+                          width: { xs: 32, sm: 36 },
+                          height: { xs: 32, sm: 36 },
+                          borderRadius: '10px',
+                          background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          boxShadow: '0 2px 8px rgba(139, 92, 246, 0.2)'
+                        }}
+                      >
+                        {step.icon ? (
+                          React.cloneElement(step.icon, {
+                            sx: { color: 'white', fontSize: { xs: 18, sm: 20 } }
+                          })
+                        ) : (
+                          <CheckIcon sx={{ color: 'white', fontSize: { xs: 18, sm: 20 } }} />
+                        )}
+                      </Box>
                     </ListItemIcon>
                     <ListItemText
                       primary={
                         <Typography
                           variant="subtitle2"
                           sx={{
-                            fontWeight: 600,
-                            color: 'text.primary',
-                            mb: 0.5,
-                            fontSize: { xs: '0.875rem', sm: '0.95rem' }
+                            fontWeight: 700,
+                            color: 'rgba(15, 23, 42, 0.95)',
+                            mb: 0.75,
+                            fontSize: { xs: '0.9375rem', sm: '1rem' },
+                            letterSpacing: '-0.01em'
                           }}
                         >
                           {step.title}
@@ -181,9 +252,9 @@ export default function PageHelper({ title, description, steps = [], tips = [] }
                         <Typography
                           variant="body2"
                           sx={{
-                            color: 'text.secondary',
-                            lineHeight: 1.6,
-                            fontSize: { xs: '0.8125rem', sm: '0.875rem' }
+                            color: 'rgba(15, 23, 42, 0.65)',
+                            lineHeight: 1.7,
+                            fontSize: { xs: '0.875rem', sm: '0.9375rem' }
                           }}
                         >
                           {step.description}
@@ -198,26 +269,46 @@ export default function PageHelper({ title, description, steps = [], tips = [] }
 
           {tips.length > 0 && (
             <>
-              <Divider sx={{ my: { xs: 2, sm: 3 } }} />
+              <Divider sx={{ 
+                my: { xs: 3, sm: 4 },
+                borderColor: 'rgba(15, 23, 42, 0.08)'
+              }} />
               <Box
                 sx={{
-                  backgroundColor: 'rgba(139, 92, 246, 0.05)',
-                  borderRadius: 2,
-                  p: { xs: 2, sm: 2.5 },
-                  border: '1px solid rgba(139, 92, 246, 0.2)'
+                  background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.04) 0%, rgba(168, 85, 247, 0.04) 100%)',
+                  backdropFilter: 'blur(10px)',
+                  WebkitBackdropFilter: 'blur(10px)',
+                  borderRadius: '16px',
+                  p: { xs: 2.5, sm: 3 },
+                  border: '1px solid rgba(139, 92, 246, 0.15)',
+                  boxShadow: '0 2px 8px rgba(139, 92, 246, 0.08)'
                 }}
               >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                  <InfoIcon sx={{ color: '#8b5cf6', fontSize: { xs: 20, sm: 22 } }} />
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+                  <Box
+                    sx={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: '8px',
+                      background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 2px 8px rgba(139, 92, 246, 0.2)'
+                    }}
+                  >
+                    <InfoIcon sx={{ color: 'white', fontSize: { xs: 18, sm: 20 } }} />
+                  </Box>
                   <Typography
                     variant="subtitle2"
                     sx={{
-                      fontWeight: 600,
+                      fontWeight: 700,
                       color: '#8b5cf6',
-                      fontSize: { xs: '0.875rem', sm: '0.95rem' }
+                      fontSize: { xs: '0.9375rem', sm: '1rem' },
+                      letterSpacing: '-0.01em'
                     }}
                   >
-                    Pro Tips
+                    💡 Pro Tips
                   </Typography>
                 </Box>
                 <List dense sx={{ pl: 0.5 }}>
@@ -226,20 +317,30 @@ export default function PageHelper({ title, description, steps = [], tips = [] }
                       key={index}
                       sx={{
                         px: 0,
-                        py: 0.5,
-                        display: 'list-item',
-                        listStyleType: 'disc',
-                        listStylePosition: 'inside'
+                        py: 0.75,
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 1.5
                       }}
                     >
+                      <Box
+                        sx={{
+                          width: 6,
+                          height: 6,
+                          borderRadius: '50%',
+                          backgroundColor: '#8b5cf6',
+                          flexShrink: 0,
+                          mt: 1
+                        }}
+                      />
                       <Typography
                         variant="body2"
                         component="span"
                         sx={{
-                          color: 'text.secondary',
-                          ml: 0.5,
-                          lineHeight: 1.6,
-                          fontSize: { xs: '0.8125rem', sm: '0.875rem' }
+                          color: 'rgba(15, 23, 42, 0.7)',
+                          lineHeight: 1.7,
+                          fontSize: { xs: '0.875rem', sm: '0.9375rem' },
+                          flex: 1
                         }}
                       >
                         {tip}
@@ -252,7 +353,16 @@ export default function PageHelper({ title, description, steps = [], tips = [] }
           )}
         </DialogContent>
 
-        <DialogActions sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1.5, sm: 2 }, backgroundColor: '#f8fafc' }}>
+        <DialogActions 
+          sx={{ 
+            px: { xs: 3, sm: 4 }, 
+            py: { xs: 2.5, sm: 3 }, 
+            background: 'linear-gradient(180deg, rgba(248, 250, 252, 0.5) 0%, rgba(248, 250, 252, 0.9) 100%)',
+            borderTop: '1px solid rgba(15, 23, 42, 0.06)',
+            backdropFilter: 'blur(10px)',
+            WebkitBackdropFilter: 'blur(10px)'
+          }}
+        >
           <Button
             onClick={handleClose}
             variant="contained"
@@ -260,17 +370,27 @@ export default function PageHelper({ title, description, steps = [], tips = [] }
             sx={{
               background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
               color: 'white',
-              px: 3,
-              py: { xs: 1.25, sm: 1 },
+              px: { xs: 3, sm: 4 },
+              py: { xs: 1.5, sm: 1.25 },
+              minWidth: { xs: '100%', sm: '160px' },
               textTransform: 'none',
-              fontWeight: 600,
-              fontSize: { xs: '0.9375rem', sm: '1rem' },
+              fontWeight: 700,
+              fontSize: { xs: '1rem', sm: '1.0625rem' },
+              borderRadius: '12px',
+              boxShadow: '0 4px 12px rgba(139, 92, 246, 0.25)',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              letterSpacing: '-0.01em',
               '&:hover': {
-                background: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)',
+                background: 'linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)',
+                transform: 'translateY(-2px)',
+                boxShadow: '0 6px 16px rgba(139, 92, 246, 0.35)',
+              },
+              '&:active': {
+                transform: 'translateY(0)',
               }
             }}
           >
-            Got it!
+            Got it, thanks! ✓
           </Button>
         </DialogActions>
       </Dialog>

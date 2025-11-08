@@ -203,68 +203,84 @@ const LoginForm = () => {
     <Box
       sx={{
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: '#f5f5f7',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        p: 2
+        p: { xs: 2, sm: 3 }
       }}
     >
-      <Container maxWidth="sm">
-        <Fade in={true} timeout={800}>
-          <Card
-            elevation={24}
-            sx={{
-              borderRadius: 4,
-              background: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)'
-            }}
-          >
-            <CardContent sx={{ p: 4 }}>
-              <Grow in={true} timeout={1000}>
-                <Box sx={{ textAlign: 'center', mb: 4 }}>
+      <Container maxWidth="xs">
+        <Fade in={true} timeout={600}>
+          <Box>
+            {/* Card */}
+            <Card
+              elevation={0}
+              sx={{
+                borderRadius: '18px',
+                background: '#ffffff',
+                border: '1px solid rgba(0, 0, 0, 0.06)',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
+                overflow: 'hidden'
+              }}
+            >
+              <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
+                {/* Logo/Icon */}
+                <Box sx={{ textAlign: 'center', mb: 3 }}>
                   <Box
                     sx={{
-                      width: 80,
-                      height: 80,
-                      borderRadius: '20px',
+                      width: 56,
+                      height: 56,
+                      borderRadius: '16px',
                       background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                      display: 'flex',
+                      display: 'inline-flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      margin: '0 auto',
-                      mb: 3,
-                      boxShadow: '0 10px 30px rgba(102, 126, 234, 0.3)'
+                      mb: 2,
+                      boxShadow: '0 4px 12px rgba(102, 126, 234, 0.2)'
                     }}
                   >
-                    <LoginIcon sx={{ color: 'white', fontSize: 32 }} />
+                    <LoginIcon sx={{ color: 'white', fontSize: 28 }} />
                   </Box>
                   <Typography
-                    variant="h4"
                     sx={{
-                      fontWeight: 'bold',
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                      backgroundClip: 'text',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      mb: 1
+                      fontSize: { xs: '1.75rem', sm: '2rem' },
+                      fontWeight: 600,
+                      color: '#1d1d1f',
+                      letterSpacing: '-0.02em',
+                      mb: 0.5
                     }}
                   >
-                    Welcome Back
+                    Sign in
                   </Typography>
-                  <Typography variant="body1" color="text.secondary">
-                    Sign in to your Invoicing System account
+                  <Typography 
+                    sx={{ 
+                      color: '#86868b',
+                      fontSize: '0.9375rem',
+                      fontWeight: 400
+                    }}
+                  >
+                    to continue to Invoicing System
                   </Typography>
                 </Box>
-              </Grow>
 
               {error && (
-                <Fade in={true}>
-                  <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
-                    {error}
-                  </Alert>
-                </Fade>
+                <Alert 
+                  severity="error" 
+                  sx={{ 
+                    mb: 3,
+                    borderRadius: '12px',
+                    border: 'none',
+                    backgroundColor: '#fff0f0',
+                    color: '#c41e1e',
+                    fontSize: '0.875rem',
+                    '& .MuiAlert-icon': {
+                      color: '#c41e1e'
+                    }
+                  }}
+                >
+                  {error}
+                </Alert>
               )}
 
               <Box component="form" onSubmit={handleSubmit}>
@@ -272,17 +288,38 @@ const LoginForm = () => {
                   fullWidth
                   name="email"
                   type="email"
-                  label="Email Address"
+                  placeholder="Email"
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  sx={{ mb: 3 }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <EmailIcon color="action" />
-                      </InputAdornment>
-                    ),
+                  size="small"
+                  sx={{ 
+                    mb: 1.5,
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '8px',
+                      backgroundColor: '#ffffff',
+                      fontSize: '0.9375rem',
+                      fontWeight: 400,
+                      '& input': {
+                        padding: '10px 14px'
+                      },
+                      '& fieldset': {
+                        borderColor: '#d2d2d7',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#86868b',
+                      },
+                      '&.Mui-focused': {
+                        '& fieldset': {
+                          borderColor: '#0071e3',
+                          borderWidth: '2px'
+                        }
+                      }
+                    },
+                    '& .MuiInputLabel-root': {
+                      color: '#86868b',
+                      fontSize: '0.9375rem'
+                    }
                   }}
                 />
 
@@ -290,48 +327,73 @@ const LoginForm = () => {
                   fullWidth
                   name="password"
                   type={showPassword ? 'text' : 'password'}
-                  label="Password"
+                  placeholder="Password"
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  sx={{ mb: 2 }}
+                  size="small"
+                  sx={{ 
+                    mb: 1.5,
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '8px',
+                      backgroundColor: '#ffffff',
+                      fontSize: '0.9375rem',
+                      fontWeight: 400,
+                      '& input': {
+                        padding: '10px 14px'
+                      },
+                      '& fieldset': {
+                        borderColor: '#d2d2d7',
+                      },
+                      '&:hover fieldset': {
+                        borderColor: '#86868b',
+                      },
+                      '&.Mui-focused': {
+                        '& fieldset': {
+                          borderColor: '#0071e3',
+                          borderWidth: '2px'
+                        }
+                      }
+                    }
+                  }}
                   InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <LockIcon color="action" />
-                      </InputAdornment>
-                    ),
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
                           onClick={() => setShowPassword(!showPassword)}
                           edge="end"
+                          size="small"
+                          sx={{
+                            color: '#86868b',
+                            '&:hover': {
+                              backgroundColor: 'rgba(0, 0, 0, 0.04)'
+                            }
+                          }}
                         >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                          {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
                         </IconButton>
                       </InputAdornment>
                     ),
                   }}
                 />
 
-                <Box sx={{ textAlign: 'right', mb: 3 }}>
+                <Box sx={{ textAlign: 'right', mb: 2 }}>
                   <Link
                     component="button"
                     type="button"
-                    variant="body2"
                     onClick={() => navigate('/forgot-password')}
                     sx={{
-                      color: '#667eea',
+                      color: '#0071e3',
                       textDecoration: 'none',
-                      fontWeight: 500,
-                      fontSize: '0.875rem',
+                      fontWeight: 400,
+                      fontSize: '0.8125rem',
+                      transition: 'opacity 0.2s ease',
                       '&:hover': {
-                        textDecoration: 'underline',
-                        color: '#764ba2'
+                        opacity: 0.7
                       }
                     }}
                   >
-                    Forgot Password?
+                    Forgot password?
                   </Link>
                 </Box>
 
@@ -339,73 +401,107 @@ const LoginForm = () => {
                   type="submit"
                   fullWidth
                   variant="contained"
-                  size="large"
                   disabled={loading}
                   sx={{
-                    py: 1.5,
-                    borderRadius: 2,
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    boxShadow: '0 8px 25px rgba(102, 126, 234, 0.3)',
+                    py: 1.25,
+                    borderRadius: '8px',
+                    textTransform: 'none',
+                    fontSize: '0.9375rem',
+                    fontWeight: 500,
+                    background: '#0071e3',
+                    boxShadow: 'none',
                     '&:hover': {
-                      background: 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)',
-                      boxShadow: '0 12px 35px rgba(102, 126, 234, 0.4)',
+                      background: '#0077ed',
+                      boxShadow: 'none'
                     },
-                    mb: 3
+                    '&:active': {
+                      background: '#006edb'
+                    },
+                    '&.Mui-disabled': {
+                      background: '#86868b',
+                      color: '#ffffff',
+                      opacity: 0.5
+                    },
+                    mb: 2.5
                   }}
                 >
-                  {loading ? 'Signing In...' : 'Sign In'}
+                  {loading ? 'Signing in...' : 'Continue'}
                 </Button>
 
-                <Divider sx={{ my: 3 }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Don't have an account?
-                  </Typography>
-                </Divider>
+                <Divider sx={{ 
+                  my: 2.5,
+                  '&::before, &::after': {
+                    borderColor: 'rgba(0, 0, 0, 0.06)'
+                  }
+                }} />
 
                 <Box sx={{ textAlign: 'center' }}>
+                  <Typography 
+                    variant="body2" 
+                    sx={{ 
+                      color: '#86868b',
+                      fontSize: '0.8125rem',
+                      mb: 1
+                    }}
+                  >
+                    Don't have an account?
+                  </Typography>
                   <Link
                     component="button"
                     type="button"
-                    variant="body2"
                     onClick={() => navigate('/register')}
                     sx={{
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                      backgroundClip: 'text',
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                      fontWeight: 'medium',
+                      color: '#0071e3',
+                      fontWeight: 400,
+                      fontSize: '0.875rem',
                       textDecoration: 'none',
+                      transition: 'opacity 0.2s ease',
                       '&:hover': {
-                        textDecoration: 'underline'
+                        opacity: 0.7
                       }
                     }}
                   >
-                    Create a new account - Start your 30-day free trial
+                    Create one now
                   </Link>
                 </Box>
               </Box>
             </CardContent>
           </Card>
+
+          {/* Free Trial Notice */}
+          <Box sx={{ textAlign: 'center', mt: 3 }}>
+            <Typography 
+              sx={{ 
+                color: '#86868b',
+                fontSize: '0.8125rem',
+                lineHeight: 1.6
+              }}
+            >
+              Start your 30-day free trial
+            </Typography>
+          </Box>
+        </Box>
         </Fade>
 
         {/* OTP Verification Dialog */}
         <Dialog
           open={showOtpDialog}
           onClose={handleCloseOtpDialog}
-          maxWidth="sm"
+          maxWidth="xs"
           fullWidth
           PaperProps={{
             sx: {
-              borderRadius: 4,
-              p: 2
+              borderRadius: '18px',
+              p: { xs: 2, sm: 3 },
+              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.12)'
             }
           }}
         >
-          <DialogTitle sx={{ textAlign: 'center', pb: 1 }}>
+          <DialogTitle sx={{ textAlign: 'center', pb: 2, pt: 2 }}>
             <Box
               sx={{
-                width: 70,
-                height: 70,
+                width: 56,
+                height: 56,
                 borderRadius: '50%',
                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 display: 'flex',
@@ -413,39 +509,69 @@ const LoginForm = () => {
                 justifyContent: 'center',
                 margin: '0 auto',
                 mb: 2,
-                boxShadow: '0 10px 30px rgba(102, 126, 234, 0.3)'
+                boxShadow: '0 4px 12px rgba(102, 126, 234, 0.2)'
               }}
             >
-              <VerifiedIcon sx={{ color: 'white', fontSize: 35 }} />
+              <VerifiedIcon sx={{ color: 'white', fontSize: 28 }} />
             </Box>
-            <Typography variant="h5" fontWeight="bold">
-              Email Verification Required
+            <Typography 
+              sx={{ 
+                fontWeight: 600,
+                fontSize: '1.375rem',
+                letterSpacing: '-0.01em',
+                color: '#1d1d1f',
+                mb: 1
+              }}
+            >
+              Verify your email
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              A 6-digit code was sent to <strong>{formData.email}</strong>
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              Please check your email inbox (and spam folder)
+            <Typography 
+              sx={{ 
+                color: '#86868b',
+                fontSize: '0.875rem',
+                fontWeight: 400,
+                lineHeight: 1.5
+              }}
+            >
+              Enter the 6-digit code sent to<br />
+              <strong style={{ color: '#1d1d1f' }}>{formData.email}</strong>
             </Typography>
           </DialogTitle>
 
-          <DialogContent>
+          <DialogContent sx={{ pt: 2, pb: 3 }}>
             {otpError && (
-              <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
+              <Alert 
+                severity="error" 
+                sx={{ 
+                  mb: 2.5, 
+                  borderRadius: '10px',
+                  border: 'none',
+                  backgroundColor: '#fff0f0',
+                  color: '#c41e1e',
+                  fontSize: '0.875rem'
+                }}
+              >
                 {otpError}
               </Alert>
             )}
 
             {resendMessage && (
-              <Alert severity="success" sx={{ mb: 2, borderRadius: 2 }}>
+              <Alert 
+                severity="success" 
+                sx={{ 
+                  mb: 2.5, 
+                  borderRadius: '10px',
+                  border: 'none',
+                  backgroundColor: '#f0fdf4',
+                  color: '#16a34a',
+                  fontSize: '0.875rem'
+                }}
+              >
                 {resendMessage}
               </Alert>
             )}
 
             <Box sx={{ textAlign: 'center', mb: 2 }}>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                Enter verification code:
-              </Typography>
               <Stack
                 direction="row"
                 spacing={1.5}
@@ -464,17 +590,28 @@ const LoginForm = () => {
                       style: {
                         textAlign: 'center',
                         fontSize: '24px',
-                        fontWeight: 'bold',
-                        padding: '16px 0'
+                        fontWeight: 600,
+                        padding: '14px 0',
+                        color: '#1d1d1f'
                       }
                     }}
                     sx={{
-                      width: '50px',
+                      width: '44px',
                       '& .MuiOutlinedInput-root': {
-                        borderRadius: 2,
-                        '&.Mui-focused fieldset': {
-                          borderColor: '#667eea',
-                          borderWidth: 2
+                        borderRadius: '8px',
+                        backgroundColor: '#f5f5f7',
+                        '& fieldset': {
+                          borderColor: '#d2d2d7',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: '#86868b',
+                        },
+                        '&.Mui-focused': {
+                          backgroundColor: '#ffffff',
+                          '& fieldset': {
+                            borderColor: '#0071e3',
+                            borderWidth: 2
+                          }
                         }
                       }
                     }}
@@ -482,52 +619,74 @@ const LoginForm = () => {
                   />
                 ))}
               </Stack>
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
+              <Typography 
+                sx={{ 
+                  mt: 2, 
+                  color: '#86868b',
+                  fontSize: '0.75rem'
+                }}
+              >
                 Code expires in 48 hours
               </Typography>
             </Box>
           </DialogContent>
 
-          <DialogActions sx={{ px: 3, pb: 3, flexDirection: 'column', gap: 1 }}>
+          <DialogActions sx={{ px: 3, pb: 3, pt: 0, flexDirection: 'column', gap: 1.5 }}>
             <Button
               fullWidth
               variant="contained"
               onClick={handleVerifyOtp}
               disabled={otpLoading}
               sx={{
-                py: 1.5,
-                borderRadius: 2,
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                py: 1.25,
+                borderRadius: '8px',
+                textTransform: 'none',
+                fontSize: '0.9375rem',
+                fontWeight: 500,
+                background: '#0071e3',
+                boxShadow: 'none',
                 '&:hover': {
-                  background: 'linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%)',
+                  background: '#0077ed',
+                  boxShadow: 'none'
+                },
+                '&:active': {
+                  background: '#006edb'
                 }
               }}
             >
-              {otpLoading ? 'Verifying...' : 'Verify & Login'}
+              {otpLoading ? 'Verifying...' : 'Verify'}
             </Button>
             
             <Button
               fullWidth
-              variant="outlined"
+              variant="text"
               onClick={handleResendCode}
               disabled={otpLoading}
               sx={{
-                py: 1.5,
-                borderRadius: 2,
-                borderColor: '#667eea',
-                color: '#667eea',
+                py: 1,
+                textTransform: 'none',
+                fontSize: '0.875rem',
+                fontWeight: 400,
+                color: '#0071e3',
                 '&:hover': {
-                  borderColor: '#5a67d8',
-                  background: 'rgba(102, 126, 234, 0.04)'
+                  background: 'rgba(0, 113, 227, 0.04)'
                 }
               }}
             >
-              Resend Code
+              Resend code
             </Button>
 
             <Button
               onClick={handleCloseOtpDialog}
-              sx={{ mt: 1 }}
+              sx={{ 
+                color: '#86868b',
+                textTransform: 'none',
+                fontSize: '0.8125rem',
+                fontWeight: 400,
+                '&:hover': {
+                  background: 'rgba(0, 0, 0, 0.04)'
+                }
+              }}
             >
               Cancel
             </Button>
