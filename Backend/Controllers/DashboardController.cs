@@ -110,5 +110,50 @@ namespace InvoicingBackend.Controllers
                 return Unauthorized(new { message = ex.Message });
             }
         }
+
+        [HttpGet("invoice-status")]
+        public async Task<ActionResult<InvoiceStatusStatsDto>> GetInvoiceStatusStats()
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                var stats = await _dashboardService.GetInvoiceStatusStatsAsync(userId);
+                return Ok(stats);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("client-performance")]
+        public async Task<ActionResult<ClientPerformanceStatsDto>> GetClientPerformanceStats([FromQuery] int topCount = 10)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                var stats = await _dashboardService.GetClientPerformanceStatsAsync(userId, topCount);
+                return Ok(stats);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("product-performance")]
+        public async Task<ActionResult<ProductPerformanceStatsDto>> GetProductPerformanceStats([FromQuery] int topCount = 10)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                var stats = await _dashboardService.GetProductPerformanceStatsAsync(userId, topCount);
+                return Ok(stats);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+        }
     }
 }

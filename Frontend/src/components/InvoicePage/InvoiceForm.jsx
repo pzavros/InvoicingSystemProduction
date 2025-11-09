@@ -559,6 +559,11 @@ const InvoiceForm = () => {
 
     const currentStatus = statusesToUse.find(s => s.statusId === invoiceData.statusId) || { statusId: 1, name: 'Draft' };
 
+    // Set the selected client ID if the invoice has one
+    if (invoiceData.clientId) {
+      setSelectedClientId(invoiceData.clientId);
+    }
+
     setFormData({
       id: invoiceData.id,
       invoiceNumber: invoiceData.invoiceNumber,
@@ -994,6 +999,7 @@ const InvoiceForm = () => {
       discountAmount: parseFloat(formData.discountAmount) || 0,
       total: parseFloat(formData.total) || 0,
       currencyId: formData.currencyId,
+      clientId: selectedClientId || null, // Link to client if selected
       companyName: formData.companyName,
       companyNo: formData.companyNo,
       vatNo: formData.vatNo,

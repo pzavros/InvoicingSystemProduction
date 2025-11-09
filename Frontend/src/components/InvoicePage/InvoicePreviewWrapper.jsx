@@ -14,15 +14,16 @@ const InvoicePreviewWrapper = ({
   formatCurrency,
   formatDate 
 }) => {
-  // Transform actual invoice data to match the preview format
-  const transformedConfig = {
-    ...templateConfig,
-    currencySymbol: currency || templateConfig?.currencySymbol || '€',
-  };
-
-  const transformedMeta = {
-    ...templateMeta,
-    documentTypeName: getDocumentTypeName(invoiceData.documentTypeId),
+  // Helper function to map documentTypeId to template type
+  const getTemplateType = (documentTypeId) => {
+    switch (documentTypeId) {
+      case 1: return "standard";
+      case 2: return "tax";
+      case 3: return "proforma";
+      case 4: return "quote";
+      case 5: return "cash";
+      default: return "standard";
+    }
   };
 
   // Helper function to get document type name
@@ -35,6 +36,18 @@ const InvoicePreviewWrapper = ({
       case 5: return "Cash Invoice";
       default: return "Invoice";
     }
+  };
+
+  // Transform actual invoice data to match the preview format
+  const transformedConfig = {
+    ...templateConfig,
+    type: getTemplateType(invoiceData.documentTypeId), // Override type based on document type
+    currencySymbol: currency || templateConfig?.currencySymbol || '€',
+  };
+
+  const transformedMeta = {
+    ...templateMeta,
+    documentTypeName: getDocumentTypeTitle(invoiceData.documentTypeId),
   };
 
   return (

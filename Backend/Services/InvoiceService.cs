@@ -226,6 +226,7 @@ namespace InvoicingBackend.Services
                 DateEntered = DateTime.UtcNow,
                 StatusId = dto.StatusId,
                 DocumentTypeId = dto.DocumentTypeId, // Add document type
+                ClientId = dto.ClientId, // Link to client if provided
                 UserId = userId // Set the user ownership
             };
 
@@ -312,6 +313,7 @@ namespace InvoicingBackend.Services
             invoice.Swift = dto.Swift;
             invoice.Iban = dto.Iban;
             invoice.DocumentTypeId = dto.DocumentTypeId; // Add document type update
+            invoice.ClientId = dto.ClientId; // Update client link if provided
             
             // Store original items for stock restoration
             var originalItems = invoice.Items.ToList();

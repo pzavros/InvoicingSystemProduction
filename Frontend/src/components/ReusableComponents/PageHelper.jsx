@@ -45,10 +45,10 @@ export default function PageHelper({ title, description, steps = [], tips = [] }
           onClick={handleOpen}
           sx={{
             position: 'fixed',
-            top: { xs: 80, md: 20 },
+            bottom: { xs: 20, md: 24 },
             right: { xs: 16, md: 24 },
-            width: { xs: 48, md: 44 },
-            height: { xs: 48, md: 44 },
+            width: { xs: 52, md: 48 },
+            height: { xs: 52, md: 48 },
             backgroundColor: 'rgba(139, 92, 246, 0.08)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',

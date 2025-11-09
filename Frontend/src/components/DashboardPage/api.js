@@ -88,4 +88,45 @@ export const getAnnualInvoiceCountBreakdown = async (year) => {
   }
 };
 
+/**
+ * Fetch invoice status and cash flow statistics
+ */
+export const getInvoiceStatusStats = async () => {
+  try {
+    const response = await dashboardApi.get('/api/dashboard/invoice-status');
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching invoice status stats:", error);
+    throw error;
+  }
+};
+
+/**
+ * Fetch client performance statistics
+ * @param {number} topCount - Number of top clients to return (default: 10)
+ */
+export const getClientPerformanceStats = async (topCount = 10) => {
+  try {
+    const response = await dashboardApi.get(`/api/dashboard/client-performance?topCount=${topCount}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching client performance stats:", error);
+    throw error;
+  }
+};
+
+/**
+ * Fetch product performance statistics
+ * @param {number} topCount - Number of top products to return (default: 10)
+ */
+export const getProductPerformanceStats = async (topCount = 10) => {
+  try {
+    const response = await dashboardApi.get(`/api/dashboard/product-performance?topCount=${topCount}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching product performance stats:", error);
+    throw error;
+  }
+};
+
 export default dashboardApi;

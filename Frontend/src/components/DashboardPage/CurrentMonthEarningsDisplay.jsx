@@ -84,6 +84,8 @@ const CurrentMonthEarningsDisplay = ({ month, year }) => {
 
   const monthLabel = monthNames[month - 1];
   const totalEarnings = data?.totalEarningsSelectedMonthYear ?? 0;
+  const totalTax = data?.totalTaxSelectedMonthYear ?? 0;
+  const totalRevenue = data?.totalRevenueSelectedMonthYear ?? 0;
   const currencySymbol = data?.currencySymbol || '$';
   const percentage = data?.percentageChangeEarnings ?? 0;
 
@@ -139,11 +141,77 @@ const CurrentMonthEarningsDisplay = ({ month, year }) => {
           color: 'rgba(15, 23, 42, 0.95)',
           letterSpacing: '-0.02em',
           lineHeight: 1.1,
-          mb: 1.5
+          mb: 1
         }}
       >
         {currencySymbol}{totalEarnings.toFixed(2)}
       </Typography>
+
+      {/* Tax and Revenue Breakdown */}
+      <Box sx={{ 
+        display: 'flex', 
+        gap: 2, 
+        mb: 1.5,
+        flexWrap: 'wrap'
+      }}>
+        <Box sx={{ 
+          display: 'flex', 
+          flexDirection: 'column',
+          gap: 0.25
+        }}>
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'rgba(15, 23, 42, 0.4)',
+              fontSize: '0.75rem',
+              fontWeight: 500,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em'
+            }}
+          >
+            Revenue (excl. tax)
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'rgba(15, 23, 42, 0.7)',
+              fontSize: '0.9375rem',
+              fontWeight: 600
+            }}
+          >
+            {currencySymbol}{totalRevenue.toFixed(2)}
+          </Typography>
+        </Box>
+
+        <Box sx={{ 
+          display: 'flex', 
+          flexDirection: 'column',
+          gap: 0.25
+        }}>
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'rgba(15, 23, 42, 0.4)',
+              fontSize: '0.75rem',
+              fontWeight: 500,
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em'
+            }}
+          >
+            Tax Collected
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              color: 'rgba(15, 23, 42, 0.7)',
+              fontSize: '0.9375rem',
+              fontWeight: 600
+            }}
+          >
+            {currencySymbol}{totalTax.toFixed(2)}
+          </Typography>
+        </Box>
+      </Box>
 
       {/* Change Indicator */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>

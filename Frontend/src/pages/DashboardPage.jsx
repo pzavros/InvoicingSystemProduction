@@ -16,6 +16,8 @@ import AnnualInvoiceCountChart from '../components/DashboardPage/AnnualInvoiceCo
 // <-- Correct relative paths into your components folder:
 import CurrentMonthEarningsDisplay from '../components/DashboardPage/CurrentMonthEarningsDisplay';
 import CurrentMonthInvoiceCountDisplay from '../components/DashboardPage/CurrentMonthInvoiceCountDisplay';
+import ClientPerformance from '../components/DashboardPage/ClientPerformance';
+import ProductPerformance from '../components/DashboardPage/ProductPerformance';
 import PageHelper from '../components/ReusableComponents/PageHelper';
 import { pageHelpContent } from '../config/pageHelpContent';
 
@@ -254,8 +256,17 @@ export default function DashboardPage() {
             <AnnualEarningsChart initialYear={currentYear} />
           </Box>
           
-          <Box>
+          <Box sx={{ mb: { xs: 2, sm: 3 } }}>
             <AnnualInvoiceCountChart initialYear={currentYear} />
+          </Box>
+
+          {/* Performance Sections */}
+          <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+            <ClientPerformance topCount={10} />
+          </Box>
+
+          <Box sx={{ mb: { xs: 2, sm: 3 } }}>
+            <ProductPerformance topCount={10} />
           </Box>
         </Box>
       

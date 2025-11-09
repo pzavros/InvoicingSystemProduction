@@ -246,7 +246,25 @@ namespace InvoicingBackend.Services
                     DateEntered = DateTime.UtcNow,
                     EnteredBy = "System",
                     UserId = null,
-                    TemplateData = JsonSerializer.Serialize(baseTemplateConfig, new JsonSerializerOptions { WriteIndented = true })
+                    TemplateData = JsonSerializer.Serialize(new
+                    {
+                        type = "cash",
+                        theme = baseTemplateConfig.theme,
+                        primaryColor = baseTemplateConfig.primaryColor,
+                        secondaryColor = baseTemplateConfig.secondaryColor,
+                        accentColor = baseTemplateConfig.accentColor,
+                        headerStyle = baseTemplateConfig.headerStyle,
+                        logoPosition = baseTemplateConfig.logoPosition,
+                        companyInfoPosition = baseTemplateConfig.companyInfoPosition,
+                        showCompanyBackground = baseTemplateConfig.showCompanyBackground,
+                        tableStyle = baseTemplateConfig.tableStyle,
+                        borderStyle = baseTemplateConfig.borderStyle,
+                        fontFamily = baseTemplateConfig.fontFamily,
+                        layout = baseTemplateConfig.layout,
+                        sections = baseTemplateConfig.sections,
+                        styling = baseTemplateConfig.styling,
+                        typography = baseTemplateConfig.typography
+                    }, new JsonSerializerOptions { WriteIndented = true })
                 }
             };
 

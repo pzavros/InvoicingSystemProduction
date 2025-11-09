@@ -26,9 +26,49 @@ import {
  * Each page has: title, description, steps, and tips
  */
 export const pageHelpContent = {
+  home: {
+    title: 'Invoices Overview',
+    description: 'View and manage all your invoices in one place. Search, filter, sort, and perform bulk actions on your invoices. Track payment status and quickly access invoice details.',
+    steps: [
+      {
+        icon: <Search sx={{ color: '#8b5cf6' }} />,
+        title: 'Search & Filter',
+        description: 'Use the search bar to find invoices by client name or invoice number. Filter by status (Draft, Unpaid, Paid, Overdue) and date ranges to narrow down results.'
+      },
+      {
+        icon: <Add sx={{ color: '#8b5cf6' }} />,
+        title: 'Create New Invoice',
+        description: 'Click the "New Invoice" button in the top-right corner to create a new invoice. Fill in client details, add items, and save or generate a PDF.'
+      },
+      {
+        icon: <Edit sx={{ color: '#8b5cf6' }} />,
+        title: 'View & Edit Invoices',
+        description: 'Click the eye icon to view invoice details and download PDFs. Use the edit icon to modify invoice information. Delete icon removes invoices (cannot undo).'
+      },
+      {
+        icon: <Receipt sx={{ color: '#8b5cf6' }} />,
+        title: 'Bulk Actions',
+        description: 'Select multiple invoices using checkboxes, then change their status in bulk. Great for marking multiple invoices as paid or updating statuses efficiently.'
+      },
+      {
+        icon: <FilterList sx={{ color: '#8b5cf6' }} />,
+        title: 'Sort & Organize',
+        description: 'Click column headers to sort invoices by number, date, client, type, or amount. Use pagination controls to navigate through large lists.'
+      }
+    ],
+    tips: [
+      'Free plan users have monthly invoice limits - check the usage indicator above the list.',
+      'Status badges change color based on invoice state - green for paid, yellow for unpaid, red for overdue.',
+      'Different document types (Invoice, Quote, Receipt) are color-coded for easy identification.',
+      'Use the "All (incl. Deleted)" filter option to see deleted invoices.',
+      'Bulk status changes save time when processing multiple invoices.',
+      'Invoice table is responsive - on mobile, it switches to card view for better readability.'
+    ]
+  },
+
   dashboard: {
     title: 'Dashboard Overview',
-    description: 'Your dashboard displays key business metrics at a glance. Track monthly earnings, invoice counts, and analyze annual trends to understand your business performance.',
+    description: 'Your dashboard displays key business metrics at a glance. Track monthly earnings, invoice counts, analyze annual trends, and monitor your top-performing clients and products.',
     steps: [
       {
         icon: <FilterList sx={{ color: '#8b5cf6' }} />,
@@ -44,6 +84,11 @@ export const pageHelpContent = {
         icon: <DashboardIcon sx={{ color: '#8b5cf6' }} />,
         title: 'Analyze Annual Charts',
         description: 'Scroll down to see Annual Earnings Chart and Annual Invoice Count Chart. These visualize trends across 12 months and can be switched between different years.'
+      },
+      {
+        icon: <DashboardIcon sx={{ color: '#8b5cf6' }} />,
+        title: 'Monitor Performance',
+        description: 'Review Client Performance to see your top clients by revenue and payment behavior. Check Product Performance to identify your best-selling products and services.'
       }
     ],
     tips: [
@@ -51,6 +96,9 @@ export const pageHelpContent = {
       'Monthly earnings include all invoice statuses - paid, unpaid, and drafts.',
       'Use the year selector on charts to compare performance across different years.',
       'Charts show monthly breakdown to help identify seasonal patterns.',
+      'Client performance shows average payment time to help you identify reliable clients.',
+      'Product performance differentiates between physical products and services.',
+      'Low stock warnings appear automatically when products run low on inventory.',
       'The system stores up to 5 years of historical data for trend analysis.'
     ]
   },

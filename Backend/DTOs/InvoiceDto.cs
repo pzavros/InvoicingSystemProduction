@@ -39,6 +39,7 @@ namespace InvoicingBackend.DTOs
         public int? StatusId { get; set; }
         public string? StatusName { get; set; }
         public int? TemplateId { get; set; }
+        public int? ClientId { get; set; } // Link to client from Clients table
         public int DocumentTypeId { get; set; } = 1; // Default to standard invoice
         public bool IsDeleted { get; set; } // Added IsDeleted property
         public IEnumerable<InvoiceItemDto> Items { get; set; } = new List<InvoiceItemDto>();

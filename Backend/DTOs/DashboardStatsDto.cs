@@ -16,7 +16,29 @@ namespace InvoicingBackend.DTOs
 
     public class MonthlyDashboardStatsDto
     {
-        public decimal TotalAmountSelectedMonthYear { get; set; }
+        // Total with tax (final invoice amount)
+        public decimal TotalEarningsSelectedMonthYear { get; set; }
+        
+        // Total tax amount collected
+        public decimal TotalTaxSelectedMonthYear { get; set; }
+        
+        // Revenue without tax (subtotal)
+        public decimal TotalRevenueSelectedMonthYear { get; set; }
+        
+        // Invoice count
         public int InvoiceCountSelectedMonthYear { get; set; }
+        
+        // User's preferred currency
+        public string CurrencySymbol { get; set; } = "€";
+        
+        // Percentage change from previous month
+        public decimal PercentageChangeEarnings { get; set; }
+        
+        // For backwards compatibility (map to TotalEarnings)
+        public decimal TotalAmountSelectedMonthYear 
+        { 
+            get => TotalEarningsSelectedMonthYear; 
+            set => TotalEarningsSelectedMonthYear = value; 
+        }
     }
 }
