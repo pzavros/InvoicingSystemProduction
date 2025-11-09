@@ -24,6 +24,7 @@ namespace InvoicingBackend.Data
         public DbSet<DocumentType> DocumentTypes { get; set; }
         public DbSet<Client> Clients { get; set; }
         public DbSet<InvoiceQuota> InvoiceQuotas { get; set; }
+        public DbSet<SupportTicket> SupportTickets { get; set; }
         
         // Webpage Models
         public DbSet<WaitlistEntry> WaitlistEntries { get; set; }
@@ -172,6 +173,13 @@ namespace InvoicingBackend.Data
             modelBuilder.Entity<InvoiceQuota>()
                 .HasIndex(iq => new { iq.UserId, iq.Month })
                 .IsUnique();
+
+            // User → SupportTickets relationship (One-to-Many)
+            modelBuilder.Entity<SupportTicket>()
+                .HasOne(st => st.User)
+                .WithMany()
+                .HasForeignKey(st => st.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
         }
     }

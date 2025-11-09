@@ -39,6 +39,7 @@ import GroupIcon from '@mui/icons-material/Group';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import SchoolIcon from '@mui/icons-material/School';
+import SupportIcon from '@mui/icons-material/Support';
 import { SidebarContext } from './SidebarContext';
 import { useAuth } from '../../utils/AuthContext';
 
@@ -176,6 +177,13 @@ export default function NavBar() {
       path: '/admin/users', 
       description: 'Manage system users',
       color: '#dc2626'
+    },
+    { 
+      text: 'Support Tickets', 
+      icon: <SupportIcon />, 
+      path: '/admin/support', 
+      description: 'Manage user support tickets',
+      color: '#8b5cf6'
     },
     { 
       text: 'System Admin', 
@@ -737,6 +745,30 @@ export default function NavBar() {
           </ListItemIcon>
           <ListItemText 
             primary="Profile" 
+            primaryTypographyProps={{
+              sx: { fontSize: '0.875rem', fontWeight: 500 }
+            }}
+          />
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            navigate('/support');
+            handleUserMenuClose();
+          }}
+          sx={{
+            py: 1.5,
+            px: 2,
+            gap: 1.5,
+            '&:hover': {
+              background: 'rgba(255, 255, 255, 0.08)'
+            }
+          }}
+        >
+          <ListItemIcon sx={{ color: 'rgba(255, 255, 255, 0.9)', minWidth: 36 }}>
+            <SupportIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText 
+            primary="Support" 
             primaryTypographyProps={{
               sx: { fontSize: '0.875rem', fontWeight: 500 }
             }}

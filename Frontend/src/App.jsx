@@ -25,6 +25,8 @@ import UserManagementPage from './pages/UserManagementPage';
 import UserFormPage from './pages/UserFormPage';
 import SystemAdminPage from './pages/SystemAdminPage';
 import GettingStartedPage from './pages/GettingStartedPage';
+import SupportPage from './pages/SupportPage';
+import AdminSupportPage from './pages/AdminSupportPage';
 import SubscriptionGuard from './components/SubscriptionPage/SubscriptionGuard';
 import SubscriptionBanner from './components/SubscriptionPage/SubscriptionBanner';
 import AdminRoute from './components/ReusableComponents/AdminRoute';
@@ -97,6 +99,7 @@ function MainContent() {
         {/* Routes that don't require subscription */}
         <Route path="/about" element={<ProtectedRoute><AboutUsPage /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+        <Route path="/support" element={<ProtectedRoute><SupportPage /></ProtectedRoute>} />
         <Route path="/getting-started" element={<ProtectedRoute><GettingStartedPage /></ProtectedRoute>} />
         
         {/* Admin Routes - Protected and require admin privileges */}
@@ -104,6 +107,7 @@ function MainContent() {
         <Route path="/users/add" element={<ProtectedRoute><AdminRoute><UserFormPage /></AdminRoute></ProtectedRoute>} />
         <Route path="/users/edit/:id" element={<ProtectedRoute><AdminRoute><UserFormPage /></AdminRoute></ProtectedRoute>} />
         <Route path="/admin/system" element={<ProtectedRoute><AdminRoute><SystemAdminPage /></AdminRoute></ProtectedRoute>} />
+        <Route path="/admin/support" element={<ProtectedRoute><AdminRoute><AdminSupportPage /></AdminRoute></ProtectedRoute>} />
       </Routes>
     </Box>
   );

@@ -22,6 +22,7 @@ namespace InvoicingBackend.Interfaces
         // Contact/Support emails
         Task<EmailResponseDto> SendContactFormSubmissionAsync(string to, string userName, string message, string referenceId, string? ccEmail = null);
         Task<EmailResponseDto> SendAdminContactNotificationAsync(string adminEmail, string userName, string userEmail, string subject, string message, string referenceId, string? userInfo = null, string? ccEmail = null);
+        Task<EmailResponseDto> SendSupportTicketConfirmationAsync(string to, string userName, string referenceNumber, string subject, string ticketType);
         
         // Subscription emails
         Task<EmailResponseDto> SendTrialStartedEmailAsync(string to, string userName, DateTime trialStartDate, DateTime trialEndDate, string dashboardUrl);

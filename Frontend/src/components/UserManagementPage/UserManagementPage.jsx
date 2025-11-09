@@ -3,11 +3,11 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import Section from "../ReusableComponents/Section";
 import UserManagementPageHeader from "./UserManagementPageHeader";
-import UsersDataGrid from "./UsersDataGrid";
+import UsersDataGridNew from "./UsersDataGridNew";
 import NotificationSnackbar from "./NotificationSnackbar";
 import useUsersData from "./useUsersData";
 import useNotification from "./useNotification";
-import { Box, Alert, CircularProgress } from "@mui/material";
+import { Box, Alert } from "@mui/material";
 
 const UserManagementPage = () => {
   const navigate = useNavigate();
@@ -41,7 +41,15 @@ const UserManagementPage = () => {
   if (error) {
     return (
       <Section>
-        <Alert severity="error" sx={{ mb: 2 }}>
+        <Alert 
+          severity="error" 
+          sx={{ 
+            mb: 2,
+            borderRadius: '12px',
+            border: '1px solid rgba(239, 68, 68, 0.2)',
+            backgroundColor: 'rgba(239, 68, 68, 0.05)'
+          }}
+        >
           Failed to load users: {error}
         </Alert>
       </Section>
@@ -57,7 +65,7 @@ const UserManagementPage = () => {
         onAddUser={handleAddUser}
       />
 
-      <UsersDataGrid
+      <UsersDataGridNew
         users={users}
         loading={loading}
         onEditUser={handleEditUser}

@@ -3,18 +3,13 @@ import React from 'react';
 import {
   Box,
   Typography,
-  Button,
-  Card,
-  CardContent,
-  Grid,
-  useTheme,
-  useMediaQuery
+  Button
 } from '@mui/material';
 import {
   PersonAdd,
   People,
   AdminPanelSettings,
-  Person
+  CheckCircle
 } from '@mui/icons-material';
 
 const UserManagementPageHeader = ({ 
@@ -23,103 +18,163 @@ const UserManagementPageHeader = ({
   activeUsers,
   onAddUser 
 }) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const stats = [
+    {
+      icon: People,
+      label: 'Total Users',
+      value: totalUsers,
+      color: '#667eea',
+      bgColor: 'rgba(102, 126, 234, 0.08)'
+    },
+    {
+      icon: CheckCircle,
+      label: 'Active Users',
+      value: activeUsers,
+      color: '#10b981',
+      bgColor: 'rgba(16, 185, 129, 0.08)'
+    },
+    {
+      icon: AdminPanelSettings,
+      label: 'Administrators',
+      value: adminUsers,
+      color: '#f59e0b',
+      bgColor: 'rgba(245, 158, 11, 0.08)'
+    }
+  ];
   
   return (
-    <Box sx={{ mb: 4 }}>
+    <Box>
+      {/* Header Section */}
       <Box sx={{ 
         display: 'flex', 
-        flexDirection: { xs: 'column', sm: 'row' },
         justifyContent: 'space-between', 
-        alignItems: { xs: 'flex-start', sm: 'center' },
-        gap: 2,
-        mb: 3
+        alignItems: 'flex-start',
+        mb: 4
       }}>
         <Box>
-          <Typography variant={isMobile ? "h5" : "h4"} fontWeight="bold" gutterBottom>
-            User Management
+          <Typography 
+            variant="h4" 
+            sx={{ 
+              fontWeight: 700,
+              fontSize: { xs: '1.75rem', sm: '2rem' },
+              color: 'rgba(15, 23, 42, 0.95)',
+              letterSpacing: '-0.02em',
+              lineHeight: 1.1,
+              mb: 0.5
+            }}
+          >
+            Users
           </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ display: { xs: 'none', sm: 'block' } }}>
-            Manage system users and their permissions
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: 'rgba(15, 23, 42, 0.5)',
+              fontSize: '0.9375rem',
+              fontWeight: 400,
+              letterSpacing: '-0.01em'
+            }}
+          >
+            Manage system users and permissions
           </Typography>
         </Box>
+
         <Button
           variant="contained"
-          startIcon={!isMobile && <PersonAdd />}
+          startIcon={<PersonAdd />}
           onClick={onAddUser}
-          fullWidth={isMobile}
-          sx={{ 
-            borderRadius: 2,
+          sx={{
+            background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+            color: 'white',
+            boxShadow: 'none',
+            borderRadius: '8px',
+            px: 2.5,
+            py: 1,
+            fontSize: '0.9375rem',
+            fontWeight: 600,
             textTransform: 'none',
-            boxShadow: 2
+            letterSpacing: '-0.01em',
+            transition: 'all 0.15s ease',
+            '&:hover': { 
+              background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+              boxShadow: 'none',
+            }
           }}
         >
-          Add New User
+          Add User
         </Button>
       </Box>
 
-      <Grid container spacing={{ xs: 2, md: 3 }}>
-        <Grid item xs={12} sm={6} md={4}>
-          <Card elevation={3} sx={{ borderRadius: { xs: 2, md: 3 } }}>
-            <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, md: 2 } }}>
-                <Box sx={{ color: 'primary.main' }}>
-                  <People fontSize={isMobile ? "medium" : "large"} />
+      {/* Stats Grid */}
+      <Box sx={{ 
+        display: 'grid',
+        gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' },
+        gap: 2,
+        mb: 4
+      }}>
+        {stats.map((stat, index) => {
+          const Icon = stat.icon;
+          return (
+            <Box
+              key={index}
+              sx={{
+                backgroundColor: 'white',
+                borderRadius: '12px',
+                border: '1px solid rgba(15, 23, 42, 0.08)',
+                p: 3,
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                '&:hover': {
+                  boxShadow: '0 4px 12px rgba(15, 23, 42, 0.08)',
+                  transform: 'translateY(-2px)',
+                  borderColor: 'rgba(15, 23, 42, 0.12)'
+                }
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box
+                  sx={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: '12px',
+                    backgroundColor: stat.bgColor,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: stat.color
+                  }}
+                >
+                  <Icon sx={{ fontSize: '1.5rem' }} />
                 </Box>
-                <Box>
-                  <Typography variant={isMobile ? "h6" : "h5"} fontWeight="bold">
-                    {totalUsers}
+                <Box sx={{ flex: 1 }}>
+                  <Typography 
+                    variant="h4" 
+                    sx={{ 
+                      fontWeight: 700,
+                      fontSize: '1.875rem',
+                      color: 'rgba(15, 23, 42, 0.95)',
+                      letterSpacing: '-0.02em',
+                      lineHeight: 1,
+                      mb: 0.5
+                    }}
+                  >
+                    {stat.value}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.8rem', md: '0.875rem' } }}>
-                    Total Users
+                  <Typography 
+                    variant="body2" 
+                    sx={{ 
+                      color: 'rgba(15, 23, 42, 0.5)',
+                      fontSize: '0.875rem',
+                      fontWeight: 500,
+                      letterSpacing: '-0.01em'
+                    }}
+                  >
+                    {stat.label}
                   </Typography>
                 </Box>
               </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4}>
-          <Card elevation={3} sx={{ borderRadius: { xs: 2, md: 3 } }}>
-            <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, md: 2 } }}>
-                <Box sx={{ color: 'success.main' }}>
-                  <Person fontSize={isMobile ? "medium" : "large"} />
-                </Box>
-                <Box>
-                  <Typography variant={isMobile ? "h6" : "h5"} fontWeight="bold">
-                    {activeUsers}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.8rem', md: '0.875rem' } }}>
-                    Active Users
-                  </Typography>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4}>
-          <Card elevation={3} sx={{ borderRadius: { xs: 2, md: 3 } }}>
-            <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, md: 2 } }}>
-                <Box sx={{ color: 'warning.main' }}>
-                  <AdminPanelSettings fontSize={isMobile ? "medium" : "large"} />
-                </Box>
-                <Box>
-                  <Typography variant={isMobile ? "h6" : "h5"} fontWeight="bold">
-                    {adminUsers}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.8rem', md: '0.875rem' } }}>
-                    Admin Users
-                  </Typography>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+            </Box>
+          );
+        })}
+      </Box>
     </Box>
   );
 };

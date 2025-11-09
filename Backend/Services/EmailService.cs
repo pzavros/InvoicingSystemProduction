@@ -376,6 +376,40 @@ catch (Exception ex)
             }
         }
 
+        public async Task<EmailResponseDto> SendSupportTicketConfirmationAsync(
+            string to, 
+            string userName, 
+            string referenceNumber, 
+            string subject, 
+            string ticketType)
+        {
+            try
+            {
+                var body = _templateService.RenderSupportTicketCreatedEmail(
+                    userName,
+                    referenceNumber,
+                    "Medium",
+                    DateTime.Now.ToString("MMMM dd, yyyy HH:mm"),
+                    $"Type: {ticketType}\nSubject: {subject}"
+                );
+                
+                var emailDto = new EmailDto
+                {
+                    To = to,
+                    Subject = $"Support Ticket Created: {referenceNumber}",
+                    Body = body,
+                    IsHtml = true
+                };
+                
+                return await SendEmailAsync(emailDto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send support ticket confirmation email to {Email}", to);
+                return new EmailResponseDto { Success = false, Message = $"Failed to send email: {ex.Message}" };
+            }
+        }
+
         // ==================== SUBSCRIPTION EMAILS ====================
 
         public async Task<EmailResponseDto> SendTrialStartedEmailAsync(
