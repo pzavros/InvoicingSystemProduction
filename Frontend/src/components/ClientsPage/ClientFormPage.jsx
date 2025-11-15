@@ -21,6 +21,7 @@ import {
 import { createClient, updateClient, getClientById } from "./api";
 import LimitReachedModal from "../SubscriptionPage/LimitReachedModal";
 import { useLimit } from "../../utils/useLimit";
+import LoadingOverlay from '../ReusableComponents/LoadingOverlay';
 
 /** ---------- Form Components ---------- **/
 const FormGrid = ({ size, children }) => (
@@ -918,6 +919,7 @@ const ClientFormPage = () => {
         onClose={closeLimitModal}
         resource={limitModalResource}
       />
+      <LoadingOverlay open={loading} message={isEditing ? "Loading client..." : "Loading..."} />
     </Box>
   );
 };

@@ -52,7 +52,12 @@ builder.Services.AddControllers()
 
 // Configure EF Core with PostgreSQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        npgsqlOptions => npgsqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
+    );
+});
 
 // Configure JWT settings
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -148,6 +153,7 @@ builder.Services.AddScoped<IDocumentTypeService, DocumentTypeService>();
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IStripeService, StripeService>();
+builder.Services.AddSingleton<IPdfGenerationService, PdfGenerationService>(); // Singleton for browser caching
 
 // Register background services
 builder.Services.AddHostedService<SubscriptionReminderService>();
@@ -231,6 +237,10 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
     db.Database.Migrate();
+    
+    // Download Chromium browser for PDF generation on startup
+    var pdfService = scope.ServiceProvider.GetRequiredService<IPdfGenerationService>();
+    await pdfService.EnsureBrowserInstalledAsync();
     
     // Seed admin user (support@e-nvoicing.com)
     await AdminSeeder.SeedAdminUserAsync(db);

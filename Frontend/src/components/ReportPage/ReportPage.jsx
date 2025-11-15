@@ -10,6 +10,7 @@ import useInvoiceReportData from './useInvoiceReportData';
 import { exportReportToExcel } from './api';
 import PageHelper from '../ReusableComponents/PageHelper';
 import { pageHelpContent } from '../../config/pageHelpContent';
+import LoadingOverlay from '../ReusableComponents/LoadingOverlay';
 
 const DRAWER_WIDTH = 360;
 
@@ -765,6 +766,7 @@ const ReportPage = () => {
       </Snackbar>
       
       <PageHelper {...pageHelpContent.reports} />
+      <LoadingOverlay open={loading || exportLoading} message={exportLoading ? "Exporting report..." : "Loading report..."} />
     </Box>
   );
 };

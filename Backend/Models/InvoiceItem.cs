@@ -7,13 +7,13 @@ namespace InvoicingBackend.Models
         // Remove duplicate Id since it's now in BaseEntity
 
         public int InvoiceId { get; set; }
-        public Invoice Invoice { get; set; }
+        public Invoice Invoice { get; set; } = null!;
         
         // Product reference (optional - can be null for custom items)
         public int? ProductId { get; set; }
         public Product? Product { get; set; }
         
-        public string Title { get; set; }
+        public string Title { get; set; } = null!;
         public string? Description { get; set; } // Made Description nullable
         public int    Quantity    { get; set; }
 

@@ -120,9 +120,9 @@ namespace Backend.Controllers.Webpage
                 var entries = await _waitlistService.GetWaitlistEntriesPaginatedAsync(page, pageSize, status, source);
                 var totalCount = await _waitlistService.GetTotalCountAsync();
 
-                Response.Headers.Add("X-Total-Count", totalCount.ToString());
-                Response.Headers.Add("X-Page", page.ToString());
-                Response.Headers.Add("X-Page-Size", pageSize.ToString());
+                Response.Headers["X-Total-Count"] = totalCount.ToString();
+                Response.Headers["X-Page"] = page.ToString();
+                Response.Headers["X-Page-Size"] = pageSize.ToString();
 
                 return Ok(entries);
             }

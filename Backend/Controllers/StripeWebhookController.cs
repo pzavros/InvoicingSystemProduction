@@ -553,16 +553,17 @@ namespace InvoicingBackend.Controllers
             }
         }
 
-        private async Task HandleSetupIntentSucceeded(Event stripeEvent)
+        private Task HandleSetupIntentSucceeded(Event stripeEvent)
         {
             var setupIntent = stripeEvent.Data.Object as SetupIntent;
-            if (setupIntent == null) return;
+            if (setupIntent == null) return Task.CompletedTask;
 
             _logger.LogInformation("Setup intent succeeded: {SetupIntentId} for customer {CustomerId}", 
                 setupIntent.Id, setupIntent.CustomerId);
 
             // This is triggered when a trial user adds their payment method
             // The subscription will be created separately
+            return Task.CompletedTask;
         }
 
         private decimal GetMonthlyPrice()

@@ -50,6 +50,7 @@ import {
   getTemplatesByDocumentType,
   getActiveTemplateByDocumentType
 } from './api';
+import LoadingOverlay from '../ReusableComponents/LoadingOverlay';
 import SimpleTemplatePreview from './SimpleTemplatePreview';
 import TemplatePreviewModal from './TemplatePreviewModal';
 import TemplateCustomizer from './TemplateCustomizer';
@@ -1065,6 +1066,7 @@ const InvoiceTemplatesPage = () => {
       </Snackbar>
       
       <PageHelper {...pageHelpContent.templates} />
+      <LoadingOverlay open={loading} message="Loading templates..." />
     </Box>
   );
 };

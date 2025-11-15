@@ -184,4 +184,21 @@ export const getInvoiceTemplateById = async (templateId) => {
   }
 };
 
+// Generate PDF from backend using Puppeteer
+export const generateInvoicePdf = async (invoiceId) => {
+  try {
+    const response = await invoiceApi.post(
+      `/api/Pdf/generate-invoice/${invoiceId}`,
+      {},
+      {
+        responseType: 'blob', // Important for binary PDF data
+      }
+    );
+    return response.data; // Returns blob
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    throw error;
+  }
+};
+
 export default invoiceApi;

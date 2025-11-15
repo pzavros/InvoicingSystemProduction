@@ -5,7 +5,7 @@ namespace InvoicingBackend.DTOs
     {
         public int? Id { get; set; }
         public int? ProductId { get; set; } // For linking to product catalog
-        public string Title { get; set; }
+        public string Title { get; set; } = null!;
         public string? Description { get; set; } // Made Description nullable
         public int    Quantity    { get; set; }
         public decimal UnitPrice  { get; set; }

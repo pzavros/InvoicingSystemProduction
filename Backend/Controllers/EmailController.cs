@@ -81,13 +81,13 @@ namespace InvoicingBackend.Controllers
         }
 
         [HttpPost("send-invoice/{invoiceId}")]
-        public async Task<IActionResult> SendInvoiceEmail(int invoiceId, [FromBody] InvoiceEmailDto emailDto)
+        public Task<IActionResult> SendInvoiceEmail(int invoiceId, [FromBody] InvoiceEmailDto emailDto)
         {
             try
             {
                 if (string.IsNullOrEmpty(emailDto.To))
                 {
-                    return BadRequest("To field is required");
+                    return Task.FromResult<IActionResult>(BadRequest("To field is required"));
                 }
 
                 // Here you would typically:
@@ -98,20 +98,20 @@ namespace InvoicingBackend.Controllers
                 // For now, we'll return a placeholder response
                 // You'll need to integrate this with your existing invoice service
                 
-                return Ok(new EmailResponseDto 
+                return Task.FromResult<IActionResult>(Ok(new EmailResponseDto 
                 { 
                     Success = false, 
                     Message = "Invoice email functionality needs to be integrated with your existing invoice service" 
-                });
+                }));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error sending invoice email");
-                return StatusCode(500, new EmailResponseDto 
+                return Task.FromResult<IActionResult>(StatusCode(500, new EmailResponseDto 
                 { 
                     Success = false, 
                     Message = "Internal server error while sending invoice email" 
-                });
+                }));
             }
         }
 
