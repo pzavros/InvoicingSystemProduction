@@ -414,6 +414,31 @@ namespace InvoicingBackend.Controllers
                 dbSubscription.PaymentFailureCount = 0;
                 dbSubscription.LastPaymentFailureDate = null;
                 dbSubscription.Status = Models.SubscriptionStatus.Active;
+                
+                // Fetch the Stripe subscription to get the next payment date
+                if (!string.IsNullOrEmpty(dbSubscription.StripeSubscriptionId))
+                {
+                    try
+                    {
+                        var stripeSubscription = await _stripeService.GetSubscriptionAsync(dbSubscription.StripeSubscriptionId);
+                        if (stripeSubscription != null)
+                        {
+                            dbSubscription.NextPaymentDate = stripeSubscription.CurrentPeriodEnd;
+                            _logger.LogInformation("Updated NextPaymentDate to {NextPaymentDate} from Stripe subscription", 
+                                dbSubscription.NextPaymentDate);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Could not fetch Stripe subscription to update NextPaymentDate, using fallback");
+                        dbSubscription.NextPaymentDate = DateTime.UtcNow.AddMonths(1);
+                    }
+                }
+                else
+                {
+                    dbSubscription.NextPaymentDate = DateTime.UtcNow.AddMonths(1);
+                }
+                
                 dbSubscription.MarkAsModified("Stripe");
 
                 // Ensure user is premium - explicitly mark as modified
@@ -439,13 +464,17 @@ namespace InvoicingBackend.Controllers
                         // Use Stripe's hosted invoice URL if available, otherwise subscription page
                         var invoiceUrl = invoice.HostedInvoiceUrl ?? "https://e-nvoicing.com/app/subscription";
                         
+                        // Ensure we have a valid next payment date
+                        var nextBillingDate = dbSubscription.NextPaymentDate ?? DateTime.UtcNow.AddMonths(1);
+                        _logger.LogInformation("NextPaymentDate for email: {NextPaymentDate}", nextBillingDate);
+                        
                         await _emailService.SendPaymentSuccessEmailAsync(
                             dbSubscription.User.Email,
                             $"{dbSubscription.User.FirstName} {dbSubscription.User.LastName}",
                             invoice.AmountPaid / 100m,
                             invoice.Currency.ToUpper(),
                             DateTime.UtcNow,
-                            dbSubscription.NextPaymentDate ?? DateTime.UtcNow.AddMonths(1),
+                            nextBillingDate,
                             invoiceUrl
                         );
                         _logger.LogInformation("Payment success email sent successfully");

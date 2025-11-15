@@ -25,7 +25,7 @@ invoiceViewApi.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('token');
-      window.location.href = '/login';
+      window.location.href = '/app/login';
     }
     return Promise.reject(error);
   }
