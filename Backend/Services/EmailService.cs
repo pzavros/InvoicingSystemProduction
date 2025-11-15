@@ -599,7 +599,7 @@ catch (Exception ex)
         {
             try
             {
-                var subject = "⚠️ Payment Failed - Action Required - E-nvoicing";
+                var subject = "⚠️ Payment Failed - E-nvoicing";
                 var body = $@"
 <!DOCTYPE html>
 <html>
@@ -626,10 +626,6 @@ catch (Exception ex)
         <div class='content'>
             <p>Hi {userName},</p>
             
-            <div class='warning-badge'>
-                Action Required Within 7 Days
-            </div>
-            
             <div class='alert-box'>
                 <h3 style='margin-top: 0; color: #dc2626;'>⚠️ We couldn't process your payment</h3>
                 <p><strong>Amount:</strong> €{amount:F2} {currency.ToUpper()}</p>
@@ -645,14 +641,10 @@ catch (Exception ex)
             
             <p><strong>How to fix this:</strong></p>
             <ol>
-                <li>Update your payment method using the button below</li>
                 <li>Ensure your card has sufficient funds</li>
                 <li>Check that your card details are up to date</li>
+                <li>Contact your bank if the issue persists</li>
             </ol>
-            
-            <center>
-                <a href='{updatePaymentUrl}' class='button'>Update Payment Method</a>
-            </center>
             
             <div class='details'>
                 <p><strong>Common reasons for payment failures:</strong></p>
