@@ -213,9 +213,36 @@ export default function NavBar() {
               sx={{
                 width: 44,
                 height: 44,
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%)',
+                backdropFilter: 'blur(10px)',
+                border: '1.5px solid rgba(102, 126, 234, 0.15)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                position: 'relative',
+                overflow: 'hidden',
+                boxShadow: '0 4px 16px rgba(102, 126, 234, 0.1)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  boxShadow: '0 6px 24px rgba(102, 126, 234, 0.2)',
+                  border: '1.5px solid rgba(102, 126, 234, 0.3)',
+                  background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.12) 0%, rgba(118, 75, 162, 0.12) 100%)',
+                },
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: '-100%',
+                  width: '100%',
+                  height: '100%',
+                  background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent)',
+                  animation: 'logoShine 4s infinite',
+                },
+                '@keyframes logoShine': {
+                  '0%': { left: '-100%' },
+                  '100%': { left: '100%' }
+                }
               }}
             >
               <Box
@@ -225,7 +252,9 @@ export default function NavBar() {
                 sx={{
                   width: '100%',
                   height: '100%',
-                  objectFit: 'contain'
+                  objectFit: 'cover',
+                  borderRadius: '10px',
+                  filter: 'drop-shadow(0 2px 4px rgba(102, 126, 234, 0.15))'
                 }}
               />
             </Box>
@@ -620,10 +649,31 @@ export default function NavBar() {
                 sx={{
                   width: 36,
                   height: 36,
-                  borderRadius: '12px',
+                  borderRadius: '10px',
+                  background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%)',
+                  backdropFilter: 'blur(10px)',
+                  border: '1.5px solid rgba(102, 126, 234, 0.15)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  boxShadow: '0 4px 16px rgba(102, 126, 234, 0.1)',
+                  transition: 'all 0.3s ease',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: '-100%',
+                    width: '100%',
+                    height: '100%',
+                    background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent)',
+                    animation: 'logoShine 4s infinite',
+                  },
+                  '@keyframes logoShine': {
+                    '0%': { left: '-100%' },
+                    '100%': { left: '100%' }
+                  }
                 }}
               >
                 <Box
@@ -633,7 +683,9 @@ export default function NavBar() {
                   sx={{
                     width: '100%',
                     height: '100%',
-                    objectFit: 'contain',
+                    objectFit: 'cover',
+                    borderRadius: '8px',
+                    filter: 'drop-shadow(0 2px 4px rgba(102, 126, 234, 0.15))'
                   }}
                 />
               </Box>
