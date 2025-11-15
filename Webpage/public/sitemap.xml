@@ -12,6 +12,22 @@
     <priority>1.0</priority>
   </url>
   
+  <!-- Cyprus Landing Page - HIGH PRIORITY FOR LOCAL SEO -->
+  <url>
+    <loc>https://e-nvoicing.com/invoicing-system-cyprus</loc>
+    <lastmod>2025-11-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
+  <!-- Freelancer Landing Page - HIGH PRIORITY FOR GLOBAL SEO -->
+  <url>
+    <loc>https://e-nvoicing.com/invoicing-system-freelancers</loc>
+    <lastmod>2025-11-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
   <!-- About Page -->
   <url>
     <loc>https://e-nvoicing.com/about</loc>

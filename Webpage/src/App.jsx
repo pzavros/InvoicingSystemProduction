@@ -7,6 +7,8 @@ import HowItWorksPage from './pages/HowItWorksPage.jsx';
 import ContactPage from './pages/ContactPage.jsx';
 import PricingPage from './pages/PricingPage.jsx';
 import ComingSoonPage from './pages/ComingSoonPage.jsx';
+import InvoicingSystemCyprusPage from './pages/InvoicingSystemCyprusPage.jsx';
+import FreelancerInvoicingPage from './pages/FreelancerInvoicingPage.jsx';
 import AdminPage from './pages/AdminPage.jsx';
 import Navbar from './components/ReusableComponents/Navbar.jsx';
 import ScrollToTop from './components/ScrollToTop.jsx';
@@ -112,6 +114,8 @@ function App() {
             <Route path="/pricing" element={<><Navbar /><PricingPage /></>} />
             <Route path="/contact" element={<><Navbar /><ContactPage /></>} />
             <Route path="/coming-soon" element={<><Navbar /><ComingSoonPage /></>} />
+            <Route path="/invoicing-system-cyprus" element={<><Navbar /><InvoicingSystemCyprusPage /></>} />
+            <Route path="/invoicing-system-freelancers" element={<><Navbar /><FreelancerInvoicingPage /></>} />
           </Routes>
         </Router>
       </AdminAuthProvider>
