@@ -578,7 +578,7 @@ const InvoiceTemplatesPage = () => {
   }
 
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ width: '100%', pb: { xs: 10, md: 8 } }}>
       {/* Clean Header - Matching Home/Products Style */}
       <Box 
         sx={{ 

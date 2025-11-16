@@ -20,6 +20,7 @@ import {
   IconButton,
   AppBar,
   Toolbar,
+  CircularProgress,
 } from "@mui/material";
 import { BiPaperPlane, BiCloudDownload } from "react-icons/bi";
 import CloseIcon from '@mui/icons-material/Close';
@@ -27,7 +28,7 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { COLOR_THEMES } from "../../utils/colorThemes";
 import InvoiceTemplatePreview from "../InvoiceTemplatesPage/InvoiceTemplatePreview";
-import { generateInvoicePdf } from "./api";
+import { generateInvoicePdf, generatePreviewPdf } from "./api";
 
 // Inject print-specific CSS
 const printStyles = `
@@ -201,18 +202,31 @@ const GenerateInvoice = (invoiceNumber) => {
 };
 
 // New function to generate PDF from backend with selectable text
-const GenerateInvoiceFromBackend = async (invoiceId, invoiceNumber) => {
-  if (!invoiceId) {
-    console.error('Invoice ID is required to generate PDF from backend');
-    alert('Cannot generate PDF: Invoice has not been saved yet. Please save the invoice first.');
-    return;
-  }
-
+const GenerateInvoiceFromBackend = async (invoiceId, invoiceNumber, previewData = null, setLoading = null) => {
   try {
-    console.log(`Requesting PDF generation for invoice ID: ${invoiceId}`);
+    // Set loading state if callback provided
+    if (setLoading) setLoading(true);
     
-    // Call backend API to generate PDF
-    const pdfBlob = await generateInvoicePdf(invoiceId);
+    console.log(`Requesting PDF generation for invoice: ${invoiceNumber}`);
+    
+    let pdfBlob;
+    
+    // If preview data is provided (unsaved changes), use preview endpoint
+    if (previewData) {
+      console.log('Using preview endpoint with current form data');
+      pdfBlob = await generatePreviewPdf(previewData);
+    }
+    // Otherwise, use the saved invoice endpoint
+    else if (invoiceId) {
+      console.log(`Using saved invoice with ID: ${invoiceId}`);
+      pdfBlob = await generateInvoicePdf(invoiceId);
+    }
+    else {
+      console.error('Neither invoice ID nor preview data provided');
+      if (setLoading) setLoading(false);
+      alert('Cannot generate PDF: Invoice has not been saved yet and no preview data available.');
+      return;
+    }
     
     console.log('PDF blob received:', pdfBlob);
     
@@ -222,7 +236,10 @@ const GenerateInvoiceFromBackend = async (invoiceId, invoiceNumber) => {
     link.href = url;
     
     const safeInvoiceNumber = String(invoiceNumber).replace(/[^a-z0-9]/gi, '_').toLowerCase();
-    link.download = `invoice_${safeInvoiceNumber || 'download'}.pdf`;
+    const filename = previewData 
+      ? `invoice_${safeInvoiceNumber || 'preview'}_preview.pdf`
+      : `invoice_${safeInvoiceNumber || 'download'}.pdf`;
+    link.download = filename;
     
     document.body.appendChild(link);
     link.click();
@@ -232,7 +249,13 @@ const GenerateInvoiceFromBackend = async (invoiceId, invoiceNumber) => {
     window.URL.revokeObjectURL(url);
     
     console.log('PDF download initiated successfully');
+    
+    // Clear loading state
+    if (setLoading) setLoading(false);
   } catch (error) {
+    // Clear loading state on error
+    if (setLoading) setLoading(false);
+    
     console.error('Backend PDF generation failed - Full error:', error);
     console.error('Error response:', error.response);
     console.error('Error message:', error.message);
@@ -271,6 +294,7 @@ const GenerateInvoiceFromBackend = async (invoiceId, invoiceNumber) => {
 const InvoiceModal = (props) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [isGeneratingPdf, setIsGeneratingPdf] = React.useState(false);
   
   // Default props to avoid runtime errors
   const items = Array.isArray(props.items) ? props.items : [];
@@ -697,6 +721,7 @@ const InvoiceModal = (props) => {
                 <Button
                   variant="contained"
                   fullWidth
+                  disabled={isGeneratingPdf}
                   sx={{
                     background: `linear-gradient(135deg, ${templateColors.primary} 0%, ${templateColors.accent} 100%)`,
                     color: 'white',
@@ -707,18 +732,63 @@ const InvoiceModal = (props) => {
                     py: { xs: 1.25, sm: 1.5 },
                     border: 'none',
                     fontFamily,
-                    boxShadow: `0 4px 15px ${templateColors.accent}55`
+                    boxShadow: `0 4px 15px ${templateColors.accent}55`,
+                    '&.Mui-disabled': {
+                      background: `linear-gradient(135deg, ${templateColors.primary}88 0%, ${templateColors.accent}88 100%)`,
+                      color: 'white'
+                    }
                   }}
-                  onClick={() => GenerateInvoiceFromBackend(props.info.id, props.info.invoiceNumber)}
+                  onClick={() => {
+                    // Prepare preview data with current form state
+                    const previewData = {
+                      invoiceNumber: String(props.info.invoiceNumber || "DRAFT"),
+                      dateOfIssue: props.info.dateOfIssue instanceof Date 
+                        ? props.info.dateOfIssue 
+                        : new Date(props.info.dateOfIssue || Date.now()),
+                      dueDate: props.info.dueDate instanceof Date 
+                        ? props.info.dueDate 
+                        : new Date(props.info.dueDate || Date.now()),
+                      billTo: props.info.billTo || "",
+                      billToEmail: props.info.billToEmail || "",
+                      billToAddress: props.info.billToAddress || "",
+                      billFrom: props.info.billFrom || "",
+                      billFromEmail: props.info.billFromEmail || "",
+                      billFromAddress: props.info.billFromAddress || "",
+                      notes: props.info.notes || "",
+                      discountAmount: parseNumericAmount(props.discountAmount),
+                      currencySymbol: props.currency || props.info.currency || "€",
+                      documentTypeName: invoiceTitle || "INVOICE",
+                      documentTypeId: props.info.documentTypeId || 1,
+                      items: items.map(item => ({
+                        title: item.itemName || item.title || "",
+                        description: item.itemDescription || item.description || "",
+                        quantity: parseNumericAmount(item.itemQuantity || item.quantity),
+                        unitPrice: parseNumericAmount(item.itemPrice || item.unitPrice),
+                        taxRate: parseNumericAmount(item.itemTaxRate || item.taxRate)
+                      }))
+                    };
+                    
+                    GenerateInvoiceFromBackend(props.info.id, props.info.invoiceNumber, previewData, setIsGeneratingPdf);
+                  }}
                 >
-                  <BiCloudDownload
-                    style={{
-                      width: isMobile ? "16px" : "18px",
-                      height: isMobile ? "16px" : "18px",
-                      marginRight: "8px",
-                    }}
-                  />
-                  Download Copy
+                  {isGeneratingPdf ? (
+                    <CircularProgress 
+                      size={isMobile ? 16 : 18} 
+                      sx={{ 
+                        color: 'white',
+                        marginRight: '8px'
+                      }} 
+                    />
+                  ) : (
+                    <BiCloudDownload
+                      style={{
+                        width: isMobile ? "16px" : "18px",
+                        height: isMobile ? "16px" : "18px",
+                        marginRight: "8px",
+                      }}
+                    />
+                  )}
+                  {isGeneratingPdf ? "Generating PDF..." : "Download Copy"}
                 </Button>
               </Grid>
             </Grid>

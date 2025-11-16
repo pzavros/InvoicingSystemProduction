@@ -79,19 +79,14 @@ namespace InvoicingBackend.Services
                         "--no-sandbox",
                         "--disable-setuid-sandbox",
                         "--disable-dev-shm-usage",
-                        "--disable-gpu"
+                        "--disable-gpu",
+                        "--disable-software-rasterizer",
+                        "--disable-extensions"
                     }
                 };
 
                 await using var browser = await Puppeteer.LaunchAsync(launchOptions);
                 await using var page = await browser.NewPageAsync();
-
-                // Set viewport for consistent rendering
-                await page.SetViewportAsync(new ViewPortOptions
-                {
-                    Width = 800,
-                    Height = 1200
-                });
 
                 _logger.LogInformation("Loading invoice HTML content...");
                 
@@ -101,25 +96,19 @@ namespace InvoicingBackend.Services
                     WaitUntil = new[] { WaitUntilNavigation.Networkidle0 }
                 });
 
-                // Wait a bit for any dynamic content to render
-                await Task.Delay(500);
+                // Wait for content to fully render
+                await Task.Delay(2000);
 
                 _logger.LogInformation("Generating PDF...");
 
-                // Generate PDF with proper options
+                // Generate PDF with proper options for multi-page support
                 var pdfOptions = new PdfOptions
                 {
                     Format = PaperFormat.A4,
                     PrintBackground = true,
-                    MarginOptions = new MarginOptions
-                    {
-                        Top = "0.5in",
-                        Bottom = "0.5in",
-                        Left = "0.5in",
-                        Right = "0.5in"
-                    },
-                    PreferCSSPageSize = false,
-                    DisplayHeaderFooter = false
+                    PreferCSSPageSize = true,
+                    DisplayHeaderFooter = false,
+                    OmitBackground = false
                 };
 
                 var pdfBytes = await page.PdfDataAsync(pdfOptions);

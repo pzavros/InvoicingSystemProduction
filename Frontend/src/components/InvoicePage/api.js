@@ -201,4 +201,21 @@ export const generateInvoicePdf = async (invoiceId) => {
   }
 };
 
+// Generate preview PDF from current form data (without saving)
+export const generatePreviewPdf = async (invoiceData) => {
+  try {
+    const response = await invoiceApi.post(
+      `/api/Pdf/preview-invoice`,
+      invoiceData,
+      {
+        responseType: 'blob', // Important for binary PDF data
+      }
+    );
+    return response.data; // Returns blob
+  } catch (error) {
+    console.error('Error generating preview PDF:', error);
+    throw error;
+  }
+};
+
 export default invoiceApi;

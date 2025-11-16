@@ -47,7 +47,8 @@ import {
   updateInvoiceStatus,
   getActiveInvoiceTemplate,
   getInvoiceTemplateById,
-  generateInvoicePdf
+  generateInvoicePdf,
+  generatePreviewPdf
 } from "../InvoicePage/api";
 import { getAllDocumentTypes } from "../DocumentTypePage/api";
 
