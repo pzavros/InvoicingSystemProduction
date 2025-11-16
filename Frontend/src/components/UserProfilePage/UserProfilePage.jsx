@@ -15,6 +15,7 @@ import NotificationSnackbar from './NotificationSnackbar';
 import ChangePasswordDialog from './ChangePasswordDialog';
 import useProfileData from './useProfileData';
 import useNotification from './useNotification';
+import LoadingOverlay from '../ReusableComponents/LoadingOverlay';
 
 const UserProfilePage = () => {
   const [saving, setSaving] = useState(false);
@@ -278,6 +279,7 @@ const UserProfilePage = () => {
         onChangePassword={changePassword}
         showNotification={showNotification}
       />
+      <LoadingOverlay open={loading || saving} message={saving ? "Saving..." : "Loading profile..."} />
     </>
   );
 };

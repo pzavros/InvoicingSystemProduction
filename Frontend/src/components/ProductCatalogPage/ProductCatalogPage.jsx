@@ -29,6 +29,7 @@ import {
 import ProductList from "./ProductList";
 import PageLoader from "../ReusableComponents/PageLoader";
 import CategoryManager from "./CategoryManager";
+import LoadingOverlay from '../ReusableComponents/LoadingOverlay';
 import LowStockAlert from "./LowStockAlert";
 import UsageIndicator from "../SubscriptionPage/UsageIndicator";
 import { getAllProducts, getAllCategories, getLowStockProducts } from "./api";
@@ -517,6 +518,7 @@ const ProductCatalogPage = () => {
       </Snackbar>
       
       <PageHelper {...pageHelpContent.products} />
+      <LoadingOverlay open={loading} message="Loading products..." />
     </Box>
   );
 };

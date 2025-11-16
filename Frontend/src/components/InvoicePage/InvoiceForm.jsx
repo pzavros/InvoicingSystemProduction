@@ -17,7 +17,6 @@ import {
   Divider,
   Autocomplete,
   IconButton,
-  Backdrop,
 } from "@mui/material";
 import { ArrowBack as ArrowBackIcon } from "@mui/icons-material";
 import { useDispatch } from "react-redux";
@@ -25,6 +24,7 @@ import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
 import InvoiceItem from "./InvoiceItem";
 import InvoiceModal from "./InvoiceModal";
 import LimitReachedModal from "../SubscriptionPage/LimitReachedModal";
+import LoadingOverlay from "../ReusableComponents/LoadingOverlay";
 import { useLimit } from "../../utils/useLimit";
 import { addInvoice, updateInvoice as updateReduxInvoice, updateInvoiceStatus as updateReduxInvoiceStatus } from "../../redux/invoicesSlice";
 import generateRandomId from "../../utils/generateRandomId";
@@ -2770,50 +2770,7 @@ const InvoiceForm = () => {
       />
 
       {/* Loading Overlay */}
-      <Backdrop
-        sx={{
-          color: '#fff',
-          zIndex: (theme) => theme.zIndex.modal + 1,
-          backdropFilter: 'blur(8px)',
-          backgroundColor: 'rgba(0, 0, 0, 0.7)',
-        }}
-        open={loading}
-      >
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 3,
-            padding: 4,
-            borderRadius: '20px',
-            background: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-          }}
-        >
-          <CircularProgress
-            size={60}
-            thickness={4}
-            sx={{
-              color: '#667eea',
-            }}
-          />
-          {loadingMessage && (
-            <Typography
-              variant="h6"
-              sx={{
-                color: '#fff',
-                fontWeight: 600,
-                textAlign: 'center',
-                textShadow: '0 2px 4px rgba(0,0,0,0.3)',
-              }}
-            >
-              {loadingMessage}
-            </Typography>
-          )}
-        </Box>
-      </Backdrop>
+      <LoadingOverlay open={loading} message={loadingMessage} />
       
       <PageHelper {...pageHelpContent.invoice} />
       </form>

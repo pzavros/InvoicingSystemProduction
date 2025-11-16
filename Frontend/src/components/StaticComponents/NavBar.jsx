@@ -19,6 +19,7 @@ import {
   Toolbar
 } from '@mui/material';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import packageJson from '../../../package.json';
 import HomeIcon from '@mui/icons-material/Home';
 import InfoIcon from '@mui/icons-material/Info';
 import ReceiptIcon from '@mui/icons-material/Receipt';
@@ -597,7 +598,7 @@ export default function NavBar() {
                 letterSpacing: '0.05em'
               }}
             >
-              Version 2.2.0
+              Version {packageJson.version}
             </Typography>
           ) : (
             <Typography 
@@ -608,7 +609,7 @@ export default function NavBar() {
                 fontWeight: 500
               }}
             >
-              v2.2
+              v{packageJson.version.split('.').slice(0, 2).join('.')}
             </Typography>
           )}
         </Box>

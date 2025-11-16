@@ -46,7 +46,9 @@ import {
   getAllStatuses, 
   updateInvoiceStatus,
   getActiveInvoiceTemplate,
-  getInvoiceTemplateById
+  getInvoiceTemplateById,
+  generateInvoicePdf,
+  generatePreviewPdf
 } from "../InvoicePage/api";
 import { getAllDocumentTypes } from "../DocumentTypePage/api";
 
@@ -735,16 +737,86 @@ const InvoiceViewForm = ({ invoice, isEditMode, invoiceId }) => {
         // Generate PDF
         const canvas = await html2canvas(invoiceElement);
         const imgData = canvas.toDataURL("image/png", 1.0);
+        
+        // A4 dimensions in points (1 point = 1/72 inch)
+        const A4_WIDTH = 612;
+        const A4_HEIGHT = 792;
+        const FOOTER_HEIGHT = 50; // Space reserved for footer
+        const CONTENT_HEIGHT = A4_HEIGHT - FOOTER_HEIGHT; // Available space for content
+        const MARGIN = 40;
+        
+        // Calculate scaling to fit A4 width
+        const imgWidth = canvas.width;
+        const imgHeight = canvas.height;
+        const ratio = A4_WIDTH / imgWidth;
+        const scaledHeight = imgHeight * ratio;
+        
+        // Create PDF with A4 pages
         const pdf = new jsPDF({
           orientation: "portrait",
           unit: "pt",
-          format: [612, 792],
+          format: "a4",
         });
         
-        const imgProps = pdf.getImageProperties(imgData);
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+        // Calculate how many pages we need (using content height, not full page height)
+        const pageCount = Math.ceil(scaledHeight / CONTENT_HEIGHT);
+        
+        // Helper function to add footer with page numbers
+        const addFooter = (pdf, currentPage, totalPages) => {
+          const footerY = A4_HEIGHT - 25; // 25pt from bottom
+          pdf.setFontSize(8);
+          pdf.setTextColor(120, 120, 120);
+          
+          // Page number (centered)
+          if (totalPages > 1) {
+            const pageText = `Page ${currentPage} of ${totalPages}`;
+            const textWidth = pdf.getTextWidth(pageText);
+            pdf.text(pageText, (A4_WIDTH - textWidth) / 2, footerY);
+          }
+          
+          // Generated date (left side) - smaller and less intrusive
+          pdf.setFontSize(7);
+          const dateText = `Generated: ${new Date().toLocaleDateString()}`;
+          pdf.text(dateText, MARGIN, footerY);
+        };
+        
+        if (pageCount === 1) {
+          // Single page - add image and footer
+          pdf.addImage(imgData, "PNG", 0, 0, A4_WIDTH, scaledHeight);
+          addFooter(pdf, 1, 1);
+        } else {
+          // Multi-page - split content across pages with footer space reserved
+          for (let page = 0; page < pageCount; page++) {
+            if (page > 0) {
+              pdf.addPage();
+            }
+            
+            const sourceY = (page * CONTENT_HEIGHT) / ratio;
+            const sourceHeight = Math.min(CONTENT_HEIGHT / ratio, imgHeight - sourceY);
+            
+            // Use canvas slicing for each page
+            const pageCanvas = document.createElement('canvas');
+            pageCanvas.width = imgWidth;
+            pageCanvas.height = sourceHeight;
+            
+            const pageCtx = pageCanvas.getContext('2d');
+            pageCtx.drawImage(
+              canvas,
+              0, sourceY,           // source x, y
+              imgWidth, sourceHeight, // source width, height
+              0, 0,                 // dest x, y
+              imgWidth, sourceHeight  // dest width, height
+            );
+            
+            const pageImgData = pageCanvas.toDataURL("image/png", 1.0);
+            const destHeight = sourceHeight * ratio;
+            
+            pdf.addImage(pageImgData, "PNG", 0, 0, A4_WIDTH, destHeight);
+            
+            // Add footer with page numbers
+            addFooter(pdf, page + 1, pageCount);
+          }
+        }
         
         // Generate filename and get PDF as blob
         const safeInvoiceNumber = String(formData.invoiceNumber).replace(/[^a-z0-9]/gi, '_').toLowerCase();

@@ -6,7 +6,7 @@ namespace InvoicingBackend.Models
     {
         // Remove duplicate Id since it's now in BaseEntity
         public int ProductId { get; set; }
-        public Product Product { get; set; }
+        public Product Product { get; set; } = null!;
         
         [Column(TypeName = "decimal(18,2)")]
         public decimal OldPrice { get; set; }

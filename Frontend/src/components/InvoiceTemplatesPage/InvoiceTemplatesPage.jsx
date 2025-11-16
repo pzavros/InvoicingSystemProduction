@@ -50,6 +50,7 @@ import {
   getTemplatesByDocumentType,
   getActiveTemplateByDocumentType
 } from './api';
+import LoadingOverlay from '../ReusableComponents/LoadingOverlay';
 import SimpleTemplatePreview from './SimpleTemplatePreview';
 import TemplatePreviewModal from './TemplatePreviewModal';
 import TemplateCustomizer from './TemplateCustomizer';
@@ -577,7 +578,7 @@ const InvoiceTemplatesPage = () => {
   }
 
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ width: '100%', pb: { xs: 10, md: 8 } }}>
       {/* Clean Header - Matching Home/Products Style */}
       <Box 
         sx={{ 
@@ -1065,6 +1066,7 @@ const InvoiceTemplatesPage = () => {
       </Snackbar>
       
       <PageHelper {...pageHelpContent.templates} />
+      <LoadingOverlay open={loading} message="Loading templates..." />
     </Box>
   );
 };

@@ -48,6 +48,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search as SearchIcon, Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, Visibility as ViewIcon, Receipt as ReceiptIcon, Lock as LockIcon } from '@mui/icons-material';
 import { getAllInvoices, deleteInvoice, getAllStatuses, updateBulkInvoiceStatus } from '../InvoicePage/api';
 import { getAllDocumentTypes } from '../DocumentTypePage/api';
+import LoadingOverlay from '../ReusableComponents/LoadingOverlay';
 import { useDispatch } from 'react-redux';
 import { formatDate } from '../ReusableComponents/dateUtils';
 import UsageIndicator from '../SubscriptionPage/UsageIndicator';
@@ -2083,6 +2084,7 @@ export default function InvoiceList() {
           {notification.message}
         </Alert>
       </Snackbar>
+      <LoadingOverlay open={loading} message="Loading invoices..." />
     </Box>
   );
 }

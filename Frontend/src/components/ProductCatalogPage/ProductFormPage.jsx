@@ -26,6 +26,7 @@ import {
 import { createProduct, updateProduct, getProductById, getAllCategories } from "./api";
 import LimitReachedModal from "../SubscriptionPage/LimitReachedModal";
 import { useLimit } from "../../utils/useLimit";
+import LoadingOverlay from '../ReusableComponents/LoadingOverlay';
 
 /** ---------- Form Components ---------- **/
 const FormGrid = ({ size, children }) => (
@@ -921,6 +922,7 @@ const ProductFormPage = () => {
         onClose={closeLimitModal}
         resource={limitModalResource}
       />
+      <LoadingOverlay open={loading} message={isEditing ? "Loading product..." : "Loading..."} />
     </Box>
   );
 };

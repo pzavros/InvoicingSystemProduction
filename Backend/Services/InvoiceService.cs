@@ -58,8 +58,8 @@ namespace InvoicingBackend.Services
                     {
                         Id = invoice.Currency.Id,
                         Code = invoice.Currency.Code,
-                        Name = invoice.Currency.Name,
-                        Symbol = invoice.Currency.Symbol
+                        Name = invoice.Currency.Name ?? "",
+                        Symbol = invoice.Currency.Symbol ?? ""
                     },
                     CompanyName = invoice.CompanyName,
                 CompanyNo = invoice.CompanyNo,
@@ -131,8 +131,8 @@ namespace InvoicingBackend.Services
                 {
                     Id = invoice.Currency.Id,
                     Code = invoice.Currency.Code,
-                    Name = invoice.Currency.Name,
-                    Symbol = invoice.Currency.Symbol
+                    Name = invoice.Currency.Name ?? "",
+                    Symbol = invoice.Currency.Symbol ?? ""
                 },
                 CompanyName = invoice.CompanyName,
                 CompanyNo = invoice.CompanyNo,
@@ -496,6 +496,8 @@ namespace InvoicingBackend.Services
         {
             foreach (var item in items.Where(i => i.ProductId.HasValue))
             {
+                if (!item.ProductId.HasValue) continue;
+                
                 var product = await _context.Products
                     .FirstOrDefaultAsync(p => p.Id == item.ProductId.Value && p.TrackInventory);
                 
@@ -526,6 +528,8 @@ namespace InvoicingBackend.Services
         {
             foreach (var item in items.Where(i => i.ProductId.HasValue))
             {
+                if (!item.ProductId.HasValue) continue;
+                
                 var product = await _context.Products
                     .FirstOrDefaultAsync(p => p.Id == item.ProductId.Value && p.TrackInventory);
                   if (product != null)

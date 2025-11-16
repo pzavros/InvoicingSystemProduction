@@ -20,6 +20,7 @@ import {
   IconButton,
   AppBar,
   Toolbar,
+  CircularProgress,
 } from "@mui/material";
 import { BiPaperPlane, BiCloudDownload } from "react-icons/bi";
 import CloseIcon from '@mui/icons-material/Close';
@@ -27,6 +28,7 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { COLOR_THEMES } from "../../utils/colorThemes";
 import InvoiceTemplatePreview from "../InvoiceTemplatesPage/InvoiceTemplatePreview";
+import { generateInvoicePdf, generatePreviewPdf } from "./api";
 
 // Inject print-specific CSS
 const printStyles = `
@@ -106,16 +108,87 @@ const GenerateInvoice = (invoiceNumber) => {
       invoiceElement.style.width = originalWidth;
       
       const imgData = canvas.toDataURL("image/png", 1.0);
+      
+      // A4 dimensions in points (1 point = 1/72 inch)
+      const A4_WIDTH = 612;
+      const A4_HEIGHT = 792;
+      const FOOTER_HEIGHT = 50; // Space reserved for footer
+      const CONTENT_HEIGHT = A4_HEIGHT - FOOTER_HEIGHT; // Available space for content
+      const MARGIN = 40;
+      
+      // Calculate scaling to fit A4 width
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = A4_WIDTH / imgWidth;
+      const scaledHeight = imgHeight * ratio;
+      
+      // Create PDF with A4 pages
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "pt",
-        format: [612, 792],
+        format: "a4",
       });
-      pdf.internal.scaleFactor = 1;
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      
+      // Calculate how many pages we need (using content height, not full page height)
+      const pageCount = Math.ceil(scaledHeight / CONTENT_HEIGHT);
+      
+      // Helper function to add footer with page numbers
+      const addFooter = (pdf, currentPage, totalPages) => {
+        const footerY = A4_HEIGHT - 25; // 25pt from bottom
+        pdf.setFontSize(8);
+        pdf.setTextColor(120, 120, 120);
+        
+        // Page number (centered)
+        if (totalPages > 1) {
+          const pageText = `Page ${currentPage} of ${totalPages}`;
+          const textWidth = pdf.getTextWidth(pageText);
+          pdf.text(pageText, (A4_WIDTH - textWidth) / 2, footerY);
+        }
+        
+        // Generated date (left side) - smaller and less intrusive
+        pdf.setFontSize(7);
+        const dateText = `Generated: ${new Date().toLocaleDateString()}`;
+        pdf.text(dateText, MARGIN, footerY);
+      };
+      
+      if (pageCount === 1) {
+        // Single page - add image and footer
+        pdf.addImage(imgData, "PNG", 0, 0, A4_WIDTH, scaledHeight);
+        addFooter(pdf, 1, 1);
+      } else {
+        // Multi-page - split content across pages with footer space reserved
+        for (let page = 0; page < pageCount; page++) {
+          if (page > 0) {
+            pdf.addPage();
+          }
+          
+          const sourceY = (page * CONTENT_HEIGHT) / ratio;
+          const sourceHeight = Math.min(CONTENT_HEIGHT / ratio, imgHeight - sourceY);
+          
+          // Use canvas slicing for each page
+          const pageCanvas = document.createElement('canvas');
+          pageCanvas.width = imgWidth;
+          pageCanvas.height = sourceHeight;
+          
+          const pageCtx = pageCanvas.getContext('2d');
+          pageCtx.drawImage(
+            canvas,
+            0, sourceY,           // source x, y
+            imgWidth, sourceHeight, // source width, height
+            0, 0,                 // dest x, y
+            imgWidth, sourceHeight  // dest width, height
+          );
+          
+          const pageImgData = pageCanvas.toDataURL("image/png", 1.0);
+          const destHeight = sourceHeight * ratio;
+          
+          pdf.addImage(pageImgData, "PNG", 0, 0, A4_WIDTH, destHeight);
+          
+          // Add footer with page numbers
+          addFooter(pdf, page + 1, pageCount);
+        }
+      }
+      
       const safeInvoiceNumber = String(invoiceNumber).replace(/[^a-z0-9]/gi, '_').toLowerCase();
       pdf.save(`invoice_${safeInvoiceNumber || 'download'}.pdf`);
     }).catch((error) => {
@@ -128,9 +201,100 @@ const GenerateInvoice = (invoiceNumber) => {
   }, 100);
 };
 
+// New function to generate PDF from backend with selectable text
+const GenerateInvoiceFromBackend = async (invoiceId, invoiceNumber, previewData = null, setLoading = null) => {
+  try {
+    // Set loading state if callback provided
+    if (setLoading) setLoading(true);
+    
+    console.log(`Requesting PDF generation for invoice: ${invoiceNumber}`);
+    
+    let pdfBlob;
+    
+    // If preview data is provided (unsaved changes), use preview endpoint
+    if (previewData) {
+      console.log('Using preview endpoint with current form data');
+      pdfBlob = await generatePreviewPdf(previewData);
+    }
+    // Otherwise, use the saved invoice endpoint
+    else if (invoiceId) {
+      console.log(`Using saved invoice with ID: ${invoiceId}`);
+      pdfBlob = await generateInvoicePdf(invoiceId);
+    }
+    else {
+      console.error('Neither invoice ID nor preview data provided');
+      if (setLoading) setLoading(false);
+      alert('Cannot generate PDF: Invoice has not been saved yet and no preview data available.');
+      return;
+    }
+    
+    console.log('PDF blob received:', pdfBlob);
+    
+    // Create download link
+    const url = window.URL.createObjectURL(pdfBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    
+    const safeInvoiceNumber = String(invoiceNumber).replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    const filename = previewData 
+      ? `invoice_${safeInvoiceNumber || 'preview'}_preview.pdf`
+      : `invoice_${safeInvoiceNumber || 'download'}.pdf`;
+    link.download = filename;
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Clean up the blob URL
+    window.URL.revokeObjectURL(url);
+    
+    console.log('PDF download initiated successfully');
+    
+    // Clear loading state
+    if (setLoading) setLoading(false);
+  } catch (error) {
+    // Clear loading state on error
+    if (setLoading) setLoading(false);
+    
+    console.error('Backend PDF generation failed - Full error:', error);
+    console.error('Error response:', error.response);
+    console.error('Error message:', error.message);
+    
+    // More detailed error message
+    let errorMessage = 'Backend PDF generation failed.\n\n';
+    
+    if (error.response) {
+      errorMessage += `Status: ${error.response.status}\n`;
+      errorMessage += `Message: ${error.response.data?.message || error.response.statusText}\n\n`;
+      
+      if (error.response.status === 401) {
+        errorMessage += 'Authentication issue - please try logging in again.';
+      } else if (error.response.status === 404) {
+        errorMessage += 'Invoice not found or PDF endpoint not available.';
+      } else if (error.response.status === 500) {
+        errorMessage += `Server error: ${error.response.data?.error || 'Unknown error'}`;
+      }
+    } else if (error.request) {
+      errorMessage += 'No response from server. Is the backend running?';
+    } else {
+      errorMessage += error.message;
+    }
+    
+    errorMessage += '\n\nWould you like to use the fallback image-based PDF instead?';
+    
+    // Fallback to image-based PDF if backend fails
+    const shouldFallback = window.confirm(errorMessage);
+    
+    if (shouldFallback) {
+      GenerateInvoice(invoiceNumber);
+    }
+  }
+};
+
 const InvoiceModal = (props) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [isGeneratingPdf, setIsGeneratingPdf] = React.useState(false);
   
   // Default props to avoid runtime errors
   const items = Array.isArray(props.items) ? props.items : [];
@@ -557,6 +721,7 @@ const InvoiceModal = (props) => {
                 <Button
                   variant="contained"
                   fullWidth
+                  disabled={isGeneratingPdf}
                   sx={{
                     background: `linear-gradient(135deg, ${templateColors.primary} 0%, ${templateColors.accent} 100%)`,
                     color: 'white',
@@ -567,18 +732,63 @@ const InvoiceModal = (props) => {
                     py: { xs: 1.25, sm: 1.5 },
                     border: 'none',
                     fontFamily,
-                    boxShadow: `0 4px 15px ${templateColors.accent}55`
+                    boxShadow: `0 4px 15px ${templateColors.accent}55`,
+                    '&.Mui-disabled': {
+                      background: `linear-gradient(135deg, ${templateColors.primary}88 0%, ${templateColors.accent}88 100%)`,
+                      color: 'white'
+                    }
                   }}
-                  onClick={() => GenerateInvoice(props.info.invoiceNumber)}
+                  onClick={() => {
+                    // Prepare preview data with current form state
+                    const previewData = {
+                      invoiceNumber: String(props.info.invoiceNumber || "DRAFT"),
+                      dateOfIssue: props.info.dateOfIssue instanceof Date 
+                        ? props.info.dateOfIssue 
+                        : new Date(props.info.dateOfIssue || Date.now()),
+                      dueDate: props.info.dueDate instanceof Date 
+                        ? props.info.dueDate 
+                        : new Date(props.info.dueDate || Date.now()),
+                      billTo: props.info.billTo || "",
+                      billToEmail: props.info.billToEmail || "",
+                      billToAddress: props.info.billToAddress || "",
+                      billFrom: props.info.billFrom || "",
+                      billFromEmail: props.info.billFromEmail || "",
+                      billFromAddress: props.info.billFromAddress || "",
+                      notes: props.info.notes || "",
+                      discountAmount: parseNumericAmount(props.discountAmount),
+                      currencySymbol: props.currency || props.info.currency || "€",
+                      documentTypeName: invoiceTitle || "INVOICE",
+                      documentTypeId: props.info.documentTypeId || 1,
+                      items: items.map(item => ({
+                        title: item.itemName || item.title || "",
+                        description: item.itemDescription || item.description || "",
+                        quantity: parseNumericAmount(item.itemQuantity || item.quantity),
+                        unitPrice: parseNumericAmount(item.itemPrice || item.unitPrice),
+                        taxRate: parseNumericAmount(item.itemTaxRate || item.taxRate)
+                      }))
+                    };
+                    
+                    GenerateInvoiceFromBackend(props.info.id, props.info.invoiceNumber, previewData, setIsGeneratingPdf);
+                  }}
                 >
-                  <BiCloudDownload
-                    style={{
-                      width: isMobile ? "16px" : "18px",
-                      height: isMobile ? "16px" : "18px",
-                      marginRight: "8px",
-                    }}
-                  />
-                  Download Copy
+                  {isGeneratingPdf ? (
+                    <CircularProgress 
+                      size={isMobile ? 16 : 18} 
+                      sx={{ 
+                        color: 'white',
+                        marginRight: '8px'
+                      }} 
+                    />
+                  ) : (
+                    <BiCloudDownload
+                      style={{
+                        width: isMobile ? "16px" : "18px",
+                        height: isMobile ? "16px" : "18px",
+                        marginRight: "8px",
+                      }}
+                    />
+                  )}
+                  {isGeneratingPdf ? "Generating PDF..." : "Download Copy"}
                 </Button>
               </Grid>
             </Grid>

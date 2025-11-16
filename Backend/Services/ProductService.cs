@@ -26,7 +26,7 @@ namespace InvoicingBackend.Services
             {                if (!string.IsNullOrWhiteSpace(searchDto.SearchTerm))
                 {
                     query = query.Where(p => p.Name.Contains(searchDto.SearchTerm) ||
-                                           p.Description.Contains(searchDto.SearchTerm));
+                                           (p.Description != null && p.Description.Contains(searchDto.SearchTerm)));
                 }
 
                 if (searchDto.CategoryId.HasValue)
@@ -457,7 +457,7 @@ namespace InvoicingBackend.Services
             var products = await _context.Products                .Include(p => p.Category)
                 .Where(p => p.IsActive && 
                            (p.Name.Contains(searchTerm) || 
-                            p.Description.Contains(searchTerm)))
+                            (p.Description != null && p.Description.Contains(searchTerm))))
                 .ToListAsync();
 
             return products.Select(MapToDto);

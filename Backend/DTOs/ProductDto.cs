@@ -2,7 +2,7 @@ namespace InvoicingBackend.DTOs
 {    public class ProductDto
     {
         public int? Id { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
         public string? Description { get; set; }
         public decimal UnitPrice { get; set; }
         public int? CategoryId { get; set; }
@@ -23,7 +23,7 @@ namespace InvoicingBackend.DTOs
       public class ProductCategoryDto
     {
         public int? Id { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = null!;
         public string? Description { get; set; }
         public bool IsActive { get; set; }
         public int ProductCount { get; set; } = 0;

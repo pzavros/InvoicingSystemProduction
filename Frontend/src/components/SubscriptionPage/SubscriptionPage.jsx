@@ -39,6 +39,7 @@ import { subscriptionAPI } from './subscriptionAPI';
 import { useSubscription } from '../../utils/SubscriptionContext';
 import PaymentDialog from './PaymentDialog';
 import UsageDashboard from './UsageDashboard';
+import LoadingOverlay from '../ReusableComponents/LoadingOverlay';
 
 const SubscriptionPage = () => {
   const { subscriptionStatus, loading: subscriptionLoading, refreshStatus } = useSubscription();
@@ -1111,6 +1112,7 @@ const SubscriptionPage = () => {
             </Box>
           </Fade>
         </Section>
+        <LoadingOverlay open={loading || actionLoading} message={actionLoading ? "Processing..." : "Loading subscription..."} />
       </Page>
     );
   };
