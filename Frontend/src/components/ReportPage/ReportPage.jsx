@@ -7,7 +7,7 @@ import ReportFilters from './ReportFilters';
 import ReportDisplay from './ReportDisplay';
 import ReportExports from './ReportExports';
 import useInvoiceReportData from './useInvoiceReportData';
-import { exportReportToExcel } from './api';
+import { exportReportToExcel, exportReportToPDF } from './api';
 import PageHelper from '../ReusableComponents/PageHelper';
 import { pageHelpContent } from '../../config/pageHelpContent';
 import LoadingOverlay from '../ReusableComponents/LoadingOverlay';
@@ -42,7 +42,7 @@ const ReportPage = () => {
   const [filters, setFilters] = useState({
     startDate: defaultDates.startDate,
     endDate: defaultDates.endDate,
-    status: 'all'
+    statuses: ['paid', 'unpaid'] // Default to paid and unpaid
   });
 
   const { data, loading, error, fetchData } = useInvoiceReportData();
@@ -54,52 +54,65 @@ const ReportPage = () => {
   const [selectedColumns, setSelectedColumns] = useState([
     'invoiceNumber',
     'date',
+    'dueDate',
     'customer',
-    'billToEmail',
     'status',
+    'itemCount',
+    'subtotal',
+    'vatAmount',
     'totalAmount'
   ]);
 
   const handleRunReport = () => {
     setShowReport(true);
-    fetchData(filters.startDate, filters.endDate, filters.status);
+    fetchData(filters.startDate, filters.endDate, filters.statuses);
   };
 
-  // Convert status filter to status IDs for backend
-  const getStatusIds = (status) => {
+  // Convert status filters to status IDs for backend
+  const getStatusIds = (statuses) => {
+    if (!statuses || statuses.length === 0) {
+      return [1, 2, 3, 4, 5]; // All statuses including deleted and overdue
+    }
+    
     const statusMap = {
-      'all': [1, 2, 3, 4],
-      'draft': [1],
-      'pending': [2],
-      'paid': [3],
-      'overdue': [4]
+      'draft': 1,
+      'unpaid': 2,
+      'paid': 3,
+      'deleted': 4,
+      'overdue': 5
     };
-    return statusMap[status] || [1, 2, 3, 4];
+    
+    return statuses.map(status => statusMap[status]).filter(id => id !== undefined);
   };
 
   const handleExport = async (format) => {
-    if (format === 'pdf') {
+    if (selectedColumns.length === 0) {
       setNotification({
         open: true,
-        message: 'PDF export is not yet implemented',
+        message: 'Please select at least one column to export',
         severity: 'warning'
       });
       return;
     }
 
-    if (format === 'excel') {
-      if (selectedColumns.length === 0) {
+    setExportLoading(true);
+    try {
+      const statusIds = getStatusIds(filters.statuses);
+      
+      if (format === 'pdf') {
+        await exportReportToPDF(
+          'logistics',
+          filters.startDate,
+          filters.endDate,
+          statusIds,
+          selectedColumns
+        );
         setNotification({
           open: true,
-          message: 'Please select at least one column to export',
-          severity: 'warning'
+          message: 'PDF report exported successfully!',
+          severity: 'success'
         });
-        return;
-      }
-
-      setExportLoading(true);
-      try {
-        const statusIds = getStatusIds(filters.status);
+      } else if (format === 'excel') {
         await exportReportToExcel(
           'logistics',
           filters.startDate,
@@ -112,16 +125,16 @@ const ReportPage = () => {
           message: 'Excel report exported successfully!',
           severity: 'success'
         });
-      } catch (error) {
-        console.error('Export failed:', error);
-        setNotification({
-          open: true,
-          message: error.message || 'Failed to export report',
-          severity: 'error'
-        });
-      } finally {
-        setExportLoading(false);
       }
+    } catch (error) {
+      console.error('Export failed:', error);
+      setNotification({
+        open: true,
+        message: error.message || 'Failed to export report',
+        severity: 'error'
+      });
+    } finally {
+      setExportLoading(false);
     }
   };
 
@@ -662,24 +675,22 @@ const ReportPage = () => {
                       date: 'Invoice Date',
                       dueDate: 'Due Date',
                       status: 'Status',
-                      totalAmount: 'Total Amount',
-                      invoiceNotes: 'Notes',
-                      customer: 'Customer',
+                      customer: 'Customer Name',
                       billToEmail: 'Customer Email',
                       billToAddress: 'Customer Address',
-                      itemTitle: 'Item Title',
-                      itemDescription: 'Item Description',
-                      quantity: 'Quantity',
-                      unitPrice: 'Unit Price',
+                      itemCount: 'Number of Items',
+                      totalQuantity: 'Total Quantity',
                       subtotal: 'Subtotal',
                       vatAmount: 'VAT Amount',
-                      discountAmount: 'Discount Amount'
+                      discountAmount: 'Discount Amount',
+                      totalAmount: 'Total Amount',
+                      invoiceNotes: 'Invoice Notes'
                     };
                     return labels[col] || col;
                   });
                   const rows = (data || []).map(invoice => 
                     selectedColumns.map(col => {
-                      if (col === 'totalAmount' || col === 'vatAmount' || col === 'discountAmount' || col === 'unitPrice' || col === 'subtotal') {
+                      if (['totalAmount', 'vatAmount', 'discountAmount', 'subtotal'].includes(col)) {
                         return invoice[col] || 0;
                       }
                       return invoice[col] || '';

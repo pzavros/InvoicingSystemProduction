@@ -256,10 +256,10 @@ namespace InvoicingBackend.Services
                     && i.DocumentTypeId != 4)
                 .ToListAsync();
 
-            // Status IDs: 1=Draft, 2=Sent/Pending, 3=Paid, 4=Overdue, 5=Cancelled
+            // Status IDs: 1=Draft, 2=Unpaid, 3=Paid, 4=Deleted, 5=Overdue
             var paidInvoices = invoices.Where(i => i.StatusId == 3).ToList();
             var pendingInvoices = invoices.Where(i => i.StatusId == 2 && i.DueDate >= today).ToList();
-            var overdueInvoices = invoices.Where(i => (i.StatusId == 2 || i.StatusId == 4) && i.DueDate < today).ToList();
+            var overdueInvoices = invoices.Where(i => i.StatusId == 5 || (i.StatusId == 2 && i.DueDate < today)).ToList();
             var draftInvoices = invoices.Where(i => i.StatusId == 1).ToList();
 
             // Overdue aging

@@ -99,7 +99,9 @@ export const getAllStatuses = async () => {
     return [
       { statusId: 1, name: 'Draft' },
       { statusId: 2, name: 'Unpaid' },
-      { statusId: 3, name: 'Paid' }
+      { statusId: 3, name: 'Paid' },
+      { statusId: 4, name: 'Deleted' },
+      { statusId: 5, name: 'Overdue' }
     ];
   }
 };

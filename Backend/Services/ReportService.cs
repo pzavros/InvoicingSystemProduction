@@ -57,6 +57,25 @@ namespace InvoicingBackend.Services
                   Console.WriteLine($"DEBUG: Invoices after filtering: {invoicesWithStatus.Count}");
             Console.WriteLine($"DEBUG: Total items across all invoices: {invoicesWithStatus.Sum(i => i.Invoice.Items.Count)}");
             
+            // Debug: Check for duplicate invoice numbers
+            var duplicateInvoiceNumbers = invoicesWithStatus
+                .GroupBy(i => i.Invoice.InvoiceNumber)
+                .Where(g => g.Count() > 1)
+                .ToList();
+            
+            if (duplicateInvoiceNumbers.Any())
+            {
+                Console.WriteLine($"WARNING: Found {duplicateInvoiceNumbers.Count} duplicate invoice numbers:");
+                foreach (var group in duplicateInvoiceNumbers)
+                {
+                    Console.WriteLine($"  Invoice Number '{group.Key}' appears {group.Count()} times:");
+                    foreach (var inv in group)
+                    {
+                        Console.WriteLine($"    - ID: {inv.Invoice.Id}, Date: {inv.Invoice.DateOfIssue:yyyy-MM-dd}, Client: {inv.Invoice.BillTo}, Status: {inv.StatusName}");
+                    }
+                }
+            }
+            
             // Debug: Check invoices without items
             var invoicesWithoutItems = invoicesWithStatus.Where(i => i.Invoice.Items.Count == 0).ToList();
             Console.WriteLine($"DEBUG: Invoices WITHOUT items: {invoicesWithoutItems.Count}");
@@ -99,91 +118,43 @@ namespace InvoicingBackend.Services
                 var inv = invWithStatus.Invoice;
                 var statusName = invWithStatus.StatusName;
                 
-                // Calculate invoice-level VAT and discount totals
-                decimal invoiceVATTotal = inv.TaxAmount;
+                // Calculate invoice-level totals
                 decimal invoiceDiscountTotal = inv.DiscountAmount;
                 decimal invoiceTotal = inv.Total;
+                int totalQuantity = inv.Items.Sum(item => item.Quantity);
 
-                // If invoice has no items, create one row with invoice data but empty item fields
-                if (inv.Items.Count == 0)
+                // Create ONE ROW per invoice (not per item)
+                int col = 1;
+                foreach (var selectedColumn in filter.SelectedColumns)
                 {
-                    // Populate columns dynamically based on selection
-                    int col = 1;
-                    foreach (var selectedColumn in filter.SelectedColumns)
+                    if (!ReportColumns.ColumnHeaders.ContainsKey(selectedColumn)) continue;
+                    
+                    var cellValue = GetCellValueForInvoice(selectedColumn, inv, statusName, invoiceDiscountTotal, invoiceTotal, totalQuantity);
+                    
+                    // Set the cell value based on type to avoid casting issues
+                    var cell = ws.Cell(row, col);
+                    switch (cellValue)
                     {
-                        if (!ReportColumns.ColumnHeaders.ContainsKey(selectedColumn)) continue;
-                        
-                        // For invoices without items, use null for item-specific fields
-                        var cellValue = GetCellValueForInvoiceWithoutItems(selectedColumn, inv, statusName, invoiceDiscountTotal, invoiceTotal);
-                        
-                        // Set the cell value based on type to avoid casting issues
-                        var cell = ws.Cell(row, col);
-                        switch (cellValue)
-                        {
-                            case string strValue:
-                                cell.Value = strValue;
-                                break;
-                            case decimal decValue:
-                                cell.Value = decValue;
-                                break;
-                            case int intValue:
-                                cell.Value = intValue;
-                                break;
-                            case DateTime dateValue:
-                                cell.Value = dateValue;
-                                break;
-                            default:
-                                cell.Value = cellValue?.ToString() ?? "";
-                                break;
-                        }
-                        col++;
+                        case string strValue:
+                            cell.Value = strValue;
+                            break;
+                        case decimal decValue:
+                            cell.Value = decValue;
+                            break;
+                        case int intValue:
+                            cell.Value = intValue;
+                            break;
+                        case DateTime dateValue:
+                            cell.Value = dateValue;
+                            break;
+                        default:
+                            cell.Value = cellValue?.ToString() ?? "";
+                            break;
                     }
-                    row++;
+                    col++;
                 }
-                else
-                {
-                    // Process each item for invoices that have items
-                    foreach (var it in inv.Items)
-                    {
-                        // Calculate item-level values
-                        decimal itemTaxRate = it.TaxRate ?? inv.TaxRate;
-                        decimal itemSubtotal = it.Quantity * it.UnitPrice;
-                        decimal itemVAT = it.IsTaxable ? (itemSubtotal * itemTaxRate / 100) : 0;
-                        decimal itemTotal = itemSubtotal + itemVAT;
-
-                        // Populate columns dynamically based on selection
-                        int col = 1;
-                        foreach (var selectedColumn in filter.SelectedColumns)
-                        {
-                            if (!ReportColumns.ColumnHeaders.ContainsKey(selectedColumn)) continue;
-                            
-                            var cellValue = GetCellValue(selectedColumn, inv, it, statusName, itemVAT, invoiceDiscountTotal, itemTotal, itemSubtotal);
-                            
-                            // Set the cell value based on type to avoid casting issues
-                            var cell = ws.Cell(row, col);
-                            switch (cellValue)
-                            {
-                                case string strValue:
-                                    cell.Value = strValue;
-                                    break;
-                                case decimal decValue:
-                                    cell.Value = decValue;
-                                    break;
-                                case int intValue:
-                                    cell.Value = intValue;
-                                    break;
-                                case DateTime dateValue:
-                                    cell.Value = dateValue;
-                                    break;
-                                default:
-                                    cell.Value = cellValue?.ToString() ?? "";
-                                    break;
-                            }
-                            col++;
-                        }
-                        row++;
-                    }
-                }}
+                row++;
+            }
 
             // Add totals row with dynamic column positioning
             ws.Cell(row, 1).Value = "TOTALS";
@@ -291,46 +262,28 @@ namespace InvoicingBackend.Services
             var ms = new MemoryStream();
             wb.SaveAs(ms);            ms.Position = 0;
             return ms;
-        }        private object GetCellValue(string columnKey, dynamic invoice, dynamic item, string statusName, 
-                                   decimal itemVAT, decimal invoiceDiscountTotal, decimal itemTotal, decimal itemSubtotal)
+        }        private object GetCellValueForInvoice(string columnKey, dynamic invoice, string statusName, 
+                                             decimal invoiceDiscountTotal, decimal invoiceTotal, int totalQuantity)
         {
+            // Get item count and summary for display
+            int itemCount = invoice.Items?.Count ?? 0;
+            string itemSummary = itemCount == 0 ? "No items" : 
+                                 itemCount == 1 ? "1 item" : 
+                                 $"{itemCount} items";
+            
             return columnKey switch
             {
                 ReportColumns.InvoiceNumber => invoice.InvoiceNumber,
                 ReportColumns.Date => invoice.DateOfIssue,
                 ReportColumns.Customer => invoice.BillTo,
-                ReportColumns.ItemTitle => item.Title,
-                ReportColumns.Status => statusName,
-                ReportColumns.VatAmount => itemVAT,
-                ReportColumns.DiscountAmount => invoiceDiscountTotal,
-                ReportColumns.TotalAmount => itemTotal,
-                ReportColumns.ItemDescription => item.Description ?? "",
-                ReportColumns.Quantity => item.Quantity,
-                ReportColumns.UnitPrice => item.UnitPrice,
-                ReportColumns.Subtotal => itemSubtotal,                ReportColumns.InvoiceNotes => invoice.Notes ?? "",
-                ReportColumns.DueDate => invoice.DueDate,
-                ReportColumns.BillToEmail => invoice.BillToEmail ?? "",
-                ReportColumns.BillToAddress => invoice.BillToAddress ?? "",
-                _ => ""
-            };
-        }
-
-        private object GetCellValueForInvoiceWithoutItems(string columnKey, dynamic invoice, string statusName, 
-                                                         decimal invoiceDiscountTotal, decimal invoiceTotal)
-        {
-            return columnKey switch
-            {
-                ReportColumns.InvoiceNumber => invoice.InvoiceNumber,
-                ReportColumns.Date => invoice.DateOfIssue,
-                ReportColumns.Customer => invoice.BillTo,
-                ReportColumns.ItemTitle => "[No Items]",
+                ReportColumns.ItemTitle => itemSummary,
                 ReportColumns.Status => statusName,
                 ReportColumns.VatAmount => invoice.TaxAmount,
                 ReportColumns.DiscountAmount => invoiceDiscountTotal,
                 ReportColumns.TotalAmount => invoiceTotal,
-                ReportColumns.ItemDescription => "[No Items]",
-                ReportColumns.Quantity => 0,
-                ReportColumns.UnitPrice => 0.0m,
+                ReportColumns.ItemDescription => "", // Not shown for invoice-level report
+                ReportColumns.Quantity => totalQuantity,
+                ReportColumns.UnitPrice => "", // Not shown for invoice-level report
                 ReportColumns.Subtotal => invoice.SubTotal,
                 ReportColumns.InvoiceNotes => invoice.Notes ?? "",
                 ReportColumns.DueDate => invoice.DueDate,

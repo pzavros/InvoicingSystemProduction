@@ -99,12 +99,15 @@ const ReportDisplay = ({
     switch (status?.toLowerCase()) {
       case 'paid':
         return { bg: '#34c759', text: '#ffffff' };
+      case 'unpaid':
       case 'pending':
         return { bg: '#ff9500', text: '#ffffff' };
       case 'overdue':
         return { bg: '#ff3b30', text: '#ffffff' };
       case 'draft':
         return { bg: '#8e8e93', text: '#ffffff' };
+      case 'deleted':
+        return { bg: '#ff3b30', text: '#ffffff' };
       default:
         return { bg: '#d1d1d6', text: '#1d1d1f' };
     }
@@ -116,18 +119,16 @@ const ReportDisplay = ({
       date: 'Invoice Date',
       dueDate: 'Due Date',
       status: 'Status',
-      totalAmount: 'Total Amount',
-      invoiceNotes: 'Notes',
-      customer: 'Customer',
+      customer: 'Customer Name',
       billToEmail: 'Customer Email',
       billToAddress: 'Customer Address',
-      itemTitle: 'Item Title',
-      itemDescription: 'Item Description',
-      quantity: 'Quantity',
-      unitPrice: 'Unit Price',
+      itemCount: 'Number of Items',
+      totalQuantity: 'Total Quantity',
       subtotal: 'Subtotal',
       vatAmount: 'VAT Amount',
-      discountAmount: 'Discount Amount'
+      discountAmount: 'Discount Amount',
+      totalAmount: 'Total Amount',
+      invoiceNotes: 'Invoice Notes'
     };
     return labels[columnId] || columnId;
   };
@@ -137,7 +138,6 @@ const ReportDisplay = ({
       case 'totalAmount':
       case 'vatAmount':
       case 'discountAmount':
-      case 'unitPrice':
       case 'subtotal':
         return (
           <Typography sx={{ 
@@ -150,14 +150,16 @@ const ReportDisplay = ({
             {formatCurrency(invoice[columnId] || 0)}
           </Typography>
         );
-      case 'quantity':
+      case 'itemCount':
+      case 'totalQuantity':
         return (
           <Typography sx={{ 
             fontVariantNumeric: 'tabular-nums',
             fontWeight: 400,
             color: '#1d1d1f',
             fontSize: '0.9375rem',
-            letterSpacing: '-0.01em'
+            letterSpacing: '-0.01em',
+            textAlign: 'center'
           }}>
             {invoice[columnId] || 0}
           </Typography>
@@ -192,6 +194,21 @@ const ReportDisplay = ({
               border: 'none'
             }}
           />
+        );
+      case 'invoiceNotes':
+        return (
+          <Typography sx={{ 
+            fontWeight: 400,
+            color: '#86868b',
+            fontSize: '0.875rem',
+            letterSpacing: '-0.01em',
+            maxWidth: '300px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+          }}>
+            {invoice[columnId] || '-'}
+          </Typography>
         );
       default:
         return (

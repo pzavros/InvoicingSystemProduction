@@ -259,7 +259,7 @@ export default function InvoiceList() {
   const canCreateInvoice = canCreate?.invoice !== false;
   
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeStatusFilters, setActiveStatusFilters] = useState({ draft: true, unpaid: true, paid: true });
+  const [activeStatusFilters, setActiveStatusFilters] = useState({ draft: true, unpaid: true, paid: true, overdue: true });
   const [showAllStatuses, setShowAllStatuses] = useState(false);
   const [dateFilter, setDateFilter] = useState('all');
 
@@ -354,7 +354,9 @@ export default function InvoiceList() {
       setAvailableStatuses([
         { statusId: 1, name: 'Draft' },
         { statusId: 2, name: 'Unpaid' },
-        { statusId: 3, name: 'Paid' }
+        { statusId: 3, name: 'Paid' },
+        { statusId: 4, name: 'Deleted' },
+        { statusId: 5, name: 'Overdue' }
       ]);
     }
   };
@@ -437,7 +439,7 @@ export default function InvoiceList() {
 
   const getStatusSelectValue = () => {
     if (showAllStatuses) {
-      return ['draft', 'unpaid', 'paid', 'allstatuses'];
+      return ['draft', 'unpaid', 'paid', 'overdue', 'allstatuses'];
     }
     return Object.entries(activeStatusFilters)
       .filter(([_, checked]) => checked)
@@ -450,10 +452,10 @@ export default function InvoiceList() {
 
     if (isNowRequestingAll) {
       setShowAllStatuses(true);
-      setActiveStatusFilters({ draft: true, unpaid: true, paid: true });
+      setActiveStatusFilters({ draft: true, unpaid: true, paid: true, overdue: true });
     } else {
       setShowAllStatuses(false);
-      const newActive = { draft: false, unpaid: false, paid: false };
+      const newActive = { draft: false, unpaid: false, paid: false, overdue: false };
       newValues.forEach(val => {
         if (val !== 'allstatuses' && newActive[val] !== undefined) {
           newActive[val] = true;
@@ -877,7 +879,7 @@ export default function InvoiceList() {
             }}
           >
             {availableStatuses
-              .filter(s => ['draft', 'unpaid', 'paid'].includes(s.name.toLowerCase()))
+              .filter(s => ['draft', 'unpaid', 'paid', 'overdue'].includes(s.name.toLowerCase()))
               .map((status) => {
                 const statusValue = status.name.toLowerCase();
                 return (

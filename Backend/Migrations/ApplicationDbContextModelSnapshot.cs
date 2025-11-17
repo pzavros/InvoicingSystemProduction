@@ -110,7 +110,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ContactMessages");
+                    b.ToTable("ContactMessages", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Models.Webpage.WaitlistEntry", b =>
@@ -197,7 +197,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("WaitlistEntries");
+                    b.ToTable("WaitlistEntries", (string)null);
                 });
 
             modelBuilder.Entity("InvoicingBackend.Models.Client", b =>
@@ -302,7 +302,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Clients");
+                    b.ToTable("Clients", (string)null);
                 });
 
             modelBuilder.Entity("InvoicingBackend.Models.Currency", b =>
@@ -325,7 +325,7 @@ namespace Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Currencies");
+                    b.ToTable("Currencies", (string)null);
 
                     b.HasData(
                         new
@@ -437,7 +437,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("DocumentTypes");
+                    b.ToTable("DocumentTypes", (string)null);
                 });
 
             modelBuilder.Entity("InvoicingBackend.Models.Invoice", b =>
@@ -603,7 +603,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Invoices");
+                    b.ToTable("Invoices", (string)null);
                 });
 
             modelBuilder.Entity("InvoicingBackend.Models.InvoiceItem", b =>
@@ -676,7 +676,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("InvoiceItems");
+                    b.ToTable("InvoiceItems", (string)null);
                 });
 
             modelBuilder.Entity("InvoicingBackend.Models.InvoiceQuota", b =>
@@ -728,7 +728,7 @@ namespace Backend.Migrations
                     b.HasIndex("UserId", "Month")
                         .IsUnique();
 
-                    b.ToTable("InvoiceQuotas");
+                    b.ToTable("InvoiceQuotas", (string)null);
                 });
 
             modelBuilder.Entity("InvoicingBackend.Models.InvoiceTemplate", b =>
@@ -799,7 +799,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("InvoiceTemplates");
+                    b.ToTable("InvoiceTemplates", (string)null);
                 });
 
             modelBuilder.Entity("InvoicingBackend.Models.Payment", b =>
@@ -876,7 +876,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Payments");
+                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("InvoicingBackend.Models.PriceHistory", b =>
@@ -934,7 +934,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("PriceHistories");
+                    b.ToTable("PriceHistories", (string)null);
                 });
 
             modelBuilder.Entity("InvoicingBackend.Models.Product", b =>
@@ -1014,7 +1014,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("InvoicingBackend.Models.ProductCategory", b =>
@@ -1068,7 +1068,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ProductCategories");
+                    b.ToTable("ProductCategories", (string)null);
                 });
 
             modelBuilder.Entity("InvoicingBackend.Models.Status", b =>
@@ -1085,7 +1085,7 @@ namespace Backend.Migrations
 
                     b.HasKey("StatusId");
 
-                    b.ToTable("Statuses");
+                    b.ToTable("Statuses", (string)null);
 
                     b.HasData(
                         new
@@ -1107,6 +1107,11 @@ namespace Backend.Migrations
                         {
                             StatusId = 4,
                             Name = "Deleted"
+                        },
+                        new
+                        {
+                            StatusId = 5,
+                            Name = "Overdue"
                         });
                 });
 
@@ -1200,7 +1205,7 @@ namespace Backend.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Subscriptions");
+                    b.ToTable("Subscriptions", (string)null);
                 });
 
             modelBuilder.Entity("InvoicingBackend.Models.SupportTicket", b =>
@@ -1261,7 +1266,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SupportTickets");
+                    b.ToTable("SupportTickets", (string)null);
                 });
 
             modelBuilder.Entity("InvoicingBackend.Models.SystemSetup", b =>
@@ -1344,7 +1349,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SystemSetups");
+                    b.ToTable("SystemSetups", (string)null);
                 });
 
             modelBuilder.Entity("InvoicingBackend.Models.User", b =>
@@ -1443,7 +1448,7 @@ namespace Backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Backend.Models.Webpage.ContactMessage", b =>

@@ -17,24 +17,22 @@ import {
 const ColumnSelector = ({ selectedColumns, onColumnsChange }) => {
   const [draggedIndex, setDraggedIndex] = useState(null);
   
-  // Column definitions matching backend ReportColumns
+  // Column definitions for invoice report (one row per invoice)
   const availableColumns = [
     { id: 'invoiceNumber', label: 'Invoice #' },
-    { id: 'date', label: 'Date' },
-    { id: 'customer', label: 'Customer' },
-    { id: 'itemTitle', label: 'Item Title' },
+    { id: 'date', label: 'Invoice Date' },
+    { id: 'dueDate', label: 'Due Date' },
     { id: 'status', label: 'Status' },
+    { id: 'customer', label: 'Customer Name' },
+    { id: 'billToEmail', label: 'Customer Email' },
+    { id: 'billToAddress', label: 'Customer Address' },
+    { id: 'itemCount', label: 'Number of Items' },
+    { id: 'totalQuantity', label: 'Total Quantity' },
+    { id: 'subtotal', label: 'Subtotal (Before Tax)' },
     { id: 'vatAmount', label: 'VAT Amount' },
     { id: 'discountAmount', label: 'Discount Amount' },
-    { id: 'totalAmount', label: 'Total Amount (EUR)' },
-    { id: 'itemDescription', label: 'Item Description' },
-    { id: 'quantity', label: 'Quantity' },
-    { id: 'unitPrice', label: 'Unit Price' },
-    { id: 'subtotal', label: 'Subtotal' },
-    { id: 'invoiceNotes', label: 'Notes' },
-    { id: 'dueDate', label: 'Due Date' },
-    { id: 'billToEmail', label: 'Customer Email' },
-    { id: 'billToAddress', label: 'Customer Address' }
+    { id: 'totalAmount', label: 'Total Amount' },
+    { id: 'invoiceNotes', label: 'Invoice Notes' }
   ];
 
   const handleColumnToggle = (columnId) => {

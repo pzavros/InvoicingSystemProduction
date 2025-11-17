@@ -35,7 +35,7 @@ reportApi.interceptors.response.use(
 );
 
 // Get invoice reports using existing invoice endpoint and filter on frontend
-export const getInvoiceReport = async (startDate, endDate, status = 'all') => {
+export const getInvoiceReport = async (startDate, endDate, statuses = ['paid', 'unpaid']) => {
   // Check if user is authenticated first to avoid 401 calls
   const token = localStorage.getItem('authToken');
   if (!token) {
@@ -48,7 +48,7 @@ export const getInvoiceReport = async (startDate, endDate, status = 'all') => {
     let invoices = response.data || [];
     
     // Transform and filter real data
-    return processInvoiceData(invoices, startDate, endDate, status);
+    return processInvoiceData(invoices, startDate, endDate, statuses);
   } catch (error) {
     console.error('Error fetching invoice report data:', error);
     throw error;
@@ -56,63 +56,47 @@ export const getInvoiceReport = async (startDate, endDate, status = 'all') => {
 };
 
 // Helper function to process real invoice data from backend
-const processInvoiceData = (invoices, startDate, endDate, status) => {
-  // Transform the data - flatten invoice items to create one row per item
+const processInvoiceData = (invoices, startDate, endDate, statuses) => {
+  // Transform the data - create ONE ROW per invoice (not per item)
   const transformedInvoices = [];
   
   invoices.forEach(invoice => {
-    // If invoice has items, create a row for each item
-    if (invoice.items && invoice.items.length > 0) {
-      invoice.items.forEach(item => {
+    // Calculate totals across all items
+    const itemCount = invoice.items?.length || 0;
+    const totalQuantity = invoice.items?.reduce((sum, item) => sum + (item.quantity || 0), 0) || 0;
+    
+    // Calculate actual VAT amount from items (since invoice.taxAmount is 0)
+    const calculatedVatAmount = invoice.items?.reduce((sum, item) => {
+      if (item.isTaxable && item.taxRate > 0) {
         const itemSubtotal = (item.quantity || 0) * (item.unitPrice || 0);
-        const itemVat = item.isTaxable ? itemSubtotal * ((item.taxRate || 0) / 100) : 0;
-        
-        transformedInvoices.push({
-          id: invoice.id,
-          invoiceNumber: invoice.invoiceNumber || 'N/A',
-          date: invoice.dateOfIssue || invoice.date || 'N/A',
-          dueDate: invoice.dueDate || 'N/A',
-          status: invoice.statusName || 'Unknown',
-          totalAmount: parseFloat(invoice.total || 0),
-          invoiceNotes: invoice.notes || 'N/A',
-          // Customer columns
-          customer: invoice.billTo || 'Unknown Client',
-          billToEmail: invoice.billToEmail || 'N/A',
-          billToAddress: invoice.billToAddress || 'N/A',
-          // Item-specific columns
-          itemTitle: item.title || item.productName || 'N/A',
-          itemDescription: item.description || 'N/A',
-          quantity: item.quantity || 0,
-          unitPrice: parseFloat(item.unitPrice || 0),
-          subtotal: itemSubtotal,
-          vatAmount: itemVat,
-          discountAmount: 0 // Not available in current schema
-        });
-      });
-    } else {
-      // If no items, create a single row for the invoice
-      transformedInvoices.push({
-        id: invoice.id,
-        invoiceNumber: invoice.invoiceNumber || 'N/A',
-        date: invoice.dateOfIssue || invoice.date || 'N/A',
-        dueDate: invoice.dueDate || 'N/A',
-        status: invoice.statusName || 'Unknown',
-        totalAmount: parseFloat(invoice.total || 0),
-        invoiceNotes: invoice.notes || 'N/A',
-        // Customer columns
-        customer: invoice.billTo || 'Unknown Client',
-        billToEmail: invoice.billToEmail || 'N/A',
-        billToAddress: invoice.billToAddress || 'N/A',
-        // Empty item columns
-        itemTitle: 'N/A',
-        itemDescription: 'N/A',
-        quantity: 0,
-        unitPrice: 0,
-        subtotal: 0,
-        vatAmount: 0,
-        discountAmount: 0
-      });
-    }
+        const itemTax = itemSubtotal * ((item.taxRate || 0) / 100);
+        return sum + itemTax;
+      }
+      return sum;
+    }, 0) || 0;
+    
+    // Create ONE row per invoice
+    transformedInvoices.push({
+      id: invoice.id,
+      invoiceNumber: invoice.invoiceNumber || 'N/A',
+      date: invoice.dateOfIssue || invoice.date || 'N/A',
+      dueDate: invoice.dueDate || 'N/A',
+      status: invoice.statusName || 'Unknown',
+      // Customer columns - handle null values from API
+      customer: invoice.billTo || 'Unknown Client',
+      billToEmail: invoice.billToEmail || '-',
+      billToAddress: invoice.billToAddress || '-',
+      // Invoice summary
+      itemCount: itemCount,
+      totalQuantity: totalQuantity,
+      // Financial columns - use calculated VAT instead of invoice.taxAmount
+      subtotal: parseFloat(invoice.subTotal || 0),
+      vatAmount: parseFloat(calculatedVatAmount),
+      discountAmount: parseFloat(invoice.discountAmount || 0),
+      totalAmount: parseFloat(invoice.total || 0),
+      // Additional info
+      invoiceNotes: invoice.notes || ''
+    });
   });
   
   // Apply filters
@@ -131,11 +115,16 @@ const processInvoiceData = (invoices, startDate, endDate, status) => {
     });
   }
   
-  // Filter by status
-  if (status && status !== 'all') {
-    filteredInvoices = filteredInvoices.filter(invoice => 
-      invoice.status?.toLowerCase().includes(status.toLowerCase())
-    );
+  // Filter by statuses (array of statuses)
+  if (statuses && statuses.length > 0) {
+    filteredInvoices = filteredInvoices.filter(invoice => {
+      const invoiceStatus = invoice.status?.toLowerCase();
+      // Check if invoice status matches any of the selected statuses
+      return statuses.some(status => {
+        // Each status is now independent and separate
+        return invoiceStatus === status.toLowerCase();
+      });
+    });
   }
   
   return filteredInvoices;
@@ -232,9 +221,64 @@ export const getFinancialSummaryReport = async (startDate, endDate) => {
   ];
 };
 
-// Export report to PDF (placeholder)
-export const exportReportToPDF = async (reportType, startDate, endDate) => {
-  throw new Error('PDF export is not yet implemented - requires backend support');
+// Export report to PDF using backend Reports service
+export const exportReportToPDF = async (reportType, startDate, endDate, statusIds = [1,2,3,4], columns = []) => {
+  try {
+    const params = new URLSearchParams();
+    
+    // Convert dates to UTC ISO format to avoid timezone issues with PostgreSQL
+    const fromDateObj = new Date(startDate);
+    const toDateObj = new Date(endDate);
+    
+    // Set to start of day UTC
+    fromDateObj.setUTCHours(0, 0, 0, 0);
+    // Set to end of day UTC
+    toDateObj.setUTCHours(23, 59, 59, 999);
+    
+    params.append('from', fromDateObj.toISOString());
+    params.append('to', toDateObj.toISOString());
+    
+    // Add status IDs
+    if (statusIds && statusIds.length > 0) {
+      statusIds.forEach(id => params.append('statusIds', id.toString()));
+    } else {
+      // Default to all statuses
+      [1, 2, 3, 4].forEach(id => params.append('statusIds', id.toString()));
+    }
+    
+    // Add selected columns if provided
+    if (columns && columns.length > 0) {
+      columns.forEach(col => params.append('columns', col));
+    }
+
+    const response = await reportApi.get(`/api/Reports/logistics-pdf?${params.toString()}`, {
+      responseType: 'blob',
+      timeout: 60000 // 60 second timeout for PDF generation
+    });
+
+    // Create a download link
+    const blob = new Blob([response.data], { 
+      type: 'application/pdf' 
+    });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    
+    // Generate filename using formatted dates
+    const fromDateStr = new Date(startDate).toISOString().split('T')[0];
+    const toDateStr = new Date(endDate).toISOString().split('T')[0];
+    link.download = `LogisticsReport_${fromDateStr}_${toDateStr}.pdf`;
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error exporting report to PDF:', error);
+    throw new Error('Failed to export PDF report: ' + (error.response?.data?.message || error.message));
+  }
 };
 
 // Export report to Excel using backend Reports service

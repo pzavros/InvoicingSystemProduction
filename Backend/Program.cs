@@ -157,6 +157,7 @@ builder.Services.AddSingleton<IPdfGenerationService, PdfGenerationService>(); //
 
 // Register background services
 builder.Services.AddHostedService<SubscriptionReminderService>();
+builder.Services.AddHostedService<InvoiceStatusUpdateService>();
 
 // Webpage services
 builder.Services.AddScoped<IWaitlistService, WaitlistService>();

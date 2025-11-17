@@ -52,7 +52,8 @@ namespace InvoicingBackend.Data
                 new Status { StatusId = 1, Name = "Draft" },
                 new Status { StatusId = 2, Name = "Unpaid" },
                 new Status { StatusId = 3, Name = "Paid" },
-                new Status { StatusId = 4, Name = "Deleted" }
+                new Status { StatusId = 4, Name = "Deleted" },
+                new Status { StatusId = 5, Name = "Overdue" }
             );            // Invoice → InvoiceItems relationship
             modelBuilder.Entity<InvoiceItem>()
                 .HasOne(ii => ii.Invoice)
