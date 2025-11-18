@@ -41,6 +41,7 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import SchoolIcon from '@mui/icons-material/School';
 import SupportIcon from '@mui/icons-material/Support';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
 import { SidebarContext } from './SidebarContext';
 import { useAuth } from '../../utils/AuthContext';
 
@@ -192,6 +193,16 @@ export default function NavBar() {
       path: '/admin/system', 
       description: 'Advanced system settings',
       color: '#ea580c'
+    },
+  ];
+
+  // Coming Soon items (disabled/grayed out)
+  const comingSoonItems = [
+    { 
+      text: 'Recurring Invoices', 
+      icon: <AutorenewIcon />, 
+      description: 'Automated recurring billing',
+      color: '#64748b'
     },
   ];
   
@@ -386,6 +397,105 @@ export default function NavBar() {
                           fontSize: '0.875rem',
                           letterSpacing: '-0.01em',
                           transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                        }
+                      }}
+                    />
+                  )}
+                </ListItem>
+              </Tooltip>
+            </Box>
+          );
+        })}
+      </List>
+
+      {/* Coming Soon Section */}
+      <Box sx={{ px: 2, py: 2 }}>
+        <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.08)' }} />
+        {effectiveDrawerOpen && (
+          <Typography 
+            variant="caption" 
+            sx={{ 
+              color: 'rgba(255, 255, 255, 0.4)', 
+              fontSize: '0.7rem',
+              fontWeight: 600,
+              letterSpacing: '0.08em',
+              mt: 2.5,
+              mb: 1.5,
+              display: 'block',
+              textTransform: 'uppercase'
+            }}
+          >
+            Coming Soon
+          </Typography>
+        )}
+      </Box>
+
+      <List sx={{ pt: 0, px: 2, pb: 2 }}>
+        {comingSoonItems.map((item, index) => {
+          const isHovered = hoveredItem === item.text;
+          
+          return (
+            <Box sx={{ mb: 0.5 }} key={item.text}>
+              <Tooltip 
+                title={!effectiveDrawerOpen ? `${item.text} (Coming Soon)` : "Coming Soon"} 
+                placement="right"
+                arrow
+              >
+                <ListItem
+                  onMouseEnter={() => setHoveredItem(item.text)}
+                  onMouseLeave={() => setHoveredItem(null)}
+                  sx={{
+                    minHeight: 44,
+                    justifyContent: effectiveDrawerOpen ? 'initial' : 'center',
+                    px: effectiveDrawerOpen ? 1.5 : 1.25,
+                    borderRadius: '11px',
+                    cursor: 'not-allowed',
+                    textDecoration: 'none',
+                    position: 'relative',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    background: 'transparent',
+                    opacity: 0.4,
+                    '&:hover': {
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      opacity: 0.5,
+                    }
+                  }}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: effectiveDrawerOpen ? 1.5 : 'auto',
+                      justifyContent: 'center',
+                      color: 'rgba(255, 255, 255, 0.3)',
+                      transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                      fontSize: '1.25rem',
+                      '& .MuiSvgIcon-root': {
+                        fontSize: '1.25rem'
+                      }
+                    }}
+                  >
+                    {item.icon}
+                  </ListItemIcon>
+                  {effectiveDrawerOpen && (
+                    <ListItemText
+                      primary={item.text}
+                      secondary="Coming Soon"
+                      primaryTypographyProps={{
+                        sx: { 
+                          color: 'rgba(255, 255, 255, 0.4)', 
+                          fontWeight: 500,
+                          fontSize: '0.875rem',
+                          letterSpacing: '-0.01em',
+                          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                        }
+                      }}
+                      secondaryTypographyProps={{
+                        sx: { 
+                          color: 'rgba(255, 255, 255, 0.25)', 
+                          fontSize: '0.7rem',
+                          fontWeight: 500,
+                          fontStyle: 'italic',
+                          mt: 0.25
                         }
                       }}
                     />
