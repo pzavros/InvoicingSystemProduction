@@ -14,6 +14,8 @@ import {
 } from "@mui/icons-material";
 import UsageIndicator from "../SubscriptionPage/UsageIndicator";
 import { useSubscription } from "../../utils/SubscriptionContext";
+import PageHelper from "../ReusableComponents/PageHelper";
+import { pageHelpContent } from "../../config/pageHelpContent";
 
 const ClientsPageHeader = ({ clientsCount, onAddClient }) => {
   const { canCreate, isPremium } = useSubscription();
@@ -43,20 +45,26 @@ const ClientsPageHeader = ({ clientsCount, onAddClient }) => {
       >
         {/* Left Side - Title and Description */}
         <Box>
-          <Typography 
-            variant="h4" 
-            component="h1" 
-            sx={{ 
-              fontWeight: 700,
-              fontSize: { xs: '1.75rem', sm: '2rem' },
-              color: 'rgba(15, 23, 42, 0.95)',
-              letterSpacing: '-0.02em',
-              lineHeight: 1.1,
-              mb: 0.5
-            }}
-          >
-            Clients
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+            <Typography 
+              variant="h4" 
+              component="h1" 
+              sx={{ 
+                fontWeight: 700,
+                fontSize: { xs: '1.75rem', sm: '2rem' },
+                color: 'rgba(15, 23, 42, 0.95)',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.1,
+              }}
+            >
+              Clients
+            </Typography>
+            <PageHelper 
+              inline={true}
+              compact={true}
+              {...pageHelpContent.clients}
+            />
+          </Box>
           <Typography 
             variant="body2" 
             sx={{ 

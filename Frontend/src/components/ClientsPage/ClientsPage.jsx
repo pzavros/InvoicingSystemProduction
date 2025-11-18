@@ -7,8 +7,6 @@ import NotificationSnackbar from "./NotificationSnackbar";
 import useClientsData from "./useClientsData";
 import useNotification from "./useNotification";
 import PageLoader from "../ReusableComponents/PageLoader";
-import PageHelper from "../ReusableComponents/PageHelper";
-import { pageHelpContent } from "../../config/pageHelpContent";
 import LoadingOverlay from '../ReusableComponents/LoadingOverlay';
 
 const ClientsPage = () => {
@@ -57,7 +55,6 @@ const ClientsPage = () => {
         onClose={hideNotification}
       />
       
-      <PageHelper {...pageHelpContent.clients} />
       <LoadingOverlay open={loading} message="Loading clients..." />
     </>
   );

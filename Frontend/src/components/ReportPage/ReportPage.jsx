@@ -8,9 +8,9 @@ import ReportDisplay from './ReportDisplay';
 import ReportExports from './ReportExports';
 import useInvoiceReportData from './useInvoiceReportData';
 import { exportReportToExcel, exportReportToPDF } from './api';
+import LoadingOverlay from '../ReusableComponents/LoadingOverlay';
 import PageHelper from '../ReusableComponents/PageHelper';
 import { pageHelpContent } from '../../config/pageHelpContent';
-import LoadingOverlay from '../ReusableComponents/LoadingOverlay';
 
 const DRAWER_WIDTH = 360;
 
@@ -42,7 +42,8 @@ const ReportPage = () => {
   const [filters, setFilters] = useState({
     startDate: defaultDates.startDate,
     endDate: defaultDates.endDate,
-    statuses: ['paid', 'unpaid'] // Default to paid and unpaid
+    statuses: ['paid', 'unpaid'], // Default to paid and unpaid
+    groupBy: 'invoices' // Default to group by invoices
   });
 
   const { data, loading, error, fetchData } = useInvoiceReportData();
@@ -57,15 +58,57 @@ const ReportPage = () => {
     'dueDate',
     'customer',
     'status',
-    'itemCount',
+    'items',
     'subtotal',
     'vatAmount',
     'totalAmount'
   ]);
 
+  // Clear report and update columns when groupBy changes
+  React.useEffect(() => {
+    // Clear the report data when groupBy changes
+    if (showReport) {
+      setShowReport(false);
+      // Show notification to user
+      setNotification({
+        open: true,
+        message: `Switched to ${filters.groupBy === 'items' ? 'Items' : 'Invoices'} view. Please run the report again.`,
+        severity: 'info'
+      });
+    }
+
+    // Update default columns based on groupBy
+    if (filters.groupBy === 'items') {
+      // Default columns for items view
+      setSelectedColumns([
+        'invoiceNumber',
+        'date',
+        'customer',
+        'itemTitle',
+        'quantity',
+        'unitPrice',
+        'lineTotal',
+        'status'
+      ]);
+    } else {
+      // Default columns for invoices view
+      setSelectedColumns([
+        'invoiceNumber',
+        'date',
+        'dueDate',
+        'customer',
+        'status',
+        'items',
+        'subtotal',
+        'vatAmount',
+        'totalAmount'
+      ]);
+    }
+  }, [filters.groupBy]);
+
   const handleRunReport = () => {
     setShowReport(true);
-    fetchData(filters.startDate, filters.endDate, filters.statuses);
+    fetchData(filters.startDate, filters.endDate, filters.statuses, filters.groupBy);
   };
 
   // Convert status filters to status IDs for backend
@@ -105,7 +148,8 @@ const ReportPage = () => {
           filters.startDate,
           filters.endDate,
           statusIds,
-          selectedColumns
+          selectedColumns,
+          filters.groupBy
         );
         setNotification({
           open: true,
@@ -118,7 +162,8 @@ const ReportPage = () => {
           filters.startDate,
           filters.endDate,
           statusIds,
-          selectedColumns
+          selectedColumns,
+          filters.groupBy
         );
         setNotification({
           open: true,
@@ -470,14 +515,53 @@ const ReportPage = () => {
         position: 'relative',
         overflow: 'hidden'
       }}>
-        {/* Toggle Button (when drawer is closed) */}
-        {!drawerOpen && (
+        {/* Toggle Button - Arrow on the right side of navbar (when drawer is closed) */}
+        {!drawerOpen && !isMobile && (
           <Fade in={!drawerOpen} timeout={400}>
             <Box sx={{ 
-              position: { xs: 'fixed', md: 'absolute' },
-              left: { xs: 16, md: 24 },
-              top: { xs: 16, md: 24 },
-              transform: 'none',
+              position: 'absolute',
+              left: 0,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              zIndex: 1400
+            }}>
+              <IconButton
+                onClick={() => setDrawerOpen(true)}
+                sx={{
+                  color: '#1d1d1f',
+                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                  backdropFilter: 'blur(20px) saturate(180%)',
+                  borderRadius: '0 12px 12px 0',
+                  width: 36,
+                  height: 80,
+                  border: '0.5px solid rgba(0, 0, 0, 0.06)',
+                  borderLeft: 'none',
+                  boxShadow: '2px 0 16px rgba(0, 0, 0, 0.08)',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 1)',
+                    boxShadow: '4px 0 24px rgba(0, 0, 0, 0.12)',
+                    width: 40,
+                    paddingLeft: '4px'
+                  },
+                  '&:active': {
+                    transform: 'translateX(2px)'
+                  }
+                }}
+              >
+                <ChevronRight sx={{ fontSize: 24 }} />
+              </IconButton>
+            </Box>
+          </Fade>
+        )}
+
+        {/* Mobile Toggle Button (when drawer is closed) */}
+        {!drawerOpen && isMobile && (
+          <Fade in={!drawerOpen} timeout={400}>
+            <Box sx={{ 
+              position: 'fixed',
+              left: 16,
+              top: 16,
               zIndex: 1200
             }}>
               <IconButton
@@ -507,6 +591,74 @@ const ReportPage = () => {
             </Box>
           </Fade>
         )}
+
+        {/* Page Header */}
+        <Grow in={true} timeout={600}>
+          <Paper
+            elevation={0}
+            sx={{
+              borderBottom: '0.5px solid rgba(0, 0, 0, 0.06)',
+              borderRadius: 0,
+              background: 'rgba(255, 255, 255, 0.85)',
+              backdropFilter: 'blur(20px) saturate(180%)',
+              px: { xs: 2, md: 3 },
+              py: { xs: 2, md: 2.5 }
+            }}
+          >
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'space-between'
+            }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Box
+                  sx={{
+                    width: { xs: 36, md: 40 },
+                    height: { xs: 36, md: 40 },
+                    borderRadius: '10px',
+                    background: 'linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 2px 8px rgba(139, 92, 246, 0.25)'
+                  }}
+                >
+                  <ReportIcon sx={{ color: 'white', fontSize: { xs: 18, md: 20 } }} />
+                </Box>
+                <Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="h6" sx={{ 
+                      fontWeight: 700,
+                      color: '#1d1d1f',
+                      fontSize: { xs: '1.125rem', md: '1.25rem' },
+                      letterSpacing: '-0.015em',
+                      lineHeight: 1.2,
+                      fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif'
+                    }}>
+                      Reports & Financial Analytics
+                    </Typography>
+                    <PageHelper 
+                      inline={true}
+                      compact={true}
+                      title={pageHelpContent.reports.title}
+                      description={pageHelpContent.reports.description}
+                      steps={pageHelpContent.reports.steps}
+                      tips={pageHelpContent.reports.tips}
+                    />
+                  </Box>
+                  <Typography variant="body2" sx={{ 
+                    color: '#86868b',
+                    fontSize: { xs: '0.8125rem', md: '0.875rem' },
+                    mt: 0.25,
+                    fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif'
+                  }}>
+                    Generate and analyze detailed financial reports
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+          </Paper>
+        </Grow>
 
         {/* Filters Section */}
         <Grow in={true} timeout={800}>
@@ -776,7 +928,6 @@ const ReportPage = () => {
         </Alert>
       </Snackbar>
       
-      <PageHelper {...pageHelpContent.reports} />
       <LoadingOverlay open={loading || exportLoading} message={exportLoading ? "Exporting report..." : "Loading report..."} />
     </Box>
   );

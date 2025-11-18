@@ -31,8 +31,10 @@ import {
  * @param {string} props.description - Main description text
  * @param {Array} props.steps - Array of step objects with icon, title, and description
  * @param {Array} props.tips - Array of tip strings (optional)
+ * @param {boolean} props.inline - If true, renders as inline button instead of fixed position (default: false)
+ * @param {boolean} props.compact - If true, renders as a tiny icon next to title (default: false)
  */
-export default function PageHelper({ title, description, steps = [], tips = [] }) {
+export default function PageHelper({ title, description, steps = [], tips = [], inline = false, compact = false }) {
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(true);
@@ -40,13 +42,48 @@ export default function PageHelper({ title, description, steps = [], tips = [] }
 
   return (
     <>
-      <Tooltip title="Help & Guide" arrow placement="left">
+      <Tooltip title="Help & Guide" arrow placement={inline || compact ? "bottom" : "right"}>
         <IconButton
           onClick={handleOpen}
-          sx={{
+          sx={compact ? {
+            // Compact mode - tiny icon next to title
+            width: 20,
+            height: 20,
+            padding: 0,
+            minWidth: 'auto',
+            color: '#8b5cf6',
+            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+            '&:hover': {
+              color: '#7c3aed',
+              transform: 'scale(1.15)',
+            },
+            '&:active': {
+              transform: 'scale(0.95)',
+            }
+          } : inline ? {
+            // Inline mode - no fixed positioning
+            width: { xs: 40, md: 40 },
+            height: { xs: 40, md: 40 },
+            backgroundColor: 'rgba(139, 92, 246, 0.08)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(139, 92, 246, 0.15)',
+            color: '#8b5cf6',
+            borderRadius: '10px',
+            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+            '&:hover': {
+              backgroundColor: 'rgba(139, 92, 246, 0.12)',
+              borderColor: 'rgba(139, 92, 246, 0.25)',
+              boxShadow: '0 4px 12px rgba(139, 92, 246, 0.2)',
+            },
+            '&:active': {
+              transform: 'scale(0.95)',
+            }
+          } : {
+            // Fixed mode - floating button
             position: 'fixed',
             bottom: { xs: 20, md: 24 },
-            right: { xs: 16, md: 24 },
+            left: { xs: 16, md: 24 },
             width: { xs: 52, md: 48 },
             height: { xs: 52, md: 48 },
             backgroundColor: 'rgba(139, 92, 246, 0.08)',
@@ -54,7 +91,7 @@ export default function PageHelper({ title, description, steps = [], tips = [] }
             WebkitBackdropFilter: 'blur(20px)',
             border: '1px solid rgba(139, 92, 246, 0.15)',
             color: '#8b5cf6',
-            zIndex: 9999,
+            zIndex: 1200,
             borderRadius: '12px',
             boxShadow: '0 4px 16px rgba(139, 92, 246, 0.15)',
             transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -69,7 +106,7 @@ export default function PageHelper({ title, description, steps = [], tips = [] }
             }
           }}
         >
-          <HelpIcon sx={{ fontSize: { xs: 24, md: 22 } }} />
+          <HelpIcon sx={{ fontSize: compact ? 16 : (inline ? 20 : { xs: 24, md: 22 }) }} />
         </IconButton>
       </Tooltip>
 

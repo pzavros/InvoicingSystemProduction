@@ -244,36 +244,46 @@ export const pageHelpContent = {
 
   reports: {
     title: 'Reports & Financial Analytics',
-    description: 'Generate detailed reports on your invoicing activity. Filter by date range, status, and clients to analyze your business performance and export data.',
+    description: 'Generate detailed reports on your invoicing activity. Filter by date range, status, and grouping to analyze your business performance and export data in multiple formats.',
     steps: [
       {
         icon: <FilterList sx={{ color: '#8b5cf6' }} />,
         title: 'Set Date Range & Filters',
-        description: 'Use the filter panel to select start date, end date, and invoice status (All, Draft, Sent, Paid, Overdue, etc.). Click "Generate Report" to view results.'
+        description: 'Use the filter panel to select start date, end date, and invoice status (Paid, Unpaid, Draft, Overdue, etc.). Choose your grouping preference to organize the data.'
+      },
+      {
+        icon: <ViewModule sx={{ color: '#8b5cf6' }} />,
+        title: 'Choose Group By Option',
+        description: 'Select "Invoices" to see one row per invoice with all items listed together, or select "Items" to see one row per item with invoice details repeated. This changes how data is organized.'
       },
       {
         icon: <ReportIcon sx={{ color: '#8b5cf6' }} />,
-        title: 'View Report Data',
-        description: 'Review the data table showing invoice number, client, amount, status, dates, and totals. Use column sorting and search to find specific records.'
-      },
-      {
-        icon: <Download sx={{ color: '#8b5cf6' }} />,
-        title: 'Export to Excel',
-        description: 'Click the "Export to Excel" button to download your report data as a spreadsheet. Great for accounting, tax preparation, and sharing with stakeholders.'
+        title: 'Customize Columns',
+        description: 'Click the settings icon to select which columns to display. Drag and drop to reorder columns. Available columns change based on your grouping choice (invoice-level vs item-level data).'
       },
       {
         icon: <TrendingUp sx={{ color: '#8b5cf6' }} />,
-        title: 'Analyze Trends',
-        description: 'Compare different time periods to identify trends. Check revenue by month, track payment patterns, and identify top clients.'
+        title: 'Generate & Review Report',
+        description: 'Click "Run Report" to generate the data. Review the table showing your selected columns. Use sorting and pagination to navigate large datasets.'
+      },
+      {
+        icon: <Download sx={{ color: '#8b5cf6' }} />,
+        title: 'Export Data',
+        description: 'Export your report to Excel, PDF, or CSV format. Exports include only your selected columns and respect your grouping choice. Perfect for accounting and analysis.'
       }
     ],
     tips: [
-      'Default date range is the current month - adjust as needed.',
-      'Use status filters to find unpaid or overdue invoices quickly.',
-      'Export reports monthly for your bookkeeper or accountant.',
-      'Save time by using common date ranges (This Month, Last Month, This Year).',
-      'Column headers are sortable - click to organize data.',
-      'Use the search function to find specific invoices or clients in large reports.'
+      'Default date range is the current month - adjust as needed for custom periods.',
+      'Group By Invoices: Best for financial summaries and revenue analysis. Shows items as "Item 1, Item 2, Item 3" in one cell.',
+      'Group By Items: Best for inventory analysis and detailed product performance. Each item gets its own row.',
+      'Changing the Group By option clears the report - click "Run Report" again to fetch new data.',
+      'Selected columns automatically switch to relevant options when you change grouping.',
+      'Use status filters to quickly find unpaid or overdue invoices.',
+      'Export to Excel for further analysis with pivot tables and charts.',
+      'CSV export works great for importing into accounting software.',
+      'Column selector allows drag-and-drop reordering for custom layouts.',
+      'Report data respects your document type filters (Invoice, Tax Invoice, etc.).',
+      'Deleted invoices are excluded by default - select "Deleted" status to include them.'
     ]
   },
 

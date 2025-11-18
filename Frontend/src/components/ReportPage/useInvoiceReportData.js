@@ -7,12 +7,12 @@ const useInvoiceReportData = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchData = useCallback(async (startDate, endDate, statuses = ['paid', 'unpaid']) => {
+  const fetchData = useCallback(async (startDate, endDate, statuses = ['paid', 'unpaid'], groupBy = 'invoices') => {
     setLoading(true);
     setError(null);
 
     try {
-      const invoiceData = await getInvoiceReport(startDate, endDate, statuses);
+      const invoiceData = await getInvoiceReport(startDate, endDate, statuses, groupBy);
       setData(invoiceData || []);
     } catch (err) {
       setError(err.message || 'Failed to fetch invoice data');

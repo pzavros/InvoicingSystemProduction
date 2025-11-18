@@ -1221,20 +1221,26 @@ const InvoiceForm = () => {
               <ArrowBackIcon sx={{ fontSize: 20, color: 'rgba(15, 23, 42, 0.7)' }} />
             </IconButton>
             <Box>
-              <Typography 
-                variant="h4" 
-                component="h1" 
-                sx={{ 
-                  fontWeight: 700,
-                  fontSize: { xs: '1.75rem', sm: '2rem' },
-                  color: 'rgba(15, 23, 42, 0.95)',
-                  letterSpacing: '-0.02em',
-                  lineHeight: 1.1,
-                  mb: 0.5
-                }}
-              >
-                {isEdit ? "Edit Invoice" : isCopy ? "Copy Invoice" : "Create Invoice"}
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                <Typography 
+                  variant="h4" 
+                  component="h1" 
+                  sx={{ 
+                    fontWeight: 700,
+                    fontSize: { xs: '1.75rem', sm: '2rem' },
+                    color: 'rgba(15, 23, 42, 0.95)',
+                    letterSpacing: '-0.02em',
+                    lineHeight: 1.1,
+                  }}
+                >
+                  {isEdit ? "Edit Invoice" : isCopy ? "Copy Invoice" : "Create Invoice"}
+                </Typography>
+                <PageHelper 
+                  inline={true}
+                  compact={true}
+                  {...pageHelpContent.invoice}
+                />
+              </Box>
               <Typography 
                 variant="body2" 
                 sx={{ 
@@ -2772,7 +2778,6 @@ const InvoiceForm = () => {
       {/* Loading Overlay */}
       <LoadingOverlay open={loading} message={loadingMessage} />
       
-      <PageHelper {...pageHelpContent.invoice} />
       </form>
     </Box>
   );

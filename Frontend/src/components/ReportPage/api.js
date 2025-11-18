@@ -34,8 +34,20 @@ reportApi.interceptors.response.use(
   }
 );
 
-// Get invoice reports using existing invoice endpoint and filter on frontend
-export const getInvoiceReport = async (startDate, endDate, statuses = ['paid', 'unpaid']) => {
+// Helper function to get document type display name
+const getDocumentTypeName = (documentTypeId) => {
+  switch (documentTypeId) {
+    case 1: return 'Invoice';
+    case 2: return 'Tax Invoice';
+    case 3: return 'Proforma Invoice';
+    case 4: return 'Quotation';
+    case 5: return 'Cash Invoice';
+    default: return 'Invoice';
+  }
+};
+
+// Get invoice reports using the logistics report API endpoint
+export const getInvoiceReport = async (startDate, endDate, statuses = ['paid', 'unpaid'], groupBy = 'invoices') => {
   // Check if user is authenticated first to avoid 401 calls
   const token = localStorage.getItem('authToken');
   if (!token) {
@@ -43,91 +55,107 @@ export const getInvoiceReport = async (startDate, endDate, statuses = ['paid', '
   }
 
   try {
-    // Use the existing invoices endpoint - it already filters by logged-in user
-    const response = await reportApi.get('/api/Invoices');
-    let invoices = response.data || [];
+    // Map status names to status IDs
+    const statusMapping = {
+      'draft': 1,
+      'unpaid': 2,
+      'paid': 3,
+      'deleted': 4,
+      'overdue': 5
+    };
     
-    // Transform and filter real data
-    return processInvoiceData(invoices, startDate, endDate, statuses);
+    // Convert status names to IDs (default to all non-deleted statuses)
+    let statusIds = [1, 2, 3, 5]; // Draft, Unpaid, Paid, Overdue
+    if (statuses && statuses.length > 0 && !statuses.includes('all')) {
+      statusIds = statuses
+        .map(s => statusMapping[s.toLowerCase()])
+        .filter(id => id !== undefined);
+    }
+
+    // Build query parameters
+    const params = new URLSearchParams();
+    params.append('from', startDate);
+    params.append('to', endDate);
+    statusIds.forEach(id => params.append('statusIds', id.toString()));
+    params.append('groupBy', groupBy);
+
+    // Use the logistics-data endpoint which filters on the backend
+    const response = await reportApi.get(`/api/Reports/logistics-data?${params.toString()}`);
+    const data = response.data || [];
+    
+    // Transform the backend data to match the frontend format
+    return transformLogisticsData(data, groupBy);
   } catch (error) {
     console.error('Error fetching invoice report data:', error);
     throw error;
   }
 };
 
-// Helper function to process real invoice data from backend
-const processInvoiceData = (invoices, startDate, endDate, statuses) => {
-  // Transform the data - create ONE ROW per invoice (not per item)
-  const transformedInvoices = [];
-  
-  invoices.forEach(invoice => {
-    // Calculate totals across all items
-    const itemCount = invoice.items?.length || 0;
-    const totalQuantity = invoice.items?.reduce((sum, item) => sum + (item.quantity || 0), 0) || 0;
-    
-    // Calculate actual VAT amount from items (since invoice.taxAmount is 0)
-    const calculatedVatAmount = invoice.items?.reduce((sum, item) => {
-      if (item.isTaxable && item.taxRate > 0) {
-        const itemSubtotal = (item.quantity || 0) * (item.unitPrice || 0);
-        const itemTax = itemSubtotal * ((item.taxRate || 0) / 100);
-        return sum + itemTax;
-      }
-      return sum;
-    }, 0) || 0;
-    
-    // Create ONE row per invoice
-    transformedInvoices.push({
-      id: invoice.id,
-      invoiceNumber: invoice.invoiceNumber || 'N/A',
-      date: invoice.dateOfIssue || invoice.date || 'N/A',
-      dueDate: invoice.dueDate || 'N/A',
-      status: invoice.statusName || 'Unknown',
-      // Customer columns - handle null values from API
-      customer: invoice.billTo || 'Unknown Client',
-      billToEmail: invoice.billToEmail || '-',
-      billToAddress: invoice.billToAddress || '-',
-      // Invoice summary
-      itemCount: itemCount,
-      totalQuantity: totalQuantity,
-      // Financial columns - use calculated VAT instead of invoice.taxAmount
-      subtotal: parseFloat(invoice.subTotal || 0),
-      vatAmount: parseFloat(calculatedVatAmount),
-      discountAmount: parseFloat(invoice.discountAmount || 0),
-      totalAmount: parseFloat(invoice.total || 0),
-      // Additional info
-      invoiceNotes: invoice.notes || ''
-    });
-  });
-  
-  // Apply filters
-  let filteredInvoices = [...transformedInvoices];
-  
-  // Filter by date range
-  if (startDate && endDate) {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    end.setHours(23, 59, 59, 999); // Include the entire end date
-    
-    filteredInvoices = filteredInvoices.filter(invoice => {
-      if (!invoice.date || invoice.date === 'N/A') return false;
-      const invoiceDate = new Date(invoice.date);
-      return !isNaN(invoiceDate.getTime()) && invoiceDate >= start && invoiceDate <= end;
-    });
-  }
-  
-  // Filter by statuses (array of statuses)
-  if (statuses && statuses.length > 0) {
-    filteredInvoices = filteredInvoices.filter(invoice => {
-      const invoiceStatus = invoice.status?.toLowerCase();
-      // Check if invoice status matches any of the selected statuses
-      return statuses.some(status => {
-        // Each status is now independent and separate
-        return invoiceStatus === status.toLowerCase();
-      });
+// Helper function to transform logistics API data to frontend format
+const transformLogisticsData = (data, groupBy = 'invoices') => {
+  if (groupBy === 'items') {
+    // Group by Items: Each row is an item with invoice details
+    return data.map(row => ({
+      id: `${row.invoiceId}-${row.itemId}`, // Unique ID for each item row
+      invoiceNumber: row.invoiceNumber || 'N/A',
+      date: row.dateOfIssue || 'N/A',
+      dueDate: row.dueDate || 'N/A',
+      status: row.statusName || 'Unknown',
+      documentType: row.documentTypeName || 'Invoice',
+      customer: row.billTo || 'Unknown Client',
+      billToEmail: row.billToEmail || '-',
+      billToAddress: row.billToAddress || '-',
+      // Item-specific fields
+      itemTitle: row.itemTitle || '-',
+      itemDescription: row.itemDescription || '-',
+      quantity: row.itemQuantity || 0,
+      unitPrice: parseFloat(row.itemUnitPrice || 0),
+      lineTotal: parseFloat(row.itemLineTotal || 0),
+      // Invoice totals (shown for reference)
+      subtotal: parseFloat(row.subTotal || 0),
+      vatAmount: parseFloat(row.taxAmount || 0),
+      discountAmount: parseFloat(row.discountAmount || 0),
+      totalAmount: parseFloat(row.total || 0),
+      invoiceNotes: row.notes || ''
+    }));
+  } else {
+    // Group by Invoices: Each row is an invoice with items comma-separated
+    return data.map(invoice => {
+      // Calculate totals across all items
+      const itemCount = invoice.items?.length || 0;
+      const totalQuantity = invoice.items?.reduce((sum, item) => sum + (item.quantity || 0), 0) || 0;
+      
+      // Calculate actual VAT amount from items
+      const calculatedVatAmount = invoice.items?.reduce((sum, item) => {
+        if (item.isTaxable && item.taxRate > 0) {
+          const itemSubtotal = (item.quantity || 0) * (item.unitPrice || 0);
+          const itemTax = itemSubtotal * ((item.taxRate || 0) / 100);
+          return sum + itemTax;
+        }
+        return sum;
+      }, 0) || 0;
+      
+      return {
+        id: invoice.id,
+        invoiceNumber: invoice.invoiceNumber || 'N/A',
+        date: invoice.dateOfIssue || 'N/A',
+        dueDate: invoice.dueDate || 'N/A',
+        status: invoice.statusName || 'Unknown',
+        documentType: invoice.documentTypeName || 'Invoice',
+        customer: invoice.billTo || 'Unknown Client',
+        billToEmail: invoice.billToEmail || '-',
+        billToAddress: invoice.billToAddress || '-',
+        itemCount: itemCount,
+        items: invoice.itemsList || '', // Comma-separated items list
+        totalQuantity: totalQuantity,
+        subtotal: parseFloat(invoice.subTotal || 0),
+        vatAmount: parseFloat(calculatedVatAmount),
+        discountAmount: parseFloat(invoice.discountAmount || 0),
+        totalAmount: parseFloat(invoice.total || 0),
+        invoiceNotes: invoice.notes || ''
+      };
     });
   }
-  
-  return filteredInvoices;
 };
 
 // Get all available invoice statuses
@@ -222,7 +250,7 @@ export const getFinancialSummaryReport = async (startDate, endDate) => {
 };
 
 // Export report to PDF using backend Reports service
-export const exportReportToPDF = async (reportType, startDate, endDate, statusIds = [1,2,3,4], columns = []) => {
+export const exportReportToPDF = async (reportType, startDate, endDate, statusIds = [1,2,3,4], columns = [], groupBy = 'invoices') => {
   try {
     const params = new URLSearchParams();
     
@@ -250,6 +278,9 @@ export const exportReportToPDF = async (reportType, startDate, endDate, statusId
     if (columns && columns.length > 0) {
       columns.forEach(col => params.append('columns', col));
     }
+
+    // Add groupBy parameter
+    params.append('groupBy', groupBy);
 
     const response = await reportApi.get(`/api/Reports/logistics-pdf?${params.toString()}`, {
       responseType: 'blob',
@@ -282,7 +313,7 @@ export const exportReportToPDF = async (reportType, startDate, endDate, statusId
 };
 
 // Export report to Excel using backend Reports service
-export const exportReportToExcel = async (reportType, startDate, endDate, statusIds = [1,2,3,4], columns = []) => {
+export const exportReportToExcel = async (reportType, startDate, endDate, statusIds = [1,2,3,4], columns = [], groupBy = 'invoices') => {
   try {
     const params = new URLSearchParams();
     
@@ -310,6 +341,9 @@ export const exportReportToExcel = async (reportType, startDate, endDate, status
     if (columns && columns.length > 0) {
       columns.forEach(col => params.append('columns', col));
     }
+
+    // Add groupBy parameter
+    params.append('groupBy', groupBy);
 
     const response = await reportApi.get(`/api/Reports/logistics?${params.toString()}`, {
       responseType: 'blob',

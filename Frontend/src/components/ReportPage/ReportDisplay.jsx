@@ -119,9 +119,16 @@ const ReportDisplay = ({
       date: 'Invoice Date',
       dueDate: 'Due Date',
       status: 'Status',
+      documentType: 'Document Type',
       customer: 'Customer Name',
       billToEmail: 'Customer Email',
       billToAddress: 'Customer Address',
+      items: 'Items',
+      itemTitle: 'Item Title',
+      itemDescription: 'Item Description',
+      quantity: 'Quantity',
+      unitPrice: 'Unit Price',
+      lineTotal: 'Line Total',
       itemCount: 'Number of Items',
       totalQuantity: 'Total Quantity',
       subtotal: 'Subtotal',
@@ -195,6 +202,24 @@ const ReportDisplay = ({
             }}
           />
         );
+      case 'documentType':
+        return (
+          <Chip
+            label={invoice[columnId] || 'Invoice'}
+            size="small"
+            sx={{
+              backgroundColor: 'rgba(139, 92, 246, 0.1)',
+              color: '#8b5cf6',
+              fontWeight: 500,
+              fontSize: '0.8125rem',
+              letterSpacing: '-0.01em',
+              borderRadius: '8px',
+              height: '26px',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+              border: 'none'
+            }}
+          />
+        );
       case 'invoiceNotes':
         return (
           <Typography sx={{ 
@@ -208,6 +233,78 @@ const ReportDisplay = ({
             whiteSpace: 'nowrap'
           }}>
             {invoice[columnId] || '-'}
+          </Typography>
+        );
+      case 'items':
+        // Comma-separated items list (for groupBy=invoices)
+        return (
+          <Typography sx={{ 
+            fontWeight: 400,
+            color: '#1d1d1f',
+            fontSize: '0.875rem',
+            letterSpacing: '-0.01em',
+            maxWidth: '400px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+          }}>
+            {invoice[columnId] || '-'}
+          </Typography>
+        );
+      case 'itemTitle':
+        // Item title (for groupBy=items)
+        return (
+          <Typography sx={{ 
+            fontWeight: 500,
+            color: '#1d1d1f',
+            fontSize: '0.9375rem',
+            letterSpacing: '-0.01em'
+          }}>
+            {invoice[columnId] || '-'}
+          </Typography>
+        );
+      case 'itemDescription':
+        // Item description (for groupBy=items)
+        return (
+          <Typography sx={{ 
+            fontWeight: 400,
+            color: '#86868b',
+            fontSize: '0.875rem',
+            letterSpacing: '-0.01em',
+            maxWidth: '300px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+          }}>
+            {invoice[columnId] || '-'}
+          </Typography>
+        );
+      case 'quantity':
+        // Quantity (for groupBy=items)
+        return (
+          <Typography sx={{ 
+            fontVariantNumeric: 'tabular-nums',
+            fontWeight: 500,
+            color: '#1d1d1f',
+            fontSize: '0.9375rem',
+            letterSpacing: '-0.01em',
+            textAlign: 'center'
+          }}>
+            {invoice[columnId] || 0}
+          </Typography>
+        );
+      case 'unitPrice':
+      case 'lineTotal':
+        // Unit price and line total (for groupBy=items)
+        return (
+          <Typography sx={{ 
+            fontVariantNumeric: 'tabular-nums',
+            fontWeight: 500,
+            color: '#1d1d1f',
+            fontSize: '0.9375rem',
+            letterSpacing: '-0.01em'
+          }}>
+            {formatCurrency(invoice[columnId] || 0)}
           </Typography>
         );
       default:

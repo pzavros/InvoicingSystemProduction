@@ -324,20 +324,26 @@ const CompanyProfileSettings = () => {
       >
         {/* Left Side - Title and Description */}
         <Box>
-          <Typography
-            variant="h4"
-            component="h1"
-            sx={{
-              fontWeight: 700,
-              fontSize: { xs: '1.75rem', sm: '2rem' },
-              color: 'rgba(15, 23, 42, 0.95)',
-              letterSpacing: '-0.02em',
-              lineHeight: 1.1,
-              mb: 0.5
-            }}
-          >
-            Company Settings
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+            <Typography
+              variant="h4"
+              component="h1"
+              sx={{
+                fontWeight: 700,
+                fontSize: { xs: '1.75rem', sm: '2rem' },
+                color: 'rgba(15, 23, 42, 0.95)',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.1,
+              }}
+            >
+              Company Settings
+            </Typography>
+            <PageHelper 
+              inline={true}
+              compact={true}
+              {...pageHelpContent.systemSetup}
+            />
+          </Box>
           <Typography
             variant="body2"
             sx={{
@@ -1238,7 +1244,6 @@ const CompanyProfileSettings = () => {
         </Alert>
       </Snackbar>
       
-      <PageHelper {...pageHelpContent.systemSetup} />
     </Box>
     </>
   );

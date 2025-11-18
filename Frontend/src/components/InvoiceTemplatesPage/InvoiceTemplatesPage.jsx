@@ -593,20 +593,26 @@ const InvoiceTemplatesPage = () => {
         }}
       >
         <Box>
-          <Typography 
-            variant="h4" 
-            component="h1" 
-            sx={{ 
-              fontWeight: 700,
-              fontSize: { xs: '1.75rem', sm: '2rem' },
-              color: 'rgba(15, 23, 42, 0.95)',
-              letterSpacing: '-0.02em',
-              lineHeight: 1.1,
-              mb: 0.5
-            }}
-          >
-            Templates
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+            <Typography 
+              variant="h4" 
+              component="h1" 
+              sx={{ 
+                fontWeight: 700,
+                fontSize: { xs: '1.75rem', sm: '2rem' },
+                color: 'rgba(15, 23, 42, 0.95)',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.1,
+              }}
+            >
+              Templates
+            </Typography>
+            <PageHelper 
+              inline={true}
+              compact={true}
+              {...pageHelpContent.templates}
+            />
+          </Box>
           <Typography 
             variant="body2" 
             sx={{ 
@@ -1065,7 +1071,6 @@ const InvoiceTemplatesPage = () => {
         </Alert>
       </Snackbar>
       
-      <PageHelper {...pageHelpContent.templates} />
       <LoadingOverlay open={loading} message="Loading templates..." />
     </Box>
   );

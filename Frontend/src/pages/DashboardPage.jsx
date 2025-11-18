@@ -51,20 +51,27 @@ export default function DashboardPage() {
             }}
           >
             <Box>
-              <Typography
-                variant="h4"
-                component="h1"
-                sx={{
-                  fontWeight: 700,
-                  fontSize: { xs: '1.75rem', sm: '2rem' },
-                  color: 'rgba(15, 23, 42, 0.95)',
-                  letterSpacing: '-0.02em',
-                  lineHeight: 1.1,
-                  mb: 0.5
-                }}
-              >
-                Dashboard
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography
+                  variant="h4"
+                  component="h1"
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: { xs: '1.75rem', sm: '2rem' },
+                    color: 'rgba(15, 23, 42, 0.95)',
+                    letterSpacing: '-0.02em',
+                    lineHeight: 1.1,
+                    mb: 0.5
+                  }}
+                >
+                  Dashboard
+                </Typography>
+                <PageHelper 
+                  inline={true}
+                  compact={true}
+                  {...pageHelpContent.dashboard}
+                />
+              </Box>
               <Typography
                 variant="body2"
                 sx={{
@@ -269,8 +276,6 @@ export default function DashboardPage() {
             <ProductPerformance topCount={10} />
           </Box>
         </Box>
-      
-        <PageHelper {...pageHelpContent.dashboard} />
       </Container>
   );
 }

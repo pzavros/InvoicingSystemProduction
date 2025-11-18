@@ -41,14 +41,18 @@ namespace InvoicingBackend.Services
             }
 
             // 1) fetch matching invoices with their items and join with status - FILTERED BY USER
+            // Exclude deleted invoices and only include document types that count for logistics
             var invoicesWithStatus = await _db.Invoices
                 .Where(i =>
                     i.UserId == userId &&
+                    !i.IsDeleted &&
                     i.DateOfIssue.Date >= filter.From.Date &&
                     i.DateOfIssue.Date <= filter.To.Date &&
                     (i.StatusId == null || filter.StatusIds.Contains(i.StatusId.Value))
                 )
                 .Include(i => i.Items)
+                .Include(i => i.DocumentType)
+                .Where(i => i.DocumentType == null || i.DocumentType.CountsForLogistics) // Only logistics-relevant document types
                 .GroupJoin(_db.Statuses,
                     invoice => invoice.StatusId,
                     status => status.StatusId,
@@ -278,6 +282,7 @@ namespace InvoicingBackend.Services
                 ReportColumns.Customer => invoice.BillTo,
                 ReportColumns.ItemTitle => itemSummary,
                 ReportColumns.Status => statusName,
+                ReportColumns.DocumentType => invoice.DocumentType?.DisplayName ?? "Invoice",
                 ReportColumns.VatAmount => invoice.TaxAmount,
                 ReportColumns.DiscountAmount => invoiceDiscountTotal,
                 ReportColumns.TotalAmount => invoiceTotal,

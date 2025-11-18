@@ -38,6 +38,141 @@ namespace InvoicingBackend.Controllers
             _context = context;
         }
 
+        [HttpGet("logistics-data")]
+        [Produces("application/json")]
+        public async Task<IActionResult> GetLogisticsData([FromQuery] ReportFilterDto filter)
+        {
+            // Get the logged-in user's ID from the JWT token
+            var userIdClaim = User.FindFirst("userId") ?? User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+            {
+                return Unauthorized(new { message = "User not authenticated" });
+            }
+
+            try
+            {
+                // Ensure dates are in UTC for PostgreSQL
+                var fromDate = filter.From.Kind == DateTimeKind.Unspecified 
+                    ? DateTime.SpecifyKind(filter.From, DateTimeKind.Utc) 
+                    : filter.From.ToUniversalTime();
+                    
+                var toDate = filter.To.Kind == DateTimeKind.Unspecified 
+                    ? DateTime.SpecifyKind(filter.To, DateTimeKind.Utc) 
+                    : filter.To.ToUniversalTime();
+
+                // Fetch matching invoices with their items and status
+                // Exclude deleted invoices and only include document types that count for logistics
+                var invoices = await _context.Invoices
+                    .Where(i =>
+                        i.UserId == userId &&
+                        !i.IsDeleted &&
+                        i.DateOfIssue.Date >= fromDate.Date &&
+                        i.DateOfIssue.Date <= toDate.Date &&
+                        (i.StatusId == null || filter.StatusIds.Contains(i.StatusId.Value))
+                    )
+                    .Include(i => i.Items)
+                    .Include(i => i.Currency)
+                    .Include(i => i.DocumentType)
+                    .Where(i => i.DocumentType == null || i.DocumentType.CountsForLogistics)
+                    .ToListAsync();
+
+                // Get status names
+                var statusDict = await _context.Statuses.ToDictionaryAsync(s => s.StatusId, s => s.Name);
+
+                // Group by Invoices (default) or Items
+                if (filter.GroupBy?.ToLower() == "items")
+                {
+                    // Group by Items: One row per item
+                    var itemRows = invoices
+                        .SelectMany(invoice => invoice.Items.Select(item => new
+                        {
+                            InvoiceId = invoice.Id,
+                            invoice.InvoiceNumber,
+                            invoice.DateOfIssue,
+                            invoice.DueDate,
+                            invoice.BillTo,
+                            invoice.BillToEmail,
+                            invoice.BillToAddress,
+                            invoice.SubTotal,
+                            invoice.TaxAmount,
+                            invoice.DiscountAmount,
+                            invoice.Total,
+                            invoice.Notes,
+                            invoice.DocumentTypeId,
+                            DocumentTypeName = invoice.DocumentType != null ? invoice.DocumentType.DisplayName : "Invoice",
+                            StatusName = invoice.StatusId.HasValue && statusDict.ContainsKey(invoice.StatusId.Value) 
+                                ? statusDict[invoice.StatusId.Value] 
+                                : "No Status",
+                            invoice.StatusId,
+                            CurrencySymbol = invoice.Currency != null ? invoice.Currency.Symbol : "€",
+                            // Item-specific fields
+                            ItemId = item.Id,
+                            ItemTitle = item.Title,
+                            ItemDescription = item.Description,
+                            ItemQuantity = item.Quantity,
+                            ItemUnitPrice = item.UnitPrice,
+                            ItemTaxRate = item.TaxRate,
+                            ItemIsTaxable = item.IsTaxable,
+                            ItemLineTotal = item.Quantity * item.UnitPrice
+                        }))
+                        .OrderBy(x => x.InvoiceNumber)
+                        .ThenBy(x => x.ItemId)
+                        .ToList();
+
+                    return Ok(itemRows);
+                }
+                else
+                {
+                    // Group by Invoices: One row per invoice with items as comma-separated list
+                    var invoiceRows = invoices
+                        .Select(invoice => new
+                        {
+                            invoice.Id,
+                            invoice.InvoiceNumber,
+                            invoice.DateOfIssue,
+                            invoice.DueDate,
+                            invoice.BillTo,
+                            invoice.BillToEmail,
+                            invoice.BillToAddress,
+                            invoice.SubTotal,
+                            invoice.TaxAmount,
+                            invoice.DiscountAmount,
+                            invoice.Total,
+                            invoice.Notes,
+                            invoice.DocumentTypeId,
+                            DocumentTypeName = invoice.DocumentType != null ? invoice.DocumentType.DisplayName : "Invoice",
+                            StatusName = invoice.StatusId.HasValue && statusDict.ContainsKey(invoice.StatusId.Value) 
+                                ? statusDict[invoice.StatusId.Value] 
+                                : "No Status",
+                            invoice.StatusId,
+                            CurrencySymbol = invoice.Currency != null ? invoice.Currency.Symbol : "€",
+                            ItemCount = invoice.Items.Count,
+                            // Items as comma-separated list
+                            ItemsList = string.Join(", ", invoice.Items.Select(item => item.Title)),
+                            Items = invoice.Items.Select(item => new
+                            {
+                                item.Id,
+                                item.Title,
+                                item.Description,
+                                item.Quantity,
+                                item.UnitPrice,
+                                item.TaxRate,
+                                item.IsTaxable
+                            }).ToList()
+                        })
+                        .OrderBy(x => x.InvoiceNumber)
+                        .ToList();
+
+                    return Ok(invoiceRows);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error generating logistics data");
+                return StatusCode(500, new { message = "Failed to retrieve logistics data", error = ex.Message });
+            }
+        }
+
         [HttpGet("logistics")]
         [Produces("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")]
         public async Task<IActionResult> GetLogistics([FromQuery] ReportFilterDto filter)
@@ -78,15 +213,19 @@ namespace InvoicingBackend.Controllers
                 }
 
                 // Fetch matching invoices with their items and status
+                // Exclude deleted invoices and only include document types that count for logistics
                 var invoicesWithStatus = await _context.Invoices
                     .Where(i =>
                         i.UserId == userId &&
+                        !i.IsDeleted &&
                         i.DateOfIssue.Date >= filter.From.Date &&
                         i.DateOfIssue.Date <= filter.To.Date &&
                         (i.StatusId == null || filter.StatusIds.Contains(i.StatusId.Value))
                     )
                     .Include(i => i.Items)
                     .Include(i => i.Currency)
+                    .Include(i => i.DocumentType)
+                    .Where(i => i.DocumentType == null || i.DocumentType.CountsForLogistics) // Only logistics-relevant document types
                     .GroupJoin(_context.Statuses,
                         invoice => invoice.StatusId,
                         status => status.StatusId,
@@ -379,6 +518,7 @@ namespace InvoicingBackend.Controllers
                     ReportColumns.BillToEmail => System.Net.WebUtility.HtmlEncode(invoice.BillToEmail?.ToString() ?? ""),
                     ReportColumns.BillToAddress => System.Net.WebUtility.HtmlEncode(invoice.BillToAddress?.ToString() ?? ""),
                     ReportColumns.Status => System.Net.WebUtility.HtmlEncode(statusName ?? ""),
+                    ReportColumns.DocumentType => System.Net.WebUtility.HtmlEncode(invoice.DocumentType?.DisplayName?.ToString() ?? "Invoice"),
                     ReportColumns.InvoiceNotes => System.Net.WebUtility.HtmlEncode(invoice.Notes?.ToString() ?? ""),
                     
                     // Item-level fields - show count or summary for invoice-level report

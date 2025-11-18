@@ -23,9 +23,16 @@ const ColumnSelector = ({ selectedColumns, onColumnsChange }) => {
     { id: 'date', label: 'Invoice Date' },
     { id: 'dueDate', label: 'Due Date' },
     { id: 'status', label: 'Status' },
+    { id: 'documentType', label: 'Document Type' },
     { id: 'customer', label: 'Customer Name' },
     { id: 'billToEmail', label: 'Customer Email' },
     { id: 'billToAddress', label: 'Customer Address' },
+    { id: 'items', label: 'Items' }, // For groupBy=invoices
+    { id: 'itemTitle', label: 'Item Title' }, // For groupBy=items
+    { id: 'itemDescription', label: 'Item Description' }, // For groupBy=items
+    { id: 'quantity', label: 'Quantity' }, // For groupBy=items
+    { id: 'unitPrice', label: 'Unit Price' }, // For groupBy=items
+    { id: 'lineTotal', label: 'Line Total' }, // For groupBy=items
     { id: 'itemCount', label: 'Number of Items' },
     { id: 'totalQuantity', label: 'Total Quantity' },
     { id: 'subtotal', label: 'Subtotal (Before Tax)' },

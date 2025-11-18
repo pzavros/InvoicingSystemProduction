@@ -49,6 +49,8 @@ import { Search as SearchIcon, Add as AddIcon, Edit as EditIcon, Delete as Delet
 import { getAllInvoices, deleteInvoice, getAllStatuses, updateBulkInvoiceStatus } from '../InvoicePage/api';
 import { getAllDocumentTypes } from '../DocumentTypePage/api';
 import LoadingOverlay from '../ReusableComponents/LoadingOverlay';
+import PageHelper from '../ReusableComponents/PageHelper';
+import { pageHelpContent } from '../../config/pageHelpContent';
 import { useDispatch } from 'react-redux';
 import { formatDate } from '../ReusableComponents/dateUtils';
 import UsageIndicator from '../SubscriptionPage/UsageIndicator';
@@ -674,20 +676,27 @@ export default function InvoiceList() {
         }}
       >
         <Box>
-          <Typography 
-            variant="h4" 
-            component="h1" 
-            sx={{ 
-              fontWeight: 700,
-              fontSize: { xs: '1.75rem', sm: '2rem' },
-              color: 'rgba(15, 23, 42, 0.95)',
-              letterSpacing: '-0.02em',
-              lineHeight: 1.1,
-              mb: 0.5
-            }}
-          >
-            Invoices
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography 
+              variant="h4" 
+              component="h1" 
+              sx={{ 
+                fontWeight: 700,
+                fontSize: { xs: '1.75rem', sm: '2rem' },
+                color: 'rgba(15, 23, 42, 0.95)',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.1,
+                mb: 0.5
+              }}
+            >
+              Invoices
+            </Typography>
+            <PageHelper 
+              inline={true}
+              compact={true}
+              {...pageHelpContent.home}
+            />
+          </Box>
           <Typography 
             variant="body2" 
             sx={{ 

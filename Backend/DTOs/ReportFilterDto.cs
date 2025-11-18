@@ -13,15 +13,20 @@ namespace InvoicingBackend.DTOs
         public DateTime To { get; set; }
 
         // binds both ?statusIds=3&statusIds=4 and ?statusIds=3,4
+        // Default: 1=Draft, 2=Unpaid, 3=Paid, 5=Overdue (exclude 4=Deleted)
         [FromQuery(Name = "statusIds")]
-        public List<int> StatusIds { get; set; } = new List<int> { 1,2,3, 4 };
+        public List<int> StatusIds { get; set; } = new List<int> { 1, 2, 3, 5 };
 
         // Column selection for the report - binds both ?columns=invoiceNumber&columns=date and ?columns=invoiceNumber,date
         [FromQuery(Name = "columns")]
         public List<string> SelectedColumns { get; set; } = new List<string> 
         { 
-            "invoiceNumber", "date", "customer", "itemTitle", "status", "vatAmount", "discountAmount", "totalAmount" 
+            "invoiceNumber", "date", "customer", "itemTitle", "status", "documentType", "vatAmount", "discountAmount", "totalAmount" 
         };
+
+        // Grouping option: "invoices" (default) or "items"
+        [FromQuery(Name = "groupBy")]
+        public string GroupBy { get; set; } = "invoices";
     }
 
     public static class ReportColumns
@@ -29,8 +34,10 @@ namespace InvoicingBackend.DTOs
         public const string InvoiceNumber = "invoiceNumber";
         public const string Date = "date";
         public const string Customer = "customer";
+        public const string Items = "items"; // All items in comma-separated format (for groupBy=invoices)
         public const string ItemTitle = "itemTitle";
         public const string Status = "status";
+        public const string DocumentType = "documentType";
         public const string VatAmount = "vatAmount";
         public const string DiscountAmount = "discountAmount";
         public const string TotalAmount = "totalAmount";
@@ -48,8 +55,10 @@ namespace InvoicingBackend.DTOs
             { InvoiceNumber, "Invoice #" },
             { Date, "Date" },
             { Customer, "Customer" },
+            { Items, "Items" }, // Comma-separated items (for groupBy=invoices)
             { ItemTitle, "Item Title" },
             { Status, "Status" },
+            { DocumentType, "Document Type" },
             { VatAmount, "VAT Amount" },
             { DiscountAmount, "Discount Amount" },
             { TotalAmount, "Total Amount (EUR)" },

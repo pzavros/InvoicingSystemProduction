@@ -148,20 +148,26 @@ const ProductCatalogPage = () => {
         }}
       >
         <Box>
-          <Typography 
-            variant="h4" 
-            component="h1" 
-            sx={{ 
-              fontWeight: 700,
-              fontSize: { xs: '1.75rem', sm: '2rem' },
-              color: 'rgba(15, 23, 42, 0.95)',
-              letterSpacing: '-0.02em',
-              lineHeight: 1.1,
-              mb: 0.5
-            }}
-          >
-            Products
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+            <Typography 
+              variant="h4" 
+              component="h1" 
+              sx={{ 
+                fontWeight: 700,
+                fontSize: { xs: '1.75rem', sm: '2rem' },
+                color: 'rgba(15, 23, 42, 0.95)',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.1,
+              }}
+            >
+              Products
+            </Typography>
+            <PageHelper 
+              inline={true}
+              compact={true}
+              {...pageHelpContent.products}
+            />
+          </Box>
           <Typography 
             variant="body2" 
             sx={{ 
@@ -517,7 +523,6 @@ const ProductCatalogPage = () => {
         </Alert>
       </Snackbar>
       
-      <PageHelper {...pageHelpContent.products} />
       <LoadingOverlay open={loading} message="Loading products..." />
     </Box>
   );

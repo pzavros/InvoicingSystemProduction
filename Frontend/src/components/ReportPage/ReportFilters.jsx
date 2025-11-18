@@ -509,6 +509,57 @@ const ReportFilters = ({ filters, onFiltersChange, onRunReport, loading }) => {
           </FormControl>
         </Grid>
 
+        <Grid item xs={12} sm={6} md={2.5}>
+          <FormControl fullWidth size="small">
+            <InputLabel sx={{
+              color: '#86868b',
+              fontWeight: 500,
+              fontSize: '0.875rem',
+              letterSpacing: '-0.01em',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+              '&.Mui-focused': {
+                color: '#86868b'
+              }
+            }}>
+              Group By
+            </InputLabel>
+            <Select
+              value={filters.groupBy || 'invoices'}
+              onChange={(e) => handleFilterChange('groupBy', e.target.value)}
+              label="Group By"
+              sx={{
+                backgroundColor: 'white',
+                borderRadius: '10px',
+                fontSize: '0.875rem',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif',
+                letterSpacing: '-0.01em',
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#d1d1d6',
+                  borderWidth: '1px'
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#86868b'
+                },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#86868b',
+                  borderWidth: '2px'
+                },
+                '& .MuiSelect-select': {
+                  padding: '8px 12px',
+                  fontWeight: 400
+                }
+              }}
+            >
+              <MenuItem value="invoices" sx={{ fontSize: '0.875rem', fontWeight: 400 }}>
+                Invoices
+              </MenuItem>
+              <MenuItem value="items" sx={{ fontSize: '0.875rem', fontWeight: 400 }}>
+                Items
+              </MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+
         <Grid item xs={12} sm={6} md={2}>
           <Button
             variant="contained"
