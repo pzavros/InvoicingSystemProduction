@@ -1233,7 +1233,7 @@ const InvoiceForm = () => {
                     lineHeight: 1.1,
                   }}
                 >
-                  {isEdit ? "Edit Invoice" : isCopy ? "Copy Invoice" : "Create Invoice"}
+                  {isEdit ? "Edit Invoice" : "Create Invoice"}
                 </Typography>
                 <PageHelper 
                   inline={true}
